@@ -112,4 +112,8 @@ def apply_projection(dataset, projection, label):
 
 
 if __name__ == '__main__':
+    # example command:
+    # > python -m serotiny.steps.apply_projection \
+    #     --projection "{'channels': ['membrane', 'structure', 'dna'], 'masks': {'membrane': 'membrane_segmentation', 'dna': 'nucleus_segmentation'}, 'axis': 'Y', 'method': 'max', 'output': '/allen/aics/modeling/spanglry/data/mitotic-classifier/projections/'}"
+
     fire.Fire(apply_projection)
