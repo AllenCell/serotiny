@@ -56,4 +56,10 @@ def merge_data(
 
 
 if __name__ == '__main__':
+    # example command:
+    # > python -m serotiny.steps.merge_data \
+    #     --dataset_paths "['data/draft_plus_human_mito_annotations.csv', 'data/manifest.csv']" \
+    #     --manifest_path "out.csv" \
+    #     --merge_datasets "[{'on': ['CellId', 'FOVId', 'CellIndex']}]"
+
     fire.Fire(merge_data)
