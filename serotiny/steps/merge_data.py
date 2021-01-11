@@ -54,26 +54,6 @@ def merge_data(
 
     return manifest_path
 
-def main(
-        datasets=None,
-        manifest=None,
-        required=None,
-        merge=None):
-
-    require(datasets, '--datasets argument must be supplied')
-    require(manifest, '--manifest argument must be supplied')
-
-    # dataset_paths = unjson(datasets)
-    required_fields = unjson(required)
-    # merge_datasets = unjson(merge)
-
-    return merge_data(
-        datasets,
-        # dataset_paths,
-        manifest,
-        required_fields,
-        # merge_datasets,
-        merge)
 
 if __name__ == '__main__':
-    fire.Fire(main)
+    fire.Fire(merge_data)
