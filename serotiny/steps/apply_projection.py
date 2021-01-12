@@ -114,6 +114,11 @@ def apply_projection(dataset, projection, label):
 if __name__ == '__main__':
     # example command:
     # > python -m serotiny.steps.apply_projection \
+    #     --dataset "data/manifest_merged.csv" \
     #     --projection "{'channels': ['membrane', 'structure', 'dna'], 'masks': {'membrane': 'membrane_segmentation', 'dna': 'nucleus_segmentation'}, 'axis': 'Y', 'method': 'max', 'output': '/allen/aics/modeling/spanglry/data/mitotic-classifier/projections/'}"
+    #     --path_3d_column "CellImage3DPath"
+    #     --chosen_projection "Chosen2DProjectionPath"
+    #     --chosen_class "ChosenMitoticClass"
+    #     --label "DraftMitoticStateResolved"
 
     fire.Fire(apply_projection)
