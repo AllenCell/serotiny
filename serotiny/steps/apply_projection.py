@@ -23,6 +23,7 @@ log = logging.getLogger(__name__)
 
 
 def find_projection_path(projection):
+    axis = projection["axis"]
     channels = projection["channels"]
     method = projection["method"]
     masks = projection.get("masks", {})
@@ -45,16 +46,14 @@ def apply_projection(
         output_path,
         projection,
         path_3d_column: str,
-        chosen_column: str,
+        chosen_projection: str,
         chosen_class=None,
         label=None,
         executor_address: Optional[str] = None
     ):
 
-        dataset = load_csv(dataset, [])
-
+        dataset = load_csv(dataset_path, [])
         axis = projection["axis"]
-        # chosen = DatasetFields.Chosen2DProjectionPath
 
         def find_dimensions(png_path):
             data = png_loader(png_path)
@@ -97,7 +96,6 @@ def apply_projection(
 
             if not path_2d.exists():
                 # calculate the chosen projection and save
-                # project_2d(path_3d, axis, method, path_2d, channels)
                 projections.append((path_3d, path_2d))
 
         # add the new column of projected images to the dataset
