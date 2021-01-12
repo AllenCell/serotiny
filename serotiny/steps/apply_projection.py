@@ -52,73 +52,75 @@ def apply_projection(
         executor_address: Optional[str] = None
     ):
 
-        dataset = load_csv(dataset_path, [])
-        axis = projection["axis"]
+     print(f'applying projection {projection}')
 
-        def find_dimensions(png_path):
-            data = png_loader(png_path)
-            return tuple(data.shape[-2:])
+     dataset = load_csv(dataset_path, [])
+     axis = projection["axis"]
 
-        channels = projection["channels"]
-        method = projection["method"]
-        masks = projection.get("masks", {})
-        out_path = Path(projection["output"])
+     def find_dimensions(png_path):
+         data = png_loader(png_path)
+         return tuple(data.shape[-2:])
 
-        # find the right projection
-        projection_path = find_projection_path(projection)
+     channels = projection["channels"]
+     method = projection["method"]
+     masks = projection.get("masks", {})
+     out_path = Path(projection["output"])
 
-        out_images = []
-        projections = []
+     # find the right projection
+     projection_path = find_projection_path(projection)
 
-        for path in dataset[path_3d_column]:
-            # get the 3d image path
-            path_3d = Path(path)
-            full_name = path_3d.name
+     out_images = []
+     projections = []
 
-            # get the root image name
-            image, tiff = os.path.splitext(full_name)
-            image, ome = os.path.splitext(image)
+     for path in dataset[path_3d_column]:
+         # get the 3d image path
+         path_3d = Path(path)
+         full_name = path_3d.name
 
-            # save the 2d path with the same name as the 3d path
-            projection_dir = out_path / projection_path
-            projection_dir.mkdir(parents=True, exist_ok=True)
-            path_2d = projection_dir / f"{image}.png"
-            out_images.append(str(path_2d))
+         # get the root image name
+         image, tiff = os.path.splitext(full_name)
+         image, ome = os.path.splitext(image)
 
-            if not path_2d.exists():
-                # calculate the chosen projection and save
-                projections.append((path_3d, path_2d))
+         # save the 2d path with the same name as the 3d path
+         projection_dir = out_path / projection_path
+         projection_dir.mkdir(parents=True, exist_ok=True)
+         path_2d = projection_dir / f"{image}.png"
+         out_images.append(str(path_2d))
 
-        # add the new column of projected images to the dataset
-        dataset[chosen_projection] = out_images
+         if not path_2d.exists():
+             # calculate the chosen projection and save
+             projections.append((path_3d, path_2d))
 
-        # if we have any projections to compute use the distributed handler
-        if projections:
-            with DistributedHandler(executor_address) as handler:
-                handler.batched_map(
-                    project_2d,
-                    [paths[0] for paths in projections],
-                    [axis for _ in range(len(projections))],
-                    [method for _ in range(len(projections))],
-                    [paths[1] for paths in projections],
-                    [channels for _ in range(len(projections))],
-                    [masks for _ in range(len(projections))],
-                )
+     # add the new column of projected images to the dataset
+     dataset[chosen_projection] = out_images
 
-        dimensions = find_dimensions(dataset[chosen_projection][0])
+     # if we have any projections to compute use the distributed handler
+     if projections:
+         with DistributedHandler(executor_address) as handler:
+             handler.batched_map(
+                 project_2d,
+                 [paths[0] for paths in projections],
+                 [axis for _ in range(len(projections))],
+                 [method for _ in range(len(projections))],
+                 [paths[1] for paths in projections],
+                 [channels for _ in range(len(projections))],
+                 [masks for _ in range(len(projections))],
+             )
 
-        if chosen_class and label:
-            dataset[chosen_class] = dataset[label]
+     dimensions = find_dimensions(dataset[chosen_projection][0])
 
-        dataset.to_csv(output_path, index=False)
+     if chosen_class and label:
+         dataset[chosen_class] = dataset[label]
 
-        result = {
-            "projection_path": projection_path,
-            "manifest": output_path,
-            "dimensions": dimensions}
+     dataset.to_csv(output_path, index=False)
 
-        print result
-        return result
+     result = {
+         "projection_path": projection_path,
+         "manifest": output_path,
+         "dimensions": dimensions}
+
+     print(result)
+     return result
 
 
 if __name__ == '__main__':
