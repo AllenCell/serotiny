@@ -62,18 +62,9 @@ def apply_projection(
         channels = projection["channels"]
         method = projection["method"]
         masks = projection.get("masks", {})
+        out_path = Path(projection["output"])
 
-        # # find the right projection
-        # out_path = Path(projection["output"])
-        # channel_str = ".".join(channels)
-        # projection_path = f"{axis}.{method}.{channel_str}"
-        # if masks:
-        #     mask_paths = [
-        #         f"{channel}-{mask}" for channel, mask in masks.items()
-        #     ]
-        #     mask_path = ".".join(mask_paths)
-        #     projection_path += f".{mask_path}"
-
+        # find the right projection
         projection_path = find_projection_path(projection)
 
         out_images = []
@@ -99,7 +90,7 @@ def apply_projection(
                 projections.append((path_3d, path_2d))
 
         # add the new column of projected images to the dataset
-        dataset[chosen_path] = out_images
+        dataset[chosen_projection] = out_images
 
         # if we have any projections to compute use the distributed handler
         if projections:
@@ -114,7 +105,7 @@ def apply_projection(
                     [masks for _ in range(len(projections))],
                 )
 
-        dimensions = find_dimensions(dataset[chosen_path][0])
+        dimensions = find_dimensions(dataset[chosen_projection][0])
 
         if chosen_class and label:
             dataset[chosen_class] = dataset[label]
