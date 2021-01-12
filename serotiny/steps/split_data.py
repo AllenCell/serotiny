@@ -1,19 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import fire
 import logging
+
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 from sklearn.model_selection import train_test_split
 
 import pandas as pd
 
-from datastep import Step, log_run_params
-
-from ..project_2d import Project2D
-from ...constants import DatasetFields
-from ...library.csv import load_csv
-from ...library.data import append_one_hot
+from ..library.csv import load_csv
+from ..library.data import append_one_hot
 
 ###############################################################################
 
@@ -39,7 +37,10 @@ def split_data(
     """
     """
 
-    dataset = load_csv(dataset, required_fields)
+    if required_fields is None:
+        required_fields = {}
+
+    dataset = load_csv(dataset_path, required_fields)
     dataset.dropna(inplace=True)
     dataset, one_hot_len = append_one_hot(
         dataset, class_column, id_column)
@@ -96,7 +97,7 @@ def split_data(
 if __name__ == '__main__':
     # example command:
     # python -m serotiny.steps.split_data \
-    #     --dataset_path "data/projections.csv" \
+    #     --dataset_path "data/projection.csv" \
     #     --output_path "data/splits/" \
     #     --class_column "ChosenMitoticClass" \
     #     --id_column "CellId" \
