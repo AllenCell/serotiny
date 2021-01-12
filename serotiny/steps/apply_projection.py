@@ -22,9 +22,27 @@ log = logging.getLogger(__name__)
 ###############################################################################
 
 
+def find_projection_path(projection):
+    channels = projection["channels"]
+    method = projection["method"]
+    masks = projection.get("masks", {})
+
+    # find the right projection
+    out_path = Path(projection["output"])
+    channel_str = ".".join(channels)
+    projection_path = f"{axis}.{method}.{channel_str}"
+    if masks:
+        mask_paths = [
+            f"{channel}-{mask}" for channel, mask in masks.items()
+        ]
+        mask_path = ".".join(mask_paths)
+        projection_path += f".{mask_path}"
+
+    return projection_path
+
 def apply_projection(
-        self,
-        dataset: Union[str, Path, pd.DataFrame],
+        dataset_path,
+        output_path,
         projection,
         path_3d_column: str,
         chosen_column: str,
@@ -46,16 +64,18 @@ def apply_projection(
         method = projection["method"]
         masks = projection.get("masks", {})
 
-        # find the right projection
-        out_path = Path(projection["output"])
-        channel_str = ".".join(channels)
-        projection_path = f"{axis}.{method}.{channel_str}"
-        if masks:
-            mask_paths = [
-                f"{channel}-{mask}" for channel, mask in masks.items()
-            ]
-            mask_path = ".".join(mask_paths)
-            projection_path += f".{mask_path}"
+        # # find the right projection
+        # out_path = Path(projection["output"])
+        # channel_str = ".".join(channels)
+        # projection_path = f"{axis}.{method}.{channel_str}"
+        # if masks:
+        #     mask_paths = [
+        #         f"{channel}-{mask}" for channel, mask in masks.items()
+        #     ]
+        #     mask_path = ".".join(mask_paths)
+        #     projection_path += f".{mask_path}"
+
+        projection_path = find_projection_path(projection)
 
         out_images = []
         projections = []
@@ -101,20 +121,19 @@ def apply_projection(
         if chosen_class and label:
             dataset[chosen_class] = dataset[label]
 
-        self.manifest = dataset
-
-        manifest_save_path = self.step_local_staging_dir / "manifest.csv"
-        self.manifest.to_csv(manifest_save_path, index=False)
+        dataset.to_csv(output_path, index=False)
 
         return {
-            "manifest": manifest_save_path,
+            "projection_path": projection_path,
+            "manifest": output_path,
             "dimensions": dimensions}
 
 
 if __name__ == '__main__':
     # example command:
     # python -m serotiny.steps.apply_projection \
-    #     --dataset "data/manifest_merged.csv" \
+    #     --dataset_path "data/manifest_merged.csv" \
+    #     --output_path "data/projection.csv" \
     #     --projection "{'channels': ['membrane', 'structure', 'dna'], 'masks': {'membrane': 'membrane_segmentation', 'dna': 'nucleus_segmentation'}, 'axis': 'Y', 'method': 'max', 'output': '/allen/aics/modeling/spanglry/data/mitotic-classifier/projections/'}" \
     #     --path_3d_column "CellImage3DPath" \
     #     --chosen_projection "Chosen2DProjectionPath" \
