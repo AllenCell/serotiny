@@ -112,10 +112,13 @@ def apply_projection(
 
         dataset.to_csv(output_path, index=False)
 
-        return {
+        result = {
             "projection_path": projection_path,
             "manifest": output_path,
             "dimensions": dimensions}
+
+        print result
+        return result
 
 
 if __name__ == '__main__':
@@ -127,6 +130,6 @@ if __name__ == '__main__':
     #     --path_3d_column "CellImage3DPath" \
     #     --chosen_projection "Chosen2DProjectionPath" \
     #     --chosen_class "ChosenMitoticClass" \
-    #     --label "DraftMitoticStateResolved"
+    #     --label "Draft mitotic state resolved"
 
     fire.Fire(apply_projection)
