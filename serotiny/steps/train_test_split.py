@@ -28,73 +28,78 @@ REQUIRED_DATASET_FIELDS = [
 ]
 
 
-class TrainTestSplit(Step):
-    def __init__(
-        self,
-        direct_upstream_tasks: List["Step"] = [Project2D],
-        config: Optional[Union[str, Path, Dict[str, str]]] = None,
-    ):
-        super().__init__(direct_upstream_tasks=direct_upstream_tasks, config=config)
+def split_data(
+        dataset_path: str,
+        output_path: str,
+        class_column: str,
+        id_column,
+        ratios=None,
+        required_fields=None):
 
-    @log_run_params
-    def run(
-        self,
-        dataset: Union[str, Path, pd.DataFrame],
-        **kwargs,
-    ):
-        """
-        Run a pure function.
+    """
+    """
 
-        Protected Parameters
-        --------------------
-        distributed_executor_address: Optional[str]
-            An optional executor address to pass to some computation engine.
-        clean: bool
-            Should the local staging directory be cleaned prior to this run.
-            Default: False (Do not clean)
-        debug: bool
-            A debug flag for the developer to use to manipulate how much data runs,
-            how it is processed, etc.
-            Default: False (Do not debug)
+    dataset = load_csv(dataset, required_fields)
+    dataset.dropna(inplace=True)
+    dataset, one_hot_len = append_one_hot(
+        dataset, class_column, id_column)
 
-        Parameters
-        ----------
+    if ratios is None:
+        ratios = {
+            'train': 0.6,
+            'test': 0.2,
+            'valid': 0.2}
 
-        Returns
-        -------
-        result: Any
-            A pickable object or value that is the result of any processing you do.
-        """
-        dataset = load_csv(dataset, REQUIRED_DATASET_FIELDS)
-        dataset.dropna(inplace=True)
-        dataset, one_hot_len = append_one_hot(
-            dataset, DatasetFields.ChosenMitoticClass, "CellId"
-        )
+    indexes = {}
+    remaining_portion = 1.0
+    remaining_data = dataset.index
 
-        # split dataset into train, test and validtion subsets
-        # TODO: make split ratio a parameter (currently 0.2)
-        indexes = {}
-        index_train_valid, indexes["test"] = train_test_split(
-            dataset.index, test_size=0.2
-        )
-        indexes["train"], indexes["valid"] = train_test_split(
-            dataset.loc[index_train_valid, :].index
-        )
+    for key, portion in list(ratios.items())[:-1]:
+        this_portion = portion / remaining_portion
+        remaining_portion -= portion
+        remaining_data, indexes[key] = train_test_split(
+            dataset.loc[remaining_data, :].index, test_size=this_portion)
 
-        # index split datasets
-        datasets = {
-            key: pd.DataFrame(dataset.loc[index, :].reset_index(drop=True))
-            for key, index in indexes.items()
-        }
+    indexes[list(ratios.keys())[-1]] = remaining_data
 
-        dataset_paths = {}
+    # # split dataset into train, test and validtion subsets
+    # # TODO: make split ratio a parameter (currently 0.2)
+    # indexes = {}
+    # index_train_valid, indexes["test"] = train_test_split(
+    #     dataset.index, test_size=0.2
+    # )
+    # indexes["train"], indexes["valid"] = train_test_split(
+    #     dataset.loc[index_train_valid, :].index
+    # )
 
-        # save a dataloader for each dataset
-        for split, dataset in datasets.items():
-            save_path = self.step_local_staging_dir / f"dataset_{split}.csv"
-            dataset.to_csv(save_path, index=False)
-            dataset_paths[split] = str(save_path)
+    # index split datasets
+    datasets = {
+        key: pd.DataFrame(dataset.loc[index, :].reset_index(drop=True))
+        for key, index in indexes.items()
+    }
 
-        output = {"dataset_paths": dataset_paths, "one_hot_len": one_hot_len}
+    # save a dataloader for each dataset
+    dataset_paths = {}
+    for split, dataset in datasets.items():
+        save_path = Path(output_path) / f"{split}.csv"
+        dataset.to_csv(save_path, index=False)
+        dataset_paths[split] = str(save_path)
 
-        return output
+    output = {
+        "dataset_paths": dataset_paths,
+        "one_hot_len": one_hot_len}
+
+    print(output)
+    return output
+
+
+if __name__ == '__main__':
+    # example command:
+    # python -m serotiny.steps.split_data \
+    #     --dataset_path "data/projections.csv" \
+    #     --output_path "data/splits/" \
+    #     --class_column "ChosenMitoticClass" \
+    #     --id_column "CellId" \
+    #     --ratios "{'train': 0.7, 'test': 0.2, 'valid': 0.1}"
+
+    fire.Fire(split_data)
