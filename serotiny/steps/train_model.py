@@ -241,7 +241,7 @@ class TrainModel(Step):
             verbose=True,
         )
 
-        early_stopping = EarlyStopping('val_loss')
+        early_stopping = EarlyStopping("val_loss")
 
         # Initialize a trainer
         trainer = pl.Trainer(

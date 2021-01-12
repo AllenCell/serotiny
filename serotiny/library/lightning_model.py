@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 import pytorch_lightning as pl
+
 # from pytorch_lightning.metrics import ConfusionMatrix
 from collections import OrderedDict
 from torch.nn import functional as F
@@ -151,28 +152,37 @@ class ClassificationModel(pl.LightningModule):
             self.classes = ("0", "1", "2", "3", "4")
 
         """Metrics"""
-        self.train_metrics = torch.nn.ModuleDict({'accuracy': pl.metrics.Accuracy(), 
-        'precision': pl.metrics.Precision(num_classes=5, average='macro'), 
-        'recall': pl.metrics.Recall(num_classes=5, average='macro'), 
-        'fbeta': pl.metrics.Fbeta(num_classes=5, average='macro'),
-        })
-        self.val_metrics = torch.nn.ModuleDict({'accuracy': pl.metrics.Accuracy(), 
-        'precision': pl.metrics.Precision(num_classes=5, average='macro'), 
-        'recall': pl.metrics.Recall(num_classes=5, average='macro'), 
-        'fbeta': pl.metrics.Fbeta(num_classes=5, average='macro')})
-        self.test_metrics = torch.nn.ModuleDict({'accuracy': pl.metrics.Accuracy(), 
-        'precision': pl.metrics.Precision(num_classes=5, average='macro'), 
-        'recall': pl.metrics.Recall(num_classes=5, average='macro'), 
-        'fbeta': pl.metrics.Fbeta(num_classes=5, average='macro')})
+        self.train_metrics = torch.nn.ModuleDict(
+            {
+                "accuracy": pl.metrics.Accuracy(),
+                "precision": pl.metrics.Precision(num_classes=5, average="macro"),
+                "recall": pl.metrics.Recall(num_classes=5, average="macro"),
+                "fbeta": pl.metrics.Fbeta(num_classes=5, average="macro"),
+            }
+        )
+        self.val_metrics = torch.nn.ModuleDict(
+            {
+                "accuracy": pl.metrics.Accuracy(),
+                "precision": pl.metrics.Precision(num_classes=5, average="macro"),
+                "recall": pl.metrics.Recall(num_classes=5, average="macro"),
+                "fbeta": pl.metrics.Fbeta(num_classes=5, average="macro"),
+            }
+        )
+        self.test_metrics = torch.nn.ModuleDict(
+            {
+                "accuracy": pl.metrics.Accuracy(),
+                "precision": pl.metrics.Precision(num_classes=5, average="macro"),
+                "recall": pl.metrics.Recall(num_classes=5, average="macro"),
+                "fbeta": pl.metrics.Fbeta(num_classes=5, average="macro"),
+            }
+        )
 
     def _generate_logs(self, preds, true, prefix, metrics):
         _, preds_batch = torch.max(preds, 1)
         return {
             # f"{prefix}_loss": loss,
             **{
-                f"{prefix}_{key}": metrics[key](
-                    preds_batch, true
-                )
+                f"{prefix}_{key}": metrics[key](preds_batch, true)
                 for key in metrics.keys()
             },
         }
@@ -188,10 +198,10 @@ class ClassificationModel(pl.LightningModule):
         return output
 
     def training_step_end(self, outputs):
-        #update and log
+        # update and log
         logs = self._generate_logs(
-            outputs['preds'],
-            outputs['target'],
+            outputs["preds"],
+            outputs["target"],
             "train",
             self.train_metrics,
         )
@@ -200,9 +210,11 @@ class ClassificationModel(pl.LightningModule):
             # TODO configure outout logging
             self.log(key, value, on_step=True, on_epoch=True, prog_bar=True)
 
-        if outputs['batch_idx'] == 0:
-            _, preds_batch = torch.max(outputs['preds'], 1)
-            conf_mat = pl.metrics.functional.confusion_matrix(preds_batch, outputs['target'], num_classes=self.hparams.num_classes)
+        if outputs["batch_idx"] == 0:
+            _, preds_batch = torch.max(outputs["preds"], 1)
+            conf_mat = pl.metrics.functional.confusion_matrix(
+                preds_batch, outputs["target"], num_classes=self.hparams.num_classes
+            )
 
             fig, ax = plt.subplots(1, 1, figsize=(10, 10))
             sns.heatmap(
@@ -229,13 +241,13 @@ class ClassificationModel(pl.LightningModule):
 
         self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True)
 
-        return {'loss' : loss, 'preds' : yhat, 'target' : y, 'batch_idx': batch_idx}
+        return {"loss": loss, "preds": yhat, "target": y, "batch_idx": batch_idx}
 
     def validation_step_end(self, outputs):
-        #update and log
+        # update and log
         logs = self._generate_logs(
-            outputs['preds'],
-            outputs['target'],
+            outputs["preds"],
+            outputs["target"],
             "val",
             self.val_metrics,
         )
@@ -244,9 +256,11 @@ class ClassificationModel(pl.LightningModule):
             # TODO configure outout logging
             self.log(key, value, on_step=True, on_epoch=True, prog_bar=True)
 
-        if outputs['batch_idx'] == 0:
-            _, preds_batch = torch.max(outputs['preds'], 1)
-            conf_mat = pl.metrics.functional.confusion_matrix(preds_batch, outputs['target'], num_classes=self.hparams.num_classes)
+        if outputs["batch_idx"] == 0:
+            _, preds_batch = torch.max(outputs["preds"], 1)
+            conf_mat = pl.metrics.functional.confusion_matrix(
+                preds_batch, outputs["target"], num_classes=self.hparams.num_classes
+            )
 
             fig, ax = plt.subplots(1, 1, figsize=(10, 10))
             sns.heatmap(
@@ -273,13 +287,13 @@ class ClassificationModel(pl.LightningModule):
         loss = nn.CrossEntropyLoss()(yhat, y)
         self.log("val_loss", loss, on_step=True, on_epoch=True, prog_bar=True)
 
-        return {'val_loss' : loss, 'preds' : yhat, 'target' : y, 'batch_idx': batch_idx}
+        return {"val_loss": loss, "preds": yhat, "target": y, "batch_idx": batch_idx}
 
     def test_step_end(self, outputs):
-        #update and log
+        # update and log
         logs = self._generate_logs(
-            outputs['preds'],
-            outputs['target'],
+            outputs["preds"],
+            outputs["target"],
             "test",
             self.test_metrics,
         )
@@ -288,9 +302,11 @@ class ClassificationModel(pl.LightningModule):
             # TODO configure outout logging
             self.log(key, value, on_step=True, on_epoch=True, prog_bar=True)
 
-        if outputs['batch_idx'] == 0:
-            _, preds_batch = torch.max(outputs['preds'], 1)
-            conf_mat = pl.metrics.functional.confusion_matrix(preds_batch, outputs['target'], num_classes=self.hparams.num_classes)
+        if outputs["batch_idx"] == 0:
+            _, preds_batch = torch.max(outputs["preds"], 1)
+            conf_mat = pl.metrics.functional.confusion_matrix(
+                preds_batch, outputs["target"], num_classes=self.hparams.num_classes
+            )
 
             fig, ax = plt.subplots(1, 1, figsize=(10, 10))
             sns.heatmap(
@@ -312,7 +328,7 @@ class ClassificationModel(pl.LightningModule):
 
         self.log("test_loss", loss)
 
-        return {"test_loss": loss, 'preds' : yhat, 'target' : y, 'batch_idx': batch_idx}
+        return {"test_loss": loss, "preds": yhat, "target": y, "batch_idx": batch_idx}
 
     def validation_epoch_end(self, outputs):
         class_probs = []

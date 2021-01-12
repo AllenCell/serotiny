@@ -15,12 +15,9 @@ log = logging.getLogger(__name__)
 
 ###############################################################################
 
-def merge_data(
-        dataset_paths,
-        manifest_path,
-        required_fields=None,
-        merge_datasets=None):
-    '''
+
+def merge_data(dataset_paths, manifest_path, required_fields=None, merge_datasets=None):
+    """
     Load a list of dataset csv's, merge them, then write back out to csv.
 
     dataset_paths - list of paths to dataset csvs.
@@ -29,14 +26,12 @@ def merge_data(
     merge_datasets - list of options to merge successive datasets into a single dataset. As this is
         defined by an operation between two datasets, there is always (number of datasets - 1)
         elements in this list.
-    '''
-    
+    """
+
     if required_fields is None:
         required_fields = {}
 
-    datasets = [
-        load_csv(path, required_fields.get(path, {}))
-        for path in dataset_paths]
+    datasets = [load_csv(path, required_fields.get(path, {})) for path in dataset_paths]
 
     manifest = datasets[0]
 
@@ -55,7 +50,7 @@ def merge_data(
     return manifest_path
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # example command:
     # > python -m serotiny.steps.merge_data \
     #     --dataset_paths "['data/draft_plus_human_mito_annotations.csv', 'data/manifest.csv']" \
