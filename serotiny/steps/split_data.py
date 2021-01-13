@@ -20,12 +20,6 @@ log = logging.getLogger(__name__)
 ###############################################################################
 
 
-REQUIRED_DATASET_FIELDS = [
-    DatasetFields.Chosen2DProjectionPath,
-    DatasetFields.ChosenMitoticClass,
-]
-
-
 def split_data(
         dataset_path: str,
         output_path: str,
