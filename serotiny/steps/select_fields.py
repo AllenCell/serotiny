@@ -8,6 +8,8 @@ import logging
 import pandas as pd
 from pathlib import Path
 
+from ..library.csv import load_csv
+
 ###############################################################################
 
 log = logging.getLogger(__name__)
@@ -21,21 +23,18 @@ def select_fields(
     fields,
 ):
 
+    print(f"selecting {len(fields)} fields")
+
     dataset = load_csv(dataset_path, [])
     manifest = dataset[fields]
     manifest.to_csv(output_path, index=False)
 
-    print(result)
-    return result
-
-
-
 
 if __name__ == "__main__":
     # example command:
-    # python -m serotiny.steps.apply_projection \
-    #     --dataset_path "data/projections.csv" \
-    #     --output_path "data/filtered.csv" \
-    #     --fields "['DatasetFields.CellId', 'DatasetFields.CellIndex', 'DatasetFields.FOVId', 'DatasetFields.CellImage3DPath', 'DatasetFields.CellImage2DAllProjectionsPath', 'DatasetFields.CellImage2DYXProjectionPath', 'DatasetFields.SourceReadPath', 'DatasetFields.NucleusSegmentationReadPath', 'DatasetFields.MembraneSegmentationReadPath', 'DatasetFields.ChannelIndexDNA', 'DatasetFields.ChannelIndexMembrane', 'DatasetFields.ChannelIndexStructure', 'DatasetFields.ChannelIndexBrightfield', 'DatasetFields.ChannelIndexNucleusSegmentation', 'DatasetFields.ChannelIndexMembraneSegmentation', 'ChosenMitoticClass', 'Chosen2DProjectionPath']"
+    python -m serotiny.steps.select_fields \
+        --dataset_path "data/projection.csv" \
+        --output_path "data/filtered.csv" \
+        --fields "['CellId', 'CellIndex', 'FOVId', 'CellImage3DPath', 'CellImage2DAllProjectionsPath', 'CellImage2DYXProjectionPath', 'SourceReadPath', 'NucleusSegmentationReadPath', 'MembraneSegmentationReadPath', 'ChannelIndexDNA', 'ChannelIndexMembrane', 'ChannelIndexStructure', 'ChannelIndexBrightfield', 'ChannelIndexNucleusSegmentation', 'ChannelIndexMembraneSegmentation', 'ChosenMitoticClass', 'Chosen2DProjectionPath']"
 
     fire.Fire(select_fields)
