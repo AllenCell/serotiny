@@ -91,7 +91,7 @@ def split_data(
 if __name__ == '__main__':
     # example command:
     # python -m serotiny.steps.split_data \
-    #     --dataset_path "data/projection.csv" \
+    #     --dataset_path "data/filtered.csv" \
     #     --output_path "data/splits/" \
     #     --class_column "ChosenMitoticClass" \
     #     --id_column "CellId" \

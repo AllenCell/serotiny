@@ -29,11 +29,13 @@ def select_fields(
     return result
 
 
+
+
 if __name__ == "__main__":
     # example command:
     # python -m serotiny.steps.apply_projection \
-    #     --dataset_path "data/manifest_merged.csv" \
-    #     --output_path "data/manifest_filtered.csv" \
-    #     --fields "['ChosenMitoticClass']"
+    #     --dataset_path "data/projections.csv" \
+    #     --output_path "data/filtered.csv" \
+    #     --fields "['DatasetFields.CellId', 'DatasetFields.CellIndex', 'DatasetFields.FOVId', 'DatasetFields.CellImage3DPath', 'DatasetFields.CellImage2DAllProjectionsPath', 'DatasetFields.CellImage2DYXProjectionPath', 'DatasetFields.SourceReadPath', 'DatasetFields.NucleusSegmentationReadPath', 'DatasetFields.MembraneSegmentationReadPath', 'DatasetFields.ChannelIndexDNA', 'DatasetFields.ChannelIndexMembrane', 'DatasetFields.ChannelIndexStructure', 'DatasetFields.ChannelIndexBrightfield', 'DatasetFields.ChannelIndexNucleusSegmentation', 'DatasetFields.ChannelIndexMembraneSegmentation', 'ChosenMitoticClass', 'Chosen2DProjectionPath']"
 
     fire.Fire(select_fields)
