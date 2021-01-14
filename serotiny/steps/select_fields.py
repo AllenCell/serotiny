@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 import fire
 import logging
 
-import pandas as pd
-from pathlib import Path
+from ..library.csv import load_csv
 
 from ..library.csv import load_csv
 
@@ -32,6 +30,13 @@ if __name__ == "__main__":
     # python -m serotiny.steps.select_fields \
     #     --dataset_path "data/projection.csv" \
     #     --output_path "data/filtered.csv" \
-    #     --fields "['CellId', 'CellIndex', 'FOVId', 'CellImage3DPath', 'CellImage2DAllProjectionsPath', 'CellImage2DYXProjectionPath', 'SourceReadPath', 'NucleusSegmentationReadPath', 'MembraneSegmentationReadPath', 'ChannelIndexDNA', 'ChannelIndexMembrane', 'ChannelIndexStructure', 'ChannelIndexBrightfield', 'ChannelIndexNucleusSegmentation', 'ChannelIndexMembraneSegmentation', 'ChosenMitoticClass', 'Chosen2DProjectionPath']"
+    #     --fields "['CellId', 'CellIndex', 'FOVId', 'CellImage3DPath', \
+    # 'CellImage2DAllProjectionsPath', 'CellImage2DYXProjectionPath', \
+    # 'SourceReadPath', 'NucleusSegmentationReadPath', \
+    # 'MembraneSegmentationReadPath', 'ChannelIndexDNA', \
+    # 'ChannelIndexMembrane', 'ChannelIndexStructure', \
+    # 'ChannelIndexBrightfield', 'ChannelIndexNucleusSegmentation', \
+    # 'ChannelIndexMembraneSegmentation', 'ChosenMitoticClass', \
+    # 'Chosen2DProjectionPath']"
 
     fire.Fire(select_fields)

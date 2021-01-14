@@ -6,9 +6,7 @@ import fire
 import logging
 
 from pathlib import Path
-from typing import Dict, List, Optional, Union
-
-import pandas as pd
+from typing import Optional
 
 from aics_dask_utils import DistributedHandler
 
@@ -29,7 +27,6 @@ def find_projection_path(projection):
     masks = projection.get("masks", {})
 
     # find the right projection
-    out_path = Path(projection["output"])
     channel_str = ".".join(channels)
     projection_path = f"{axis}.{method}.{channel_str}"
     if masks:
@@ -134,7 +131,12 @@ if __name__ == "__main__":
     # python -m serotiny.steps.apply_projection \
     #     --dataset_path "data/manifest_merged.csv" \
     #     --output_path "data/projection.csv" \
-    #     --projection "{'channels': ['membrane', 'structure', 'dna'], 'masks': {'membrane': 'membrane_segmentation', 'dna': 'nucleus_segmentation'}, 'axis': 'Y', 'method': 'max', 'output': '/allen/aics/modeling/spanglry/data/mitotic-classifier/projections/'}" \
+    #     --projection "{'channels': ['membrane', 'structure', 'dna'],
+    # 'masks': 
+    # {'membrane': 'membrane_segmentation', 'dna': 'nucleus_segmentation'},
+    # 'axis': 'Y', 'method': 'max', 
+    # 'output': 
+    # '/allen/aics/modeling/spanglry/data/mitotic-classifier/projections/'}" \
     #     --path_3d_column "CellImage3DPath" \
     #     --chosen_projection "Chosen2DProjectionPath" \
     #     --chosen_class "ChosenMitoticClass" \

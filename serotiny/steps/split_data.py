@@ -6,7 +6,6 @@ import fire
 import logging
 
 from pathlib import Path
-from typing import Dict, List, Optional, Union
 from sklearn.model_selection import train_test_split
 
 import pandas as pd
