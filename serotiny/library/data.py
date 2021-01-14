@@ -28,6 +28,18 @@ def download_quilt_data(
         dataset_manifest.fetch(data_save_loc)
 
 
+def sample_classes(manifest, column, classes):
+    '''
+    Sample one of each class from the manifest.
+    '''
+
+    sample = {
+        key: manifest[manifest[column].isin([key])]
+        for key in classes}
+
+    return sample
+
+
 class DataframeDataset(Dataset):
     """general dataframe Dataset class"""
 
