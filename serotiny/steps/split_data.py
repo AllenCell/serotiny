@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import fire
 import logging
 
 from pathlib import Path
-from typing import Dict, List, Optional, Union
 from sklearn.model_selection import train_test_split
 
 import pandas as pd
@@ -29,6 +29,9 @@ def split_data(
         required_fields=None):
 
     """
+    Split the incoming data into N sets of output data, randomly
+    sampled according to the provided ratios. The output files will
+    be named after the keys for each ratio. 
     """
 
     if required_fields is None:
@@ -57,16 +60,6 @@ def split_data(
 
     indexes[list(ratios.keys())[-1]] = remaining_data
 
-    # # split dataset into train, test and validtion subsets
-    # # TODO: make split ratio a parameter (currently 0.2)
-    # indexes = {}
-    # index_train_valid, indexes["test"] = train_test_split(
-    #     dataset.index, test_size=0.2
-    # )
-    # indexes["train"], indexes["valid"] = train_test_split(
-    #     dataset.loc[index_train_valid, :].index
-    # )
-
     # index split datasets
     datasets = {
         key: pd.DataFrame(dataset.loc[index, :].reset_index(drop=True))
@@ -76,6 +69,8 @@ def split_data(
     # save a dataloader for each dataset
     dataset_paths = {}
     for split, dataset in datasets.items():
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
         save_path = Path(output_path) / f"{split}.csv"
         dataset.to_csv(save_path, index=False)
         dataset_paths[split] = str(save_path)
@@ -91,7 +86,7 @@ def split_data(
 if __name__ == '__main__':
     # example command:
     # python -m serotiny.steps.split_data \
-    #     --dataset_path "data/projection.csv" \
+    #     --dataset_path "data/filtered.csv" \
     #     --output_path "data/splits/" \
     #     --class_column "ChosenMitoticClass" \
     #     --id_column "CellId" \

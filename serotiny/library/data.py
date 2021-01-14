@@ -9,6 +9,8 @@ import multiprocessing as mp
 from sklearn.preprocessing import OneHotEncoder
 from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler
 from torch.utils.data.dataloader import default_collate as collate
+import torch
+from .image import png_loader
 
 
 def download_quilt_data(
@@ -51,6 +53,45 @@ class DataframeDataset(Dataset):
             else self._get_single_item(idx)
         )
         return sample
+
+
+class LoadId(object):
+    def __init__(self, id_fields):
+        self.id_fields = id_fields
+
+    def __call__(self, row):
+        return {key: row[key] for key in self.id_fields}
+
+
+class LoadClass(object):
+    def __init__(self, num_classes, binary=False):
+        self.num_classes = num_classes
+        self.binary = binary
+
+    def __call__(self, row):
+        if self.binary:
+            return torch.tensor([row[str(i)] for i in range(self.num_classes)])
+        else:
+            return torch.tensor(
+                row["ChosenMitoticClassInteger"],
+            )
+
+
+class LoadImage(object):
+    def __init__(self, chosen_label, num_channels, channel_indexes, transform):
+        self.chosen_label = chosen_label
+        self.num_channels = num_channels
+        self.channel_indexes = channel_indexes
+        self.transform = transform
+
+    def __call__(self, row):
+        return png_loader(
+            # DatasetFields.Chosen2DProjectionPath
+            row[self.chosen_label],
+            channel_order="CYX",
+            indexes={"C": self.channel_indexes or range(self.num_channels)},
+            transform=self.transform,
+        )
 
 
 def load_data_loader(

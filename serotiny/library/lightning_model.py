@@ -1,11 +1,8 @@
 import torch
 from torch import nn
 import pytorch_lightning as pl
-
-# from pytorch_lightning.metrics import ConfusionMatrix
 from collections import OrderedDict
 from torch.nn import functional as F
-from pytorch_lightning.metrics import functional as FM
 import matplotlib.pyplot as plt
 import numpy as np
 import torchvision.models as models
@@ -17,8 +14,10 @@ class BasicNeuralNetwork(nn.Module):
         super().__init__()
         self.network_name = "BasicNeuralNetwork"
         self.num_classes = num_classes
-        y, x = dimensions
-        self.layer_1 = torch.nn.Linear(x * y * num_channels, 128)
+        self.layer_1 = torch.nn.Linear(
+            dimensions[1] * dimensions[0] * num_channels, 
+            128
+        )
         self.layer_2 = torch.nn.Linear(128, 256)
         # TODO configure output dims as param
         self.layer_3 = torch.nn.Linear(256, num_classes)
@@ -78,7 +77,10 @@ class ResNet18Network(nn.Module):
         self.classifier = nn.Sequential(
             OrderedDict(
                 [
-                    ("fc1", nn.Linear(self.feature_extractor.fc.out_features, 100)),
+                    (
+                        "fc1",
+                        nn.Linear(self.feature_extractor.fc.out_features, 100)
+                    ),
                     ("relu", nn.ReLU()),
                     # TODO configure output number classes
                     ("fc2", nn.Linear(100, num_classes)),
@@ -97,7 +99,9 @@ class ResNet18Network(nn.Module):
 
 available_networks = {"basic": BasicNeuralNetwork, "resnet18": ResNet18Network}
 available_optimizers = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}
-available_schedulers = {"reduce_lr_plateau": torch.optim.lr_scheduler.ReduceLROnPlateau}
+available_schedulers = {
+    "reduce_lr_plateau": torch.optim.lr_scheduler.ReduceLROnPlateau
+}
 
 
 class ClassificationModel(pl.LightningModule):
@@ -131,7 +135,8 @@ class ClassificationModel(pl.LightningModule):
             self.activations = True
 
         hparams = {
-            symbol: getattr(self.hparams, symbol) for symbol in dir(self.hparams)
+            symbol: getattr(self.hparams, symbol)
+            for symbol in dir(self.hparams)
         }
         print(f"hyperparameters - {hparams}")
 
@@ -154,26 +159,32 @@ class ClassificationModel(pl.LightningModule):
         """Metrics"""
         self.train_metrics = torch.nn.ModuleDict(
             {
-                "accuracy": pl.metrics.Accuracy(),
-                "precision": pl.metrics.Precision(num_classes=5, average="macro"),
-                "recall": pl.metrics.Recall(num_classes=5, average="macro"),
-                "fbeta": pl.metrics.Fbeta(num_classes=5, average="macro"),
+                'accuracy': pl.metrics.Accuracy(),
+                'precision': pl.metrics.Precision(
+                    num_classes=5,
+                    average='macro'
+                ),
+                'recall': pl.metrics.Recall(num_classes=5, average='macro'),
             }
         )
         self.val_metrics = torch.nn.ModuleDict(
             {
-                "accuracy": pl.metrics.Accuracy(),
-                "precision": pl.metrics.Precision(num_classes=5, average="macro"),
-                "recall": pl.metrics.Recall(num_classes=5, average="macro"),
-                "fbeta": pl.metrics.Fbeta(num_classes=5, average="macro"),
+                'accuracy': pl.metrics.Accuracy(),
+                'precision': pl.metrics.Precision(
+                    num_classes=5,
+                    average='macro'
+                ), 
+                'recall': pl.metrics.Recall(num_classes=5, average='macro'),
             }
         )
-        self.test_metrics = torch.nn.ModuleDict(
+        self.test_metrics = torch.nn.ModuleDict(    
             {
-                "accuracy": pl.metrics.Accuracy(),
-                "precision": pl.metrics.Precision(num_classes=5, average="macro"),
-                "recall": pl.metrics.Recall(num_classes=5, average="macro"),
-                "fbeta": pl.metrics.Fbeta(num_classes=5, average="macro"),
+                'accuracy': pl.metrics.Accuracy(),
+                'precision': pl.metrics.Precision(
+                    num_classes=5,
+                    average='macro'
+                ),
+                'recall': pl.metrics.Recall(num_classes=5, average='macro'),
             }
         )
 
@@ -182,7 +193,9 @@ class ClassificationModel(pl.LightningModule):
         return {
             # f"{prefix}_loss": loss,
             **{
-                f"{prefix}_{key}": metrics[key](preds_batch, true)
+                f"{prefix}_{key}": metrics[key](
+                    preds_batch, true
+                )
                 for key in metrics.keys()
             },
         }
@@ -198,10 +211,9 @@ class ClassificationModel(pl.LightningModule):
         return output
 
     def training_step_end(self, outputs):
-        # update and log
         logs = self._generate_logs(
-            outputs["preds"],
-            outputs["target"],
+            outputs['preds'],
+            outputs['target'],
             "train",
             self.train_metrics,
         )
@@ -210,15 +222,20 @@ class ClassificationModel(pl.LightningModule):
             # TODO configure outout logging
             self.log(key, value, on_step=True, on_epoch=True, prog_bar=True)
 
-        if outputs["batch_idx"] == 0:
-            _, preds_batch = torch.max(outputs["preds"], 1)
+        if outputs['batch_idx'] == 0:
+            _, preds_batch = torch.max(outputs['preds'], 1)
             conf_mat = pl.metrics.functional.confusion_matrix(
-                preds_batch, outputs["target"], num_classes=self.hparams.num_classes
+                preds_batch,
+                outputs['target'],
+                num_classes=self.hparams.num_classes
             )
 
             fig, ax = plt.subplots(1, 1, figsize=(10, 10))
             sns.heatmap(
-                conf_mat.cpu(), cmap="RdBu_r", annot=True, ax=ax, annot_kws={"size": 8}
+                conf_mat.cpu(),
+                cmap="RdBu_r",
+                annot=True, ax=ax,
+                annot_kws={"size": 8}
             )
             self.logger.experiment.add_figure(
                 "Confusion matrix (train)",
@@ -239,15 +256,24 @@ class ClassificationModel(pl.LightningModule):
         # layer of network
         loss = nn.CrossEntropyLoss()(yhat, y)
 
-        self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True)
+        self.log(
+            "train_loss", loss,
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True
+        )
 
-        return {"loss": loss, "preds": yhat, "target": y, "batch_idx": batch_idx}
+        return {
+            'loss': loss,
+            'preds': yhat,
+            'target': y,
+            'batch_idx': batch_idx
+        }
 
     def validation_step_end(self, outputs):
-        # update and log
         logs = self._generate_logs(
-            outputs["preds"],
-            outputs["target"],
+            outputs['preds'],
+            outputs['target'],
             "val",
             self.val_metrics,
         )
@@ -256,15 +282,20 @@ class ClassificationModel(pl.LightningModule):
             # TODO configure outout logging
             self.log(key, value, on_step=True, on_epoch=True, prog_bar=True)
 
-        if outputs["batch_idx"] == 0:
-            _, preds_batch = torch.max(outputs["preds"], 1)
+        if outputs['batch_idx'] == 0:
+            _, preds_batch = torch.max(outputs['preds'], 1)
             conf_mat = pl.metrics.functional.confusion_matrix(
-                preds_batch, outputs["target"], num_classes=self.hparams.num_classes
+                preds_batch, 
+                outputs['target'], 
+                num_classes=self.hparams.num_classes
             )
 
             fig, ax = plt.subplots(1, 1, figsize=(10, 10))
             sns.heatmap(
-                conf_mat.cpu(), cmap="RdBu_r", annot=True, ax=ax, annot_kws={"size": 8}
+                conf_mat.cpu(), 
+                cmap="RdBu_r", 
+                annot=True, ax=ax, 
+                annot_kws={"size": 8}
             )
             self.logger.experiment.add_figure(
                 "Confusion matrix (val)",
@@ -287,13 +318,17 @@ class ClassificationModel(pl.LightningModule):
         loss = nn.CrossEntropyLoss()(yhat, y)
         self.log("val_loss", loss, on_step=True, on_epoch=True, prog_bar=True)
 
-        return {"val_loss": loss, "preds": yhat, "target": y, "batch_idx": batch_idx}
+        return {
+            'val_loss': loss,
+            'preds': yhat,
+            'target': y,
+            'batch_idx': batch_idx
+        }
 
     def test_step_end(self, outputs):
-        # update and log
         logs = self._generate_logs(
-            outputs["preds"],
-            outputs["target"],
+            outputs['preds'],
+            outputs['target'],
             "test",
             self.test_metrics,
         )
@@ -302,15 +337,21 @@ class ClassificationModel(pl.LightningModule):
             # TODO configure outout logging
             self.log(key, value, on_step=True, on_epoch=True, prog_bar=True)
 
-        if outputs["batch_idx"] == 0:
-            _, preds_batch = torch.max(outputs["preds"], 1)
+        if outputs['batch_idx'] == 0:
+            _, preds_batch = torch.max(outputs['preds'], 1)
             conf_mat = pl.metrics.functional.confusion_matrix(
-                preds_batch, outputs["target"], num_classes=self.hparams.num_classes
+                preds_batch, 
+                outputs['target'], 
+                num_classes=self.hparams.num_classes
             )
 
             fig, ax = plt.subplots(1, 1, figsize=(10, 10))
             sns.heatmap(
-                conf_mat.cpu(), cmap="RdBu_r", annot=True, ax=ax, annot_kws={"size": 8}
+                conf_mat.cpu(), 
+                cmap="RdBu_r", 
+                annot=True, 
+                ax=ax, 
+                annot_kws={"size": 8}
             )
             self.logger.experiment.add_figure(
                 "Confusion matrix (test)",
@@ -328,7 +369,12 @@ class ClassificationModel(pl.LightningModule):
 
         self.log("test_loss", loss)
 
-        return {"test_loss": loss, "preds": yhat, "target": y, "batch_idx": batch_idx}
+        return {
+            "test_loss": loss, 
+            'preds': yhat, 
+            'target': y, 
+            'batch_idx': batch_idx
+        }
 
     def validation_epoch_end(self, outputs):
         class_probs = []
@@ -410,7 +456,9 @@ class ClassificationModel(pl.LightningModule):
         # convert output probabilities to predicted class
         _, preds_tensor = torch.max(output, 1)
         preds = np.squeeze(preds_tensor.cpu().numpy())
-        return preds, [F.softmax(el, dim=0)[i].item() for i, el in zip(preds, output)]
+        return preds, [
+            F.softmax(el, dim=0)[i].item() for i, el in zip(preds, output)
+            ]
 
     def _plot_classes_preds(self, net, images, labels):
         """
