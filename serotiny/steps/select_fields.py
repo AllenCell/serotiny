@@ -22,9 +22,6 @@ def select_fields(
     output_path,
     fields,
 ):
-
-    print(f"selecting {len(fields)} fields")
-
     dataset = load_csv(dataset_path, [])
     manifest = dataset[fields]
     manifest.to_csv(output_path, index=False)

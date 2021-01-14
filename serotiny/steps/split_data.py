@@ -30,6 +30,9 @@ def split_data(
         required_fields=None):
 
     """
+    Split the incoming data into N sets of output data, randomly
+    sampled according to the provided ratios. The output files will
+    be named after the keys for each ratio. 
     """
 
     if required_fields is None:
@@ -57,16 +60,6 @@ def split_data(
             dataset.loc[remaining_data, :].index, test_size=this_portion)
 
     indexes[list(ratios.keys())[-1]] = remaining_data
-
-    # # split dataset into train, test and validtion subsets
-    # # TODO: make split ratio a parameter (currently 0.2)
-    # indexes = {}
-    # index_train_valid, indexes["test"] = train_test_split(
-    #     dataset.index, test_size=0.2
-    # )
-    # indexes["train"], indexes["valid"] = train_test_split(
-    #     dataset.loc[index_train_valid, :].index
-    # )
 
     # index split datasets
     datasets = {
