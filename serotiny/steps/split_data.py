@@ -77,7 +77,8 @@ def split_data(
     # save a dataloader for each dataset
     dataset_paths = {}
     for split, dataset in datasets.items():
-        os.makedirs(output_path)
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
         save_path = Path(output_path) / f"{split}.csv"
         dataset.to_csv(save_path, index=False)
         dataset_paths[split] = str(save_path)
