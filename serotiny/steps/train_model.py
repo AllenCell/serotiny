@@ -43,8 +43,8 @@ def train_model(
     model: str = "resnet18",
     batch_size: int = 64,
     num_gpus: int = 1,
-    num_workers: int = 1,
-    channel_indexes: list[str] = ["dna", "membrane"],
+    num_workers: int = 50,
+    channel_indexes: list = ["dna", "membrane"],
     num_epochs: int = 1,
     lr: int = 0.001,
     optimizer: str = "sgd",
@@ -231,7 +231,7 @@ def train_model(
     print("Best mode path is", checkpoint_callback.best_model_path)
     print("Use checkpoint = torch.load[CKPT_PATH] to get checkpoint")
     print("use model = ClassificationModel(),")
-    print("trainer = Trainer(resume_from_checkpoint=CKPT_PATH)"
+    print("trainer = Trainer(resume_from_checkpoint=CKPT_PATH)")
     print("to load trainer")
     return
 
