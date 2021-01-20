@@ -6,8 +6,6 @@ import logging
 
 from ..library.csv import load_csv
 
-from ..library.csv import load_csv
-
 ###############################################################################
 
 log = logging.getLogger(__name__)
