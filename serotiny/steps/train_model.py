@@ -239,7 +239,7 @@ def train_model(
 if __name__ == '__main__':
     # example command:
     # python -m serotiny.steps.train_model \
-    #     --datasets_path "data/projection.csv" \
+    #     --datasets_path "data/splits/" \
     #     --output_path "data/models/" \
 
     fire.Fire(train_model)
