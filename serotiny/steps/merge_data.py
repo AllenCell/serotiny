@@ -33,7 +33,7 @@ def merge_data(
         elements in this list.
     """
 
-    if required_fields is None:
+    if not required_fields:
         required_fields = {}
 
     datasets = [load_csv(path, required_fields.get(path, {})) for path 
