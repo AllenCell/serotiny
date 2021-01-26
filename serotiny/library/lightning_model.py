@@ -15,7 +15,7 @@ class BasicNeuralNetwork(nn.Module):
         self.network_name = "BasicNeuralNetwork"
         self.num_classes = num_classes
         self.layer_1 = torch.nn.Linear(
-            dimensions[1] * dimensions[0] * num_channels, 
+            dimensions[1] * dimensions[0] * num_channels,
             128
         )
         self.layer_2 = torch.nn.Linear(128, 256)
@@ -111,7 +111,7 @@ class ClassificationModel(pl.LightningModule):
         x_label="projection_image",
         y_label="mitotic_class",
         num_channels=3,
-        num_classes=5,
+        classes=("M0", "M1/M2", "M3", "M4/M5", "M6/M7"),
         image_x=104,
         image_y=176,
         lr=1e-3,
@@ -149,42 +149,44 @@ class ClassificationModel(pl.LightningModule):
             # 64, int(self.hparams.num_channels), 176, 104
         )
 
-        if self.hparams.num_classes == 5:
-            self.classes = ("M0", "M1/M2", "M3", "M4/M5", "M6/M7")
-        elif self.hparams.num_classes == 2:
-            self.classes = ("Mitotic", "Non_Mitotic")
-        else:
-            self.classes = ("0", "1", "2", "3", "4")
-
         """Metrics"""
         self.train_metrics = torch.nn.ModuleDict(
             {
                 'accuracy': pl.metrics.Accuracy(),
                 'precision': pl.metrics.Precision(
-                    num_classes=5,
+                    num_classes=len(self.hparams.classes),
                     average='macro'
                 ),
-                'recall': pl.metrics.Recall(num_classes=5, average='macro'),
+                'recall': pl.metrics.Recall(
+                    num_classes=len(self.hparams.classes),
+                    average='macro'
+                ),
             }
         )
         self.val_metrics = torch.nn.ModuleDict(
             {
                 'accuracy': pl.metrics.Accuracy(),
                 'precision': pl.metrics.Precision(
-                    num_classes=5,
+                    num_classes=len(self.hparams.classes),
                     average='macro'
-                ), 
-                'recall': pl.metrics.Recall(num_classes=5, average='macro'),
+                ),
+                'recall': pl.metrics.Recall(
+                    num_classes=len(self.hparams.classes),
+                    average='macro'
+                ),
             }
         )
-        self.test_metrics = torch.nn.ModuleDict(    
+        self.test_metrics = torch.nn.ModuleDict(
             {
                 'accuracy': pl.metrics.Accuracy(),
                 'precision': pl.metrics.Precision(
-                    num_classes=5,
+                    num_classes=len(self.hparams.classes),
                     average='macro'
                 ),
-                'recall': pl.metrics.Recall(num_classes=5, average='macro'),
+                'recall': pl.metrics.Recall(
+                    num_classes=len(self.hparams.classes),
+                    average='macro'
+                ),
             }
         )
 
@@ -227,7 +229,7 @@ class ClassificationModel(pl.LightningModule):
             conf_mat = pl.metrics.functional.confusion_matrix(
                 preds_batch,
                 outputs['target'],
-                num_classes=self.hparams.num_classes
+                num_classes=len(self.hparams.classes)
             )
 
             fig, ax = plt.subplots(1, 1, figsize=(10, 10))
@@ -285,16 +287,16 @@ class ClassificationModel(pl.LightningModule):
         if outputs['batch_idx'] == 0:
             _, preds_batch = torch.max(outputs['preds'], 1)
             conf_mat = pl.metrics.functional.confusion_matrix(
-                preds_batch, 
-                outputs['target'], 
-                num_classes=self.hparams.num_classes
+                preds_batch,
+                outputs['target'],
+                num_classes=len(self.hparams.classes)
             )
 
             fig, ax = plt.subplots(1, 1, figsize=(10, 10))
             sns.heatmap(
-                conf_mat.cpu(), 
-                cmap="RdBu_r", 
-                annot=True, ax=ax, 
+                conf_mat.cpu(),
+                cmap="RdBu_r",
+                annot=True, ax=ax,
                 annot_kws={"size": 8}
             )
             self.logger.experiment.add_figure(
@@ -340,17 +342,17 @@ class ClassificationModel(pl.LightningModule):
         if outputs['batch_idx'] == 0:
             _, preds_batch = torch.max(outputs['preds'], 1)
             conf_mat = pl.metrics.functional.confusion_matrix(
-                preds_batch, 
-                outputs['target'], 
-                num_classes=self.hparams.num_classes
+                preds_batch,
+                outputs['target'],
+                num_classes=len(self.hparams.classes)
             )
 
             fig, ax = plt.subplots(1, 1, figsize=(10, 10))
             sns.heatmap(
-                conf_mat.cpu(), 
-                cmap="RdBu_r", 
-                annot=True, 
-                ax=ax, 
+                conf_mat.cpu(),
+                cmap="RdBu_r",
+                annot=True,
+                ax=ax,
                 annot_kws={"size": 8}
             )
             self.logger.experiment.add_figure(
@@ -370,9 +372,9 @@ class ClassificationModel(pl.LightningModule):
         self.log("test_loss", loss)
 
         return {
-            "test_loss": loss, 
-            'preds': yhat, 
-            'target': y, 
+            "test_loss": loss,
+            'preds': yhat,
+            'target': y,
             'batch_idx': batch_idx
         }
 
@@ -388,7 +390,7 @@ class ClassificationModel(pl.LightningModule):
         test_probs = torch.cat([torch.stack(batch) for batch in class_probs])
         test_preds = torch.cat(class_preds)
         # plot all the pr curves
-        for i in range(len(self.classes)):
+        for i in range(len(self.hparams.classes)):
             self._add_pr_curve_tensorboard(
                 i, test_probs, test_preds, global_step=self.current_epoch
             )
@@ -405,7 +407,7 @@ class ClassificationModel(pl.LightningModule):
         test_probs = torch.cat([torch.stack(batch) for batch in class_probs])
         test_preds = torch.cat(class_preds)
         # plot all the pr curves
-        for i in range(len(self.classes)):
+        for i in range(len(self.hparams.classes)):
             self._add_pr_curve_tensorboard(
                 i,
                 test_probs,
@@ -424,7 +426,7 @@ class ClassificationModel(pl.LightningModule):
                     x_label=self.hparams.x_label,
                     y_label=self.hparams.y_label,
                     num_channels=self.hparams.num_channels,
-                    num_classes=self.hparams.num_classes,
+                    classes=self.hparams.classes,
                     image_x=self.hparams.image_x,
                     image_y=self.hparams.image_y,
                     lr=self.hparams.lr,
@@ -479,9 +481,9 @@ class ClassificationModel(pl.LightningModule):
             self._matplotlib_imshow(images[idx], one_channel=True)
             ax.set_title(
                 "{0}, {1:.1f}%\n(label: {2})".format(
-                    self.classes[preds[idx]],
+                    self.hparams.classes[preds[idx]],
                     probs[idx] * 100.0,
-                    self.classes[labels[idx]],
+                    self.hparams.classes[labels[idx]],
                 ),
             )
         return fig
@@ -503,7 +505,7 @@ class ClassificationModel(pl.LightningModule):
         tensorboard_probs = test_probs[:, class_index]
 
         self.logger.experiment.add_pr_curve(
-            self.classes[class_index] + name,
+            self.hparams.classes[class_index] + name,
             tensorboard_preds,
             tensorboard_probs,
             global_step=global_step,
@@ -617,7 +619,9 @@ class ClassificationModel(pl.LightningModule):
                 grads = v
                 name = k
                 self.logger.experiment.add_histogram(
-                    tag=name, values=grads, global_step=self.trainer.global_step
+                    tag=name,
+                    values=grads, 
+                    global_step=self.trainer.global_step
                 )
 
 
