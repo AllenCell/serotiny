@@ -53,8 +53,6 @@ def merge_data(
     # Save manifest to CSV
     manifest.to_csv(manifest_path, index=False)
 
-    return manifest_path
-
 
 if __name__ == "__main__":
     # example command:
