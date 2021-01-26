@@ -51,7 +51,6 @@ def train_model(
     scheduler: str = "reduce_lr_plateau",
     id_fields: list = ["CellId", "CellIndex", "FOVId"],
     channels: list = ["membrane", "structure", "dna"],
-    **kwargs,
 ):
     """
     """
