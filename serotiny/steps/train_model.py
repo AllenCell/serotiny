@@ -39,7 +39,7 @@ log = logging.getLogger(__name__)
 def train_model(
     datasets_path: str,
     output_path: str,
-    one_hot_len: int = 5,
+    classes: list = ["M0", "M1/M2", "M3", "M4/M5", "M6/M7"],
     model: str = "resnet18",
     batch_size: int = 64,
     num_gpus: int = 1,
@@ -95,7 +95,7 @@ def train_model(
     loaders = {
         # Use callable class objects here because lambdas aren't picklable
         "id": LoadId(id_fields),
-        "mitotic_class": LoadClass(one_hot_len),
+        "mitotic_class": LoadClass(len(classes)),
         "projection_image": LoadImage(
             DatasetFields.Chosen2DProjectionPath,
             num_channels,
@@ -150,7 +150,7 @@ def train_model(
     # init model
     network_config = {
         "num_channels": num_channels,
-        "num_classes": one_hot_len,
+        "num_classes": len(classes),
         "dimensions": dimensions,
     }
     model = {"type": model}
@@ -173,7 +173,7 @@ def train_model(
         x_label="projection_image",
         y_label="mitotic_class",
         num_channels=num_channels,
-        num_classes=one_hot_len,
+        classes=classes,
         image_x=dimensions[0],
         image_y=dimensions[1],
         lr=lr,
