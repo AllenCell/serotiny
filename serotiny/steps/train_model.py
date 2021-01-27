@@ -51,7 +51,6 @@ def train_model(
     scheduler: str = "reduce_lr_plateau",
     id_fields: list = ["CellId", "CellIndex", "FOVId"],
     channels: list = ["membrane", "structure", "dna"],
-    **kwargs,
 ):
     """
     """
@@ -233,7 +232,6 @@ def train_model(
     print("use model = ClassificationModel(),")
     print("trainer = Trainer(resume_from_checkpoint=CKPT_PATH)")
     print("to load trainer")
-    return
 
 
 if __name__ == '__main__':

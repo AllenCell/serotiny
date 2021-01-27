@@ -6,11 +6,17 @@ import warnings
 
 import multiprocessing as mp
 
+from itertools import chain, combinations
 from sklearn.preprocessing import OneHotEncoder
 from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler
 from torch.utils.data.dataloader import default_collate as collate
 import torch
 from .image import png_loader
+
+
+def powerset(iterable):
+    s = list(iterable)
+    return list(chain.from_iterable(combinations(s, r) for r in range(len(s)+1)))
 
 
 def download_quilt_data(
