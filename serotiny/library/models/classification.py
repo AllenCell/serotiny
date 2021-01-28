@@ -1,101 +1,20 @@
-import torch
-from torch import nn
-import pytorch_lightning as pl
+"""
+General 2d classifier module, implemented as a Pytorch Lightning module
+"""
+
 from collections import OrderedDict
-from torch.nn import functional as F
-import matplotlib.pyplot as plt
+
 import numpy as np
-import torchvision.models as models
+import matplotlib.pyplot as plt
 import seaborn as sns
 
+import torch
+from torch import nn
+from torch.nn import functional as F
+import pytorch_lightning as pl
 
-class BasicNeuralNetwork(nn.Module):
-    def __init__(self, num_channels=3, num_classes=5, dimensions=(176, 104)):
-        super().__init__()
-        self.network_name = "BasicNeuralNetwork"
-        self.num_classes = num_classes
-        self.layer_1 = torch.nn.Linear(
-            dimensions[1] * dimensions[0] * num_channels,
-            128
-        )
-        self.layer_2 = torch.nn.Linear(128, 256)
-        # TODO configure output dims as param
-        self.layer_3 = torch.nn.Linear(256, num_classes)
-
-        self.dropout = nn.Dropout(0.25)
-        torch.nn.init.xavier_uniform_(self.layer_1.weight)
-        torch.nn.init.xavier_uniform_(self.layer_2.weight)
-        torch.nn.init.xavier_uniform_(self.layer_3.weight)
-
-    def forward(self, x):
-        batch_size, channels, width, height = x.size()
-        x = x.view(batch_size, -1)
-        x = self.dropout(x)
-        x = self.layer_1(x)
-        x = self.dropout(x)
-        x = F.relu(x)
-        x = self.layer_2(x)
-        x = self.dropout(x)
-        x = F.relu(x)
-        x = self.layer_3(x)
-
-        return x
-
-
-class ResNet18Network(nn.Module):
-    def __init__(self, num_channels=3, num_classes=5, dimensions=(176, 104)):
-        super().__init__()
-        self.network_name = "Resnet18"
-        self.num_classes = num_classes
-        self.feature_extractor_first_layer = nn.Sequential(
-            OrderedDict(
-                [
-                    (
-                        "conv_before_resnet",
-                        nn.Conv2d(
-                            num_channels,
-                            3,
-                            kernel_size=1,
-                            stride=1,
-                            padding=0,
-                            bias=False,
-                        ),
-                    )
-                ]
-            )
-        )
-        # initialize weights of first layer
-        torch.nn.init.xavier_uniform_(
-            self.feature_extractor_first_layer.conv_before_resnet.weight
-        )
-
-        self.feature_extractor = models.resnet18(pretrained=True)
-        # dont freeze the weights
-        # self.feature_extractor.eval()
-
-        # Classifier architecture to put on top of resnet18
-        self.classifier = nn.Sequential(
-            OrderedDict(
-                [
-                    (
-                        "fc1",
-                        nn.Linear(self.feature_extractor.fc.out_features, 100)
-                    ),
-                    ("relu", nn.ReLU()),
-                    # TODO configure output number classes
-                    ("fc2", nn.Linear(100, num_classes)),
-                    # ("output", nn.Sigmoid()),
-                ]
-            )
-        )
-
-    def forward(self, x):
-        # TODO rewritw this as self.model(x) so it works witn different models
-        x = self.feature_extractor_first_layer(x)
-        representations = self.feature_extractor(x)
-        x = self.classifier(representations)
-        return x
-
+from ._2d.basic_nn import BasicNeuralNetwork
+from ._2d.resnet18 import ResNet18Network
 
 available_networks = {"basic": BasicNeuralNetwork, "resnet18": ResNet18Network}
 available_optimizers = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}
