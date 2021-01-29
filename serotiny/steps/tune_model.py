@@ -49,6 +49,11 @@ def tune_model(
     **kwargs,
 ):
     """
+    Initialize ray instance with specified number of cpus
+    and gpus. Pass in a search space to sample from,
+    a number of samples to choose from that space, and 
+    resources per trial. Other
+    training arguments are the same as train_model
     """
 
     ray.init(num_cpus=num_cpus, num_gpus=num_gpus)

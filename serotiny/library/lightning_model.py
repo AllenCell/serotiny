@@ -134,7 +134,9 @@ class ClassificationModel(pl.LightningModule):
         self.network = network
 
         if self.network.network_name == "Resnet18":
-            self.activations = True
+            # This spits out too many images to 
+            # tensorboard. Setting it to False
+            self.activations = False
 
         # hparams = {
         #     symbol: getattr(self.hparams, symbol)
@@ -285,6 +287,7 @@ class ClassificationModel(pl.LightningModule):
         outputs = self._log_metrics(outputs, "train")
         return outputs
 
+    # Add this to visualize network graph
     # def training_epoch_end(self, outputs):
         # Log computation graph
         #  the function is called after every epoch is completed
