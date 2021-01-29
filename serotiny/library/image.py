@@ -7,7 +7,9 @@ from imageio import imwrite
 import aicsimageio
 import aicsimageio.transforms as transforms
 import aicsimageprocessing
+import aicsimageio.writers.ome_tiff_writer as ome_tiff_writer
 
+from skimage.transform import resize
 
 ALL_CHANNELS = ["C", "Y", "X", "S", "T", "Z"]
 EMPTY_INDEXES = {channel: 0 for channel in ALL_CHANNELS}
@@ -119,6 +121,55 @@ def tiff_loader_CZYX(
     data = data.astype(output_dtype)
 
     return data
+
+def change_resolution(path_in, path_out, ZYX_resolution):
+    aicsimageio.use_dask(False)
+
+    """
+    Changes the resolution of a 3D OME TIFF file
+    Parameters
+    ----------
+    path_in: Union[str, Path]
+        The path to the input OME TIFF file 
+    path_out: Union[str, Path]
+        The path to the output OME TIFF file
+    ZYX_resolution: Union[scalar, list]
+        Resolution scaling factor or desired ZYX dimensions (list of 3)
+    Returns
+    -------
+    data_new.shape: Tuple
+        Tuple that contains the image dimensions of output image
+    """
+
+    # Read in image and get channel names
+    aicsimg = aicsimageio.AICSImage(path_in)
+    channel_names = aicsimg.get_channel_names()
+    data = aicsimg.get_image_data("CZYX", S=0, T=0)
+    #this function should change when we have multiple scenes (S>0) or time series (T>0)
+
+    # Get image dimensions
+    C, Z, Y, X = data.shape
+    # Get image dimensions of new image
+    if isinstance(ZYX_resolution, list):
+        if len(ZYX_resolution) != 3:
+            raise Exception(f"Resolution must be three long (Z Y X) not {len(ZYX_resolution)}")
+        Znew, Ynew, Xnew = ZYX_resolution
+    else:
+        Znew = np.round(Z * ZYX_resolution).astype(np.int)
+        Ynew = np.round(Y * ZYX_resolution).astype(np.int)
+        Xnew = np.round(X * ZYX_resolution).astype(np.int)
+    # Resize to get desired resolution
+    data_new = np.zeros((1, C, Znew, Ynew, Xnew), dtype='uint8')
+    for c in np.arange(C):
+        data_new[0, c, :, :, :] = resize(data[c, :, :, :].squeeze(), (Znew, Ynew, Xnew), preserve_range=True)
+    data_new = data_new.astype((np.uint8))
+    # change this to do it across all channels at once, perhaps this can be done without for loop
+
+    # Write output image
+    with ome_tiff_writer.OmeTiffWriter(path_out, overwrite_file=True) as writer2:
+        writer2.save(data=data_new, channel_names=channel_names, dimension_order="STCZYX")
+
+    return data_new.shape
 
 
 def project_2d(path_3d, axis, method, path_2d, channels=None, masks=None):

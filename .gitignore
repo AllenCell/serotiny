@@ -3,6 +3,7 @@
 /lightning_logs
 /data
 /config
+/scripts
 
 # notebooks bcz eww (force add them if you must?)
 *.ipynb
