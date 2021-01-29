@@ -29,7 +29,7 @@ def tune_model(
     label: str = "Draft mitotic state resolved",
     batch_size: int = 64,
     num_gpus: int = 4,
-    num_cpus: int = 30,
+    num_cpus: int = 40,
     num_workers: int = 50,
     channel_indexes: list = ["dna", "membrane"],
     num_epochs: int = 10,
@@ -38,15 +38,13 @@ def tune_model(
     model_scheduler: str = "reduce_lr_plateau",
     id_fields: list = ["CellId", "CellIndex", "FOVId"],
     channels: list = ["membrane", "structure", "dna"],
-    num_samples: int = 10,
+    num_samples: int = 16,
     gpus_per_trial: int = 1,
     search_space: dict = {
         "lr": tune.loguniform(1e-4, 1e-1),
         "batch_size": tune.choice([32, 64, 128]),
-        "model_optimizer": tune.choice(["sgd", "adam"]),
-        "model": tune.choice(["basic", "resnet18"])
-    },
-    **kwargs,
+        "model_optimizer": tune.choice(["sgd", "adam"])
+    }
 ):
     """
     Initialize ray instance with specified number of cpus
@@ -56,7 +54,9 @@ def tune_model(
     training arguments are the same as train_model
     """
 
+    # Initialize ray
     ray.init(num_cpus=num_cpus, num_gpus=num_gpus)
+    assert ray.is_initialized() is True
 
     reporter = CLIReporter(
         parameter_columns=[key for key in search_space.keys()],
@@ -76,7 +76,7 @@ def tune_model(
         "num_workers": num_workers,
         "channel_indexes": channel_indexes,
         "num_epochs": num_epochs,
-        "lr":  lr,
+        "lr": lr,
         "model_optimizer": model_optimizer,
         "model_scheduler": model_scheduler,
         "id_fields": id_fields,
@@ -86,8 +86,6 @@ def tune_model(
     }
 
     config.update(search_space)
-
-    print(config)
 
     # hyperopt = HyperOptSearch(metric="loss", mode="min")
 
@@ -99,7 +97,7 @@ def tune_model(
     analysis = tune.run(
         train_model_config,
         resources_per_trial={
-            "cpu": 5,
+            "cpu": 10,
             "gpu": gpus_per_trial
         },
         config=config,
@@ -123,7 +121,10 @@ def tune_model(
     # Get best result as pandas dataframe
 
     print("Best hyperparameters found were: ", analysis.best_config)
-    return
+
+    # Shutdown Ray
+    ray.shutdown()
+    assert ray.is_initialized() is False
 
 
 if __name__ == '__main__':

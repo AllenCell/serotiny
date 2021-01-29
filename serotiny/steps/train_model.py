@@ -80,8 +80,7 @@ def train_model(
     id_fields: list = ["CellId", "CellIndex", "FOVId"],
     channels: list = ["membrane", "structure", "dna"],
     test: bool = True,
-    tune_bool: bool = False,
-    **kwargs,
+    tune_bool: bool = False
 ):
     """
     Initialize dataloaders and model
@@ -232,11 +231,11 @@ def train_model(
         early_stopping = EarlyStopping("val_loss")
 
         callbacks = [
-                MyPrintingCallback(),
-                PrintTableMetricsCallback(),
-                GPUStatsMonitor(),
-                GlobalProgressBar(),
-                early_stopping,
+            MyPrintingCallback(),
+            PrintTableMetricsCallback(),
+            GPUStatsMonitor(),
+            GlobalProgressBar(),
+            early_stopping,
         ]
 
         # Initialize a trainer
@@ -283,16 +282,15 @@ def train_model(
             },
             on="validation_end"
         )
-      
         # Use ddp to split training across gpus
         trainer = pl.Trainer(
-                max_epochs=num_epochs,
-                accelerator="ddp",
-                replace_sampler_ddp=False,
-                gpus=num_gpus,
-                logger=logger,
-                progress_bar_refresh_rate=0,
-                callbacks=[tune_callback]
+            max_epochs=num_epochs,
+            accelerator="ddp",
+            replace_sampler_ddp=False,
+            gpus=num_gpus,
+            logger=logger,
+            progress_bar_refresh_rate=0,
+            callbacks=[tune_callback]
         )
         # Train the model ⚡
         trainer.fit(ae, dataloaders["train"], dataloaders["valid"])
