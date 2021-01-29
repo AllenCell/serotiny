@@ -52,6 +52,7 @@ def train_model_config(
         num_gpus=config['num_gpus'],
         num_workers=config['num_workers'],
         channel_indexes=config['channel_indexes'],
+        num_epochs=config["num_epochs"],
         lr=config['lr'],
         model_optimizer=config['model_optimizer'],
         model_scheduler=config['model_scheduler'],
@@ -83,6 +84,8 @@ def train_model(
     **kwargs,
 ):
     """
+    Initialize dataloaders and model
+    Call trainer.fit()
     """
     filenames = listdir(datasets_path)
     dataset_splits = [split for split in filenames if split.endswith(".csv")]
