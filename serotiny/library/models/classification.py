@@ -15,6 +15,7 @@ import pytorch_lightning as pl
 
 from ._2d.basic_nn import BasicNeuralNetwork
 from ._2d.resnet18 import ResNet18Network
+from ._utils import acc_prec_recall
 
 AVAILABLE_NETWORKS = {"basic": BasicNeuralNetwork, "resnet18": ResNet18Network}
 AVAILABLE_OPTIMIZERS = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}
@@ -69,45 +70,9 @@ class ClassificationModel(pl.LightningModule):
         )
 
         """Metrics"""
-        self.train_metrics = torch.nn.ModuleDict(
-            {
-                'accuracy': pl.metrics.Accuracy(),
-                'precision': pl.metrics.Precision(
-                    num_classes=len(self.hparams.classes),
-                    average='macro'
-                ),
-                'recall': pl.metrics.Recall(
-                    num_classes=len(self.hparams.classes),
-                    average='macro'
-                ),
-            }
-        )
-        self.val_metrics = torch.nn.ModuleDict(
-            {
-                'accuracy': pl.metrics.Accuracy(),
-                'precision': pl.metrics.Precision(
-                    num_classes=len(self.hparams.classes),
-                    average='macro'
-                ),
-                'recall': pl.metrics.Recall(
-                    num_classes=len(self.hparams.classes),
-                    average='macro'
-                ),
-            }
-        )
-        self.test_metrics = torch.nn.ModuleDict(
-            {
-                'accuracy': pl.metrics.Accuracy(),
-                'precision': pl.metrics.Precision(
-                    num_classes=len(self.hparams.classes),
-                    average='macro'
-                ),
-                'recall': pl.metrics.Recall(
-                    num_classes=len(self.hparams.classes),
-                    average='macro'
-                ),
-            }
-        )
+        self.train_metrics = acc_prec_recall(self.hparams.classes)
+        self.val_metrics = acc_prec_recall(self.hparams.classes)
+        self.test_metrics = acc_prec_recall(self.hparams.classes)
 
     def _generate_logs(self, preds, true, prefix, metrics):
         _, preds_batch = torch.max(preds, 1)
