@@ -25,7 +25,7 @@ def download_quilt_data(
     data_save_loc="quilt_data",
     ignore_warnings=True,
 ):
-    """download a quilt dataset and supress nfs file attribe warnings by default"""
+    """download a quilt dataset and supress nfs file attribe warnings"""
     dataset_manifest = quilt3.Package.browse(package, bucket)
 
     if ignore_warnings:
@@ -117,7 +117,7 @@ def load_data_loader(
 ):
     """ Load a pytorch DataLoader from the provided dataset. """
 
-    # Load a dataframe from the dataset, using the provided row processing functions
+    # Load a dataframe from the dataset, using the provided row processing fns
     dataframe = DataframeDataset(dataset, loaders=loaders, transform=transform)
 
     # Configure WeightedRandomSampler to handle class imbalances
@@ -155,7 +155,10 @@ def append_one_hot(dataset: pd.DataFrame, column: str, id: str):
 
     one_hot = one_hot_encoding(dataset, column)
     # Lets merge on a unique ID to avoid errors here
-    dataset = pd.merge(dataset, pd.DataFrame(one_hot, index=dataset[id]), on=[id])
+    dataset = pd.merge(
+        dataset,
+        pd.DataFrame(one_hot, index=dataset[id]), on=[id]
+    )
 
     # Lets also calculate class weights
     # TODO make ChosenMitoticClass not hardcoded
@@ -172,6 +175,8 @@ def append_one_hot(dataset: pd.DataFrame, column: str, id: str):
         for index, label in enumerate(labels_unique)
     }
 
-    dataset[column + "Integer"] = [class_labels_dict[e] for e in dataset[column]]
+    dataset[column + "Integer"] = [
+        class_labels_dict[e] for e in dataset[column]
+    ]
 
     return dataset, one_hot.shape[-1]

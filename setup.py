@@ -65,6 +65,9 @@ requirements = [
     "tqdm",
     "seaborn",
     'urllib3<1.26',
+    "ray",
+    "hyperopt",
+    "ray[tune]",
 ]
 
 extra_requirements = {
