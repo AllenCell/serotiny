@@ -266,7 +266,6 @@ class ClassificationModel(pl.LightningModule):
         # This depends on if y is one hot or not, also on the last
         # layer of network
         loss = nn.CrossEntropyLoss()(yhat, y)
-        print("training loss", loss)
 
         self.log(
             "train_loss", loss,
