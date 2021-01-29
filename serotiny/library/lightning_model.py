@@ -138,12 +138,6 @@ class ClassificationModel(pl.LightningModule):
             # tensorboard. Setting it to False
             self.activations = False
 
-        # hparams = {
-        #     symbol: getattr(self.hparams, symbol)
-        #     for symbol in dir(self.hparams)
-        # }
-        # print(f"hyperparameters - {hparams}")
-
         # Print out network
         self.example_input_array = torch.zeros(
             64,
@@ -286,29 +280,6 @@ class ClassificationModel(pl.LightningModule):
     def training_step_end(self, outputs):
         outputs = self._log_metrics(outputs, "train")
         return outputs
-
-    # Add this to visualize network graph
-    # def training_epoch_end(self, outputs):
-        # Log computation graph
-        #  the function is called after every epoch is completed
-        # if self.current_epoch == 0:
-        #     self.logger.experiment.add_graph(
-        #         ClassificationModel(
-        #             network=self.hparams.network,
-        #             x_label=self.hparams.x_label,
-        #             y_label=self.hparams.y_label,
-        #             num_channels=self.hparams.num_channels,
-        #             classes=self.hparams.classes,
-        #             image_x=self.hparams.image_x,
-        #             image_y=self.hparams.image_y,
-        #             lr=self.hparams.lr,
-        #             optimizer=self.hparams.optimizer,
-        #             scheduler=self.hparams.scheduler,
-        #         ),
-        #         self.example_input_array.cuda(),
-        #     )
-        # if self.activations is True:
-        #     self.show_activations(self.reference_image)
 
     def validation_step(self, batch, batch_idx):
 
