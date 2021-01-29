@@ -49,7 +49,8 @@ def choose_executor(
         # Only auto batch size if it is not None
         if batch_size is None:
             # Batch size is num_workers * worker_cpu * 0.75
-            # We could just do num_workers * worker_cpu but 3/4 of that is safer
+            # We could just do num_workers * worker_cpu 
+            # but 3/4 of that is safer
             batch_size = int(num_workers * worker_cpu * 0.75)
 
         # Log dashboard URI

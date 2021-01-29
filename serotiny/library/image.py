@@ -50,7 +50,11 @@ def normalize_img_zero_one(img_arr):
 
 
 def png_loader(
-    path_str, channel_order=None, indexes=None, transform=None, output_dtype=np.float64
+    path_str,
+    channel_order=None,
+    indexes=None,
+    transform=None,
+    output_dtype=np.float64
 ):
     # find the orientation and channel indexes
     orientation, channel_indexes = define_channels(channel_order, indexes)
@@ -126,7 +130,9 @@ def project_2d(path_3d, axis, method, path_2d, channels=None, masks=None):
 
     # load the 3d image
     image_3d = tiff_loader_CZYX(
-        path_3d, select_channels=channels or DEFAULT_CHANNELS, channel_masks=masks
+        path_3d,
+        select_channels=channels or DEFAULT_CHANNELS,
+        channel_masks=masks
     )
 
     # find the argument based on the axis
@@ -184,7 +190,7 @@ def tiff_loader_CYX(
     data = data[
         :,
         (data.shape[1] - center_slab_width)
-        // 2 : (data.shape[1] + center_slab_width)
+        // 2: (data.shape[1] + center_slab_width)
         // 2,
         ...,
     ]
@@ -232,7 +238,7 @@ def tiff_loader_CYX_seg(
     data = data[
         :,
         (data.shape[1] - center_slab_width)
-        // 2 : (data.shape[1] + center_slab_width)
+        // 2: (data.shape[1] + center_slab_width)
         // 2,
         ...,
     ]
@@ -243,7 +249,8 @@ def tiff_loader_CYX_seg(
 
 
 def feature_loader(
-    path_str, feature_dtype_dict={"dna_volume": np.float32, "cell_volume": np.float32}
+    path_str,
+    feature_dtype_dict={"dna_volume": np.float32, "cell_volume": np.float32}
 ):
     with open(path_str) as json_file:
         data = json.load(json_file)
