@@ -51,6 +51,7 @@ def apply_projection(
     chosen_projection: str,
     chosen_class=None,
     label=None,
+    source_path=None,
     executor_address: Optional[str] = None,
 ):
 
@@ -76,6 +77,11 @@ def apply_projection(
 
     for path in dataset[path_3d_column]:
         # get the 3d image path
+        if source_path is not None:
+            path = os.path.join(
+                source_path,
+                os.path.basename(path))
+
         path_3d = Path(path)
         full_name = path_3d.name
 
@@ -115,15 +121,6 @@ def apply_projection(
         dataset[chosen_class] = dataset[label]
 
     dataset.to_csv(output_path, index=False)
-
-    result = {
-        "projection_path": projection_path,
-        "manifest": output_path,
-        "dimensions": dimensions,
-    }
-
-    print(result)
-    return result
 
 
 if __name__ == "__main__":
