@@ -16,9 +16,9 @@ import pytorch_lightning as pl
 from ._2d.basic_nn import BasicNeuralNetwork
 from ._2d.resnet18 import ResNet18Network
 
-available_networks = {"basic": BasicNeuralNetwork, "resnet18": ResNet18Network}
-available_optimizers = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}
-available_schedulers = {
+AVAILABLE_NETWORKS = {"basic": BasicNeuralNetwork, "resnet18": ResNet18Network}
+AVAILABLE_OPTIMIZERS = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}
+AVAILABLE_SCHEDULERS = {
     "reduce_lr_plateau": torch.optim.lr_scheduler.ReduceLROnPlateau
 }
 
@@ -495,25 +495,25 @@ class ClassificationModel(pl.LightningModule):
     def configure_optimizers(self):
         # TODO configure optimizer as Adam or SGD etc, also other parameters
         # with it like shceduler
-        if self.hparams.optimizer in available_optimizers:
-            optimizer_class = available_optimizers[self.hparams.optimizer]
+        if self.hparams.optimizer in AVAILABLE_OPTIMIZERS:
+            optimizer_class = AVAILABLE_OPTIMIZERS[self.hparams.optimizer]
             optimizer = optimizer_class(self.parameters(), lr=self.hparams.lr)
         else:
             raise Exception(
                 (
                     f"optimizer {self.hparams.optimizer} not available, "
-                    f"options are {list(available_optimizers.keys())}"
+                    f"options are {list(AVAILABLE_OPTIMIZERS.keys())}"
                 )
             )
 
-        if self.hparams.scheduler in available_schedulers:
-            scheduler_class = available_schedulers[self.hparams.scheduler]
+        if self.hparams.scheduler in AVAILABLE_SCHEDULERS:
+            scheduler_class = AVAILABLE_SCHEDULERS[self.hparams.scheduler]
             scheduler = scheduler_class(optimizer)
         else:
             raise Exception(
                 (
                     f"scheduler {self.hparams.scheduler} not available, "
-                    f"options are {list(available_schedulers.keys())}"
+                    f"options are {list(AVAILABLE_SCHEDULERS.keys())}"
                 )
             )
 
