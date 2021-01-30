@@ -119,18 +119,12 @@ def apply_resolution(
 
 if __name__ == "__main__":
     # example command:
-    # python -m serotiny.steps.apply_projection \
-    #     --manifest_in "data/manifest_merged.csv" \
-    #     --output_path "data/projection.csv" \
-    #     --projection "{'channels': ['membrane', 'structure', 'dna'],
-    # 'masks': 
-    # {'membrane': 'membrane_segmentation', 'dna': 'nucleus_segmentation'},
-    # 'axis': 'Y', 'method': 'max', 
-    # 'output': 
-    # '/allen/aics/modeling/spanglry/data/mitotic-classifier/projections/'}" \
-    #     --path_3d_column "CellImage3DPath" \
-    #     --chosen_projection "Chosen2DProjectionPath" \
-    #     --chosen_class "ChosenMitoticClass" \
-    #     --label "Draft mitotic state resolved"
+    # python -m  serotiny.steps.change_resolution \
+    # --manifest_in /allen/aics/modeling/theok/Projects/Data/idle/mcw/smalltestdataset/manifest.csv \
+    # --path_3d_column CellImage3DPath \
+    # --manifest_out /allen/aics/modeling/theok/Projects/Data/idle/mcw/smalltestdataset/out/manifest.csv \
+    # --path_3d_resized_column CellSampledImage3DPath \
+    # --path_out /allen/aics/modeling/theok/Projects/Data/idle/mcw/smalltestdataset/out/ \
+    # --resolution [10,20,50]
 
     fire.Fire(apply_resolution)
