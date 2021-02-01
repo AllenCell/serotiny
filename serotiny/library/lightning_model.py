@@ -396,7 +396,7 @@ class ClassificationModel(pl.LightningModule):
         preds = np.squeeze(preds_tensor.cpu().numpy())
         return preds, [
             F.softmax(el, dim=0)[i].item() for i, el in zip(preds, output)
-            ]
+        ]
 
     def _plot_classes_preds(self, net, images, labels):
         """

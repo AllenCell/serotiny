@@ -2,12 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from pathlib import Path
-# from typing import Optional
-from os import listdir
 import fire
 
-from torchvision import transforms
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning.callbacks import (
@@ -19,18 +15,13 @@ from pl_bolts.callbacks import PrintTableMetricsCallback
 from ray.tune.integration.pytorch_lightning import TuneReportCallback
 from ray import tune
 
-# from torchvision.utils import save_image
-
-from ..constants import DatasetFields
-from ..library.data import load_data_loader, LoadId, LoadImage, LoadClass
 from ..library.progress_bar import GlobalProgressBar
 from ..library.lightning_model import (
     ClassificationModel,
     MyPrintingCallback,
     available_networks,
 )
-from ..library.csv import load_csv
-from ..library.image import png_loader
+import serotiny.library.datamodules as datamodules
 
 ###############################################################################
 
@@ -66,122 +57,46 @@ def train_model_config(
 def train_model(
     datasets_path: str,
     output_path: str,
-    classes: list = ["M0", "M1/M2", "M3", "M4/M5", "M6/M7"],
+    data_config: dict = {
+        "classes": ["M0", "M1/M2", "M3", "M4/M5", "M6/M7"],
+        "channel_indexes": ["dna", "membrane"],
+        "id_fields": ["CellId", "CellIndex", "FOVId"],
+        "channels": ["membrane", "structure", "dna"],
+    },
+    data_key: str = "Mitotic2DDataModule",
     model: str = "resnet18",
     label: str = "Draft mitotic state resolved",
     batch_size: int = 64,
     num_gpus: int = 1,
     num_workers: int = 50,
-    channel_indexes: list = ["dna", "membrane"],
     num_epochs: int = 1,
     lr: int = 0.001,
     model_optimizer: str = "sgd",
     model_scheduler: str = "reduce_lr_plateau",
-    id_fields: list = ["CellId", "CellIndex", "FOVId"],
-    channels: list = ["membrane", "structure", "dna"],
     test: bool = True,
-    tune_bool: bool = False
+    tune_bool: bool = False,
 ):
     """
     Initialize dataloaders and model
     Call trainer.fit()
     """
-    filenames = listdir(datasets_path)
-    dataset_splits = [split for split in filenames if split.endswith(".csv")]
-    dataset_paths = [Path(datasets_path + split) for split in dataset_splits]
-    num_channels = len(channels)
-    chosen_channels = channel_indexes
-    channel_indexes = None
+    # Load data module
+    dm_class = datamodules.__dict__[data_key]
 
-    if chosen_channels is not None:
-        try:
-            channel_indexes = [
-                channels.index(channel_name) for channel_name
-                in chosen_channels
-            ]
-            num_channels = len(channel_indexes)
-        except ValueError:
-            raise Exception(
-                (
-                    f"channel indexes {channel_indexes} "
-                    f"do not match channel names {channels}"
-                )
-            )
-
-    for path in dataset_paths:
-        if not path.exists():
-            raise Exception(f"not all datasets are present, missing {path}")
-
-    transform = transforms.Compose(
-        [
-            transforms.ToPILImage(),
-            transforms.Resize(256),
-            transforms.CenterCrop(256),
-            transforms.ToTensor(),
-        ]
+    dm = dm_class(
+        batch_size=batch_size, 
+        num_workers=num_workers, 
+        config=data_config,
+        data_dir=datasets_path
     )
-
-    # TODO choose either one hot encoding or mitotic class integer
-    # This choice is useful when deciding what loss function to use later
-    loaders = {
-        # Use callable class objects here because lambdas aren't picklable
-        "id": LoadId(id_fields),
-        "mitotic_class": LoadClass(len(classes)),
-        "projection_image": LoadImage(
-            DatasetFields.Chosen2DProjectionPath,
-            num_channels,
-            channel_indexes,
-            transform,
-        ),
-    }
-
-    # TODO configure and make augmented dataloaders
-    dataloaders = {}
-    for split_csv, path in zip(dataset_splits, dataset_paths):
-        split = split_csv.split(".")[0]
-        # TODO: add required fields
-        dataset = load_csv(path, [])
-        shuffle = False
-
-        if split == "train":
-            transform = transforms.Compose(
-                [
-                    transforms.ToPILImage(),
-                    transforms.CenterCrop(256),
-                    transforms.RandomHorizontalFlip(),
-                    transforms.ToTensor(),
-                ]
-            )
-            loaders["projection_image"] = LoadImage(
-                DatasetFields.Chosen2DProjectionPath,
-                num_channels,
-                channel_indexes,
-                transform,
-            )
-        # Load a test image to get image dimensions after transform
-        test_image = png_loader(
-            dataset[DatasetFields.Chosen2DProjectionPath].iloc[0],
-            channel_order="CYX",
-            indexes={"C": channel_indexes or range(num_channels)},
-            transform=transform,
-        )
-
-        # Get test image dimensions
-        dimensions = (test_image.shape[1], test_image.shape[2])
-
-        dataloaders[split] = load_data_loader(
-            dataset,
-            loaders,
-            transform=transform,
-            shuffle=shuffle,
-            batch_size=batch_size,
-            num_workers=num_workers,
-        )
+    dm.setup()
+    num_channels = dm._num_channels
+    dimensions = dm.dims 
 
     # init model
     network_config = {
         "num_channels": num_channels,
-        "num_classes": len(classes),
+        "num_classes": len(data_config['classes']),
         "dimensions": dimensions,
     }
     model = {"type": model}
@@ -198,12 +113,12 @@ def train_model(
             )
         )
 
-    ae = ClassificationModel(
+    classification_model = ClassificationModel(
         network,
-        x_label="projection_image",
-        y_label="mitotic_class",
+        x_label=dm.x_label,
+        y_label=dm.y_label,
         num_channels=num_channels,
-        classes=classes,
+        classes=data_config['classes'],
         label=label,
         image_x=dimensions[0],
         image_y=dimensions[1],
@@ -255,11 +170,11 @@ def train_model(
         )
 
         # Train the model ⚡
-        trainer.fit(ae, dataloaders["train"], dataloaders["valid"])
+        trainer.fit(classification_model, dm)
 
         # test the model
         if test is True:
-            trainer.test(test_dataloaders=dataloaders["test"])
+            trainer.test(datamodule=dm)
 
         # Use this to get best model path from callback
         print("Best mode path is", checkpoint_callback.best_model_path)
@@ -293,7 +208,7 @@ def train_model(
             callbacks=[tune_callback]
         )
         # Train the model ⚡
-        trainer.fit(ae, dataloaders["train"], dataloaders["valid"])
+        trainer.fit(classification_model, dm)
     # return
 
 
