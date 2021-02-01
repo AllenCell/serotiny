@@ -3,6 +3,7 @@
 
 import logging
 from pathlib import Path
+# from typing import Optional
 from os import listdir
 import fire
 
@@ -15,6 +16,8 @@ from pytorch_lightning.callbacks import (
     EarlyStopping
 )
 from pl_bolts.callbacks import PrintTableMetricsCallback
+from ray.tune.integration.pytorch_lightning import TuneReportCallback
+from ray import tune
 
 # from torchvision.utils import save_image
 
@@ -36,23 +39,52 @@ log = logging.getLogger(__name__)
 ###############################################################################
 
 
+def train_model_config(
+    config,
+):
+    train_model(
+        datasets_path=config["datasets_path"],
+        output_path=config["output_path"],
+        classes=config['classes'],
+        model=config['model'],
+        label=config['label'],
+        batch_size=config['batch_size'],
+        num_gpus=config['num_gpus'],
+        num_workers=config['num_workers'],
+        channel_indexes=config['channel_indexes'],
+        num_epochs=config["num_epochs"],
+        lr=config['lr'],
+        model_optimizer=config['model_optimizer'],
+        model_scheduler=config['model_scheduler'],
+        id_fields=config['id_fields'],
+        channels=config['channels'],
+        test=config['test'],
+        tune_bool=config['tune_bool'],
+    )
+
+
 def train_model(
     datasets_path: str,
     output_path: str,
     classes: list = ["M0", "M1/M2", "M3", "M4/M5", "M6/M7"],
     model: str = "resnet18",
+    label: str = "Draft mitotic state resolved",
     batch_size: int = 64,
     num_gpus: int = 1,
     num_workers: int = 50,
     channel_indexes: list = ["dna", "membrane"],
     num_epochs: int = 1,
     lr: int = 0.001,
-    optimizer: str = "sgd",
-    scheduler: str = "reduce_lr_plateau",
+    model_optimizer: str = "sgd",
+    model_scheduler: str = "reduce_lr_plateau",
     id_fields: list = ["CellId", "CellIndex", "FOVId"],
     channels: list = ["membrane", "structure", "dna"],
+    test: bool = True,
+    tune_bool: bool = False
 ):
     """
+    Initialize dataloaders and model
+    Call trainer.fit()
     """
     filenames = listdir(datasets_path)
     dataset_splits = [split for split in filenames if split.endswith(".csv")]
@@ -166,78 +198,109 @@ def train_model(
             )
         )
 
-    # TODO add all config args to model
     ae = ClassificationModel(
         network,
         x_label="projection_image",
         y_label="mitotic_class",
         num_channels=num_channels,
         classes=classes,
+        label=label,
         image_x=dimensions[0],
         image_y=dimensions[1],
         lr=lr,
-        optimizer=optimizer,
-        scheduler=scheduler,
+        optimizer=model_optimizer,
+        scheduler=model_scheduler,
     )
 
     # Initialize a logger
-    # TODO configure output model location
-    logger = TensorBoardLogger(
-        str(output_path) + "/lightning_logs",
-    )
+    if tune_bool is False:
 
-    # Initialize model checkpoint
-    checkpoint_callback = ModelCheckpoint(
-        filepath=str(output_path) + "/checkpoints/",
-        # if save_top_k = 1, all files in this local staging dir
-        # will be deleted when a checkpoint is saved
-        # save_top_k=1,
-        monitor="val_loss",
-        verbose=True,
-    )
+        logger = TensorBoardLogger(
+            str(output_path) + "/lightning_logs",
+        )
+        # Initialize model checkpoint
+        checkpoint_callback = ModelCheckpoint(
+            filepath=str(output_path) + "/checkpoints/",
+            # if save_top_k = 1, all files in this local staging dir
+            # will be deleted when a checkpoint is saved
+            # save_top_k=1,
+            monitor="val_loss",
+            verbose=True,
+        )
 
-    early_stopping = EarlyStopping("val_loss")
+        early_stopping = EarlyStopping("val_loss")
 
-    # Initialize a trainer
-    trainer = pl.Trainer(
-        logger=logger,
-        accelerator="ddp",
-        replace_sampler_ddp=False,
-        gpus=num_gpus,
-        max_epochs=num_epochs,
-        progress_bar_refresh_rate=20,
-        checkpoint_callback=checkpoint_callback,
-        callbacks=[
+        callbacks = [
             MyPrintingCallback(),
             PrintTableMetricsCallback(),
             GPUStatsMonitor(),
             GlobalProgressBar(),
             early_stopping,
-        ],
-        precision=16,
-        benchmark=True,
-        profiler=True,
-        weights_summary="full",
-    )
+        ]
 
-    # Train the model ⚡
-    trainer.fit(ae, dataloaders["train"], dataloaders["valid"])
+        # Initialize a trainer
+        trainer = pl.Trainer(
+            logger=logger,
+            accelerator="ddp",
+            replace_sampler_ddp=False,
+            gpus=num_gpus,
+            max_epochs=num_epochs,
+            progress_bar_refresh_rate=20,
+            checkpoint_callback=checkpoint_callback,
+            callbacks=callbacks,
+            precision=16,
+            benchmark=True,
+            profiler=True,
+            weights_summary="full",
+        )
 
-    # test the model
-    # trainer.test(test_dataloaders=dataloaders["test"])
+        # Train the model ⚡
+        trainer.fit(ae, dataloaders["train"], dataloaders["valid"])
 
-    # Use this to get best model path from callback
-    print("Best mode path is", checkpoint_callback.best_model_path)
-    print("Use checkpoint = torch.load[CKPT_PATH] to get checkpoint")
-    print("use model = ClassificationModel(),")
-    print("trainer = Trainer(resume_from_checkpoint=CKPT_PATH)")
-    print("to load trainer")
+        # test the model
+        if test is True:
+            trainer.test(test_dataloaders=dataloaders["test"])
+
+        # Use this to get best model path from callback
+        print("Best mode path is", checkpoint_callback.best_model_path)
+        print("Use checkpoint = torch.load[CKPT_PATH] to get checkpoint")
+        print("use model = ClassificationModel(),")
+        print("trainer = Trainer(resume_from_checkpoint=CKPT_PATH)")
+        print("to load trainer")
+    else:
+        # Add tensorboard logs to tune directory so there
+        # are no repeat logs
+        logger = TensorBoardLogger(
+            save_dir=tune.get_trial_dir(), name="", version="."
+        )
+
+        # Tune callback tracks val loss and accuracy
+        tune_callback = TuneReportCallback(
+            {
+                "loss": "val_loss_epoch",
+                "mean_accuracy": "val_accuracy_epoch"
+            },
+            on="validation_end"
+        )
+        # Use ddp to split training across gpus
+        trainer = pl.Trainer(
+            max_epochs=num_epochs,
+            accelerator="ddp",
+            replace_sampler_ddp=False,
+            gpus=num_gpus,
+            logger=logger,
+            progress_bar_refresh_rate=0,
+            callbacks=[tune_callback]
+        )
+        # Train the model ⚡
+        trainer.fit(ae, dataloaders["train"], dataloaders["valid"])
+    # return
 
 
 if __name__ == '__main__':
     # example command:
     # python -m serotiny.steps.train_model \
-    #     --datasets_path "data/splits/" \
-    #     --output_path "data/models/" \
+    #     --datasets_path "./results/splits/" \
+    #     --output_path "./results/models/" \
 
     fire.Fire(train_model)
