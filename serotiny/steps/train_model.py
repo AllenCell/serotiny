@@ -24,7 +24,7 @@ from ray import tune
 from ..constants import DatasetFields
 from ..library.data import load_data_loader, LoadId, LoadImage, LoadClass
 from ..library.progress_bar import GlobalProgressBar
-from ..library.lightning_model import (
+from ..library.models.classification import (
     ClassificationModel,
     MyPrintingCallback,
     available_networks,
