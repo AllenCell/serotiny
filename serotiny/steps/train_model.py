@@ -16,7 +16,7 @@ from ray.tune.integration.pytorch_lightning import TuneReportCallback
 from ray import tune
 
 from ..library.progress_bar import GlobalProgressBar
-from ..library.lightning_model import (
+from ..library.models.classification import (
     ClassificationModel,
     MyPrintingCallback,
     available_networks,
