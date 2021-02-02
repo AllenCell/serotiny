@@ -5,12 +5,9 @@ import pytorch_lightning as pl
 from torchvision import transforms
 from os import listdir
 from ..csv import load_csv
-from ..image import png_loader, tiff_loader_CZYX
 from pathlib import Path
-from ...constants import DatasetFields
-from ...library.data import load_data_loader, LoadClass, LoadId
+from ...library.data import load_data_loader
 
-from aicsimageprocessing.resize import resize_to
 
 class BaseDataModule(pl.LightningDataModule):
 
@@ -34,7 +31,6 @@ class BaseDataModule(pl.LightningDataModule):
         self.id_fields = config["id_fields"]
         self.batch_size = batch_size
         self.num_workers = num_workers
-        self.load_image_args = config["load_image_args"]
 
         self._num_channels = len(self.channels)
         chosen_channels = self.channel_indexes
@@ -63,13 +59,17 @@ class BaseDataModule(pl.LightningDataModule):
         self.y_label = y_label
 
     def prepare_data(self):
-        raise NotImplemented("`prepare_data` hasn't been defined for this data module")
+        pass
 
-    def load_image(self, *args, **kwargs):
-        raise NotImplemented("`load_image` hasn't been defined for this data module")
+    def load_image(self, dataset):
+        raise NotImplementedError(
+            "`load_image` hasn't been defined for this data module"
+        )
 
     def get_dims(self, shape):
-        raise NotImplemented("`get_dims` hasn't been defined for this data module")
+        raise NotImplementedError(
+            "`get_dims` hasn't been defined for this data module"
+        )
 
     def setup(self, stage=None):
 
@@ -89,32 +89,12 @@ class BaseDataModule(pl.LightningDataModule):
             self.datasets[split] = dataset
 
         # Load a test image to get image dimensions after transform
-        test_image = self.load_image(**self.load_image_args)
+        test_image = self.load_image(dataset)
 
         # Get test image dimensions
         dimensions = self.get_dims(test_image)
 
         self.dims = dimensions
-
-    def train_dataloader(self):
-        train_dataset = self.datasets['train']
-        train_loaders = self.loaders.copy()
-        train_loaders[self.x_label] = LoadImage(
-            DatasetFields.CellImage3DPath,
-            self._num_channels,
-            self.channel_indexes,
-            self.train_transform,
-        )
-        train_dataloader = load_data_loader(
-            train_dataset,
-            train_loaders,
-            transform=self.train_transform,
-            shuffle=False,
-            batch_size=self.batch_size,
-            num_workers=self.num_workers,
-        )
-
-        return train_dataloader
 
     def val_dataloader(self):
         val_dataset = self.datasets['valid']

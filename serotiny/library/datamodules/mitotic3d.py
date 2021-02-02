@@ -1,30 +1,29 @@
-import pytorch_lightning as pl
 
 # Note - you must have torchvision installed for this example
 from torchvision import transforms
-from os import listdir
-from ..csv import load_csv
-from ..image import png_loader, tiff_loader_CZYX
-from pathlib import Path
+from ..image import tiff_loader_CZYX
+import numpy as np
 from ...constants import DatasetFields
 from ...library.data import load_data_loader, Load3DImage, LoadClass, LoadId
 from .base_datamodule import BaseDataModule
 
 from aicsimageprocessing.resize import resize_to
 
+
 class Mitotic3DDataModule(BaseDataModule):
 
     def __init__(
         self,
         config: dict,
-        x_label: str,
-        y_label: str,
         batch_size: int,
         num_workers: int,
         data_dir: str = './',
     ):
 
         super().__init__(
+            config=config,
+            batch_size=batch_size,
+            num_workers=num_workers,
             transform_list=[
                 transforms.Lambda(lambda x: resize_to(x, (6, 64, 128, 96))),
                 transforms.ToTensor()
@@ -34,7 +33,8 @@ class Mitotic3DDataModule(BaseDataModule):
                 transforms.ToTensor()
             ],
             x_label="cell_image",
-            y_label="mitotic_class"
+            y_label="mitotic_class",
+            data_dir=data_dir,
         )
 
         self.loaders = {
@@ -61,3 +61,23 @@ class Mitotic3DDataModule(BaseDataModule):
 
     def get_dims(self, img):
         return (img.shape[1], img.shape[2], img.shape[3])
+
+    def train_dataloader(self):
+        train_dataset = self.datasets['train']
+        train_loaders = self.loaders.copy()
+        train_loaders[self.x_label] = Load3DImage(
+            DatasetFields.CellImage3DPath,
+            self._num_channels,
+            self.channel_indexes,
+            self.train_transform,
+        )
+        train_dataloader = load_data_loader(
+            train_dataset,
+            train_loaders,
+            transform=self.train_transform,
+            shuffle=False,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+        )
+
+        return train_dataloader

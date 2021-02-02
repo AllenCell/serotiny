@@ -2,9 +2,8 @@
 Basic Neural Net for 3D classification
 """
 
-import torch
 from torch import nn
-from torch.nn import functional as F
+
 
 def _conv_layer(in_c, out_c, kernel_size=(3, 3, 3), padding=0):
     return nn.Sequential(
@@ -13,8 +12,16 @@ def _conv_layer(in_c, out_c, kernel_size=(3, 3, 3), padding=0):
         nn.BatchNorm3d(out_c),
     )
 
+
 class BasicCNN_3D(nn.Module):
-    def __init__(self, num_classes, in_channels=6, num_layers=4, max_pool_layers={1}):
+    def __init__(
+        self,
+        num_classes,
+        in_channels=6,
+        num_layers=4,
+        max_pool_layers={1},
+        dimensions=None
+    ):
         super().__init__()
         self.network_name = "BasicNeuralNetwork_3D"
         self.num_classes = num_classes
@@ -29,7 +36,7 @@ class BasicCNN_3D(nn.Module):
                 _conv_layer(in_channels, out_channels, kernel_size=(2, 3, 3))
             )
             in_channels = out_channels
-            out_channels = out_channels * (2**(i+1))
+            out_channels = out_channels * (2**(i + 1))
 
         self.layers = nn.Sequential(*layers)
 
@@ -42,5 +49,6 @@ class BasicCNN_3D(nn.Module):
             x = layer(x)
             if i in self.max_pool_layers:
                 x = self.mp(x)
-
+        print(x.shape)
+        print(x.view(x.shape[0], -1).shape)
         return self.output(x.view(x.shape[0], -1))

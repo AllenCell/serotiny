@@ -14,11 +14,15 @@ from torch import nn
 from torch.nn import functional as F
 import pytorch_lightning as pl
 
-from .networks._2d.basic_nn import BasicNeuralNetwork
-from .networks._2d.resnet18 import ResNet18Network
-from .networks._utils import acc_prec_recall
+from ..networks._2d import BasicNeuralNetwork, ResNet18Network
+from ..networks._3d import BasicCNN_3D
+from ..models._utils import acc_prec_recall
 
-AVAILABLE_NETWORKS = {"basic": BasicNeuralNetwork, "resnet18": ResNet18Network}
+AVAILABLE_NETWORKS = {
+    "basic": BasicNeuralNetwork, 
+    "resnet18": ResNet18Network, 
+    "basic3D": BasicCNN_3D
+}
 AVAILABLE_OPTIMIZERS = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}
 AVAILABLE_SCHEDULERS = {
     "reduce_lr_plateau": torch.optim.lr_scheduler.ReduceLROnPlateau
@@ -31,7 +35,7 @@ class ClassificationModel(pl.LightningModule):
         network,
         x_label="projection_image",
         y_label="mitotic_class",
-        num_channels=3,
+        in_channels=3,
         classes=("M0", "M1/M2", "M3", "M4/M5", "M6/M7"),
         image_x=104,
         image_y=176,
@@ -59,18 +63,26 @@ class ClassificationModel(pl.LightningModule):
             self.activations = False
 
         # Print out network
+        # self.example_input_array = torch.zeros(
+        #     64,
+        #     int(self.hparams.in_channels),
+        #     image_y,
+        #     image_x
+        #     # 64, int(self.hparams.num_channels), 176, 104
+        # )
         self.example_input_array = torch.zeros(
+            1,
+            int(self.hparams.in_channels),
             64,
-            int(self.hparams.num_channels),
-            image_y,
-            image_x
+            128,
+            96
             # 64, int(self.hparams.num_channels), 176, 104
         )
 
         """Metrics"""
-        self.train_metrics = acc_prec_recall(self.hparams.classes)
-        self.val_metrics = acc_prec_recall(self.hparams.classes)
-        self.test_metrics = acc_prec_recall(self.hparams.classes)
+        self.train_metrics = acc_prec_recall(len(self.hparams.classes))
+        self.val_metrics = acc_prec_recall(len(self.hparams.classes))
+        self.test_metrics = acc_prec_recall(len(self.hparams.classes))
         self.metrics = {
             "train": self.train_metrics,
             "val": self.val_metrics,
