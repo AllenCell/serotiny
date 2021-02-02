@@ -25,32 +25,11 @@ class BaseDataModule(pl.LightningDataModule):
         super().__init__()
 
         self.data_dir = data_dir
-        self.channels = config["channels"]
-        self.channel_indexes = config["channel_indexes"]
-        self.classes = config["classes"]
+
         self.id_fields = config["id_fields"]
         self.batch_size = batch_size
         self.num_workers = num_workers
-
-        self._num_channels = len(self.channels)
-        chosen_channels = self.channel_indexes
-        self.channel_indexes = None
         self.datasets = {}
-
-        if chosen_channels is not None:
-            try:
-                self.channel_indexes = [
-                    self.channels.index(channel_name) for channel_name
-                    in chosen_channels
-                ]
-                self._num_channels = len(self.channel_indexes)
-            except ValueError:
-                raise Exception(
-                    (
-                        f"channel indexes {self.channel_indexes} "
-                        f"do not match channel names {self.channels}"
-                    )
-                )
 
         self.transform = transforms.Compose(transform_list)
         self.train_transform = transforms.Compose(train_transform_list)

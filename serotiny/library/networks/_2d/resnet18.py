@@ -4,12 +4,9 @@ ResNet18 module, leveraging pretrained weights +
 
 from collections import OrderedDict
 
-import numpy as np
 import torch
 from torch import nn
-from torch.nn import functional as F
 import torchvision.models as models
-import seaborn as sns
 
 
 class ResNet18Network(nn.Module):
@@ -60,7 +57,6 @@ class ResNet18Network(nn.Module):
         )
 
     def forward(self, x):
-       # TODO rewritw this as self.model(x) so it works witn different models
         x = self.feature_extractor_first_layer(x)
         representations = self.feature_extractor(x)
         x = self.classifier(representations)

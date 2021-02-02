@@ -5,6 +5,7 @@ from ..image import png_loader
 from ...constants import DatasetFields
 from ...library.data import load_data_loader, Load2DImage, LoadClass, LoadId
 from .base_datamodule import BaseDataModule
+from .utils import subset_channels
 
 
 class Mitotic2DDataModule(BaseDataModule):
@@ -16,6 +17,16 @@ class Mitotic2DDataModule(BaseDataModule):
         num_workers: int,
         data_dir: str = './',
     ):
+
+        self.channels = config["channels"]
+        self.channel_subset = config["channel_indexes"]
+        self.classes = config["classes"]
+        self.num_channels = len(self.channels)
+
+        self.channel_indexes, self.num_channels = subset_channels(
+            channel_subset=self.channel_subset, 
+            channels=self.channels, 
+        )
 
         super().__init__(
             config=config,
@@ -47,7 +58,7 @@ class Mitotic2DDataModule(BaseDataModule):
             self.y_label: LoadClass(len(self.classes)),
             self.x_label: Load2DImage(
                 DatasetFields.Chosen2DProjectionPath,
-                self._num_channels,
+                self.num_channels,
                 self.channel_indexes,
                 self.transform,
             ),
@@ -62,7 +73,7 @@ class Mitotic2DDataModule(BaseDataModule):
         return png_loader(
             dataset[DatasetFields.Chosen2DProjectionPath].iloc[0],
             channel_order="CYX",
-            indexes={"C": self.channel_indexes or range(self._num_channels)},
+            indexes={"C": self.channel_indexes or range(self.num_channels)},
             transform=self.transform,
         )
 
@@ -76,7 +87,7 @@ class Mitotic2DDataModule(BaseDataModule):
         train_loaders = self.loaders.copy()
         train_loaders[self.x_label] = Load2DImage(
             DatasetFields.CellImage3DPath,
-            self._num_channels,
+            self.num_channels,
             self.channel_indexes,
             self.train_transform,
         )

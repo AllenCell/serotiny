@@ -6,8 +6,10 @@ import numpy as np
 from ...constants import DatasetFields
 from ...library.data import load_data_loader, Load3DImage, LoadClass, LoadId
 from .base_datamodule import BaseDataModule
+import torch
 
 from aicsimageprocessing.resize import resize_to
+from .utils import subset_channels
 
 
 class Mitotic3DDataModule(BaseDataModule):
@@ -20,17 +22,27 @@ class Mitotic3DDataModule(BaseDataModule):
         data_dir: str = './',
     ):
 
+        self.channels = config["channels"]
+        self.channel_subset = config["channel_indexes"]
+        self.classes = config["classes"]
+        self.num_channels = len(self.channels)
+
+        self.channel_indexes, self.num_channels = subset_channels(
+            channel_subset=self.channel_subset, 
+            channels=self.channels, 
+        )
+
         super().__init__(
             config=config,
             batch_size=batch_size,
             num_workers=num_workers,
             transform_list=[
                 transforms.Lambda(lambda x: resize_to(x, (6, 64, 128, 96))),
-                transforms.ToTensor()
+                transforms.Lambda(lambda x: torch.tensor(x)),
             ],
             train_transform_list=[
                 transforms.Lambda(lambda x: resize_to(x, (6, 64, 128, 96))),
-                transforms.ToTensor()
+                transforms.Lambda(lambda x: torch.tensor(x)),
             ],
             x_label="cell_image",
             y_label="mitotic_class",
@@ -43,7 +55,7 @@ class Mitotic3DDataModule(BaseDataModule):
             self.y_label: LoadClass(len(self.classes)),
             self.x_label: Load3DImage(
                 DatasetFields.CellImage3DPath,
-                self._num_channels,
+                self.num_channels,
                 self.channel_indexes,
                 self.transform,
             ),
@@ -67,7 +79,7 @@ class Mitotic3DDataModule(BaseDataModule):
         train_loaders = self.loaders.copy()
         train_loaders[self.x_label] = Load3DImage(
             DatasetFields.CellImage3DPath,
-            self._num_channels,
+            self.num_channels,
             self.channel_indexes,
             self.train_transform,
         )

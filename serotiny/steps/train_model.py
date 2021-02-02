@@ -18,8 +18,10 @@ from ray import tune
 from ..library.progress_bar import GlobalProgressBar
 from ..library.models.classification import (
     ClassificationModel,
+    AVAILABLE_NETWORKS,
+)
+from ..library.models.callbacks import (
     MyPrintingCallback,
-    available_networks,
 )
 import serotiny.library.datamodules as datamodules
 
@@ -59,17 +61,17 @@ def train_model(
     output_path: str,
     data_config: dict = {
         "classes": ["M0", "M1/M2", "M3", "M4/M5", "M6/M7"],
-        "channel_indexes": ["dna", "membrane"],
+        "channel_indexes": ["nucleus_segmentation", "membrane_segmentation", "dna", "membrane", "structure", "brightfield"],
         "id_fields": ["CellId", "CellIndex", "FOVId"],
-        "channels": ["membrane", "structure", "dna"],
+        "channels": ["nucleus_segmentation", "membrane_segmentation", "dna", "membrane", "structure", "brightfield"],
     },
-    data_key: str = "Mitotic2DDataModule",
-    model: str = "resnet18",
+    data_key: str = "Mitotic3DDataModule",
+    model: str = "basic3D",
     label: str = "Draft mitotic state resolved",
     batch_size: int = 64,
     num_gpus: int = 1,
     num_workers: int = 50,
-    num_epochs: int = 1,
+    num_epochs: int = 15,
     lr: int = 0.001,
     model_optimizer: str = "sgd",
     model_scheduler: str = "reduce_lr_plateau",
@@ -90,12 +92,12 @@ def train_model(
         data_dir=datasets_path
     )
     dm.setup()
-    num_channels = dm._num_channels
+    in_channels = dm.num_channels
     dimensions = dm.dims 
 
     # init model
     network_config = {
-        "num_channels": num_channels,
+        "in_channels": in_channels,
         "num_classes": len(data_config['classes']),
         "dimensions": dimensions,
     }
@@ -103,13 +105,13 @@ def train_model(
     network_config.update(model)
     model_type = network_config.pop("type")
 
-    if model_type in available_networks:
-        network = available_networks[model_type](**network_config)
+    if model_type in AVAILABLE_NETWORKS:
+        network = AVAILABLE_NETWORKS[model_type](**network_config)
     else:
         raise Exception(
             (
                 f"network type {model_type} not available, "
-                f"options are {list(available_networks.keys())}"
+                f"options are {list(AVAILABLE_NETWORKS.keys())}"
             )
         )
 
@@ -117,7 +119,7 @@ def train_model(
         network,
         x_label=dm.x_label,
         y_label=dm.y_label,
-        num_channels=num_channels,
+        in_channels=in_channels,
         classes=data_config['classes'],
         label=label,
         image_x=dimensions[0],

@@ -14,7 +14,7 @@ def _conv_layer(in_c, out_c, kernel_size=(3, 3, 3), padding=0):
 
 
 class BasicCNN_3D(nn.Module):
-    def __init__(self, in_channels=6, num_classes=5, num_layers=5, max_pool_layers={0, 1, 2}):
+    def __init__(self, in_channels=6, num_classes=5, num_layers=5, max_pool_layers={0, 1, 2}, dimensions=None):
         super().__init__()
         self.network_name = "BasicNeuralNetwork_3D"
         self.num_classes = num_classes
@@ -42,5 +42,5 @@ class BasicCNN_3D(nn.Module):
             x = layer(x)
             if i in self.max_pool_layers:
                 x = self.mp(x)
-
+                
         return self.output(x.view(x.shape[0], -1))

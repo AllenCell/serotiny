@@ -87,6 +87,7 @@ def tiff_loader_CZYX(
     output_dtype=np.float32,
     channel_masks=None,
     mask_thresh=0,
+    transform=None,
 ):
     aicsimg = aicsimageio.AICSImage(path_str)
     channel_names = aicsimg.get_channel_names()
@@ -121,6 +122,8 @@ def tiff_loader_CZYX(
         data = data[channel_indexes, ...]
 
     data = data.astype(output_dtype)
+    if transform:
+        data = transform(data)
 
     return data
 

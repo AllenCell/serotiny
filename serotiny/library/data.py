@@ -16,7 +16,7 @@ from .image import png_loader, tiff_loader_CZYX
 
 def powerset(iterable):
     s = list(iterable)
-    return list(chain.from_iterable(combinations(s, r) for r in range(len(s)+1)))
+    return list(chain.from_iterable(combinations(s, r) for r in range(len(s) + 1)))
 
 
 def download_quilt_data(
@@ -110,11 +110,13 @@ class Load2DImage:
             transform=self.transform,
         )
 
+
 class Load3DImage:
     def __init__(self, chosen_col, num_channels, channel_indexes, transform=None):
         self.chosen_col = chosen_col
         self.num_channels = num_channels
         self.channel_indexes = channel_indexes
+        self.transform = transform
 
     def __call__(self, row):
         return tiff_loader_CZYX(
@@ -123,7 +125,8 @@ class Load3DImage:
             select_channels=None,
             output_dtype=np.float32,
             channel_masks=None,
-            mask_thresh=0
+            mask_thresh=0,
+            transform=self.transform
         )
 
 
