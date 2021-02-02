@@ -14,9 +14,9 @@ from torch import nn
 from torch.nn import functional as F
 import pytorch_lightning as pl
 
-from ._2d.basic_nn import BasicNeuralNetwork
-from ._2d.resnet18 import ResNet18Network
-from ._utils import acc_prec_recall
+from .networks._2d.basic_nn import BasicNeuralNetwork
+from .networks._2d.resnet18 import ResNet18Network
+from .networks._utils import acc_prec_recall
 
 AVAILABLE_NETWORKS = {"basic": BasicNeuralNetwork, "resnet18": ResNet18Network}
 AVAILABLE_OPTIMIZERS = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}

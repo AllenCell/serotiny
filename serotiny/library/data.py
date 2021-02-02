@@ -11,7 +11,7 @@ from sklearn.preprocessing import OneHotEncoder
 from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler
 from torch.utils.data.dataloader import default_collate as collate
 import torch
-from .image import png_loader
+from .image import png_loader, tiff_loader_CZYX
 
 
 def powerset(iterable):
@@ -73,7 +73,7 @@ class DataframeDataset(Dataset):
         return sample
 
 
-class LoadId(object):
+class LoadId:
     def __init__(self, id_fields):
         self.id_fields = id_fields
 
@@ -81,7 +81,7 @@ class LoadId(object):
         return {key: row[key] for key in self.id_fields}
 
 
-class LoadClass(object):
+class LoadClass:
     def __init__(self, num_classes, binary=False):
         self.num_classes = num_classes
         self.binary = binary
@@ -95,20 +95,35 @@ class LoadClass(object):
             )
 
 
-class LoadImage(object):
-    def __init__(self, chosen_label, num_channels, channel_indexes, transform):
-        self.chosen_label = chosen_label
+class Load2DImage:
+    def __init__(self, chosen_col, num_channels, channel_indexes, transform):
+        self.chosen_col = chosen_col
         self.num_channels = num_channels
         self.channel_indexes = channel_indexes
         self.transform = transform
 
     def __call__(self, row):
         return png_loader(
-            # DatasetFields.Chosen2DProjectionPath
-            row[self.chosen_label],
+            row[self.chosen_col],
             channel_order="CYX",
             indexes={"C": self.channel_indexes or range(self.num_channels)},
             transform=self.transform,
+        )
+
+class Load3DImage:
+    def __init__(self, chosen_col, num_channels, channel_indexes, transform=None):
+        self.chosen_col = chosen_col
+        self.num_channels = num_channels
+        self.channel_indexes = channel_indexes
+
+    def __call__(self, row):
+        return tiff_loader_CZYX(
+            path_str=row[self.chosen_col],
+            channel_indexes=self.channel_indexes,
+            select_channels=None,
+            output_dtype=np.float32,
+            channel_masks=None,
+            mask_thresh=0
         )
 
 
