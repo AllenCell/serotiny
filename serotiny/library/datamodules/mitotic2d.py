@@ -8,9 +8,9 @@ from ..image import png_loader
 from pathlib import Path
 from ...constants import DatasetFields
 from ...library.data import load_data_loader, LoadImage, LoadClass, LoadId
+from .base_datamodule import BaseDataModule
 
-
-class Mitotic2DDataModule(pl.LightningDataModule):
+class Mitotic2DDataModule(BaseDataModule):
 
     def __init__(
         self,

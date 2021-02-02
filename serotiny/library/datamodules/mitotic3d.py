@@ -12,7 +12,7 @@ from .base_datamodule import BaseDataModule
 
 from aicsimageprocessing.resize import resize_to
 
-class Mitotic3DDataModule():
+class Mitotic3DDataModule(BaseDataModule):
 
     def __init__(
         self,
