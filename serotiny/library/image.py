@@ -1,6 +1,8 @@
 import numpy as np
 import json
 import torch
+from pathlib import Path
+from typing import NamedTuple, Optional, Union
 
 from imageio import imwrite
 
@@ -122,7 +124,11 @@ def tiff_loader_CZYX(
 
     return data
 
-def change_resolution(path_in, path_out, ZYX_resolution):
+def change_resolution(
+        path_in: Union[str, Path],
+        path_out: Union[str, Path],
+        ZYX_resolution: Union[float, list]
+):
     aicsimageio.use_dask(False)
 
     """
@@ -133,7 +139,7 @@ def change_resolution(path_in, path_out, ZYX_resolution):
         The path to the input OME TIFF file 
     path_out: Union[str, Path]
         The path to the output OME TIFF file
-    ZYX_resolution: Union[scalar, list]
+    ZYX_resolution: Union[float, list]
         Resolution scaling factor or desired ZYX dimensions (list of 3)
     Returns
     -------

@@ -86,6 +86,8 @@ def apply_resolution(
     # Preparing variables for resizing of images
     out_images = []
     images_to_resize = []
+    resolution_dir = Path(path_out) / resolution_path
+    resolution_dir.mkdir(parents=True, exist_ok=True)
 
     for path in dataset[path_3d_column]:
         # get the 3d image path
@@ -93,8 +95,6 @@ def apply_resolution(
         full_name = path_3d.name
 
         # save the resized images with the same name as the 3d path
-        resolution_dir = Path(path_out) / resolution_path
-        resolution_dir.mkdir(parents=True, exist_ok=True)
         path_res = resolution_dir / full_name
         out_images.append(str(path_res))
 
