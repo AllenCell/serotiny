@@ -61,7 +61,7 @@ def apply_resolution(
     path_3d_column: str
         The name of the column in manifest_in that lists the paths to the input OME TIFF files
     manifest_out: Union[str, Path]
-        The path to the output OME TIFF file
+        The path to the manifest csv file with resampled images
     path_3d_resized_column: str
         The name of the column in manifest_out that lists the paths to the output OME TIFF files
     path_out: Union[str, Path]
