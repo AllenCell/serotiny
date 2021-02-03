@@ -25,13 +25,13 @@ test_requirements = [
 dev_requirements = [
     *setup_requirements,
     *test_requirements,
-    "bumpversion>=0.6.0",
+    "bump2version>=1.0.1",
     "coverage>=5.1",
     "ipython>=7.15.0",
-    "m2r>=0.2.1",
+    "m2r2>=0.2.7",
     "pytest-runner>=5.2",
-    "Sphinx>=2.0.0b1,<3",
-    "sphinx_rtd_theme>=0.4.3",
+    "Sphinx>=3.4.3",
+    "sphinx_rtd_theme>=0.5.1",
     "tox>=3.15.2",
     "twine>=3.1.1",
     "wheel>=0.34.2",
@@ -65,6 +65,9 @@ requirements = [
     "tqdm",
     "seaborn",
     'urllib3<1.26',
+    "ray",
+    "hyperopt",
+    "ray[tune]",
 ]
 
 extra_requirements = {
@@ -74,7 +77,7 @@ extra_requirements = {
     "all": [
         *requirements,
         *dev_requirements,
-    ],
+    ]
 }
 
 setup(
@@ -83,17 +86,20 @@ setup(
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
-        "License :: Free for non-commercial use",
+        "License :: OSI Approved :: MIT License",
         "Natural Language :: English",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
     ],
-    description="classify 2d cell images into mitotic or non-mitotic",
+    description="library and commands for deep learning workflows",
     entry_points={
-        "console_scripts": ["mitotic_classifier=mitotic_classifier.bin.cli:cli"]
+        "console_scripts": [
+            "my_example=serotiny.bin.my_example:main"
+        ],
     },
     install_requires=requirements,
-    license="Allen Institute Software License",
+    license="MIT license",
     long_description=readme,
     long_description_content_type="text/markdown",
     include_package_data=True,
@@ -108,6 +114,6 @@ setup(
     url="https://github.com/AllenCellModeling/serotiny",
     # Do not edit this string manually, always use bumpversion
     # Details in CONTRIBUTING.rst
-    version="0.0.1",
+    version="0.0.0",
     zip_safe=False,
 )

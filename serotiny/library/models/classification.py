@@ -1,105 +1,26 @@
+"""
+General 2d classifier module, implemented as a Pytorch Lightning module
+"""
+
+from collections import OrderedDict
+
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from typing import Optional
+
 import torch
 from torch import nn
-import pytorch_lightning as pl
-from collections import OrderedDict
 from torch.nn import functional as F
-import matplotlib.pyplot as plt
-import numpy as np
-import torchvision.models as models
-import seaborn as sns
+import pytorch_lightning as pl
 
+from ._2d.basic_nn import BasicNeuralNetwork
+from ._2d.resnet18 import ResNet18Network
+from ._utils import acc_prec_recall
 
-class BasicNeuralNetwork(nn.Module):
-    def __init__(self, num_channels=3, num_classes=5, dimensions=(176, 104)):
-        super().__init__()
-        self.network_name = "BasicNeuralNetwork"
-        self.num_classes = num_classes
-        self.layer_1 = torch.nn.Linear(
-            dimensions[1] * dimensions[0] * num_channels, 
-            128
-        )
-        self.layer_2 = torch.nn.Linear(128, 256)
-        # TODO configure output dims as param
-        self.layer_3 = torch.nn.Linear(256, num_classes)
-
-        self.dropout = nn.Dropout(0.25)
-        torch.nn.init.xavier_uniform_(self.layer_1.weight)
-        torch.nn.init.xavier_uniform_(self.layer_2.weight)
-        torch.nn.init.xavier_uniform_(self.layer_3.weight)
-
-    def forward(self, x):
-        batch_size, channels, width, height = x.size()
-        x = x.view(batch_size, -1)
-        x = self.dropout(x)
-        x = self.layer_1(x)
-        x = self.dropout(x)
-        x = F.relu(x)
-        x = self.layer_2(x)
-        x = self.dropout(x)
-        x = F.relu(x)
-        x = self.layer_3(x)
-
-        return x
-
-
-class ResNet18Network(nn.Module):
-    def __init__(self, num_channels=3, num_classes=5, dimensions=(176, 104)):
-        super().__init__()
-        self.network_name = "Resnet18"
-        self.num_classes = num_classes
-        self.feature_extractor_first_layer = nn.Sequential(
-            OrderedDict(
-                [
-                    (
-                        "conv_before_resnet",
-                        nn.Conv2d(
-                            num_channels,
-                            3,
-                            kernel_size=1,
-                            stride=1,
-                            padding=0,
-                            bias=False,
-                        ),
-                    )
-                ]
-            )
-        )
-        # initialize weights of first layer
-        torch.nn.init.xavier_uniform_(
-            self.feature_extractor_first_layer.conv_before_resnet.weight
-        )
-
-        self.feature_extractor = models.resnet18(pretrained=True)
-        # dont freeze the weights
-        # self.feature_extractor.eval()
-
-        # Classifier architecture to put on top of resnet18
-        self.classifier = nn.Sequential(
-            OrderedDict(
-                [
-                    (
-                        "fc1",
-                        nn.Linear(self.feature_extractor.fc.out_features, 100)
-                    ),
-                    ("relu", nn.ReLU()),
-                    # TODO configure output number classes
-                    ("fc2", nn.Linear(100, num_classes)),
-                    # ("output", nn.Sigmoid()),
-                ]
-            )
-        )
-
-    def forward(self, x):
-        # TODO rewritw this as self.model(x) so it works witn different models
-        x = self.feature_extractor_first_layer(x)
-        representations = self.feature_extractor(x)
-        x = self.classifier(representations)
-        return x
-
-
-available_networks = {"basic": BasicNeuralNetwork, "resnet18": ResNet18Network}
-available_optimizers = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}
-available_schedulers = {
+AVAILABLE_NETWORKS = {"basic": BasicNeuralNetwork, "resnet18": ResNet18Network}
+AVAILABLE_OPTIMIZERS = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}
+AVAILABLE_SCHEDULERS = {
     "reduce_lr_plateau": torch.optim.lr_scheduler.ReduceLROnPlateau
 }
 
@@ -111,13 +32,14 @@ class ClassificationModel(pl.LightningModule):
         x_label="projection_image",
         y_label="mitotic_class",
         num_channels=3,
-        num_classes=5,
+        classes=("M0", "M1/M2", "M3", "M4/M5", "M6/M7"),
         image_x=104,
         image_y=176,
         lr=1e-3,
         optimizer="adam",
         scheduler="reduce_lr_plateau",
-        metrics=None,
+        label: Optional[str] = None,
+        projection: Optional[dict] = None,
     ):
         super().__init__()
         """Save hyperparameters"""
@@ -132,13 +54,9 @@ class ClassificationModel(pl.LightningModule):
         self.network = network
 
         if self.network.network_name == "Resnet18":
-            self.activations = True
-
-        hparams = {
-            symbol: getattr(self.hparams, symbol)
-            for symbol in dir(self.hparams)
-        }
-        print(f"hyperparameters - {hparams}")
+            # This spits out too many images to 
+            # tensorboard. Setting it to False
+            self.activations = False
 
         # Print out network
         self.example_input_array = torch.zeros(
@@ -149,44 +67,15 @@ class ClassificationModel(pl.LightningModule):
             # 64, int(self.hparams.num_channels), 176, 104
         )
 
-        if self.hparams.num_classes == 5:
-            self.classes = ("M0", "M1/M2", "M3", "M4/M5", "M6/M7")
-        elif self.hparams.num_classes == 2:
-            self.classes = ("Mitotic", "Non_Mitotic")
-        else:
-            self.classes = ("0", "1", "2", "3", "4")
-
         """Metrics"""
-        self.train_metrics = torch.nn.ModuleDict(
-            {
-                'accuracy': pl.metrics.Accuracy(),
-                'precision': pl.metrics.Precision(
-                    num_classes=5,
-                    average='macro'
-                ),
-                'recall': pl.metrics.Recall(num_classes=5, average='macro'),
-            }
-        )
-        self.val_metrics = torch.nn.ModuleDict(
-            {
-                'accuracy': pl.metrics.Accuracy(),
-                'precision': pl.metrics.Precision(
-                    num_classes=5,
-                    average='macro'
-                ), 
-                'recall': pl.metrics.Recall(num_classes=5, average='macro'),
-            }
-        )
-        self.test_metrics = torch.nn.ModuleDict(    
-            {
-                'accuracy': pl.metrics.Accuracy(),
-                'precision': pl.metrics.Precision(
-                    num_classes=5,
-                    average='macro'
-                ),
-                'recall': pl.metrics.Recall(num_classes=5, average='macro'),
-            }
-        )
+        self.train_metrics = acc_prec_recall(self.hparams.classes)
+        self.val_metrics = acc_prec_recall(self.hparams.classes)
+        self.test_metrics = acc_prec_recall(self.hparams.classes)
+        self.metrics = {
+            "train": self.train_metrics,
+            "val": self.val_metrics,
+            "test": self.test_metrics
+        }
 
     def _generate_logs(self, preds, true, prefix, metrics):
         _, preds_batch = torch.max(preds, 1)
@@ -210,13 +99,15 @@ class ClassificationModel(pl.LightningModule):
         output = self.network(x)
         return output
 
-    def training_step_end(self, outputs):
+    def _log_metrics(self, outputs, prefix):
+
         logs = self._generate_logs(
             outputs['preds'],
             outputs['target'],
-            "train",
-            self.train_metrics,
+            prefix,
+            self.metrics[prefix],
         )
+        outputs.update(logs)
 
         for key, value in logs.items():
             # TODO configure outout logging
@@ -227,7 +118,7 @@ class ClassificationModel(pl.LightningModule):
             conf_mat = pl.metrics.functional.confusion_matrix(
                 preds_batch,
                 outputs['target'],
-                num_classes=self.hparams.num_classes
+                num_classes=len(self.hparams.classes)
             )
 
             fig, ax = plt.subplots(1, 1, figsize=(10, 10))
@@ -238,7 +129,7 @@ class ClassificationModel(pl.LightningModule):
                 annot_kws={"size": 8}
             )
             self.logger.experiment.add_figure(
-                "Confusion matrix (train)",
+                f"Confusion matrix {prefix}",
                 fig,
                 global_step=self.current_epoch,
             )
@@ -270,39 +161,8 @@ class ClassificationModel(pl.LightningModule):
             'batch_idx': batch_idx
         }
 
-    def validation_step_end(self, outputs):
-        logs = self._generate_logs(
-            outputs['preds'],
-            outputs['target'],
-            "val",
-            self.val_metrics,
-        )
-
-        for key, value in logs.items():
-            # TODO configure outout logging
-            self.log(key, value, on_step=True, on_epoch=True, prog_bar=True)
-
-        if outputs['batch_idx'] == 0:
-            _, preds_batch = torch.max(outputs['preds'], 1)
-            conf_mat = pl.metrics.functional.confusion_matrix(
-                preds_batch, 
-                outputs['target'], 
-                num_classes=self.hparams.num_classes
-            )
-
-            fig, ax = plt.subplots(1, 1, figsize=(10, 10))
-            sns.heatmap(
-                conf_mat.cpu(), 
-                cmap="RdBu_r", 
-                annot=True, ax=ax, 
-                annot_kws={"size": 8}
-            )
-            self.logger.experiment.add_figure(
-                "Confusion matrix (val)",
-                fig,
-                global_step=self.current_epoch,
-            )
-
+    def training_step_end(self, outputs):
+        outputs = self._log_metrics(outputs, "train")
         return outputs
 
     def validation_step(self, batch, batch_idx):
@@ -325,58 +185,21 @@ class ClassificationModel(pl.LightningModule):
             'batch_idx': batch_idx
         }
 
-    def test_step_end(self, outputs):
-        logs = self._generate_logs(
-            outputs['preds'],
-            outputs['target'],
-            "test",
-            self.test_metrics,
-        )
+    def validation_step_end(self, outputs):
 
-        for key, value in logs.items():
-            # TODO configure outout logging
-            self.log(key, value, on_step=True, on_epoch=True, prog_bar=True)
-
-        if outputs['batch_idx'] == 0:
-            _, preds_batch = torch.max(outputs['preds'], 1)
-            conf_mat = pl.metrics.functional.confusion_matrix(
-                preds_batch, 
-                outputs['target'], 
-                num_classes=self.hparams.num_classes
-            )
-
-            fig, ax = plt.subplots(1, 1, figsize=(10, 10))
-            sns.heatmap(
-                conf_mat.cpu(), 
-                cmap="RdBu_r", 
-                annot=True, 
-                ax=ax, 
-                annot_kws={"size": 8}
-            )
-            self.logger.experiment.add_figure(
-                "Confusion matrix (test)",
-                fig,
-                global_step=self.current_epoch,
-            )
+        outputs = self._log_metrics(outputs, "val")
 
         return outputs
 
-    def test_step(self, batch, batch_idx):
-        x, y = self.parse_batch(batch)
-
-        yhat = self(x)
-        loss = nn.CrossEntropyLoss()(yhat, y)
-
-        self.log("test_loss", loss)
-
-        return {
-            "test_loss": loss, 
-            'preds': yhat, 
-            'target': y, 
-            'batch_idx': batch_idx
-        }
-
     def validation_epoch_end(self, outputs):
+
+        avg_loss = torch.stack(
+            [x["val_loss"] for x in outputs]).mean()
+        avg_acc = torch.stack(
+            [x["val_accuracy"] for x in outputs]).mean()
+        self.log("val_loss_epoch", avg_loss)
+        self.log("val_accuracy_epoch", avg_acc)
+
         class_probs = []
         class_preds = []
         for pred in outputs:
@@ -388,10 +211,32 @@ class ClassificationModel(pl.LightningModule):
         test_probs = torch.cat([torch.stack(batch) for batch in class_probs])
         test_preds = torch.cat(class_preds)
         # plot all the pr curves
-        for i in range(len(self.classes)):
+        for i in range(len(self.hparams.classes)):
             self._add_pr_curve_tensorboard(
                 i, test_probs, test_preds, global_step=self.current_epoch
             )
+
+    def test_step(self, batch, batch_idx):
+
+        x, y = self.parse_batch(batch)
+
+        yhat = self(x)
+        loss = nn.CrossEntropyLoss()(yhat, y)
+
+        self.log("test_loss", loss)
+
+        return {
+            "test_loss": loss,
+            'preds': yhat,
+            'target': y,
+            'batch_idx': batch_idx
+        }
+
+    def test_step_end(self, outputs):
+
+        outputs = self._log_metrics(outputs, "test")
+
+        return outputs
 
     def test_epoch_end(self, outputs):
         class_probs = []
@@ -405,7 +250,7 @@ class ClassificationModel(pl.LightningModule):
         test_probs = torch.cat([torch.stack(batch) for batch in class_probs])
         test_preds = torch.cat(class_preds)
         # plot all the pr curves
-        for i in range(len(self.classes)):
+        for i in range(len(self.hparams.classes)):
             self._add_pr_curve_tensorboard(
                 i,
                 test_probs,
@@ -413,29 +258,6 @@ class ClassificationModel(pl.LightningModule):
                 global_step=self.current_epoch,
                 name="_test",
             )
-
-    def training_epoch_end(self, outputs):
-        # Log computation graph
-        #  the function is called after every epoch is completed
-        if self.current_epoch == 0:
-            self.logger.experiment.add_graph(
-                ClassificationModel(
-                    network=self.hparams.network,
-                    x_label=self.hparams.x_label,
-                    y_label=self.hparams.y_label,
-                    num_channels=self.hparams.num_channels,
-                    num_classes=self.hparams.num_classes,
-                    image_x=self.hparams.image_x,
-                    image_y=self.hparams.image_y,
-                    lr=self.hparams.lr,
-                    optimizer=self.hparams.optimizer,
-                    scheduler=self.hparams.scheduler,
-                    metrics=self.hparams.metrics,
-                ),
-                self.example_input_array.cuda(),
-            )
-        if self.activations is True:
-            self.show_activations(self.reference_image)
 
     def _matplotlib_imshow(self, img, one_channel=False):
         if one_channel:
@@ -479,9 +301,9 @@ class ClassificationModel(pl.LightningModule):
             self._matplotlib_imshow(images[idx], one_channel=True)
             ax.set_title(
                 "{0}, {1:.1f}%\n(label: {2})".format(
-                    self.classes[preds[idx]],
+                    self.hparams.classes[preds[idx]],
                     probs[idx] * 100.0,
-                    self.classes[labels[idx]],
+                    self.hparams.classes[labels[idx]],
                 ),
             )
         return fig
@@ -503,7 +325,7 @@ class ClassificationModel(pl.LightningModule):
         tensorboard_probs = test_probs[:, class_index]
 
         self.logger.experiment.add_pr_curve(
-            self.classes[class_index] + name,
+            self.hparams.classes[class_index] + name,
             tensorboard_preds,
             tensorboard_probs,
             global_step=global_step,
@@ -511,7 +333,6 @@ class ClassificationModel(pl.LightningModule):
         self.logger.experiment.close()
 
     def show_activations(self, x):
-        # TODO configure if we want this or noot
         # logging reference image
         for i in range(4):
             self.logger.experiment.add_image(
@@ -572,27 +393,26 @@ class ClassificationModel(pl.LightningModule):
             )
 
     def configure_optimizers(self):
-        # TODO configure optimizer as Adam or SGD etc, also other parameters
         # with it like shceduler
-        if self.hparams.optimizer in available_optimizers:
-            optimizer_class = available_optimizers[self.hparams.optimizer]
+        if self.hparams.optimizer in AVAILABLE_OPTIMIZERS:
+            optimizer_class = AVAILABLE_OPTIMIZERS[self.hparams.optimizer]
             optimizer = optimizer_class(self.parameters(), lr=self.hparams.lr)
         else:
             raise Exception(
                 (
                     f"optimizer {self.hparams.optimizer} not available, "
-                    f"options are {list(available_optimizers.keys())}"
+                    f"options are {list(AVAILABLE_OPTIMIZERS.keys())}"
                 )
             )
 
-        if self.hparams.scheduler in available_schedulers:
-            scheduler_class = available_schedulers[self.hparams.scheduler]
+        if self.hparams.scheduler in AVAILABLE_SCHEDULERS:
+            scheduler_class = AVAILABLE_SCHEDULERS[self.hparams.scheduler]
             scheduler = scheduler_class(optimizer)
         else:
             raise Exception(
                 (
                     f"scheduler {self.hparams.scheduler} not available, "
-                    f"options are {list(available_schedulers.keys())}"
+                    f"options are {list(AVAILABLE_SCHEDULERS.keys())}"
                 )
             )
 
@@ -611,23 +431,15 @@ class ClassificationModel(pl.LightningModule):
         # example to inspect gradient information in tensorboard
         if (
             self.log_grads and self.trainer.global_step % 100 == 0
-        ):  # don't make the tf file huge
+        ):  # don't make the file huge
             params = self.state_dict()
             for k, v in params.items():
                 grads = v
                 name = k
                 self.logger.experiment.add_histogram(
-                    tag=name, values=grads, global_step=self.trainer.global_step
+                    tag=name,
+                    values=grads,
+                    global_step=self.trainer.global_step
                 )
 
 
-class MyPrintingCallback(pl.Callback):
-    # TODO confugure a better callback than this, its currently empty
-    def on_init_start(self, trainer):
-        print("Starting to init trainer!")
-
-    def on_init_end(self, trainer):
-        print("Trainer is init now")
-
-    def on_train_end(self, trainer, pl_module):
-        print("Do something when training ends")
