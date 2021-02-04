@@ -185,7 +185,15 @@ def change_resolution(
     return data_new.shape
 
 
-def project_2d(path_3d, axis, method, path_2d, channels=None, masks=None):
+def project_2d(
+    path_3d, 
+    axis, 
+    method, 
+    path_2d, 
+    channels=None, 
+    masks=None,
+    proj_all=False,
+):
     aicsimageio.use_dask(False)
 
     # load the 3d image
@@ -212,7 +220,7 @@ def project_2d(path_3d, axis, method, path_2d, channels=None, masks=None):
     # project from CZYX to CYX
     projection = aicsimageprocessing.imgtoprojection(
         image_3d,
-        proj_all=False,
+        proj_all=proj_all,
         proj_method=method,
         local_adjust=False,
         global_adjust=True,
