@@ -6,6 +6,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
+
 class BasicNeuralNetwork(nn.Module):
     def __init__(self, num_channels=3, num_classes=5, dimensions=(176, 104)):
         super().__init__()

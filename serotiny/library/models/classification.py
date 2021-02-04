@@ -2,9 +2,6 @@
 General 2d classifier module, implemented as a Pytorch Lightning module
 """
 
-from collections import OrderedDict
-
-import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from typing import Optional
@@ -14,11 +11,15 @@ from torch import nn
 from torch.nn import functional as F
 import pytorch_lightning as pl
 
-from ._2d.basic_nn import BasicNeuralNetwork
-from ._2d.resnet18 import ResNet18Network
-from ._utils import acc_prec_recall
+from ..networks._2d import BasicNeuralNetwork, ResNet18Network
+from ..networks._3d import BasicCNN_3D
+from ._utils import acc_prec_recall, add_pr_curve_tensorboard
 
-AVAILABLE_NETWORKS = {"basic": BasicNeuralNetwork, "resnet18": ResNet18Network}
+AVAILABLE_NETWORKS = {
+    "basic": BasicNeuralNetwork, 
+    "resnet18": ResNet18Network, 
+    "basic3D": BasicCNN_3D
+}
 AVAILABLE_OPTIMIZERS = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}
 AVAILABLE_SCHEDULERS = {
     "reduce_lr_plateau": torch.optim.lr_scheduler.ReduceLROnPlateau
@@ -31,7 +32,7 @@ class ClassificationModel(pl.LightningModule):
         network,
         x_label="projection_image",
         y_label="mitotic_class",
-        num_channels=3,
+        in_channels=3,
         classes=("M0", "M1/M2", "M3", "M4/M5", "M6/M7"),
         image_x=104,
         image_y=176,
@@ -48,29 +49,31 @@ class ClassificationModel(pl.LightningModule):
 
         """Configs"""
         self.log_grads = True
-        self.activations = False
 
         """model"""
         self.network = network
 
-        if self.network.network_name == "Resnet18":
-            # This spits out too many images to 
-            # tensorboard. Setting it to False
-            self.activations = False
-
         # Print out network
+        # self.example_input_array = torch.zeros(
+        #     64,
+        #     int(self.hparams.in_channels),
+        #     image_y,
+        #     image_x
+        #     # 64, int(self.hparams.num_channels), 176, 104
+        # )
         self.example_input_array = torch.zeros(
+            1,
+            int(self.hparams.in_channels),
             64,
-            int(self.hparams.num_channels),
-            image_y,
-            image_x
+            128,
+            96
             # 64, int(self.hparams.num_channels), 176, 104
         )
 
         """Metrics"""
-        self.train_metrics = acc_prec_recall(self.hparams.classes)
-        self.val_metrics = acc_prec_recall(self.hparams.classes)
-        self.test_metrics = acc_prec_recall(self.hparams.classes)
+        self.train_metrics = acc_prec_recall(len(self.hparams.classes))
+        self.val_metrics = acc_prec_recall(len(self.hparams.classes))
+        self.test_metrics = acc_prec_recall(len(self.hparams.classes))
         self.metrics = {
             "train": self.train_metrics,
             "val": self.val_metrics,
@@ -168,12 +171,16 @@ class ClassificationModel(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
 
         x, y = self.parse_batch(batch)
-        if batch_idx == 0:
-            self.logger.experiment.add_figure(
-                "predictions vs actuals (val).",
-                self._plot_classes_preds(self.network, x, y),
-                global_step=self.current_epoch,
-            )
+        # if batch_idx == 0:
+        #     self.logger.experiment.add_figure(
+        #         "predictions vs actuals (val).",
+        #         plot_classes_preds(
+        # self.network, 
+        # x, 
+        # y, 
+        # self.hparams.classes),
+        #         global_step=self.current_epoch,
+        #     )
         yhat = self(x)
         loss = nn.CrossEntropyLoss()(yhat, y)
         self.log("val_loss", loss, on_step=True, on_epoch=True, prog_bar=True)
@@ -212,8 +219,13 @@ class ClassificationModel(pl.LightningModule):
         test_preds = torch.cat(class_preds)
         # plot all the pr curves
         for i in range(len(self.hparams.classes)):
-            self._add_pr_curve_tensorboard(
-                i, test_probs, test_preds, global_step=self.current_epoch
+            add_pr_curve_tensorboard(
+                logger=self.logger, 
+                classes=self.hparams.classes, 
+                class_index=i, 
+                test_probs=test_probs, 
+                test_preds=test_preds, 
+                global_step=self.current_epoch
             )
 
     def test_step(self, batch, batch_idx):
@@ -251,145 +263,14 @@ class ClassificationModel(pl.LightningModule):
         test_preds = torch.cat(class_preds)
         # plot all the pr curves
         for i in range(len(self.hparams.classes)):
-            self._add_pr_curve_tensorboard(
-                i,
-                test_probs,
-                test_preds,
+            add_pr_curve_tensorboard(
+                logger=self.logger, 
+                classes=self.hparams.classes, 
+                class_index=i, 
+                test_probs=test_probs, 
+                test_preds=test_preds, 
                 global_step=self.current_epoch,
                 name="_test",
-            )
-
-    def _matplotlib_imshow(self, img, one_channel=False):
-        if one_channel:
-            img = img.mean(dim=0)
-        img = img / 2 + 0.5  # unnormalize
-        npimg = img.cpu().numpy()
-        if one_channel:
-            plt.imshow(npimg, cmap="Greys")
-        else:
-            plt.imshow(np.transpose(npimg, (1, 2, 0)))
-
-    def _images_to_probs(self, net, images):
-        """
-        Generates predictions and corresponding probabilities from a trained
-        network and a list of images
-        """
-        output = net(images)
-        # convert output probabilities to predicted class
-        _, preds_tensor = torch.max(output, 1)
-        preds = np.squeeze(preds_tensor.cpu().numpy())
-        return preds, [
-            F.softmax(el, dim=0)[i].item() for i, el in zip(preds, output)
-            ]
-
-    def _plot_classes_preds(self, net, images, labels):
-        """
-        Generates matplotlib Figure using a trained network, along with images
-        and labels from a batch, that shows the network's top prediction along
-        with its probability, alongside the actual label, coloring this
-        information based on whether the prediction was correct or not.
-        Uses the "images_to_probs" function.
-        """
-        preds, probs = self._images_to_probs(net, images)
-
-        labels = list(labels.cpu().numpy())
-        labels = [int(i) for i in labels]
-        # plot the images in the batch, along with predicted and true labels
-        fig = plt.figure(figsize=(20, 15))
-        for idx in np.arange(4):
-            ax = fig.add_subplot(1, 4, idx + 1, xticks=[], yticks=[])
-            self._matplotlib_imshow(images[idx], one_channel=True)
-            ax.set_title(
-                "{0}, {1:.1f}%\n(label: {2})".format(
-                    self.hparams.classes[preds[idx]],
-                    probs[idx] * 100.0,
-                    self.hparams.classes[labels[idx]],
-                ),
-            )
-        return fig
-
-    # helper function
-    def _add_pr_curve_tensorboard(
-        self,
-        class_index,
-        test_probs,
-        test_preds,
-        global_step=0,
-        name="_val",
-    ):
-        """
-        Takes in a "class_index" and plots the corresponding
-        precision-recall curve
-        """
-        tensorboard_preds = test_preds == class_index
-        tensorboard_probs = test_probs[:, class_index]
-
-        self.logger.experiment.add_pr_curve(
-            self.hparams.classes[class_index] + name,
-            tensorboard_preds,
-            tensorboard_probs,
-            global_step=global_step,
-        )
-        self.logger.experiment.close()
-
-    def show_activations(self, x):
-        # logging reference image
-        for i in range(4):
-            self.logger.experiment.add_image(
-                "input",
-                torch.Tensor.cpu(x[i][0]),
-                global_step=self.current_epoch,
-                dataformats="HW",
-            )
-
-        first_conv_output = self.network.feature_extractor_first_layer(x)
-
-        for i in range(4):  # Log 4 images per epoch
-            self.logger.experiment.add_image(
-                "first_conv",
-                torch.Tensor.cpu(first_conv_output[i][0]),
-                global_step=self.current_epoch,
-                dataformats="HW",
-            )
-
-        # logging first convolution activations
-        second_convolution = nn.Sequential(
-            OrderedDict(
-                [
-                    ("conv1", self.network.feature_extractor.conv1),
-                    ("bn1", self.network.feature_extractor.bn1),
-                    ("relu", self.network.feature_extractor.relu),
-                ]
-            )
-        )
-        second_convolution_output = second_convolution(first_conv_output)
-        # img_grid = torchvision.utils.make_grid(out)
-        for i in range(4):  # Log 4 images per epoch
-            self.logger.experiment.add_image(
-                "second_conv",
-                torch.Tensor.cpu(second_convolution_output[i][0]),
-                global_step=self.current_epoch,
-                dataformats="HW",
-            )
-
-        # logging classifier activations
-        # logging first convolution activations
-        basic_block = nn.Sequential(
-            OrderedDict(
-                [
-                    ("maxpool", self.network.feature_extractor.maxpool),
-                    ("layer1", self.network.feature_extractor.layer1),
-                ]
-            )
-        )
-        basic_block_output = basic_block(second_convolution_output)
-        # img_grid_classifier = torchvision.utils.make_grid(out_classifier)
-        for i in range(4):
-            self.logger.experiment.add_image(
-                "first_basic_block",
-                torch.Tensor.cpu(basic_block_output[i][0]),
-                global_step=self.current_epoch,
-                dataformats="HW",
             )
 
     def configure_optimizers(self):

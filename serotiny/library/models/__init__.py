@@ -1,1 +1,3 @@
-from .classification import ClassificationModel, MyPrintingCallback, available_networks
+from .classification import ClassificationModel, AVAILABLE_NETWORKS
+
+__all__ = ["ClassificationModel", "AVAILABLE_NETWORKS"]
