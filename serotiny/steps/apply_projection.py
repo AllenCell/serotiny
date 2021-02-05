@@ -49,8 +49,6 @@ def apply_projection(
     projection,
     path_3d_column: str,
     chosen_projection: str,
-    chosen_class=None,
-    label=None,
     source_path=None,
     executor_address: Optional[str] = None,
 ):
@@ -116,9 +114,6 @@ def apply_projection(
             )
 
     dimensions = find_dimensions(dataset[chosen_projection][0])
-
-    if chosen_class and label:
-        dataset[chosen_class] = dataset[label]
 
     dataset.to_csv(output_path, index=False)
 
