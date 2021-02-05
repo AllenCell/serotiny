@@ -50,6 +50,7 @@ def apply_projection(
     path_3d_column: str,
     chosen_projection: str,
     source_path=None,
+    proj_all=False,
     executor_address: Optional[str] = None,
 ):
 
@@ -111,6 +112,7 @@ def apply_projection(
                 [paths[1] for paths in projections],
                 [channels for _ in range(len(projections))],
                 [masks for _ in range(len(projections))],
+                [proj_all for _ in range(len(projections))]
             )
 
     dimensions = find_dimensions(dataset[chosen_projection][0])
