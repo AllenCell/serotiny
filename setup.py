@@ -48,7 +48,7 @@ step_workflow_requirements = [
     "fire",
     "psutil",
     "python-dateutil<=2.8.0",  # need <=2.8.0 for quilt3 in step
-    "actk>=0.2.0",  # useful functions
+    "actk>0.2.0",  # useful functions
     "dill>=0.3.3",  # pickle dataloader containing lambda functions
 ]
 

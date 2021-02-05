@@ -52,6 +52,7 @@ def apply_projection(
     chosen_class=None,
     label=None,
     source_path=None,
+    proj_all=False,
     executor_address: Optional[str] = None,
 ):
 
@@ -113,9 +114,8 @@ def apply_projection(
                 [paths[1] for paths in projections],
                 [channels for _ in range(len(projections))],
                 [masks for _ in range(len(projections))],
+                [proj_all for _ in range(len(projections))]
             )
-
-    dimensions = find_dimensions(dataset[chosen_projection][0])
 
     if chosen_class and label:
         dataset[chosen_class] = dataset[label]
