@@ -5,7 +5,7 @@ import logging
 import fire
 
 import pytorch_lightning as pl
-from pytorch_lightning.loggers import TensorBoardLogger
+from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
 from pytorch_lightning.callbacks import (
     ModelCheckpoint,
     GPUStatsMonitor,
@@ -20,14 +20,15 @@ from ..library.models.classification import (
     ClassificationModel,
     AVAILABLE_NETWORKS,
 )
-from ..library.models.callbacks import (
-    MyPrintingCallback,
-)
+# from ..library.models.callbacks import (
+#     MyPrintingCallback,
+# )
 import serotiny.library.datamodules as datamodules
 
 ###############################################################################
 
 log = logging.getLogger(__name__)
+pl.seed_everything(42)
 
 ###############################################################################
 
@@ -59,19 +60,25 @@ def train_model_config(
 def train_model(
     datasets_path: str,
     output_path: str,
+    # data_config: dict = {
+    #     "classes": ["M0", "M1/M2", "M3", "M4/M5", "M6/M7"],
+    #     "channel_indexes": ["nucleus_segmentation", "membrane_segmentation", "dna", "membrane", "structure", "brightfield"],
+    #     "id_fields": ["CellId", "CellIndex", "FOVId"],
+    #     "channels": ["nucleus_segmentation", "membrane_segmentation", "dna", "membrane", "structure", "brightfield"],
+    # },
     data_config: dict = {
         "classes": ["M0", "M1/M2", "M3", "M4/M5", "M6/M7"],
-        "channel_indexes": ["nucleus_segmentation", "membrane_segmentation", "dna", "membrane", "structure", "brightfield"],
+        "channel_indexes": ["dna", "membrane", "structure"],
         "id_fields": ["CellId", "CellIndex", "FOVId"],
-        "channels": ["nucleus_segmentation", "membrane_segmentation", "dna", "membrane", "structure", "brightfield"],
+        "channels": ["dna", "membrane", "structure"],
     },
-    data_key: str = "Mitotic3DDataModule",
-    model: str = "basic3D",
+    data_key: str = "Mitotic2DDataModule",
+    model: str = "resnet18",
     label: str = "Draft mitotic state resolved",
     batch_size: int = 64,
     num_gpus: int = 1,
     num_workers: int = 50,
-    num_epochs: int = 15,
+    num_epochs: int = 1,
     lr: int = 0.001,
     model_optimizer: str = "sgd",
     model_scheduler: str = "reduce_lr_plateau",
@@ -94,6 +101,7 @@ def train_model(
     dm.setup()
     in_channels = dm.num_channels
     dimensions = dm.dims 
+    print(in_channels, dimensions)
 
     # init model
     network_config = {
@@ -104,6 +112,7 @@ def train_model(
     model = {"type": model}
     network_config.update(model)
     model_type = network_config.pop("type")
+    print(model_type)
 
     if model_type in AVAILABLE_NETWORKS:
         network = AVAILABLE_NETWORKS[model_type](**network_config)
@@ -114,7 +123,7 @@ def train_model(
                 f"options are {list(AVAILABLE_NETWORKS.keys())}"
             )
         )
-
+    print(dimensions)
     classification_model = ClassificationModel(
         network,
         x_label=dm.x_label,
@@ -122,8 +131,7 @@ def train_model(
         in_channels=in_channels,
         classes=data_config['classes'],
         label=label,
-        image_x=dimensions[0],
-        image_y=dimensions[1],
+        dimensions=dimensions,
         lr=lr,
         optimizer=model_optimizer,
         scheduler=model_scheduler,
@@ -132,9 +140,12 @@ def train_model(
     # Initialize a logger
     if tune_bool is False:
 
-        logger = TensorBoardLogger(
+        tb_logger = TensorBoardLogger(
             str(output_path) + "/lightning_logs",
         )
+
+        csv_logger = CSVLogger(str(output_path) + "/lightning_logs" + "/csv_logs")
+
         # Initialize model checkpoint
         checkpoint_callback = ModelCheckpoint(
             filepath=str(output_path) + "/checkpoints/",
@@ -148,7 +159,6 @@ def train_model(
         early_stopping = EarlyStopping("val_loss")
 
         callbacks = [
-            MyPrintingCallback(),
             PrintTableMetricsCallback(),
             GPUStatsMonitor(),
             GlobalProgressBar(),
@@ -157,9 +167,9 @@ def train_model(
 
         # Initialize a trainer
         trainer = pl.Trainer(
-            logger=logger,
-            accelerator="ddp",
-            replace_sampler_ddp=False,
+            logger=[tb_logger, csv_logger],
+            accelerator="dp",
+            # replace_sampler_ddp=False,
             gpus=num_gpus,
             max_epochs=num_epochs,
             progress_bar_refresh_rate=20,
@@ -169,6 +179,7 @@ def train_model(
             benchmark=True,
             profiler=True,
             weights_summary="full",
+            deterministic=True,
         )
 
         # Train the model ⚡
@@ -184,6 +195,8 @@ def train_model(
         print("use model = ClassificationModel(),")
         print("trainer = Trainer(resume_from_checkpoint=CKPT_PATH)")
         print("to load trainer")
+
+        return checkpoint_callback.best_model_path
     else:
         # Add tensorboard logs to tune directory so there
         # are no repeat logs
