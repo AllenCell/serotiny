@@ -47,8 +47,8 @@ def train_model_config(
         channel_indexes=config['channel_indexes'],
         num_epochs=config["num_epochs"],
         lr=config['lr'],
-        model_optimizer=config['model_optimizer'],
-        model_scheduler=config['model_scheduler'],
+        optimizer=config['optimizer'],
+        scheduler=config['scheduler'],
         id_fields=config['id_fields'],
         channels=config['channels'],
         test=config['test'],
@@ -59,31 +59,26 @@ def train_model_config(
 def train_model(
     datasets_path: str,
     output_path: str,
-    data_config: dict = {
-        "classes": ["M0", "M1/M2", "M3", "M4/M5", "M6/M7"],
-        "channel_indexes": ["nucleus_segmentation", "membrane_segmentation", "dna", "membrane", "structure", "brightfield"],
-        "id_fields": ["CellId", "CellIndex", "FOVId"],
-        "channels": ["nucleus_segmentation", "membrane_segmentation", "dna", "membrane", "structure", "brightfield"],
-    },
-    data_key: str = "Mitotic3DDataModule",
-    model: str = "basic3D",
-    label: str = "Draft mitotic state resolved",
-    batch_size: int = 64,
-    num_gpus: int = 1,
-    num_workers: int = 50,
-    num_epochs: int = 15,
-    lr: int = 0.001,
-    model_optimizer: str = "sgd",
-    model_scheduler: str = "reduce_lr_plateau",
-    test: bool = True,
-    tune_bool: bool = False,
+    data_config: dict,
+    datamodule: str,
+    model: str,
+    label: str,
+    batch_size: int,
+    num_gpus: int,
+    num_workers: int,
+    num_epochs: int,
+    lr: int,
+    optimizer: str,
+    scheduler: str,
+    test: bool,
+    tune_bool: bool,
 ):
     """
     Initialize dataloaders and model
     Call trainer.fit()
     """
     # Load data module
-    dm_class = datamodules.__dict__[data_key]
+    dm_class = datamodules.__dict__[datamodule]
 
     dm = dm_class(
         batch_size=batch_size, 
@@ -125,8 +120,8 @@ def train_model(
         image_x=dimensions[0],
         image_y=dimensions[1],
         lr=lr,
-        optimizer=model_optimizer,
-        scheduler=model_scheduler,
+        optimizer=optimizer,
+        scheduler=scheduler,
     )
 
     # Initialize a logger
