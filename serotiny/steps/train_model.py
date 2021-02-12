@@ -14,6 +14,8 @@ from pytorch_lightning.callbacks import (
 from pl_bolts.callbacks import PrintTableMetricsCallback
 from ray.tune.integration.pytorch_lightning import TuneReportCallback
 from ray import tune
+from datetime import datetime
+import os
 
 from ..library.progress_bar import GlobalProgressBar
 from ..library.models.classification import (
@@ -101,7 +103,6 @@ def train_model(
     dm.setup()
     in_channels = dm.num_channels
     dimensions = dm.dims 
-    print(in_channels, dimensions)
 
     # init model
     network_config = {
@@ -112,7 +113,6 @@ def train_model(
     model = {"type": model}
     network_config.update(model)
     model_type = network_config.pop("type")
-    print(model_type)
 
     if model_type in AVAILABLE_NETWORKS:
         network = AVAILABLE_NETWORKS[model_type](**network_config)
@@ -123,7 +123,7 @@ def train_model(
                 f"options are {list(AVAILABLE_NETWORKS.keys())}"
             )
         )
-    print(dimensions)
+        
     classification_model = ClassificationModel(
         network,
         x_label=dm.x_label,
@@ -141,14 +141,24 @@ def train_model(
     if tune_bool is False:
 
         tb_logger = TensorBoardLogger(
-            str(output_path) + "/lightning_logs",
+            save_dir=str(output_path) + "/lightning_logs",
+            version="version_" + datetime.now().strftime("%d-%m-%Y--%H-%M-%S"),
+            name="",
         )
 
-        csv_logger = CSVLogger(str(output_path) + "/lightning_logs" + "/csv_logs")
+        csv_logger = CSVLogger(
+            save_dir=str(output_path) + "/lightning_logs" + "/csv_logs",        
+            version="version_" + datetime.now().strftime("%d-%m-%Y--%H-%M-%S"),
+            name="",
+        )
+
+        ckpt_path = os.path.join(
+            str(output_path) + "/lightning_logs", tb_logger.version, "checkpoints",
+        )
 
         # Initialize model checkpoint
         checkpoint_callback = ModelCheckpoint(
-            filepath=str(output_path) + "/checkpoints/",
+            filepath=ckpt_path,
             # if save_top_k = 1, all files in this local staging dir
             # will be deleted when a checkpoint is saved
             # save_top_k=1,
