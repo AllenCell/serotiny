@@ -8,12 +8,12 @@ from torch.nn import functional as F
 
 
 class BasicNeuralNetwork(nn.Module):
-    def __init__(self, num_channels=3, num_classes=5, dimensions=(176, 104)):
+    def __init__(self, in_channels=3, num_classes=5, dimensions=(176, 104)):
         super().__init__()
         self.network_name = "BasicNeuralNetwork"
         self.num_classes = num_classes
         self.layer_1 = torch.nn.Linear(
-            dimensions[1] * dimensions[0] * num_channels,
+            dimensions[1] * dimensions[0] * in_channels,
             128
         )
         self.layer_2 = torch.nn.Linear(128, 256)
