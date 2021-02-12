@@ -23,8 +23,6 @@ log = logging.getLogger(__name__)
 def split_data(
         dataset_path: str,
         output_path: str,
-        class_column: str,
-        id_column,
         ratios=None,
         required_fields=None):
 
@@ -38,9 +36,6 @@ def split_data(
         required_fields = {}
 
     dataset = load_csv(dataset_path, required_fields)
-    dataset.dropna(inplace=True)
-    dataset, one_hot_len = append_one_hot(
-        dataset, class_column, id_column)
 
     if ratios is None:
         ratios = {
@@ -74,13 +69,6 @@ def split_data(
         save_path = Path(output_path) / f"{split}.csv"
         dataset.to_csv(save_path, index=False)
         dataset_paths[split] = str(save_path)
-
-    output = {
-        "dataset_paths": dataset_paths,
-        "one_hot_len": one_hot_len}
-
-    print(output)
-    return output
 
 
 if __name__ == '__main__':
