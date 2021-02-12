@@ -5,7 +5,7 @@ import logging
 import fire
 
 import pytorch_lightning as pl
-from pytorch_lightning.loggers import TensorBoardLogger
+from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
 from pytorch_lightning.callbacks import (
     ModelCheckpoint,
     GPUStatsMonitor,
@@ -14,20 +14,23 @@ from pytorch_lightning.callbacks import (
 from pl_bolts.callbacks import PrintTableMetricsCallback
 from ray.tune.integration.pytorch_lightning import TuneReportCallback
 from ray import tune
+from datetime import datetime
+import os
 
 from ..library.progress_bar import GlobalProgressBar
 from ..library.models.classification import (
     ClassificationModel,
     AVAILABLE_NETWORKS,
 )
-from ..library.models.callbacks import (
-    MyPrintingCallback,
-)
+# from ..library.models.callbacks import (
+#     MyPrintingCallback,
+# )
 import serotiny.library.datamodules as datamodules
 
 ###############################################################################
 
 log = logging.getLogger(__name__)
+pl.seed_everything(42)
 
 ###############################################################################
 
@@ -67,7 +70,7 @@ def train_model(
     num_gpus: int,
     num_workers: int,
     num_epochs: int,
-    lr: int,
+    lr: float,
     optimizer: str,
     scheduler: str,
     test: bool,
@@ -109,7 +112,7 @@ def train_model(
                 f"options are {list(AVAILABLE_NETWORKS.keys())}"
             )
         )
-
+        
     classification_model = ClassificationModel(
         network,
         x_label=dm.x_label,
@@ -117,8 +120,7 @@ def train_model(
         in_channels=in_channels,
         classes=data_config['classes'],
         label=label,
-        image_x=dimensions[0],
-        image_y=dimensions[1],
+        dimensions=dimensions,
         lr=lr,
         optimizer=optimizer,
         scheduler=scheduler,
@@ -127,12 +129,25 @@ def train_model(
     # Initialize a logger
     if tune_bool is False:
 
-        logger = TensorBoardLogger(
-            str(output_path) + "/lightning_logs",
+        tb_logger = TensorBoardLogger(
+            save_dir=str(output_path) + "/lightning_logs",
+            version="version_" + datetime.now().strftime("%d-%m-%Y--%H-%M-%S"),
+            name="",
         )
+
+        csv_logger = CSVLogger(
+            save_dir=str(output_path) + "/lightning_logs" + "/csv_logs",
+            version="version_" + datetime.now().strftime("%d-%m-%Y--%H-%M-%S"),
+            name="",
+        )
+
+        ckpt_path = os.path.join(
+            str(output_path) + "/lightning_logs", tb_logger.version, "checkpoints",
+        )
+
         # Initialize model checkpoint
         checkpoint_callback = ModelCheckpoint(
-            filepath=str(output_path) + "/checkpoints/",
+            filepath=ckpt_path,
             # if save_top_k = 1, all files in this local staging dir
             # will be deleted when a checkpoint is saved
             # save_top_k=1,
@@ -143,7 +158,6 @@ def train_model(
         early_stopping = EarlyStopping("val_loss")
 
         callbacks = [
-            MyPrintingCallback(),
             PrintTableMetricsCallback(),
             GPUStatsMonitor(),
             GlobalProgressBar(),
@@ -152,9 +166,9 @@ def train_model(
 
         # Initialize a trainer
         trainer = pl.Trainer(
-            logger=logger,
-            accelerator="ddp",
-            replace_sampler_ddp=False,
+            logger=[tb_logger, csv_logger],
+            accelerator="dp",
+            # replace_sampler_ddp=False,
             gpus=num_gpus,
             max_epochs=num_epochs,
             progress_bar_refresh_rate=20,
@@ -164,6 +178,7 @@ def train_model(
             benchmark=True,
             profiler=True,
             weights_summary="full",
+            deterministic=True,
         )
 
         # Train the model ⚡
@@ -179,6 +194,8 @@ def train_model(
         print("use model = ClassificationModel(),")
         print("trainer = Trainer(resume_from_checkpoint=CKPT_PATH)")
         print("to load trainer")
+
+        return checkpoint_callback.best_model_path
     else:
         # Add tensorboard logs to tune directory so there
         # are no repeat logs
