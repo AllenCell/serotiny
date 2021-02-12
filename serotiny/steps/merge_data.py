@@ -46,7 +46,10 @@ def merge_data(
         assert len(merge_datasets) == len(dataset_paths) - 1
 
         for next_dataset, merge_keys in zip(datasets[1:], merge_datasets):
-            manifest = manifest.merge(next_dataset, **merge_keys)
+            existing_cols = set(manifest.columns.tolist())
+            manifest = manifest.merge(
+                next_dataset[[col for col in next_dataset.columns
+                              if (col not in existing_cols) or (col in merge_keys["on"])]], **merge_keys)
     else:
         assert len(dataset_paths) == 1
 
