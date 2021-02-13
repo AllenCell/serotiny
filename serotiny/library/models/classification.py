@@ -4,7 +4,10 @@ General 2d classifier module, implemented as a Pytorch Lightning module
 
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pandas as pd
+import numpy as np
 from typing import Optional
+from pathlib import Path
 
 import torch
 from torch import nn
@@ -110,9 +113,15 @@ class ClassificationModel(pl.LightningModule):
             for key, value in logs.items():
                 # self.log logs to all loggers
                 self.log(key, value, on_epoch=True)
+
+            res = {"pred":np.array([]),  "target":np.array([])}
             for pred, target in zip(outputs['preds'], outputs['target']):
-                self.log(f"{prefix}_pred", pred, on_epoch=True)
-                self.log(f"{prefix}_true", true, on_epoch=True)
+                res["pred"] = np.hstack([res["pred"], pred.cpu().numpy()])
+                res["target"] = np.hstack([res["target"], target.cpu().numpy()])
+
+            pd.DataFrame(res, columns=["pred", "target"]).to_csv(
+                Path(self.logger[1].save_dir) / "test_results.csv"
+            )
 
         if outputs['batch_idx'] == 0:
             _, preds_batch = torch.max(outputs['preds'], 1)
