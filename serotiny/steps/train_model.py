@@ -93,7 +93,9 @@ def train_model(
     )
     dm.setup()
     in_channels = dm.num_channels
-    dimensions = dm.dims 
+    print(in_channels)
+
+    dimensions = dm.dims
 
     # init model
     network_config = {
@@ -114,7 +116,7 @@ def train_model(
                 f"options are {list(AVAILABLE_NETWORKS.keys())}"
             )
         )
-        
+
     classification_model = ClassificationModel(
         network,
         x_label=dm.x_label,

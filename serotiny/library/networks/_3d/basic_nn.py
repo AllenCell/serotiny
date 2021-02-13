@@ -38,9 +38,12 @@ class BasicCNN_3D(nn.Module):
         self.output = nn.Linear(2880, num_classes)
 
     def forward(self, x):
+        print(x.shape)
         for i, layer in enumerate(self.layers):
             x = layer(x)
             if i in self.max_pool_layers:
                 x = self.mp(x)
-                
+
+        print(x.shape)
+
         return self.output(x.view(x.shape[0], -1))

@@ -39,11 +39,11 @@ class ACTK3DDataModule(BaseDataModule):
             batch_size=batch_size,
             num_workers=num_workers,
             transform_list=[
-                transforms.Lambda(lambda x: resize_to(x, (6, 64, 128, 96))),
+                transforms.Lambda(lambda x: resize_to(x, (self.num_channels, 64, 128, 96))),
                 transforms.Lambda(lambda x: torch.tensor(x)),
             ],
             train_transform_list=[
-                transforms.Lambda(lambda x: resize_to(x, (6, 64, 128, 96))),
+                transforms.Lambda(lambda x: resize_to(x, (self.num_channels, 64, 128, 96))),
                 transforms.Lambda(lambda x: torch.tensor(x)),
             ],
             x_label=x_label,
@@ -78,7 +78,7 @@ class ACTK3DDataModule(BaseDataModule):
         )
 
     def get_dims(self, img):
-        return (img.shape[1], img.shape[2], img.shape[3])
+        return (64, 128, 96)
 
     def train_dataloader(self):
         train_dataset = self.datasets['train']

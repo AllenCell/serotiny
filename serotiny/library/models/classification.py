@@ -34,7 +34,7 @@ class ClassificationModel(pl.LightningModule):
         y_label="mitotic_class",
         in_channels=3,
         classes=("M0", "M1/M2", "M3", "M4/M5", "M6/M7"),
-        dimensions=(104, 176),
+        dimensions=None,
         lr=1e-3,
         optimizer="adam",
         scheduler="reduce_lr_plateau",
@@ -52,11 +52,12 @@ class ClassificationModel(pl.LightningModule):
         self.network = network
 
         # Print out network
-        self.example_input_array = torch.zeros(
-            1,
-            int(self.hparams.in_channels),
-            *dimensions
-        )
+        if dimensions is not None:
+            self.example_input_array = torch.zeros(
+                1,
+                int(self.hparams.in_channels),
+                *dimensions
+            )
 
         """Metrics"""
         self.train_metrics = acc_prec_recall(len(self.hparams.classes))
@@ -103,7 +104,7 @@ class ClassificationModel(pl.LightningModule):
         # Tensorboard logging by default
         for key, value in logs.items():
             self.logger[0].experiment.add_scalar(key, value, self.global_step)
-            
+
         # CSV logging
         if CSV_logger:
             for key, value in logs.items():
@@ -163,8 +164,8 @@ class ClassificationModel(pl.LightningModule):
 
         # No CSV metric logging needed here
         outputs = self._log_metrics(
-            outputs, 
-            "train", 
+            outputs,
+            "train",
             CSV_logger=False
         )
         return outputs
