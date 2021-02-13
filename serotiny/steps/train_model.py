@@ -43,7 +43,6 @@ def train_model_config(
         output_path=config["output_path"],
         classes=config['classes'],
         model=config['model'],
-        label=config['label'],
         batch_size=config['batch_size'],
         num_gpus=config['num_gpus'],
         num_workers=config['num_workers'],
@@ -65,7 +64,6 @@ def train_model(
     data_config: dict,
     datamodule: str,
     model: str,
-    label: str,
     batch_size: int,
     num_gpus: int,
     num_workers: int,
@@ -75,6 +73,8 @@ def train_model(
     scheduler: str,
     test: bool,
     tune_bool: bool,
+    x_label: str,
+    y_label: str,
 ):
     """
     Initialize dataloaders and model
@@ -84,10 +84,12 @@ def train_model(
     dm_class = datamodules.__dict__[datamodule]
 
     dm = dm_class(
-        batch_size=batch_size, 
-        num_workers=num_workers, 
+        batch_size=batch_size,
+        num_workers=num_workers,
         config=data_config,
-        data_dir=datasets_path
+        data_dir=datasets_path,
+        x_label=x_label,
+        y_label=y_label,
     )
     dm.setup()
     in_channels = dm.num_channels
@@ -119,7 +121,6 @@ def train_model(
         y_label=dm.y_label,
         in_channels=in_channels,
         classes=data_config['classes'],
-        label=label,
         dimensions=dimensions,
         lr=lr,
         optimizer=optimizer,
@@ -167,16 +168,16 @@ def train_model(
         # Initialize a trainer
         trainer = pl.Trainer(
             logger=[tb_logger, csv_logger],
-            accelerator="dp",
-            # replace_sampler_ddp=False,
+            accelerator="ddp",
+            replace_sampler_ddp=False,
             gpus=num_gpus,
             max_epochs=num_epochs,
             progress_bar_refresh_rate=20,
             checkpoint_callback=checkpoint_callback,
             callbacks=callbacks,
             precision=16,
-            benchmark=True,
-            profiler=True,
+            benchmark=False,
+            profiler=False,
             weights_summary="full",
             deterministic=True,
         )

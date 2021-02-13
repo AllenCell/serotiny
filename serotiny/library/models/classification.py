@@ -38,7 +38,6 @@ class ClassificationModel(pl.LightningModule):
         lr=1e-3,
         optimizer="adam",
         scheduler="reduce_lr_plateau",
-        label: Optional[str] = None,
         projection: Optional[dict] = None,
     ):
         super().__init__()

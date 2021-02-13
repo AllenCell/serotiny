@@ -82,16 +82,17 @@ class LoadId:
 
 
 class LoadClass:
-    def __init__(self, num_classes, binary=False):
+    def __init__(self, num_classes, y_encoded_label, binary=False):
         self.num_classes = num_classes
         self.binary = binary
+        self.y_encoded_label = y_encoded_label
 
     def __call__(self, row):
         if self.binary:
             return torch.tensor([row[str(i)] for i in range(self.num_classes)])
         else:
             return torch.tensor(
-                row["ChosenMitoticClassInteger"],
+                row[self.y_encoded_label],
             )
 
 
@@ -179,7 +180,6 @@ def append_one_hot(dataset: pd.DataFrame, column: str, id: str):
     )
 
     # Lets also calculate class weights
-    # TODO make ChosenMitoticClass not hardcoded
     labels_unique, counts = np.unique(dataset[column], return_counts=True)
     class_weights = [sum(counts) / c for c in counts]
     class_weights_dict = {i: j for (i, j) in zip(labels_unique, class_weights)}

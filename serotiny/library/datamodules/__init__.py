@@ -1,4 +1,4 @@
-from .mitotic2d import Mitotic2DDataModule
-from .mitotic3d import Mitotic3DDataModule
+from .actk2d import ACTK2DDataModule
+from .actk3d import ACTK3DDataModule
 
-__all__ = ["Mitotic2DDataModule", "Mitotic3DDataModule"]
+__all__ = ["ACTK2DDataModule", "ACTK3DDataModule"]
