@@ -109,6 +109,9 @@ class ClassificationModel(pl.LightningModule):
             for key, value in logs.items():
                 # self.log logs to all loggers
                 self.log(key, value, on_epoch=True)
+            for pred, target in zip(outputs['preds'], outputs['target']):
+                self.log(f"{prefix}_pred", pred, on_epoch=True)
+                self.log(f"{prefix}_true", true, on_epoch=True)
 
         if outputs['batch_idx'] == 0:
             _, preds_batch = torch.max(outputs['preds'], 1)
