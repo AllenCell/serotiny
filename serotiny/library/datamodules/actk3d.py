@@ -21,7 +21,6 @@ class ACTK3DDataModule(BaseDataModule):
         num_workers: int,
         x_label: str,
         y_label: str,
-        y_encoded_label: str,
         data_dir: str,
     ):
 
@@ -59,7 +58,7 @@ class ACTK3DDataModule(BaseDataModule):
         self.loaders = {
             # Use callable class objects here because lambdas aren't picklable
             "id": LoadId(self.id_fields),
-            self.y_label: LoadClass(len(self.classes), y_encoded_label),
+            self.y_label: LoadClass(len(self.classes), self.y_encoded_label),
             self.x_label: Load3DImage(
                 DatasetFields.CellImage3DPath,
                 self.num_channels,
