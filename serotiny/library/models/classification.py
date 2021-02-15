@@ -114,14 +114,22 @@ class ClassificationModel(pl.LightningModule):
                 # self.log logs to all loggers
                 self.log(key, value, on_epoch=True)
 
-            res = {"pred":np.array([]),  "target":np.array([])}
-            for pred, target in zip(outputs['preds'], outputs['target']):
-                res["pred"] = np.hstack([res["pred"], pred.cpu().numpy()])
-                res["target"] = np.hstack([res["target"], target.cpu().numpy()])
 
-            pd.DataFrame(res, columns=["pred", "target"]).to_csv(
-                Path(self.logger[1].save_dir) / "test_results.csv"
+            probs = F.softmax(outputs["preds"], dim=1).cpu().numpy()
+            pred = np.expand_dims(np.argmax(probs, axis=1), 1)
+            target = np.expand_dims(outputs['target'].cpu().numpy(), 1)
+
+            df = pd.DataFrame(
+                np.hstack([probs, pred, target]),
+                columns=[f"prob_{i}" for i in range(len(self.hparams.classes))] +
+                        ["pred", "target"]
             )
+
+            path = Path(self.logger[1].save_dir) / "test_results.csv"
+            if path.exists():
+                df.to_csv(path, mode='a', header=False, index=False)
+            else:
+                df.to_csv(path, header="column_names", index=False)
 
         if outputs['batch_idx'] == 0:
             _, preds_batch = torch.max(outputs['preds'], 1)
@@ -261,7 +269,7 @@ class ClassificationModel(pl.LightningModule):
         loss = nn.CrossEntropyLoss()(yhat, y)
 
         self.log("test_loss", loss)
-            
+
         return {
             "test_loss": loss,
             'preds': yhat,
