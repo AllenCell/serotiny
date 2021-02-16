@@ -10,7 +10,7 @@ import torchvision.models as models
 
 
 class ResNet18Network(nn.Module):
-    def __init__(self, in_channels=3, num_classes=5, dimensions=(176, 104)):
+    def __init__(self, in_channels=3, num_classes=5, dimensions=(176, 104), pretrained=True):
         super().__init__()
         self.network_name = "Resnet18"
         self.num_classes = num_classes
@@ -36,29 +36,11 @@ class ResNet18Network(nn.Module):
             self.feature_extractor_first_layer.conv_before_resnet.weight
         )
 
-        self.feature_extractor = models.resnet18(pretrained=True)
-        # dont freeze the weights
-        # self.feature_extractor.eval()
+        self.classifier = models.resnet18(pretrained=pretrained)
 
-        # Classifier architecture to put on top of resnet18
-        self.classifier = nn.Sequential(
-            OrderedDict(
-                [
-                    (
-                        "fc1",
-                        nn.Linear(self.feature_extractor.fc.out_features, 100)
-                    ),
-                    ("relu", nn.ReLU()),
-                    # TODO configure output number classes
-                    ("fc2", nn.Linear(100, num_classes)),
-                    # ("output", nn.Sigmoid()),
-                ]
-            )
-        )
+        # Replace final layer
+        self.classifier.fc = nn.Linear(512, num_classes)
 
     def forward(self, x):
         x = self.feature_extractor_first_layer(x)
-        representations = self.feature_extractor(x)
-        x = self.classifier(representations)
-        return x
-
+        return self.classifier(x)
