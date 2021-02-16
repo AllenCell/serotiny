@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# taken from https://github.com/okankop/Efficient-3DCNNs/blob/master/models/resnet.py
 
 import torch
 import torch.nn as nn
