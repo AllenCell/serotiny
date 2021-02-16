@@ -22,6 +22,7 @@ class ACTK3DDataModule(BaseDataModule):
         x_label: str,
         y_label: str,
         data_dir: str,
+        resize_dims=(64, 128, 96),
     ):
 
         self.channels = config["channels"]
@@ -39,11 +40,11 @@ class ACTK3DDataModule(BaseDataModule):
             batch_size=batch_size,
             num_workers=num_workers,
             transform_list=[
-                transforms.Lambda(lambda x: resize_to(x, (self.num_channels, 64, 128, 96))),
+                transforms.Lambda(lambda x: resize_to(x, (self.num_channels, *resize_dims))),
                 transforms.Lambda(lambda x: torch.tensor(x)),
             ],
             train_transform_list=[
-                transforms.Lambda(lambda x: resize_to(x, (self.num_channels, 64, 128, 96))),
+                transforms.Lambda(lambda x: resize_to(x, (self.num_channels, *resize_dims))),
                 transforms.Lambda(lambda x: torch.tensor(x)),
             ],
             x_label=x_label,
