@@ -14,12 +14,13 @@ from torch import nn
 from torch.nn import functional as F
 import pytorch_lightning as pl
 
-from ..networks._2d import BasicNeuralNetwork, ResNet18Network
+from ..networks._2d import BasicCNN_2D, BasicNeuralNetwork, ResNet18Network
 from ..networks._3d import BasicCNN_3D
 from ._utils import acc_prec_recall, add_pr_curve_tensorboard
 
 AVAILABLE_NETWORKS = {
-    "basic": BasicNeuralNetwork, 
+    "basic2D": BasicCNN_2D,
+    "mlp": BasicNeuralNetwork,
     "resnet18": ResNet18Network, 
     "basic3D": BasicCNN_3D
 }
