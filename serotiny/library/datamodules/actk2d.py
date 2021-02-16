@@ -87,7 +87,7 @@ class ACTK2DDataModule(BaseDataModule):
         train_dataset = self.datasets['train']
         train_loaders = self.loaders.copy()
         train_loaders[self.x_label] = Load2DImage(
-            DatasetFields.CellImage3DPath,
+            DatasetFields.Chosen2DProjectionPath,
             self.num_channels,
             self.channel_indexes,
             self.train_transform,
