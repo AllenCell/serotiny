@@ -30,9 +30,6 @@ def filter_data(
         dataset_path,
         required_fields.get(dataset_path, {}))
 
-    if required_fields is not None:
-        dataset = dataset.dropna(subset=required_fields)
-
     # trick to shuffle dataset rows
     dataset = dataset.sample(frac=1, random_state=seed)
 
@@ -62,7 +59,7 @@ def filter_data(
         index = filter_options.get('index', 'id')
 
         dataset.set_index(index)
-        values = dataset[column].unique()
+        values = dataset[column].dropna().unique()
 
         subsets = []
         for value in values:
