@@ -10,7 +10,7 @@ import torchvision.models as models
 
 
 class ResNet18Network(nn.Module):
-    def __init__(self, num_channels=3, num_classes=5, dimensions=(176, 104)):
+    def __init__(self, in_channels=3, num_classes=5, dimensions=(176, 104)):
         super().__init__()
         self.network_name = "Resnet18"
         self.num_classes = num_classes
@@ -20,7 +20,7 @@ class ResNet18Network(nn.Module):
                     (
                         "conv_before_resnet",
                         nn.Conv2d(
-                            num_channels,
+                            in_channels,
                             3,
                             kernel_size=1,
                             stride=1,

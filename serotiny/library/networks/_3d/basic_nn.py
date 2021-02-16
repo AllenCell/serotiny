@@ -42,5 +42,5 @@ class BasicCNN_3D(nn.Module):
             x = layer(x)
             if i in self.max_pool_layers:
                 x = self.mp(x)
-                
+
         return self.output(x.view(x.shape[0], -1))

@@ -4,7 +4,10 @@ General 2d classifier module, implemented as a Pytorch Lightning module
 
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pandas as pd
+import numpy as np
 from typing import Optional
+from pathlib import Path
 
 import torch
 from torch import nn
@@ -34,12 +37,10 @@ class ClassificationModel(pl.LightningModule):
         y_label="mitotic_class",
         in_channels=3,
         classes=("M0", "M1/M2", "M3", "M4/M5", "M6/M7"),
-        image_x=104,
-        image_y=176,
+        dimensions=None,
         lr=1e-3,
         optimizer="adam",
         scheduler="reduce_lr_plateau",
-        label: Optional[str] = None,
         projection: Optional[dict] = None,
     ):
         super().__init__()
@@ -54,21 +55,12 @@ class ClassificationModel(pl.LightningModule):
         self.network = network
 
         # Print out network
-        # self.example_input_array = torch.zeros(
-        #     64,
-        #     int(self.hparams.in_channels),
-        #     image_y,
-        #     image_x
-        #     # 64, int(self.hparams.num_channels), 176, 104
-        # )
-        self.example_input_array = torch.zeros(
-            1,
-            int(self.hparams.in_channels),
-            64,
-            128,
-            96
-            # 64, int(self.hparams.num_channels), 176, 104
-        )
+        if dimensions is not None:
+            self.example_input_array = torch.zeros(
+                1,
+                int(self.hparams.in_channels),
+                *dimensions
+            )
 
         """Metrics"""
         self.train_metrics = acc_prec_recall(len(self.hparams.classes))
@@ -102,7 +94,7 @@ class ClassificationModel(pl.LightningModule):
         output = self.network(x)
         return output
 
-    def _log_metrics(self, outputs, prefix):
+    def _log_metrics(self, outputs, prefix, CSV_logger=False):
 
         logs = self._generate_logs(
             outputs['preds'],
@@ -112,9 +104,32 @@ class ClassificationModel(pl.LightningModule):
         )
         outputs.update(logs)
 
+        # Tensorboard logging by default
         for key, value in logs.items():
-            # TODO configure outout logging
-            self.log(key, value, on_step=True, on_epoch=True, prog_bar=True)
+            self.logger[0].experiment.add_scalar(key, value, self.global_step)
+
+        # CSV logging
+        if CSV_logger:
+            for key, value in logs.items():
+                # self.log logs to all loggers
+                self.log(key, value, on_epoch=True)
+
+
+            probs = F.softmax(outputs["preds"], dim=1).cpu().numpy()
+            pred = np.expand_dims(np.argmax(probs, axis=1), 1)
+            target = np.expand_dims(outputs['target'].cpu().numpy(), 1)
+
+            df = pd.DataFrame(
+                np.hstack([probs, pred, target]),
+                columns=[f"prob_{i}" for i in range(len(self.hparams.classes))] +
+                        ["pred", "target"]
+            )
+
+            path = Path(self.logger[1].save_dir) / "test_results.csv"
+            if path.exists():
+                df.to_csv(path, mode='a', header=False, index=False)
+            else:
+                df.to_csv(path, header="column_names", index=False)
 
         if outputs['batch_idx'] == 0:
             _, preds_batch = torch.max(outputs['preds'], 1)
@@ -131,7 +146,8 @@ class ClassificationModel(pl.LightningModule):
                 annot=True, ax=ax,
                 annot_kws={"size": 8}
             )
-            self.logger.experiment.add_figure(
+            # logger[0] is tensorboard logger
+            self.logger[0].experiment.add_figure(
                 f"Confusion matrix {prefix}",
                 fig,
                 global_step=self.current_epoch,
@@ -150,12 +166,9 @@ class ClassificationModel(pl.LightningModule):
         # layer of network
         loss = nn.CrossEntropyLoss()(yhat, y)
 
-        self.log(
-            "train_loss", loss,
-            on_step=True,
-            on_epoch=True,
-            prog_bar=True
-        )
+        # Default logger=False for training_step
+        # set it to true to log train loss to all lggers
+        self.log("train_loss", loss, logger=True)
 
         return {
             'loss': loss,
@@ -165,7 +178,13 @@ class ClassificationModel(pl.LightningModule):
         }
 
     def training_step_end(self, outputs):
-        outputs = self._log_metrics(outputs, "train")
+
+        # No CSV metric logging needed here
+        outputs = self._log_metrics(
+            outputs,
+            "train",
+            CSV_logger=False
+        )
         return outputs
 
     def validation_step(self, batch, batch_idx):
@@ -183,7 +202,8 @@ class ClassificationModel(pl.LightningModule):
         #     )
         yhat = self(x)
         loss = nn.CrossEntropyLoss()(yhat, y)
-        self.log("val_loss", loss, on_step=True, on_epoch=True, prog_bar=True)
+        # Default logger for validation step is True
+        self.log("val_loss", loss)
 
         return {
             'val_loss': loss,
@@ -194,7 +214,12 @@ class ClassificationModel(pl.LightningModule):
 
     def validation_step_end(self, outputs):
 
-        outputs = self._log_metrics(outputs, "val")
+        # No CSV metric logging needed here
+        outputs = self._log_metrics(
+            outputs, 
+            "val",
+            CSV_logger=False
+        )
 
         return outputs
 
@@ -204,8 +229,15 @@ class ClassificationModel(pl.LightningModule):
             [x["val_loss"] for x in outputs]).mean()
         avg_acc = torch.stack(
             [x["val_accuracy"] for x in outputs]).mean()
-        self.log("val_loss_epoch", avg_loss)
-        self.log("val_accuracy_epoch", avg_acc)
+
+        val_epoch_end_metrics = {
+            "val_loss_epoch":
+            avg_loss, 
+            "val_accuracy_epoch":
+            avg_acc, 
+        }
+        for key, value in val_epoch_end_metrics.items():
+            self.logger[0].experiment.add_scalar(key, value, self.global_step)
 
         class_probs = []
         class_preds = []
@@ -220,7 +252,8 @@ class ClassificationModel(pl.LightningModule):
         # plot all the pr curves
         for i in range(len(self.hparams.classes)):
             add_pr_curve_tensorboard(
-                logger=self.logger, 
+                logger=self.logger[0], 
+                # logger[0] is tensorboard logger
                 classes=self.hparams.classes, 
                 class_index=i, 
                 test_probs=test_probs, 
@@ -246,7 +279,12 @@ class ClassificationModel(pl.LightningModule):
 
     def test_step_end(self, outputs):
 
-        outputs = self._log_metrics(outputs, "test")
+        # Log test metrics to CSV
+        outputs = self._log_metrics(
+            outputs, 
+            "test",
+            CSV_logger=True
+        )
 
         return outputs
 
@@ -264,7 +302,8 @@ class ClassificationModel(pl.LightningModule):
         # plot all the pr curves
         for i in range(len(self.hparams.classes)):
             add_pr_curve_tensorboard(
-                logger=self.logger, 
+                logger=self.logger[0], 
+                # logger[0] is tensorboard logger 
                 classes=self.hparams.classes, 
                 class_index=i, 
                 test_probs=test_probs, 
@@ -317,10 +356,10 @@ class ClassificationModel(pl.LightningModule):
             for k, v in params.items():
                 grads = v
                 name = k
-                self.logger.experiment.add_histogram(
+                # logger[0] is tensorboard logger
+                self.logger[0].experiment.add_histogram(
                     tag=name,
                     values=grads,
                     global_step=self.trainer.global_step
                 )
-
 
