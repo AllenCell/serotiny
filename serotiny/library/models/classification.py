@@ -23,7 +23,7 @@ AVAILABLE_NETWORKS = {
     "basic2D": BasicCNN_2D,
     "resnet18_2D": ResNet18Network,
     "basic3D": BasicCNN_3D,
-    "resnet18_3D"
+    "resnet18_3D": ResNet18_3D
 }
 AVAILABLE_OPTIMIZERS = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}
 AVAILABLE_SCHEDULERS = {
