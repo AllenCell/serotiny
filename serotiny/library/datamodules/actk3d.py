@@ -35,6 +35,8 @@ class ACTK3DDataModule(BaseDataModule):
             channels=self.channels,
         )
 
+        self.dims = resize_dims
+
         super().__init__(
             config=config,
             batch_size=batch_size,
@@ -79,7 +81,7 @@ class ACTK3DDataModule(BaseDataModule):
         )
 
     def get_dims(self, img):
-        return (64, 128, 96)
+        return self.dims
 
     def train_dataloader(self):
         train_dataset = self.datasets['train']
