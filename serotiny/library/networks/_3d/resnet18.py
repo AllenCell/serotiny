@@ -68,6 +68,15 @@ class ResNet18_3D(nn.Module):
             self.feature_extractor_first_layer.conv_before_resnet.weight
         )
 
+
+        # the layer arithmetic for the resnet assumes the inputs are at least 224 wide/high/deep.
+        # here, I'm padding the input with zeros so it fulfills that requirement.
+        # I'm doing symmetric padding for each dimension, so I calculate how much it lacks until
+        # it meets 224 and divide it by 2 (to add half on top/bottom left/right etc etc).
+        # the resulting padding tuple has 6 entries because it looks like
+        # (pad_x_left, pad_x_right, pad_y_up, pad_y_down, pad_z_top, pad_z_bottom),
+        # and I initialize it to all zeros so the cases that don't need padding get
+        # bypassed.
         padding = [0] * 6
         for ix, dim in enumerate(dimensions):
             if dim < 224:
