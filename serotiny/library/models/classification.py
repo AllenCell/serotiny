@@ -15,14 +15,15 @@ from torch.nn import functional as F
 import pytorch_lightning as pl
 
 from ..networks._2d import BasicCNN_2D, BasicNeuralNetwork, ResNet18Network
-from ..networks._3d import BasicCNN_3D
+from ..networks._3d import BasicCNN_3D, ResNet18_3D
 from ._utils import acc_prec_recall, add_pr_curve_tensorboard
 
 AVAILABLE_NETWORKS = {
-    "basic2D": BasicCNN_2D,
     "mlp": BasicNeuralNetwork,
-    "resnet18": ResNet18Network, 
-    "basic3D": BasicCNN_3D
+    "basic2D": BasicCNN_2D,
+    "resnet18_2D": ResNet18Network,
+    "basic3D": BasicCNN_3D,
+    "resnet18_3D": ResNet18_3D
 }
 AVAILABLE_OPTIMIZERS = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}
 AVAILABLE_SCHEDULERS = {
