@@ -16,7 +16,7 @@ import pytorch_lightning as pl
 
 from ..networks._2d import BasicCNN_2D, BasicNeuralNetwork, ResNet18Network
 from ..networks._3d import BasicCNN_3D, ResNet18_3D
-from ._utils import acc_prec_recall, add_pr_curve_tensorboard
+from ._utils import acc_prec_recall, add_pr_curve_tensorboard, plot_classes_preds
 
 AVAILABLE_NETWORKS = {
     "mlp": BasicNeuralNetwork,
@@ -116,7 +116,6 @@ class ClassificationModel(pl.LightningModule):
                 # self.log logs to all loggers
                 self.log(key, value, on_epoch=True)
 
-
             probs = F.softmax(outputs["preds"], dim=1).cpu().numpy()
             pred = np.expand_dims(np.argmax(probs, axis=1), 1)
             target = np.expand_dims(outputs['target'].cpu().numpy(), 1)
@@ -192,16 +191,18 @@ class ClassificationModel(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
 
         x, y = self.parse_batch(batch)
-        # if batch_idx == 0:
-        #     self.logger.experiment.add_figure(
-        #         "predictions vs actuals (val).",
-        #         plot_classes_preds(
-        # self.network, 
-        # x, 
-        # y, 
-        # self.hparams.classes),
-        #         global_step=self.current_epoch,
-        #     )
+        if batch_idx == 0:
+            # if len(self.hparams.dimensions) == 2:
+            self.logger[0].experiment.add_figure(
+                "predictions vs actuals (val).",
+                plot_classes_preds(
+                    self.network, 
+                    x, 
+                    y, 
+                    self.hparams.classes
+                ),
+                global_step=self.current_epoch,
+            )
         yhat = self(x)
         loss = nn.CrossEntropyLoss()(yhat, y)
         # Default logger for validation step is True
@@ -266,6 +267,19 @@ class ClassificationModel(pl.LightningModule):
     def test_step(self, batch, batch_idx):
 
         x, y = self.parse_batch(batch)
+
+        if batch_idx == 0:
+            if len(self.hparams.dimensions) == 2:
+                self.logger[0].experiment.add_figure(
+                    "predictions vs actuals (test).",
+                    plot_classes_preds(
+                        self.network, 
+                        x, 
+                        y, 
+                        self.hparams.classes
+                    ),
+                    global_step=self.current_epoch,
+                )
 
         yhat = self(x)
         loss = nn.CrossEntropyLoss()(yhat, y)

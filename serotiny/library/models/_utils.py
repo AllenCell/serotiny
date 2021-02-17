@@ -28,9 +28,14 @@ def acc_prec_recall(n_classes):
     )
 
 
-def matplotlib_imshow(img, one_channel=False):
+def matplotlib_imshow(img, one_channel=False, max_project=False):
     if one_channel:
         img = img.mean(dim=0)
+    if max_project:
+        im = np.zeros((img.shape[0], img.shape[1], img.shape[2]))
+        for ch in range(img.shape[0]):
+            im[ch] = img[ch].max(axis=1)
+        img = im.copy()
     img = img / 2 + 0.5  # unnormalize
     npimg = img.cpu().numpy()
     if one_channel:
@@ -69,7 +74,11 @@ def plot_classes_preds(net, images, labels, classes):
     fig = plt.figure(figsize=(20, 15))
     for idx in np.arange(4):
         ax = fig.add_subplot(1, 4, idx + 1, xticks=[], yticks=[])
-        matplotlib_imshow(images[idx], one_channel=True)
+        if len(images[idx].shape) == 4:
+            max_project = True
+        else:
+            max_project = False
+        matplotlib_imshow(images[idx], one_channel=True, max_project=max_project)
         ax.set_title(
             "{0}, {1:.1f}%\n(label: {2})".format(
                 classes[preds[idx]],
