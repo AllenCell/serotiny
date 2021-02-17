@@ -192,6 +192,7 @@ class ClassificationModel(pl.LightningModule):
 
         x, y = self.parse_batch(batch)
         if batch_idx == 0:
+            # add this if we want to plot images only for 2D model
             # if len(self.hparams.dimensions) == 2:
             self.logger[0].experiment.add_figure(
                 "predictions vs actuals (val).",
