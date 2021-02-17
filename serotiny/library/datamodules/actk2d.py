@@ -21,13 +21,13 @@ class ACTK2DDataModule(BaseDataModule):
     ):
 
         self.channels = config["channels"]
-        self.channel_subset = config["channel_indexes"]
+        self.select_channels = config["select_channels"]
         self.classes = config["classes"]
         self.num_channels = len(self.channels)
 
         self.channel_indexes, self.num_channels = subset_channels(
-            channel_subset=self.channel_subset, 
-            channels=self.channels, 
+            channel_subset=self.select_channels,
+            channels=self.channels,
         )
 
         super().__init__(
@@ -44,6 +44,8 @@ class ACTK2DDataModule(BaseDataModule):
                 transforms.ToPILImage(),
                 transforms.Resize(256),
                 transforms.CenterCrop(256),
+                transforms.RandomHorizontalFlip(),
+                transforms.RandomVerticalFlip(),
                 transforms.ToTensor(),
             ],
             x_label=x_label,
@@ -66,7 +68,7 @@ class ACTK2DDataModule(BaseDataModule):
                 self.transform,
             ),
         }
-        
+
         # self.dims is returned when you call dm.size()
         # Setting default dims here because we know them.
         # Could optionally be assigned dynamically in dm.setup()

@@ -113,17 +113,16 @@ class Load2DImage:
 
 
 class Load3DImage:
-    def __init__(self, chosen_col, num_channels, channel_indexes, transform=None):
+    def __init__(self, chosen_col, num_channels, select_channels, transform=None):
         self.chosen_col = chosen_col
         self.num_channels = num_channels
-        self.channel_indexes = channel_indexes
+        self.select_channels = select_channels
         self.transform = transform
 
     def __call__(self, row):
         return tiff_loader_CZYX(
             path_str=row[self.chosen_col],
-            channel_indexes=self.channel_indexes,
-            select_channels=None,
+            select_channels=self.select_channels,
             output_dtype=np.float32,
             channel_masks=None,
             mask_thresh=0,

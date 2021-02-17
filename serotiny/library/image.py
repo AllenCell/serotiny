@@ -86,7 +86,6 @@ def png_loader(
 
 def tiff_loader_CZYX(
     path_str,
-    channel_indexes=None,
     select_channels=None,
     output_dtype=np.float32,
     channel_masks=None,
@@ -121,8 +120,6 @@ def tiff_loader_CZYX(
 
     if select_channels:
         channel_indexes = [map_channel(channel) for channel in select_channels]
-
-    if channel_indexes:
         data = data[channel_indexes, ...]
 
     data = data.astype(output_dtype)
@@ -186,11 +183,11 @@ def change_resolution(
 
 
 def project_2d(
-    path_3d, 
-    axis, 
-    method, 
-    path_2d, 
-    channels=None, 
+    path_3d,
+    axis,
+    method,
+    path_2d,
+    channels=None,
     masks=None,
     proj_all=False,
 ):
