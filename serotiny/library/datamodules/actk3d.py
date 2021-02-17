@@ -11,6 +11,7 @@ import torch
 from aicsimageprocessing.resize import resize_to
 from .utils import subset_channels
 
+import torchio.transforms as tiotransforms
 
 class ACTK3DDataModule(BaseDataModule):
 
@@ -26,15 +27,9 @@ class ACTK3DDataModule(BaseDataModule):
     ):
 
         self.channels = config["channels"]
-        self.channel_subset = config["channel_indexes"]
+        self.select_channels = config["select_channels"]
         self.classes = config["classes"]
-        self.num_channels = len(self.channels)
-
-        self.channel_indexes, self.num_channels = subset_channels(
-            channel_subset=self.channel_subset,
-            channels=self.channels,
-        )
-
+        self.num_channels = len(self.select_channels)
         self.dims = resize_dims
 
         super().__init__(
@@ -48,6 +43,8 @@ class ACTK3DDataModule(BaseDataModule):
             train_transform_list=[
                 transforms.Lambda(lambda x: resize_to(x, (self.num_channels, *resize_dims))),
                 transforms.Lambda(lambda x: torch.tensor(x)),
+                tiotransforms.ToCanonical(),
+                tiotransforms.RandomFlip()
             ],
             x_label=x_label,
             y_label=y_label,
@@ -65,7 +62,7 @@ class ACTK3DDataModule(BaseDataModule):
             self.x_label: Load3DImage(
                 DatasetFields.CellImage3DPath,
                 self.num_channels,
-                self.channel_indexes,
+                self.select_channels,
                 self.transform,
             ),
         }
@@ -73,8 +70,7 @@ class ACTK3DDataModule(BaseDataModule):
     def load_image(self, dataset):
         return tiff_loader_CZYX(
             path_str=dataset[DatasetFields.CellImage3DPath].iloc[0],
-            channel_indexes=self.channel_indexes,
-            select_channels=None,
+            select_channels=self.select_channels,
             output_dtype=np.float32,
             channel_masks=None,
             mask_thresh=0
@@ -89,7 +85,7 @@ class ACTK3DDataModule(BaseDataModule):
         train_loaders[self.x_label] = Load3DImage(
             DatasetFields.CellImage3DPath,
             self.num_channels,
-            self.channel_indexes,
+            self.select_channels,
             self.train_transform,
         )
         train_dataloader = load_data_loader(
