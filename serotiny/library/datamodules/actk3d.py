@@ -30,7 +30,7 @@ class ACTK3DDataModule(BaseDataModule):
         self.select_channels = config["select_channels"]
         self.classes = config["classes"]
         self.num_channels = len(self.select_channels)
-        self.dims = resize_dims
+        self.resize_dims = resize_dims
 
         super().__init__(
             config=config,
@@ -68,16 +68,16 @@ class ACTK3DDataModule(BaseDataModule):
         }
 
     def load_image(self, dataset):
-        return tiff_loader_CZYX(
-            path_str=dataset[DatasetFields.CellImage3DPath].iloc[0],
-            select_channels=self.select_channels,
-            output_dtype=np.float32,
-            channel_masks=None,
-            mask_thresh=0
+        return self.transform(
+            tiff_loader_CZYX(
+                path_str=dataset[DatasetFields.CellImage3DPath].iloc[0],
+                select_channels=self.select_channels,
+                output_dtype=np.float32,
+            )
         )
 
     def get_dims(self, img):
-        return self.dims
+        return img.shape[1:]
 
     def train_dataloader(self):
         train_dataset = self.datasets['train']

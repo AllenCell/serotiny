@@ -92,9 +92,8 @@ def train_model(
         y_label=y_label,
     )
     dm.setup()
-    in_channels = dm.num_channels
-    print(in_channels)
 
+    in_channels = dm.num_channels
     dimensions = dm.dims
 
     # init model
