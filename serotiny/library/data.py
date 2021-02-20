@@ -60,7 +60,7 @@ class DataframeDataset(Dataset):
         return len(self.dataframe)
 
     def _get_single_item(self, idx):
-        row = self.dataframe.loc[idx, :]
+        row = self.dataframe.iloc[idx, :]
         return {key: loader(row) for key, loader in self.loaders.items()}
 
     def __getitem__(self, idx):
@@ -131,7 +131,8 @@ class Load3DImage:
 
 
 def load_data_loader(
-    dataset, loaders, transform, batch_size=16, num_workers=0, shuffle=False
+        dataset, loaders, transform, batch_size=16, num_workers=0, shuffle=False,
+        weights_col="ClassWeights"
 ):
     """ Load a pytorch DataLoader from the provided dataset. """
 
@@ -139,8 +140,12 @@ def load_data_loader(
     dataframe = DataframeDataset(dataset, loaders=loaders, transform=transform)
 
     # Configure WeightedRandomSampler to handle class imbalances
-    weights = [e for e in dataframe.dataframe["ClassWeights"]]
-    sampler = WeightedRandomSampler(weights, len(dataframe.dataframe))
+    if weights_col is not None:
+        weights = [e for e in dataframe.dataframe[weights_col]]
+        sampler = WeightedRandomSampler(weights, len(dataframe.dataframe))
+    else:
+        weights = None,
+        sampler = None
 
     # create the pytorch dataloader from that dataframe
     dataloader = DataLoader(
