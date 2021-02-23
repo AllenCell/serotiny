@@ -10,7 +10,6 @@ from ...library.data import load_data_loader
 
 
 class BaseDataModule(pl.LightningDataModule):
-
     def __init__(
         self,
         config: dict,
@@ -20,7 +19,7 @@ class BaseDataModule(pl.LightningDataModule):
         y_label: str,
         batch_size: int,
         num_workers: int,
-        data_dir: str = './',
+        data_dir: str = "./",
     ):
         super().__init__()
 
@@ -46,9 +45,7 @@ class BaseDataModule(pl.LightningDataModule):
         )
 
     def get_dims(self, shape):
-        raise NotImplementedError(
-            "`get_dims` hasn't been defined for this data module"
-        )
+        raise NotImplementedError("`get_dims` hasn't been defined for this data module")
 
     def setup(self, stage=None):
 
@@ -76,7 +73,7 @@ class BaseDataModule(pl.LightningDataModule):
         self.dims = dimensions
 
     def val_dataloader(self):
-        val_dataset = self.datasets['valid']
+        val_dataset = self.datasets["valid"]
         val_dataloader = load_data_loader(
             val_dataset,
             self.loaders,
@@ -88,7 +85,7 @@ class BaseDataModule(pl.LightningDataModule):
         return val_dataloader
 
     def test_dataloader(self):
-        test_dataset = self.datasets['test']
+        test_dataset = self.datasets["test"]
         test_dataloader = load_data_loader(
             test_dataset,
             self.loaders,

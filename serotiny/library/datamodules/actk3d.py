@@ -1,4 +1,3 @@
-
 # Note - you must have torchvision installed for this example
 from torchvision import transforms
 from ..image import tiff_loader_CZYX
@@ -13,8 +12,8 @@ from .utils import subset_channels
 
 import torchio.transforms as tiotransforms
 
-class ACTK3DDataModule(BaseDataModule):
 
+class ACTK3DDataModule(BaseDataModule):
     def __init__(
         self,
         config: dict,
@@ -37,14 +36,18 @@ class ACTK3DDataModule(BaseDataModule):
             batch_size=batch_size,
             num_workers=num_workers,
             transform_list=[
-                transforms.Lambda(lambda x: resize_to(x, (self.num_channels, *resize_dims))),
+                transforms.Lambda(
+                    lambda x: resize_to(x, (self.num_channels, *resize_dims))
+                ),
                 transforms.Lambda(lambda x: torch.tensor(x)),
             ],
             train_transform_list=[
-                transforms.Lambda(lambda x: resize_to(x, (self.num_channels, *resize_dims))),
+                transforms.Lambda(
+                    lambda x: resize_to(x, (self.num_channels, *resize_dims))
+                ),
                 transforms.Lambda(lambda x: torch.tensor(x)),
                 tiotransforms.ToCanonical(),
-                tiotransforms.RandomFlip()
+                tiotransforms.RandomFlip(),
             ],
             x_label=x_label,
             y_label=y_label,
@@ -53,7 +56,7 @@ class ACTK3DDataModule(BaseDataModule):
 
         self.x_label = x_label
         self.y_label = y_label
-        self.y_encoded_label = y_label+"Integer"
+        self.y_encoded_label = y_label + "Integer"
 
         self.loaders = {
             # Use callable class objects here because lambdas aren't picklable
@@ -80,7 +83,7 @@ class ACTK3DDataModule(BaseDataModule):
         return img.shape[1:]
 
     def train_dataloader(self):
-        train_dataset = self.datasets['train']
+        train_dataset = self.datasets["train"]
         train_loaders = self.loaders.copy()
         train_loaders[self.x_label] = Load3DImage(
             DatasetFields.CellImage3DPath,

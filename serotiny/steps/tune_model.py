@@ -5,6 +5,7 @@ import logging
 import fire
 
 import ray
+
 # from ray.tune.suggest.hyperopt import HyperOptSearch
 from ray import tune
 from ray.tune import CLIReporter
@@ -43,13 +44,13 @@ def tune_model(
     search_space: dict = {
         "lr": tune.loguniform(1e-4, 1e-1),
         "batch_size": tune.choice([32, 64, 128]),
-        "model_optimizer": tune.choice(["sgd", "adam"])
-    }
+        "model_optimizer": tune.choice(["sgd", "adam"]),
+    },
 ):
     """
     Initialize ray instance with specified number of cpus
     and gpus. Pass in a search space to sample from,
-    a number of samples to choose from that space, and 
+    a number of samples to choose from that space, and
     resources per trial. Other
     training arguments are the same as train_model
     """
@@ -62,7 +63,7 @@ def tune_model(
         parameter_columns=[key for key in search_space.keys()],
         # loss and mean accuracy are specified in the tune_callback
         # passed into the trainer in train_model
-        metric_columns=["loss", "mean_accuracy", "training_iteration"]
+        metric_columns=["loss", "mean_accuracy", "training_iteration"],
     )
 
     config = {
@@ -82,24 +83,18 @@ def tune_model(
         "id_fields": id_fields,
         "channels": channels,
         "test": False,
-        "tune_bool": True
+        "tune_bool": True,
     }
 
     config.update(search_space)
 
     # hyperopt = HyperOptSearch(metric="loss", mode="min")
 
-    tune_scheduler = ASHAScheduler(
-        max_t=num_epochs,
-        grace_period=1,
-        reduction_factor=2)
+    tune_scheduler = ASHAScheduler(max_t=num_epochs, grace_period=1, reduction_factor=2)
 
     analysis = tune.run(
         train_model_config,
-        resources_per_trial={
-            "cpu": 10,
-            "gpu": gpus_per_trial
-        },
+        resources_per_trial={"cpu": 10, "gpu": gpus_per_trial},
         config=config,
         # search_alg=hyperopt,
         local_dir=output_path,
@@ -108,7 +103,7 @@ def tune_model(
         mode="min",
         num_samples=num_samples,
         progress_reporter=reporter,
-        scheduler=tune_scheduler
+        scheduler=tune_scheduler,
     )
     print("Best config: ", analysis.get_best_config)
     print("dataframe", analysis.results_df)
@@ -127,7 +122,7 @@ def tune_model(
     assert ray.is_initialized() is False
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # example command:
     # python -m serotiny.steps.tune_model \
     #     --datasets_path

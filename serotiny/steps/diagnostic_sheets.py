@@ -31,7 +31,7 @@ def diagnostic_sheets(
     proj_all=True,
     num_images=200,
     executor_address: Optional[str] = None,
-    overwrite: bool = False,  
+    overwrite: bool = False,
 ):
 
     # make a visualization manifest
@@ -43,7 +43,7 @@ def diagnostic_sheets(
     sampled_dataset = dataset.sample(n=num_images)
 
     # Update projection config output path for apply_projection function
-    projection['output'] = output_path
+    projection["output"] = output_path
 
     # Get all projection images
     # Only difference here is proj_all is True
@@ -61,10 +61,8 @@ def diagnostic_sheets(
     )
 
     # Set local staging dir for datastep step
-    workflow_config = {
-        "project_local_staging_dir": output_path
-    }
-    
+    workflow_config = {"project_local_staging_dir": output_path}
+
     # Call diagnsotic sheet step
     diagnostic_sheets_class = DiagnosticSheets(config=workflow_config)
 
@@ -73,13 +71,15 @@ def diagnostic_sheets(
     # Make sure no / in the class labels because code reads it as a split directory
     # and spits out errors
     if metadata == "ChosenMitoticClass":
-        visualization_dataframe[metadata] = visualization_dataframe[metadata].map({
-            'M4/M5': "M4_M5",
-            "M1/M2": "M1_M2",
-            "M6/M7": "M6_M7",
-            "M0": "M0",
-            "M3": "M3"
-        })
+        visualization_dataframe[metadata] = visualization_dataframe[metadata].map(
+            {
+                "M4/M5": "M4_M5",
+                "M1/M2": "M1_M2",
+                "M6/M7": "M6_M7",
+                "M0": "M0",
+                "M3": "M3",
+            }
+        )
 
     diagnostic_sheets_class.run(
         dataset=visualization_dataframe,
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     # python -m serotiny.steps.diagnostic_sheets \
     #     --dataset_path "./results/manifest_merged.csv" \
     #     --projection "{'channels': ['membrane', 'structure', 'dna'],
-    # 'masks': 
+    # 'masks':
     # {'membrane': 'membrane_segmentation', 'dna': 'nucleus_segmentation'},
     # 'axis': 'Y', 'method': 'max'}" \
     #     --path_3d_column "CellImage3DPath" \

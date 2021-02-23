@@ -1,4 +1,3 @@
-
 # Note - you must have torchvision installed for this example
 from torchvision import transforms
 from ..image import png_loader
@@ -9,7 +8,6 @@ from .utils import subset_channels
 
 
 class ACTK2DDataModule(BaseDataModule):
-
     def __init__(
         self,
         config: dict,
@@ -55,7 +53,7 @@ class ACTK2DDataModule(BaseDataModule):
 
         self.x_label = x_label
         self.y_label = y_label
-        self.y_encoded_label = y_label+"Integer"
+        self.y_encoded_label = y_label + "Integer"
 
         self.loaders = {
             # Use callable class objects here because lambdas aren't picklable
@@ -86,7 +84,7 @@ class ACTK2DDataModule(BaseDataModule):
         return (img.shape[1], img.shape[2])
 
     def train_dataloader(self):
-        train_dataset = self.datasets['train']
+        train_dataset = self.datasets["train"]
         train_loaders = self.loaders.copy()
         train_loaders[self.x_label] = Load2DImage(
             DatasetFields.Chosen2DProjectionPath,

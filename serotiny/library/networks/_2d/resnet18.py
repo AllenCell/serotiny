@@ -10,7 +10,9 @@ import torchvision.models as models
 
 
 class ResNet18Network(nn.Module):
-    def __init__(self, in_channels=3, num_classes=5, dimensions=(176, 104), pretrained=True):
+    def __init__(
+        self, in_channels=3, num_classes=5, dimensions=(176, 104), pretrained=True
+    ):
         super().__init__()
         self.network_name = "Resnet18"
         self.num_classes = num_classes

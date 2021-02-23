@@ -6,11 +6,7 @@ import fire
 
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
-from pytorch_lightning.callbacks import (
-    ModelCheckpoint,
-    GPUStatsMonitor,
-    EarlyStopping
-)
+from pytorch_lightning.callbacks import ModelCheckpoint, GPUStatsMonitor, EarlyStopping
 from pl_bolts.callbacks import PrintTableMetricsCallback
 from ray.tune.integration.pytorch_lightning import TuneReportCallback
 from ray import tune
@@ -22,6 +18,7 @@ from ..library.models.classification import (
     ClassificationModel,
     AVAILABLE_NETWORKS,
 )
+
 # from ..library.models.callbacks import (
 #     MyPrintingCallback,
 # )
@@ -41,20 +38,20 @@ def train_model_config(
     train_model(
         datasets_path=config["datasets_path"],
         output_path=config["output_path"],
-        classes=config['classes'],
-        model=config['model'],
-        batch_size=config['batch_size'],
-        num_gpus=config['num_gpus'],
-        num_workers=config['num_workers'],
-        channel_indexes=config['channel_indexes'],
+        classes=config["classes"],
+        model=config["model"],
+        batch_size=config["batch_size"],
+        num_gpus=config["num_gpus"],
+        num_workers=config["num_workers"],
+        channel_indexes=config["channel_indexes"],
         num_epochs=config["num_epochs"],
-        lr=config['lr'],
-        optimizer=config['optimizer'],
-        scheduler=config['scheduler'],
-        id_fields=config['id_fields'],
-        channels=config['channels'],
-        test=config['test'],
-        tune_bool=config['tune_bool'],
+        lr=config["lr"],
+        optimizer=config["optimizer"],
+        scheduler=config["scheduler"],
+        id_fields=config["id_fields"],
+        channels=config["channels"],
+        test=config["test"],
+        tune_bool=config["tune_bool"],
     )
 
 
@@ -99,7 +96,7 @@ def train_model(
     # init model
     network_config = {
         "in_channels": in_channels,
-        "num_classes": len(data_config['classes']),
+        "num_classes": len(data_config["classes"]),
         "dimensions": dimensions,
     }
     model = {"type": model}
@@ -121,7 +118,7 @@ def train_model(
         x_label=dm.x_label,
         y_label=dm.y_label,
         in_channels=in_channels,
-        classes=data_config['classes'],
+        classes=data_config["classes"],
         dimensions=dimensions,
         lr=lr,
         optimizer=optimizer,
@@ -144,7 +141,9 @@ def train_model(
         )
 
         ckpt_path = os.path.join(
-            str(output_path) + "/lightning_logs", tb_logger.version, "checkpoints",
+            str(output_path) + "/lightning_logs",
+            tb_logger.version,
+            "checkpoints",
         )
 
         # Initialize model checkpoint
@@ -201,17 +200,12 @@ def train_model(
     else:
         # Add tensorboard logs to tune directory so there
         # are no repeat logs
-        logger = TensorBoardLogger(
-            save_dir=tune.get_trial_dir(), name="", version="."
-        )
+        logger = TensorBoardLogger(save_dir=tune.get_trial_dir(), name="", version=".")
 
         # Tune callback tracks val loss and accuracy
         tune_callback = TuneReportCallback(
-            {
-                "loss": "val_loss_epoch",
-                "mean_accuracy": "val_accuracy_epoch"
-            },
-            on="validation_end"
+            {"loss": "val_loss_epoch", "mean_accuracy": "val_accuracy_epoch"},
+            on="validation_end",
         )
         # Use ddp to split training across gpus
         trainer = pl.Trainer(
@@ -221,14 +215,14 @@ def train_model(
             gpus=num_gpus,
             logger=logger,
             progress_bar_refresh_rate=0,
-            callbacks=[tune_callback]
+            callbacks=[tune_callback],
         )
         # Train the model ⚡
         trainer.fit(classification_model, dm)
     # return
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # example command:
     # python -m serotiny.steps.train_model \
     #     --datasets_path "./results/splits/" \

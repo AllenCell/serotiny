@@ -77,9 +77,7 @@ def apply_projection(
     for path in dataset[path_3d_column]:
         # get the 3d image path
         if source_path is not None:
-            path = os.path.join(
-                source_path,
-                os.path.basename(path))
+            path = os.path.join(source_path, os.path.basename(path))
 
         path_3d = Path(path)
         full_name = path_3d.name
@@ -112,7 +110,7 @@ def apply_projection(
                 [paths[1] for paths in projections],
                 [channels for _ in range(len(projections))],
                 [masks for _ in range(len(projections))],
-                [proj_all for _ in range(len(projections))]
+                [proj_all for _ in range(len(projections))],
             )
 
     dimensions = find_dimensions(dataset[chosen_projection][0])
@@ -126,10 +124,10 @@ if __name__ == "__main__":
     #     --dataset_path "data/manifest_merged.csv" \
     #     --output_path "data/projection.csv" \
     #     --projection "{'channels': ['membrane', 'structure', 'dna'],
-    # 'masks': 
+    # 'masks':
     # {'membrane': 'membrane_segmentation', 'dna': 'nucleus_segmentation'},
-    # 'axis': 'Y', 'method': 'max', 
-    # 'output': 
+    # 'axis': 'Y', 'method': 'max',
+    # 'output':
     # '/allen/aics/modeling/spanglry/data/mitotic-classifier/projections/'}" \
     #     --path_3d_column "CellImage3DPath" \
     #     --chosen_projection "Chosen2DProjectionPath" \

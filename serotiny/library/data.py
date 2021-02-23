@@ -37,13 +37,11 @@ def download_quilt_data(
 
 
 def sample_classes(manifest, column, classes):
-    '''
+    """
     Sample one of each class from the manifest.
-    '''
+    """
 
-    sample = {
-        key: manifest[manifest[column].isin([key])]
-        for key in classes}
+    sample = {key: manifest[manifest[column].isin([key])] for key in classes}
 
     return sample
 
@@ -126,7 +124,7 @@ class Load3DImage:
             output_dtype=np.float32,
             channel_masks=None,
             mask_thresh=0,
-            transform=self.transform
+            transform=self.transform,
         )
 
 
@@ -173,10 +171,7 @@ def append_one_hot(dataset: pd.DataFrame, column: str, id: str):
 
     one_hot = one_hot_encoding(dataset, column)
     # Lets merge on a unique ID to avoid errors here
-    dataset = pd.merge(
-        dataset,
-        pd.DataFrame(one_hot, index=dataset[id]), on=[id]
-    )
+    dataset = pd.merge(dataset, pd.DataFrame(one_hot, index=dataset[id]), on=[id])
 
     # Lets also calculate class weights
     labels_unique, counts = np.unique(dataset[column], return_counts=True)
@@ -192,8 +187,6 @@ def append_one_hot(dataset: pd.DataFrame, column: str, id: str):
         for index, label in enumerate(labels_unique)
     }
 
-    dataset[column + "Integer"] = [
-        class_labels_dict[e] for e in dataset[column]
-    ]
+    dataset[column + "Integer"] = [class_labels_dict[e] for e in dataset[column]]
 
     return dataset, one_hot.shape[-1]

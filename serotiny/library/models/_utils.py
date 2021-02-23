@@ -15,15 +15,9 @@ def acc_prec_recall(n_classes):
     """
     return nn.ModuleDict(
         {
-            'accuracy': pl.metrics.Accuracy(),
-            'precision': pl.metrics.Precision(
-                num_classes=n_classes,
-                average='macro'
-            ),
-            'recall': pl.metrics.Recall(
-                num_classes=n_classes,
-                average='macro'
-            ),
+            "accuracy": pl.metrics.Accuracy(),
+            "precision": pl.metrics.Precision(num_classes=n_classes, average="macro"),
+            "recall": pl.metrics.Recall(num_classes=n_classes, average="macro"),
         }
     )
 
@@ -48,9 +42,7 @@ def images_to_probs(net, images):
     # convert output probabilities to predicted class
     _, preds_tensor = torch.max(output, 1)
     preds = np.squeeze(preds_tensor.cpu().numpy())
-    return preds, [
-        F.softmax(el, dim=0)[i].item() for i, el in zip(preds, output)
-    ]
+    return preds, [F.softmax(el, dim=0)[i].item() for i, el in zip(preds, output)]
 
 
 def plot_classes_preds(net, images, labels, classes):
@@ -82,13 +74,7 @@ def plot_classes_preds(net, images, labels, classes):
 
 # helper function
 def add_pr_curve_tensorboard(
-    logger,
-    classes,
-    class_index,
-    test_probs,
-    test_preds,
-    global_step=0,
-    name="_val"
+    logger, classes, class_index, test_probs, test_preds, global_step=0, name="_val"
 ):
     """
     Takes in a "class_index" and plots the corresponding

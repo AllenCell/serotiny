@@ -13,12 +13,7 @@ log = logging.getLogger(__name__)
 ###############################################################################
 
 
-def merge_data(
-    dataset_paths,
-    manifest_path,
-    required_fields=None,
-    merge_datasets=None
-):
+def merge_data(dataset_paths, manifest_path, required_fields=None, merge_datasets=None):
     """
     Load a list of dataset csv's, merge them, then write back out to csv.
 
@@ -36,8 +31,7 @@ def merge_data(
     if not required_fields:
         required_fields = {}
 
-    datasets = [load_csv(path, required_fields.get(path, {})) for path 
-                in dataset_paths]
+    datasets = [load_csv(path, required_fields.get(path, {})) for path in dataset_paths]
 
     manifest = datasets[0]
 
@@ -48,8 +42,15 @@ def merge_data(
         for next_dataset, merge_keys in zip(datasets[1:], merge_datasets):
             existing_cols = set(manifest.columns.tolist())
             manifest = manifest.merge(
-                next_dataset[[col for col in next_dataset.columns
-                              if (col not in existing_cols) or (col in merge_keys["on"])]], **merge_keys)
+                next_dataset[
+                    [
+                        col
+                        for col in next_dataset.columns
+                        if (col not in existing_cols) or (col in merge_keys["on"])
+                    ]
+                ],
+                **merge_keys
+            )
     else:
         assert len(dataset_paths) == 1
 
@@ -60,7 +61,7 @@ def merge_data(
 if __name__ == "__main__":
     # example command:
     # > python -m serotiny.steps.merge_data \
-    #     --dataset_paths "['data/draft_plus_human_mito_annotations.csv', 
+    #     --dataset_paths "['data/draft_plus_human_mito_annotations.csv',
     #                       'data/manifest.csv']" \
     #     --manifest_path "data/manifest_merged.csv" \
     #     --merge_datasets "[{'on': ['CellId', 'FOVId', 'CellIndex']}]"

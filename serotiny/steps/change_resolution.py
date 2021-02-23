@@ -34,7 +34,9 @@ def find_resolution_path(resolution):
     """
     if isinstance(resolution, list):
         if len(resolution) != 3:
-            raise Exception(f"Resolution must be three long (Z Y X) not {len(resolution)}")
+            raise Exception(
+                f"Resolution must be three long (Z Y X) not {len(resolution)}"
+            )
         resolution_path = f"ResolutionZ{resolution[0]}Y{resolution[1]}X{resolution[2]}"
     else:
         resolution_path = f"Resolution_scale{resolution}"
@@ -116,6 +118,7 @@ def apply_resolution(
             )
 
     dataset.to_csv(manifest_out, index=False)
+
 
 if __name__ == "__main__":
     # example command:

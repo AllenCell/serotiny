@@ -12,10 +12,7 @@ class BasicNeuralNetwork(nn.Module):
         super().__init__()
         self.network_name = "BasicNeuralNetwork"
         self.num_classes = num_classes
-        self.layer_1 = torch.nn.Linear(
-            dimensions[1] * dimensions[0] * in_channels,
-            128
-        )
+        self.layer_1 = torch.nn.Linear(dimensions[1] * dimensions[0] * in_channels, 128)
         self.layer_2 = torch.nn.Linear(128, 256)
         # TODO configure output dims as param
         self.layer_3 = torch.nn.Linear(256, num_classes)
@@ -38,5 +35,3 @@ class BasicNeuralNetwork(nn.Module):
         x = self.layer_3(x)
 
         return x
-
-

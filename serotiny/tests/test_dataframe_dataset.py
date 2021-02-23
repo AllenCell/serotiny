@@ -5,11 +5,9 @@ from ..library.data import DataframeDataset, one_hot_encoding, append_one_hot
 
 import pytest
 
+
 @pytest.mark.parametrize(
-    "data, expected",
-    [
-        ({"A": [1, 2, 3], "B": [10, 20, 30]}, (3.0, 3, 1.0))
-    ]
+    "data, expected", [({"A": [1, 2, 3], "B": [10, 20, 30]}, (3.0, 3, 1.0))]
 )
 def test_one_hot_encoder(data, expected):
     dataframe = pd.DataFrame(data=data)
@@ -32,7 +30,6 @@ def test_dataframe_dataset():
     dataframe_dataset = DataframeDataset(dataframe, loaders)
 
     assert dataframe_dataset[0]["A"] == data["A"][0] + 5
-
 
 
 # # The best practice would be to parametrize your tests, and include tests for any
@@ -68,7 +65,6 @@ def test_dataframe_dataset():
 #     example = Example(start_val)
 #     example.update_value(next_val)
 #     assert expected_values == example.values
-
 
 
 if __name__ == "__main__":

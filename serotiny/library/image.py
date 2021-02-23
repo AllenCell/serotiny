@@ -54,11 +54,7 @@ def normalize_img_zero_one(img_arr):
 
 
 def png_loader(
-    path_str,
-    channel_order=None,
-    indexes=None,
-    transform=None,
-    output_dtype=np.float64
+    path_str, channel_order=None, indexes=None, transform=None, output_dtype=np.float64
 ):
     # find the orientation and channel indexes
     orientation, channel_indexes = define_channels(channel_order, indexes)
@@ -128,10 +124,11 @@ def tiff_loader_CZYX(
 
     return data
 
+
 def change_resolution(
-        path_in: Union[str, Path],
-        path_out: Union[str, Path],
-        ZYX_resolution: Union[float, list]
+    path_in: Union[str, Path],
+    path_out: Union[str, Path],
+    ZYX_resolution: Union[float, list],
 ):
     aicsimageio.use_dask(False)
 
@@ -155,29 +152,35 @@ def change_resolution(
     aicsimg = aicsimageio.AICSImage(path_in)
     channel_names = aicsimg.get_channel_names()
     data = aicsimg.get_image_data("CZYX", S=0, T=0)
-    #this function should change when we have multiple scenes (S>0) or time series (T>0)
+    # this function should change when we have multiple scenes (S>0) or time series (T>0)
 
     # Get image dimensions
     C, Z, Y, X = data.shape
     # Get image dimensions of new image
     if isinstance(ZYX_resolution, list):
         if len(ZYX_resolution) != 3:
-            raise Exception(f"Resolution must be three long (Z Y X) not {len(ZYX_resolution)}")
+            raise Exception(
+                f"Resolution must be three long (Z Y X) not {len(ZYX_resolution)}"
+            )
         Znew, Ynew, Xnew = ZYX_resolution
     else:
         Znew = np.round(Z * ZYX_resolution).astype(np.int)
         Ynew = np.round(Y * ZYX_resolution).astype(np.int)
         Xnew = np.round(X * ZYX_resolution).astype(np.int)
     # Resize to get desired resolution
-    data_new = np.zeros((1, C, Znew, Ynew, Xnew), dtype='uint8')
+    data_new = np.zeros((1, C, Znew, Ynew, Xnew), dtype="uint8")
     for c in np.arange(C):
-        data_new[0, c, :, :, :] = resize(data[c, :, :, :].squeeze(), (Znew, Ynew, Xnew), preserve_range=True)
+        data_new[0, c, :, :, :] = resize(
+            data[c, :, :, :].squeeze(), (Znew, Ynew, Xnew), preserve_range=True
+        )
     data_new = data_new.astype((np.uint8))
     # change this to do it across all channels at once, perhaps this can be done without for loop
 
     # Write output image
     with ome_tiff_writer.OmeTiffWriter(path_out, overwrite_file=True) as writer2:
-        writer2.save(data=data_new, channel_names=channel_names, dimension_order="STCZYX")
+        writer2.save(
+            data=data_new, channel_names=channel_names, dimension_order="STCZYX"
+        )
 
     return data_new.shape
 
@@ -195,9 +198,7 @@ def project_2d(
 
     # load the 3d image
     image_3d = tiff_loader_CZYX(
-        path_3d,
-        select_channels=channels or DEFAULT_CHANNELS,
-        channel_masks=masks
+        path_3d, select_channels=channels or DEFAULT_CHANNELS, channel_masks=masks
     )
 
     # find the argument based on the axis
@@ -255,7 +256,7 @@ def tiff_loader_CYX(
     data = data[
         :,
         (data.shape[1] - center_slab_width)
-        // 2: (data.shape[1] + center_slab_width)
+        // 2 : (data.shape[1] + center_slab_width)
         // 2,
         ...,
     ]
@@ -303,7 +304,7 @@ def tiff_loader_CYX_seg(
     data = data[
         :,
         (data.shape[1] - center_slab_width)
-        // 2: (data.shape[1] + center_slab_width)
+        // 2 : (data.shape[1] + center_slab_width)
         // 2,
         ...,
     ]
@@ -314,8 +315,7 @@ def tiff_loader_CYX_seg(
 
 
 def feature_loader(
-    path_str,
-    feature_dtype_dict={"dna_volume": np.float32, "cell_volume": np.float32}
+    path_str, feature_dtype_dict={"dna_volume": np.float32, "cell_volume": np.float32}
 ):
     with open(path_str) as json_file:
         data = json.load(json_file)

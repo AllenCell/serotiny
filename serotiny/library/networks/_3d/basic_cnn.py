@@ -14,7 +14,14 @@ def _conv_layer(in_c, out_c, kernel_size=(3, 3, 3), padding=0):
 
 
 class BasicCNN_3D(nn.Module):
-    def __init__(self, in_channels=6, num_classes=5, num_layers=5, max_pool_layers={0, 1, 2}, dimensions=None):
+    def __init__(
+        self,
+        in_channels=6,
+        num_classes=5,
+        num_layers=5,
+        max_pool_layers={0, 1, 2},
+        dimensions=None,
+    ):
         super().__init__()
         self.network_name = "BasicNeuralNetwork_3D"
         self.num_classes = num_classes
@@ -25,11 +32,9 @@ class BasicCNN_3D(nn.Module):
 
         out_channels = 4
         for i in range(num_layers):
-            layers.append(
-               _conv_layer(in_channels, out_channels, kernel_size=(3, 3, 3))
-            )
+            layers.append(_conv_layer(in_channels, out_channels, kernel_size=(3, 3, 3)))
             in_channels = out_channels
-            out_channels = out_channels * int(1.5**(i))
+            out_channels = out_channels * int(1.5 ** (i))
 
         self.layers = nn.Sequential(*layers)
 
