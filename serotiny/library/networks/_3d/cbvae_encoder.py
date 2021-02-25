@@ -3,9 +3,9 @@ import torch
 
 from torch import nn
 
-from ...norm import spectral_norm
-from ...layers.activation import activation_map
-from ...layers._3d.down_residual import DownResidualLayer
+from ..norm import spectral_norm
+from ..layers.activation import activation_map
+from ..layers._3d.down_residual import DownResidualLayer
 
 class CBVAEEncoder(nn.Module):
     def __init__(
