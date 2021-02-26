@@ -36,13 +36,6 @@ def find_projection_path(projection):
 
     return projection_path
 
-
-# make steps for:
-#   * filtering columns
-#   * copying columns
-#   * one-hot encoding/class integer appending
-
-
 def apply_projection(
     dataset_path,
     output_path,

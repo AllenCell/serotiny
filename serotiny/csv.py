@@ -6,6 +6,10 @@ from actk.utils import dataset_utils
 
 
 def load_csv(dataset: Union[str, Path, pd.DataFrame], required: List[str]):
+    """
+    Read dataframe from either a path or an existing pd.DataFrame, checking
+    the fields given by `required` are present
+    """
 
     # Handle dataset provided as string or path
     if isinstance(dataset, (str, Path)):

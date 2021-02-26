@@ -1,8 +1,11 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+# coding: utf-8 -*-
+
+"""
+Definition of useful constants
+"""
 
 
-class DatasetFields:
+class ACTKFields:
     CellId = "CellId"
     CellIndex = "CellIndex"
     FOVId = "FOVId"

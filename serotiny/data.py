@@ -1,23 +1,27 @@
 from collections.abc import Iterable
+import warnings
+import multiprocessing as mp
+from itertools import chain, combinations
+
 import numpy as np
 import pandas as pd
 import quilt3
-import warnings
 
-import multiprocessing as mp
-
-from itertools import chain, combinations
 from sklearn.preprocessing import OneHotEncoder
+import torch
 from torch.utils.data import Dataset, DataLoader, WeightedRandomSampler
 from torch.utils.data.dataloader import default_collate as collate
-import torch
-from .image import png_loader, tiff_loader_CZYX
+from serotiny.library.image import png_loader, tiff_loader_CZYX
 
 
 def powerset(iterable):
-    s = list(iterable)
-    return list(chain.from_iterable(combinations(s, r) for r in range(len(s) + 1)))
-
+    """
+    Generate all combinations of the elements of `iterable`, for all possible
+    size of the combo
+    """
+    elements = list(iterable)
+    return list(chain.from_iterable(combinations(elements, r)
+                for r in range(len(elements) + 1)))
 
 def download_quilt_data(
     package="rorydm/mitotic_annotations",
@@ -25,7 +29,9 @@ def download_quilt_data(
     data_save_loc="quilt_data",
     ignore_warnings=True,
 ):
-    """download a quilt dataset and supress nfs file attribe warnings"""
+    """
+    download a quilt dataset and supress nfs file attribe warnings
+    """
     dataset_manifest = quilt3.Package.browse(package, bucket)
 
     if ignore_warnings:
@@ -47,12 +53,23 @@ def sample_classes(manifest, column, classes):
 
 
 class DataframeDataset(Dataset):
-    """general dataframe Dataset class"""
+    """
+    Class to wrap a pandas DataFrame in a pytorch Dataset. In practice, at AICS
+    we use this to wrap manifest dataframes that point to the image files that
+    correspond to a cell. The `loaders` dict contains a loading function for each
+    key, normally consisting of a function to load the contents of a file from a path.
+    Parameters
+    ----------
+    dataframe: pd.DataFrame
+        The file which points to or contains the data to be loaded
+    loaders: dict
+        A dict which contains methods to appropriately load data from columns
+        in the dataset.
+    """
 
-    def __init__(self, dataframe, loaders=None, transform=None):
+    def __init__(self, dataframe, loaders=None):
         self.dataframe = dataframe
         self.loaders = loaders
-        self.transform = transform
 
     def __len__(self):
         return len(self.dataframe)
@@ -70,16 +87,21 @@ class DataframeDataset(Dataset):
         )
         return sample
 
-
-class LoadId:
-    def __init__(self, id_fields):
-        self.id_fields = id_fields
+class LoadField:
+    """
+    Loader class, used to retrieve fields directly from the dataframe
+    """
+    def __init__(self, fields):
+        self.id_fields = fields
 
     def __call__(self, row):
-        return {key: row[key] for key in self.id_fields}
+        return {key: row[field] for field in self.fields}
 
 
 class LoadClass:
+    """
+    Loader class, used to retrieve class values from the dataframe,
+    """
     def __init__(self, num_classes, y_encoded_label, binary=False):
         self.num_classes = num_classes
         self.binary = binary
@@ -88,13 +110,13 @@ class LoadClass:
     def __call__(self, row):
         if self.binary:
             return torch.tensor([row[str(i)] for i in range(self.num_classes)])
-        else:
-            return torch.tensor(
-                row[self.y_encoded_label],
-            )
+
+        return torch.tensor(row[self.y_encoded_label])
 
 
 class Load2DImage:
+    """
+    """
     def __init__(self, chosen_col, num_channels, channel_indexes, transform):
         self.chosen_col = chosen_col
         self.num_channels = num_channels

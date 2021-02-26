@@ -12,6 +12,9 @@ else:
 
 
 class GlobalProgressBar(ProgressBarBase):
+    """
+    Progress bar to log training progress
+    """
     def __init__(self, process_position: int = 0):
         super().__init__()
         self._process_position = process_position
