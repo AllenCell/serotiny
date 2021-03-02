@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 
+from collections import OrderedDict
+import torch
 import torch.nn as nn
+from torch.nn import functional as F
 import pytorch_lightning as pl
 import matplotlib.pyplot as plt
 import numpy as np
-from torch.nn import functional as F
-import torch
-from collections import OrderedDict
-
 
 def acc_prec_recall(n_classes):
     """
@@ -23,6 +22,9 @@ def acc_prec_recall(n_classes):
 
 
 def matplotlib_imshow(img, one_channel=False):
+    """
+    Plot image via matplotlib's imshow
+    """
     if one_channel:
         img = img.mean(dim=0)
     img = img / 2 + 0.5  # unnormalize

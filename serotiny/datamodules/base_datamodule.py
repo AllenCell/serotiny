@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-import pytorch_lightning as pl
-
-# Note - you must have torchvision installed for this example
-from torchvision import transforms
 from os import listdir
-from ..csv import load_csv
 from pathlib import Path
+
+import pytorch_lightning as pl
+from torchvision import transforms
+from ..csv import load_csv
 from ...library.data import load_data_loader
 
 

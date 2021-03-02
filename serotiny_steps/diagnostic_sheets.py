@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import fire
+from pathlib import Path
+from typing import Optional
 import logging
 
-from typing import Optional
+import fire
 import pandas as pd
-from pathlib import Path
 
 from actk.steps.diagnostic_sheets import DiagnosticSheets
 from .apply_projection import apply_projection

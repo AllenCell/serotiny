@@ -4,7 +4,6 @@ import pytorch_lightning as pl
 
 
 class MyPrintingCallback(pl.Callback):
-    # TODO confugure a better callback than this, its currently empty
     def on_init_start(self, trainer):
         print("Starting to init trainer!")
 

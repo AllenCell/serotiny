@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import logging
+from datetime import datetime
+
 import fire
 
 import pytorch_lightning as pl
@@ -10,11 +13,9 @@ from pytorch_lightning.callbacks import ModelCheckpoint, GPUStatsMonitor, EarlyS
 from pl_bolts.callbacks import PrintTableMetricsCallback
 from ray.tune.integration.pytorch_lightning import TuneReportCallback
 from ray import tune
-from datetime import datetime
-import os
 
-from ..library.progress_bar import GlobalProgressBar
-from ..library.models.classification import (
+from serotiny.progress_bar import GlobalProgressBar
+from serotiny.models.classification import (
     ClassificationModel,
     AVAILABLE_NETWORKS,
 )
@@ -22,7 +23,7 @@ from ..library.models.classification import (
 # from ..library.models.callbacks import (
 #     MyPrintingCallback,
 # )
-import serotiny.library.datamodules as datamodules
+import serotiny.datamodules as datamodules
 
 ###############################################################################
 

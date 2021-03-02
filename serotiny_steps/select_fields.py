@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import fire
 import logging
+import fire
 
-from ..library.csv import load_csv
+from data.csv import load_csv
 
 ###############################################################################
 

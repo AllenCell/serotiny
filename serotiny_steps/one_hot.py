@@ -2,13 +2,11 @@
 # -*- coding: utf-8 -*-
 
 import os
-import fire
 import logging
+import fire
 
-import pandas as pd
-
-from ..library.csv import load_csv
-from ..library.data import append_one_hot
+from serotiny.csv import load_csv
+from serotiny.data import append_one_hot
 
 ###############################################################################
 

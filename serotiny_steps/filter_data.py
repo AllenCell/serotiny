@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import logging
 import numpy as np
 import pandas as pd
 
-import logging
 import fire
 
-from ..library.csv import load_csv
+from serotiny.csv import load_csv
 
 ###############################################################################
 

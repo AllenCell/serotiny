@@ -2,7 +2,8 @@
 from torchvision import transforms
 from ..image import png_loader
 from ...constants import DatasetFields
-from ...library.data import load_data_loader, Load2DImage, LoadClass, LoadId
+from ...data import load_data_loader
+from ...data.loaders import Load2DImage, LoadClass, LoadColumns
 from .base_datamodule import BaseDataModule
 from .utils import subset_channels
 
@@ -57,7 +58,7 @@ class ACTK2DDataModule(BaseDataModule):
 
         self.loaders = {
             # Use callable class objects here because lambdas aren't picklable
-            "id": LoadId(self.id_fields),
+            "id": LoadColumns(self.id_fields),
             self.y_label: LoadClass(len(self.classes), self.y_encoded_label),
             self.x_label: Load2DImage(
                 DatasetFields.Chosen2DProjectionPath,

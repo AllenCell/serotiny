@@ -1,11 +1,11 @@
-# Note - you must have torchvision installed for this example
+import numpy as np
+import torch
 from torchvision import transforms
 from ..image import tiff_loader_CZYX
-import numpy as np
 from ...constants import DatasetFields
-from ...library.data import load_data_loader, Load3DImage, LoadClass, LoadId
+from ...data import load_data_loader
+from ...data.loaders import Load3DImage, LoadClass, LoadColumns
 from .base_datamodule import BaseDataModule
-import torch
 
 from aicsimageprocessing.resize import resize_to
 from .utils import subset_channels
@@ -60,7 +60,7 @@ class ACTK3DDataModule(BaseDataModule):
 
         self.loaders = {
             # Use callable class objects here because lambdas aren't picklable
-            "id": LoadId(self.id_fields),
+            "id": LoadColumns(self.id_fields),
             self.y_label: LoadClass(len(self.classes), self.y_encoded_label),
             self.x_label: Load3DImage(
                 DatasetFields.CellImage3DPath,

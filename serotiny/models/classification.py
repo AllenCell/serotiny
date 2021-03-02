@@ -1,13 +1,13 @@
 """
-General 2d classifier module, implemented as a Pytorch Lightning module
+General classifier module, implemented as a Pytorch Lightning module
 """
 
+from typing import Optional
+from pathlib import Path
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 import numpy as np
-from typing import Optional
-from pathlib import Path
 
 import torch
 from torch import nn
@@ -16,7 +16,7 @@ import pytorch_lightning as pl
 
 from ..networks._2d import BasicCNN_2D, BasicNeuralNetwork, ResNet18Network
 from ..networks._3d import BasicCNN_3D, ResNet18_3D
-from ._utils import acc_prec_recall, add_pr_curve_tensorboard
+from .utils import acc_prec_recall, add_pr_curve_tensorboard
 
 AVAILABLE_NETWORKS = {
     "mlp": BasicNeuralNetwork,
@@ -30,6 +30,9 @@ AVAILABLE_SCHEDULERS = {"reduce_lr_plateau": torch.optim.lr_scheduler.ReduceLROn
 
 
 class ClassificationModel(pl.LightningModule):
+    """
+    Pytorch lightning module that implements classification model logic
+    """
     def __init__(
         self,
         network,
@@ -44,14 +47,11 @@ class ClassificationModel(pl.LightningModule):
         projection: Optional[dict] = None,
     ):
         super().__init__()
-        """Save hyperparameters"""
         # Can be accessed via checkpoint['hyper_parameters']
         self.save_hyperparameters()
 
-        """Configs"""
         self.log_grads = True
 
-        """model"""
         self.network = network
 
         # Print out network
@@ -60,7 +60,6 @@ class ClassificationModel(pl.LightningModule):
                 1, int(self.hparams.in_channels), *dimensions
             )
 
-        """Metrics"""
         self.train_metrics = acc_prec_recall(len(self.hparams.classes))
         self.val_metrics = acc_prec_recall(len(self.hparams.classes))
         self.test_metrics = acc_prec_recall(len(self.hparams.classes))
@@ -71,6 +70,20 @@ class ClassificationModel(pl.LightningModule):
         }
 
     def _generate_logs(self, preds, true, prefix, metrics):
+        """
+        Produce logs based on metrics dict
+
+        Parameters
+        ----------
+        preds: torch.tensor
+            the predictions given by the model
+        true: torch.tensor
+            the true labels
+        prefix: str
+            prefix to identify these logs
+        metrics: dict
+            metric dictionary with keys and callables
+        """
         _, preds_batch = torch.max(preds, 1)
         return {
             # f"{prefix}_loss": loss,
@@ -81,6 +94,9 @@ class ClassificationModel(pl.LightningModule):
         }
 
     def parse_batch(self, batch):
+        """
+        Retrieve x and y from batch
+        """
         x = batch[self.hparams.x_label]
         y = batch[self.hparams.y_label]
         # Return floats because this is expected dtype for nn.Loss
@@ -91,6 +107,9 @@ class ClassificationModel(pl.LightningModule):
         return output
 
     def _log_metrics(self, outputs, prefix, CSV_logger=False):
+        """
+        Produce metrics and save them
+        """
 
         logs = self._generate_logs(
             outputs["preds"],

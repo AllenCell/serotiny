@@ -158,7 +158,7 @@ def change_resolution(
     Parameters
     ----------
     path_in: Union[str, Path]
-        The path to the input OME TIFF file 
+        The path to the input OME TIFF file
     path_out: Union[str, Path]
         The path to the output OME TIFF file
     ZYX_resolution: Union[float, list]

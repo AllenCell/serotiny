@@ -2,16 +2,17 @@
 # -*- coding: utf-8 -*-
 
 import os
-import fire
 import logging
 
 from pathlib import Path
 from typing import Optional
 
+import fire
+
 from aics_dask_utils import DistributedHandler
 
-from ..library.csv import load_csv
-from ..library.image import change_resolution
+from serotiny.csv import load_csv
+from serotiny.image import change_resolution
 
 ###############################################################################
 
