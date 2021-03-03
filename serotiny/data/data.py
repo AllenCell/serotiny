@@ -40,7 +40,8 @@ def download_quilt_data(
         dataset_manifest.fetch(data_save_loc)
 
 def load_data_loader(
-    dataset, loaders, transform, batch_size=16, num_workers=0, shuffle=False
+        dataset, loaders, transform, batch_size=16, num_workers=0, shuffle=False,
+        weights_col="ClassWeights"
 ):
     """ Load a pytorch DataLoader from the provided dataset. """
 
@@ -48,8 +49,10 @@ def load_data_loader(
     dataframe = DataframeDataset(dataset, loaders=loaders, transform=transform)
 
     # Configure WeightedRandomSampler to handle class imbalances
-    weights = dataframe.dataframe["ClassWeights"].values
-    sampler = WeightedRandomSampler(weights, len(dataframe.dataframe))
+    sampler = None
+    if weights_col is not None:
+        weights = dataframe.dataframe[weights_col].values
+        sampler = WeightedRandomSampler(weights, len(dataframe.dataframe))
 
     # create the pytorch dataloader from that dataframe
     dataloader = DataLoader(

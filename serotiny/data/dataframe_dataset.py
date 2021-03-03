@@ -21,16 +21,21 @@ class DataframeDataset(Dataset):
         loaded
     """
 
-    def __init__(self, dataframe, loaders=None, transform=None):
+    def __init__(self, dataframe, loaders=None, transform=None, iloc=True):
         self.dataframe = dataframe
         self.loaders = loaders
         self.transform = transform
+        self.iloc = iloc
 
     def __len__(self):
         return len(self.dataframe)
 
     def _get_single_item(self, idx):
-        row = self.dataframe.loc[idx, :]
+        if self.iloc:
+            row = self.dataframe.iloc[idx, :]
+        else:
+            row = self.dataframe.loc[idx, :]
+
         return {key: loader(row) for key, loader in self.loaders.items()}
 
     def __getitem__(self, idx):
