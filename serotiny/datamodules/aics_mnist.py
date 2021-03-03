@@ -1,14 +1,16 @@
 import glob
 import tarfile
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
 from torchvision import transforms
 from ..image import png_loader
-from ...library.data import download_quilt_data
-from ...library.data import load_data_loader, Load2DImage, LoadClass, LoadId
+from ..data import download_quilt_data
+from ..data import load_data_loader
+from ..data.loaders import Load2DImage, LoadClass, LoadColumns
 from .base_datamodule import BaseDataModule
 from .utils import subset_channels
 
@@ -79,7 +81,7 @@ class AICS_MNIST_DataModule(BaseDataModule):
 
         self.loaders = {
             # Use callable class objects here because lambdas aren't picklable
-            "id": LoadId(self.id_fields),
+            "id": LoadColumns(self.id_fields),
             self.y_label: LoadClass(self.num_classes, self.y_encoded_label),
             self.x_label: Load2DImage(
                 "path",
