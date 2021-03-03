@@ -5,7 +5,7 @@ from pathlib import Path
 import pytorch_lightning as pl
 from torchvision import transforms
 from ..csv import load_csv
-from ...library.data import load_data_loader
+from ..data import load_data_loader
 
 
 class BaseDataModule(pl.LightningDataModule):

@@ -1,11 +1,11 @@
 # Note - you must have torchvision installed for this example
 from torchvision import transforms
-from ..image import png_loader
-from ...constants import DatasetFields
+from ...image import png_loader
 from ...data import load_data_loader
 from ...data.loaders import Load2DImage, LoadClass, LoadColumns
-from .base_datamodule import BaseDataModule
-from .utils import subset_channels
+from ..constants import DatasetFields
+from ..base_datamodule import BaseDataModule
+from ..utils import subset_channels
 
 
 class ACTK2DDataModule(BaseDataModule):

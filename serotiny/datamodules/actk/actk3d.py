@@ -1,16 +1,18 @@
 import numpy as np
 import torch
+
 from torchvision import transforms
-from ..image import tiff_loader_CZYX
-from ...constants import DatasetFields
+import torchio.transforms as tiotransforms
+from aicsimageprocessing.resize import resize_to
+
+from ...image import tiff_loader_CZYX
 from ...data import load_data_loader
 from ...data.loaders import Load3DImage, LoadClass, LoadColumns
-from .base_datamodule import BaseDataModule
+from ..constants import DatasetFields
+from ..base_datamodule import BaseDataModule
+from ..utils import subset_channels
 
-from aicsimageprocessing.resize import resize_to
-from .utils import subset_channels
 
-import torchio.transforms as tiotransforms
 
 
 class ACTK3DDataModule(BaseDataModule):
