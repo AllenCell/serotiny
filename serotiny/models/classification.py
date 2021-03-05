@@ -33,6 +33,7 @@ class ClassificationModel(pl.LightningModule):
     """
     Pytorch lightning module that implements classification model logic
     """
+
     def __init__(
         self,
         network,

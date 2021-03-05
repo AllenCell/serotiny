@@ -7,10 +7,12 @@ import numpy as np
 
 from ..image import tiff_loader_CZYX, png_loader
 
+
 class LoadColumns:
     """
     Loader class, used to retrieve fields directly from dataframe columns
     """
+
     def __init__(self, columns):
         self.columns = columns
 
@@ -22,6 +24,7 @@ class LoadClass:
     """
     Loader class, used to retrieve class values from the dataframe,
     """
+
     def __init__(self, num_classes, y_encoded_label, binary=False):
         self.num_classes = num_classes
         self.binary = binary
@@ -38,6 +41,7 @@ class Load2DImage:
     """
     Loader class, used to retrieve images from paths given in a dataframe column
     """
+
     def __init__(self, chosen_col, num_channels, channel_indexes, transform):
         self.chosen_col = chosen_col
         self.num_channels = num_channels
@@ -57,6 +61,7 @@ class Load3DImage:
     """
     Loader class, used to retrieve images from paths given in a dataframe column
     """
+
     def __init__(self, chosen_col, num_channels, select_channels, transform=None):
         self.chosen_col = chosen_col
         self.num_channels = num_channels

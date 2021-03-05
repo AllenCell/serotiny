@@ -5,6 +5,7 @@ from torch import nn
 from ...norm import spectral_norm
 from ..activation import activation_map
 
+
 class BasicLayer(nn.Module):
     def __init__(
         self, ch_in, ch_out, ksize=4, dstep=2, padding=1, activation="relu", bn=True

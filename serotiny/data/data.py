@@ -18,8 +18,10 @@ def powerset(iterable):
     size of the combo
     """
     elements = list(iterable)
-    return list(chain.from_iterable(combinations(elements, r)
-                for r in range(len(elements) + 1)))
+    return list(
+        chain.from_iterable(combinations(elements, r) for r in range(len(elements) + 1))
+    )
+
 
 def download_quilt_data(
     package,
@@ -39,9 +41,15 @@ def download_quilt_data(
     else:
         dataset_manifest.fetch(data_save_loc)
 
+
 def load_data_loader(
-        dataset, loaders, transform, batch_size=16, num_workers=0, shuffle=False,
-        weights_col="ClassWeights"
+    dataset,
+    loaders,
+    transform,
+    batch_size=16,
+    num_workers=0,
+    shuffle=False,
+    weights_col="ClassWeights",
 ):
     """ Load a pytorch DataLoader from the provided dataset. """
 

@@ -4,6 +4,7 @@ import pandas as pd
 
 from serotiny.library.data import DataframeDataset, one_hot_encoding, append_one_hot
 
+
 @pytest.mark.parametrize(
     "data, expected", [({"A": [1, 2, 3], "B": [10, 20, 30]}, (3.0, 3, 1.0))]
 )
@@ -35,6 +36,7 @@ def test_dataframe_dataset():
     dataframe_dataset = DataframeDataset(dataframe, loaders)
 
     assert dataframe_dataset[0]["A"] == data["A"][0] + 5
+
 
 if __name__ == "__main__":
     test_one_hot_encoder()

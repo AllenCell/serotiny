@@ -6,6 +6,7 @@ from ...norm import spectral_norm
 from ..activation import activation_map
 from .basic import BasicLayer
 
+
 class DownResidualLayer(nn.Module):
     def __init__(
         self, ch_in, ch_out, activation="relu", ch_cond_list=[], activation_last=None

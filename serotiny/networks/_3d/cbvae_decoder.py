@@ -7,6 +7,7 @@ from ..norm import spectral_norm
 from ..layers.activation import activation_map
 from ..layers._3d.up_residual import UpResidualLayer
 
+
 class CBVAEDecoder(nn.Module):
     def __init__(
         self,

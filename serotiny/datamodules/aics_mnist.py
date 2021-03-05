@@ -24,23 +24,25 @@ def make_manifest(dataset_path):
             structure = structure_path.split("/")[-1]
             for cell_img in glob.glob(_struct_path):
                 cells.append(
-                    dict(cellpath2dict(cell_img), structure=structure, split=split,
-                         path=str(Path(cell_img).resolve()))
+                    dict(
+                        cellpath2dict(cell_img),
+                        structure=structure,
+                        split=split,
+                        path=str(Path(cell_img).resolve()),
+                    )
                 )
 
     return pd.DataFrame(cells)
+
 
 def cellpath2dict(path):
     cell = path.split("/")[-1]
     cell = cell.split(".")[0]
     cell = cell.split("_")
-    return {
-        cell[i*2]: cell[i*2 + 1]
-        for i in range(len(cell)//2)
-    }
+    return {cell[i * 2]: cell[i * 2 + 1] for i in range(len(cell) // 2)}
+
 
 class AICS_MNIST_DataModule(BaseDataModule):
-
     def __init__(
         self,
         config: dict,
@@ -64,8 +66,7 @@ class AICS_MNIST_DataModule(BaseDataModule):
             config=config,
             batch_size=batch_size,
             num_workers=num_workers,
-            transform_list=[
-            ],
+            transform_list=[],
             train_transform_list=[
                 transforms.RandomHorizontalFlip(),
                 transforms.RandomVerticalFlip(),
@@ -104,7 +105,7 @@ class AICS_MNIST_DataModule(BaseDataModule):
             download_quilt_data(
                 package="aics/aics_mnist",
                 bucket="s3://allencell",
-                data_save_loc=data_dir
+                data_save_loc=data_dir,
             )
 
         if not (data_dir / "aics_mnist_rgb").exists():
@@ -113,7 +114,9 @@ class AICS_MNIST_DataModule(BaseDataModule):
 
         if not (data_dir / "aics_mnist_rgb.csv").exists():
             manifest = make_manifest(data_dir / "aics_mnist_rgb")
-            manifest["structure_encoded"] = LabelEncoder().fit_transform(manifest["structure"])
+            manifest["structure_encoded"] = LabelEncoder().fit_transform(
+                manifest["structure"]
+            )
             manifest.to_csv(data_dir / "aics_mnist_rgb.csv", index=False)
 
     def setup(self, stage=None):
@@ -139,7 +142,6 @@ class AICS_MNIST_DataModule(BaseDataModule):
         self.datasets["valid"] = train_val.loc[val_inds]
         self.datasets["valid"]["split"] = "valid"
 
-
         self.dims = (28, 28)
 
     def prepare_data(self):
@@ -157,7 +159,7 @@ class AICS_MNIST_DataModule(BaseDataModule):
         return (img.shape[1], img.shape[2])
 
     def train_dataloader(self):
-        train_dataset = self.datasets['train']
+        train_dataset = self.datasets["train"]
         train_loaders = self.loaders.copy()
         train_loaders[self.x_label] = Load2DImage(
             "path",
@@ -178,7 +180,7 @@ class AICS_MNIST_DataModule(BaseDataModule):
         return train_dataloader
 
     def val_dataloader(self):
-        val_dataset = self.datasets['valid']
+        val_dataset = self.datasets["valid"]
         val_loaders = self.loaders.copy()
         val_loaders[self.x_label] = Load2DImage(
             "path",
@@ -199,7 +201,7 @@ class AICS_MNIST_DataModule(BaseDataModule):
         return val_dataloader
 
     def test_dataloader(self):
-        test_dataset = self.datasets['test']
+        test_dataset = self.datasets["test"]
         test_loaders = self.loaders.copy()
         test_loaders[self.x_label] = Load2DImage(
             "path",

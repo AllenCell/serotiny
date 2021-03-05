@@ -13,8 +13,6 @@ from ..base_datamodule import BaseDataModule
 from ..utils import subset_channels
 
 
-
-
 class ACTK3DDataModule(BaseDataModule):
     def __init__(
         self,

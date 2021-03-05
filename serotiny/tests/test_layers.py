@@ -12,5 +12,6 @@ from ..library.networks.layers._3d.up_residual import UpResidualLayer
 from ..library.networks._3d.cbvae_encoder import CBVAEEncoder
 from ..library.networks._3d.cbvae_decoder import CBVAEDecoder
 
+
 def test_layers():
     BasicLayer(5, 5)

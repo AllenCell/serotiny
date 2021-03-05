@@ -2,6 +2,7 @@ from collections.abc import Iterable
 from torch.utils.data import Dataset
 from torch.utils.data.dataloader import default_collate as collate
 
+
 class DataframeDataset(Dataset):
     """
     Class to wrap a pandas DataFrame in a pytorch Dataset. In practice, at AICS

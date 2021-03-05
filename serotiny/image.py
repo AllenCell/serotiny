@@ -94,6 +94,7 @@ def png_loader(
 
     return img
 
+
 def tiff_loader_CZYX(
     path_str,
     select_channels=None,
@@ -120,12 +121,15 @@ def tiff_loader_CZYX(
     data = aicsimg.get_image_data("CZYX", S=0, T=0)
 
     if (not set(select_channels).issubset(channel_names)) or (
-        not set(channel_masks.keys()).issubset(channel_names)):
-        raise KeyError("Some elements of `select_channels` or `channel_masks` "
-                       "are not present in `channel_names`:\n"
-                       f"\tchannel_names: {channel_names}\n"
-                       f"\tchannel_masks: {channel_masks}\n"
-                       f"\tselect_channels:: {select_channels}")
+        not set(channel_masks.keys()).issubset(channel_names)
+    ):
+        raise KeyError(
+            "Some elements of `select_channels` or `channel_masks` "
+            "are not present in `channel_names`:\n"
+            f"\tchannel_names: {channel_names}\n"
+            f"\tchannel_masks: {channel_masks}\n"
+            f"\tselect_channels:: {select_channels}"
+        )
 
     channel_map = {
         channel_name: index for index, channel_name in enumerate(channel_names)
@@ -147,6 +151,7 @@ def tiff_loader_CZYX(
         data = transform(data)
 
     return data
+
 
 def change_resolution(
     path_in: Union[str, Path],
@@ -192,11 +197,14 @@ def change_resolution(
         y_dim_new = np.round(y_dim * ZYX_resolution).astype(np.int)
         x_dim_new = np.round(x_dim * ZYX_resolution).astype(np.int)
     # Resize to get desired resolution
-    data_new = np.zeros((1, num_channels, z_dim_new, y_dim_new, x_dim_new), dtype="uint8")
+    data_new = np.zeros(
+        (1, num_channels, z_dim_new, y_dim_new, x_dim_new), dtype="uint8"
+    )
     for channel in np.arange(num_channels):
         data_new[0, channel, :, :, :] = resize(
-            data[channel, :, :, :].squeeze(), (z_dim_new, y_dim_new, x_dim_new),
-            preserve_range=True
+            data[channel, :, :, :].squeeze(),
+            (z_dim_new, y_dim_new, x_dim_new),
+            preserve_range=True,
         )
     data_new = data_new.astype((np.uint8))
     # change this to do it across all channels at once, perhaps this can be done without for loop
@@ -208,6 +216,7 @@ def change_resolution(
         )
 
     return data_new.shape
+
 
 def project_2d(
     path_3d,

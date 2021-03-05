@@ -17,9 +17,8 @@ from ..losses import KLDLoss
 from .utils import index_to_onehot
 
 AVAILABLE_OPTIMIZERS = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}
-AVAILABLE_SCHEDULERS = {
-    "reduce_lr_plateau": torch.optim.lr_scheduler.ReduceLROnPlateau
-}
+AVAILABLE_SCHEDULERS = {"reduce_lr_plateau": torch.optim.lr_scheduler.ReduceLROnPlateau}
+
 
 def find_optimizer(optimizer_name, parameters, lr):
     if optimizer_name in AVAILABLE_OPTIMIZERS:
@@ -32,6 +31,7 @@ def find_optimizer(optimizer_name, parameters, lr):
         )
     return optimizer
 
+
 def reparameterize(mu, log_var, add_noise=True):
     if add_noise:
         std = torch.exp(0.5 * log_var)
@@ -41,6 +41,7 @@ def reparameterize(mu, log_var, add_noise=True):
         out = mu
 
     return out
+
 
 class CBVAEModel(pl.LightningModule):
     def __init__(
@@ -54,13 +55,13 @@ class CBVAEModel(pl.LightningModule):
         beta=1,
         kld_reduction="sum",
         x_label="x",
-        class_label='class',
+        class_label="class",
         num_classes=0,
-        reference='ref',
+        reference="ref",
         target_channel=0,
         reference_channels=[1, 2],
-        input_dims=[28,28],
-        auto_padding=True
+        input_dims=[28, 28],
+        auto_padding=True,
     ):
         super().__init__()
 
@@ -68,8 +69,9 @@ class CBVAEModel(pl.LightningModule):
         # large objects unnecessarily
         frame = inspect.currentframe()
         init_args = get_init_args(frame)
-        self.save_hyperparameters(*[arg for arg in init_args
-                                    if arg not in ["encoder", "decoder"]])
+        self.save_hyperparameters(
+            *[arg for arg in init_args if arg not in ["encoder", "decoder"]]
+        )
 
         self.log_grads = True
 
@@ -81,7 +83,7 @@ class CBVAEModel(pl.LightningModule):
 
     def parse_batch(self, batch):
         x = batch[self.hparams.x_label].float()
-        x_target = x[:,self.hparams.target_channel]
+        x_target = x[:, self.hparams.target_channel]
         if self.hparams.reference_channels is not None:
             x_reference = x[self.hparams.reference_channels]
         else:
@@ -104,7 +106,6 @@ class CBVAEModel(pl.LightningModule):
         # shape of the convolutional portion of this network is going to be
         # equal to the input shape downscaled by np.ceil(dim/div)
 
-
         # Forward passes
         mu, logsigma = self.encoder(x_target, x_reference, x_class)
 
@@ -116,8 +117,10 @@ class CBVAEModel(pl.LightningModule):
         x_hat = self.decoder(z, x_reference, x_class)
 
         if self.hparams.auto_padding:
-            padding = [(x_dim - xhat_dim)//2 for x_dim, xhat_dim
-                       in zip(x_target.shape[2:], x_hat.shape[2:])]
+            padding = [
+                (x_dim - xhat_dim) // 2
+                for x_dim, xhat_dim in zip(x_target.shape[2:], x_hat.shape[2:])
+            ]
 
             # make padding symmetric in every dimension
             padding = sum([[p, p] for p in padding], [])
@@ -133,7 +136,6 @@ class CBVAEModel(pl.LightningModule):
 
         loss = recon_loss + self.beta * kld_loss
 
-
         self.manual_backward(loss)
         (opt_enc, opt_dec) = self.optimizers()
         opt_enc.step()
@@ -146,10 +148,7 @@ class CBVAEModel(pl.LightningModule):
         self.log("train reconstruction loss", recon_loss, logger=True)
         self.log("train kld loss", kld_loss, logger=True)
 
-        return {
-            'loss': loss,
-            'batch_idx': batch_idx
-        }
+        return {"loss": loss, "batch_idx": batch_idx}
 
     def validation_step(self, batch, batch_idx):
         x_target, x_reference, x_class = self.parse_batch(batch)
@@ -162,11 +161,11 @@ class CBVAEModel(pl.LightningModule):
         self.log("validation kld loss", kld_loss, logger=True)
 
         return {
-            'validation_loss': loss,
-            'x_hat': x_hat,
-            'x_class': x_class,
-            'z_latent': z_latent,
-            'batch_idx': batch_idx
+            "validation_loss": loss,
+            "x_hat": x_hat,
+            "x_class": x_class,
+            "z_latent": z_latent,
+            "batch_idx": batch_idx,
         }
 
     def test_step(self, batch, batch_idx):
@@ -180,23 +179,21 @@ class CBVAEModel(pl.LightningModule):
         self.log("test kld loss", kld_loss, logger=True)
 
         return {
-            'test_loss': loss,
-            'x_hat': x_hat,
-            'x_class': x_class,
-            'z_latent': z_latent,
-            'batch_idx': batch_idx
+            "test_loss": loss,
+            "x_hat": x_hat,
+            "x_class": x_class,
+            "z_latent": z_latent,
+            "batch_idx": batch_idx,
         }
 
     def configure_optimizers(self):
         encoder_optimizer = find_optimizer(
-            self.hparams.optimizer_encoder,
-            self.encoder.parameters(),
-            self.hparams.lr)
+            self.hparams.optimizer_encoder, self.encoder.parameters(), self.hparams.lr
+        )
 
         decoder_optimizer = find_optimizer(
-            self.hparams.optimizer_decoder,
-            self.decoder.parameters(),
-            self.hparams.lr)
+            self.hparams.optimizer_decoder, self.decoder.parameters(), self.hparams.lr
+        )
 
         return (
             {
@@ -226,8 +223,5 @@ class CBVAEModel(pl.LightningModule):
                 name = k
                 # logger[0] is tensorboard logger
                 self.logger[0].experiment.add_histogram(
-                    tag=name,
-                    values=grads,
-                    global_step=self.trainer.global_step
+                    tag=name, values=grads, global_step=self.trainer.global_step
                 )
-

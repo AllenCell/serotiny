@@ -7,6 +7,7 @@ from ..norm import spectral_norm
 from ..layers.activation import activation_map
 from ..layers._3d.down_residual import DownResidualLayer
 
+
 class CBVAEEncoder(nn.Module):
     def __init__(
         self,
@@ -47,7 +48,9 @@ class CBVAEEncoder(nn.Module):
             ch_in = ch_out
 
         with torch.no_grad():
-            self.imsize_compressed = tuple(self.conv_forward(torch.zeros(1, n_ch_target, *input_dims)).shape[2:])
+            self.imsize_compressed = tuple(
+                self.conv_forward(torch.zeros(1, n_ch_target, *input_dims)).shape[2:]
+            )
 
         if self.n_latent_dim > 0:
             self.latent_out_mu = spectral_norm(

@@ -2,6 +2,7 @@
 Definition of useful constants
 """
 
+
 class DatasetFields:
     CellId = "CellId"
     CellIndex = "CellIndex"

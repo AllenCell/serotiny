@@ -1,5 +1,6 @@
 from torch import nn
 
+
 def activation_map(activation):
     if activation is None or activation.lower() == "none":
         return nn.Sequential()
@@ -21,5 +22,3 @@ def activation_map(activation):
 
     elif activation.lower() == "softplus":
         return nn.Softplus()
-
-

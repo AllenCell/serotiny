@@ -8,6 +8,7 @@ from ..activation import activation_map
 from .pad import PadLayer
 from .basic import BasicLayer
 
+
 class UpResidualLayer(nn.Module):
     def __init__(
         self,

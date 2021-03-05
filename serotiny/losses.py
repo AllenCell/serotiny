@@ -2,6 +2,7 @@ import math
 import torch
 import torch.nn as nn
 
+
 class KLDLoss(nn.Module):
     # computes kl loss against a reference isotropic gaussian distribution
     def __init__(self, reduction):
