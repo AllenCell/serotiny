@@ -176,3 +176,45 @@ class AICS_MNIST_DataModule(BaseDataModule):
         )
 
         return train_dataloader
+
+    def val_dataloader(self):
+        val_dataset = self.datasets['valid']
+        val_loaders = self.loaders.copy()
+        val_loaders[self.x_label] = Load2DImage(
+            "path",
+            self.num_channels,
+            self.channel_indexes,
+            self.transform,
+        )
+        val_dataloader = load_data_loader(
+            val_dataset,
+            val_loaders,
+            transform=self.transform,
+            shuffle=False,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            weights_col=None,
+        )
+
+        return val_dataloader
+
+    def test_dataloader(self):
+        test_dataset = self.datasets['test']
+        test_loaders = self.loaders.copy()
+        test_loaders[self.x_label] = Load2DImage(
+            "path",
+            self.num_channels,
+            self.channel_indexes,
+            self.transform,
+        )
+        test_dataloader = load_data_loader(
+            test_dataset,
+            test_loaders,
+            transform=self.transform,
+            shuffle=False,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            weights_col=None,
+        )
+
+        return test_dataloader

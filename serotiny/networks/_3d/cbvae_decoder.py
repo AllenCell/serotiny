@@ -21,7 +21,7 @@ class CBVAEDecoder(nn.Module):
         activation_last="sigmoid",
     ):
 
-        super(CBVAEDecoder, self).__init__()
+        super().__init__()
 
         self.gpu_ids = gpu_ids
         self.padding_latent = padding_latent

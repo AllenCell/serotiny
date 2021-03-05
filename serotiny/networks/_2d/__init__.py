@@ -9,4 +9,5 @@ __all__ = [
     "BasicNeuralNetwork",
     "ResNet18Network",
     "CBVAEEncoder",
-    "CBVAEDecoder"]
+    "CBVAEDecoder"
+]

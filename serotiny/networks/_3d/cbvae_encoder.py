@@ -16,9 +16,9 @@ class CBVAEEncoder(nn.Module):
         n_ch_target=1,
         n_ch_ref=2,
         conv_channels_list=[32, 64, 128, 256, 512],
-        imsize_compressed=[5, 3, 2],
+        input_dims=[28, 28, 28],
     ):
-        super(Enc, self).__init__()
+        super().__init__()
 
         self.gpu_ids = gpu_ids
 
@@ -46,10 +46,13 @@ class CBVAEEncoder(nn.Module):
 
             ch_in = ch_out
 
+        with torch.no_grad():
+            self.imsize_compressed = tuple(self.conv_forward(torch.zeros(1, n_ch_target, *input_dims)).shape[2:])
+
         if self.n_latent_dim > 0:
             self.latent_out_mu = spectral_norm(
                 nn.Linear(
-                    ch_in * int(np.prod(imsize_compressed)),
+                    ch_in * int(np.prod(self.imsize_compressed)),
                     self.n_latent_dim,
                     bias=True,
                 )
@@ -57,14 +60,13 @@ class CBVAEEncoder(nn.Module):
 
             self.latent_out_sigma = spectral_norm(
                 nn.Linear(
-                    ch_in * int(np.prod(imsize_compressed)),
+                    ch_in * int(np.prod(self.imsize_compressed)),
                     self.n_latent_dim,
                     bias=True,
                 )
             )
 
-    def forward(self, x_target, x_ref=None, x_class=None):
-
+    def conv_forward(self, x_target, x_ref=None, x_class=None):
         scales = 1 / (2 ** torch.arange(0, len(self.target_path) + 1).float())
 
         if x_ref is None:
@@ -78,6 +80,11 @@ class CBVAEEncoder(nn.Module):
         for ref, target_path in zip(x_ref, self.target_path):
             x_target = target_path(x_target, ref, x_class)
 
+        return x_target
+
+    def forward(self, x_target, x_ref=None, x_class=None):
+
+        x_target = self.conv_forward(x_target, x_ref, x_class)
         x_target = x_target.view(x_target.size()[0], -1)
 
         mu = self.latent_out_mu(x_target)

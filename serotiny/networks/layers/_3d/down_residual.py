@@ -10,7 +10,7 @@ class DownResidualLayer(nn.Module):
     def __init__(
         self, ch_in, ch_out, activation="relu", ch_cond_list=[], activation_last=None
     ):
-        super(DownResidualLayer, self).__init__()
+        super().__init__()
 
         if activation_last is None:
             activation_last = activation

@@ -14,6 +14,5 @@ class PadLayer(nn.Module):
             return x
         else:
             return nn.functional.pad(
-                x, [self.pad_dims[1], 0, self.pad_dims[0]], "constant", 0
+                x, [self.pad_dims[1], self.pad_dims[1], self.pad_dims[0], self.pad_dims[0]], "constant", 0
             )
-

@@ -1,10 +1,6 @@
-import torch.nn as nn
-
-from . import utils
-
-import torch
 import math
-
+import torch
+import torch.nn as nn
 
 class KLDLoss(nn.Module):
     # computes kl loss against a reference isotropic gaussian distribution
@@ -31,7 +27,7 @@ class BatchLoss(nn.Module):
     def __init__(self, loss, loss_kwargs):
         super(BatchLoss, self).__init__()
 
-        self.loss = utils.load_object(loss, loss_kwargs)
+        self.loss = loss(**loss_kwargs)
 
     def forward(self, *args):
         return self.loss(*args) / args[0].shape[0]

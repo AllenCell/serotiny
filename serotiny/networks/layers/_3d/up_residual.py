@@ -17,7 +17,7 @@ class UpResidualLayer(nn.Module):
         ch_cond_list=[],
         activation_last=None,
     ):
-        super(UpResidualLayer, self).__init__()
+        super().__init__()
 
         if activation_last is None:
             activation_last = activation

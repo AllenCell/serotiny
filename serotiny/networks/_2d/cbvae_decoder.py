@@ -12,7 +12,6 @@ class CBVAEDecoder(nn.Module):
         self,
         n_latent_dim,
         n_classes,
-        gpu_ids,
         padding_latent=[0, 0],
         imsize_compressed=[5, 3],
         n_ch_target=1,
@@ -21,9 +20,8 @@ class CBVAEDecoder(nn.Module):
         activation_last="sigmoid",
     ):
 
-        super(Dec, self).__init__()
+        super().__init__()
 
-        self.gpu_ids = gpu_ids
         self.padding_latent = padding_latent
         self.imsize_compressed = imsize_compressed
 
@@ -78,9 +76,6 @@ class CBVAEDecoder(nn.Module):
         )
 
     def forward(self, z_target, x_ref=None, x_class=None):
-        # gpu_ids = None
-        # if isinstance(x.data, torch.cuda.FloatTensor) and len(self.gpu_ids) > 1:
-
         scales = 1 / (2 ** torch.arange(0, len(self.target_path)).float())
 
         if x_ref is None:

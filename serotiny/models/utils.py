@@ -156,3 +156,11 @@ def show_activations(x, logger, network, current_epoch):
             global_step=current_epoch,
             dataformats="HW",
         )
+
+def index_to_onehot(index, n_classes):
+    index = index.long().unsqueeze(1)
+
+    onehot = torch.zeros(len(index), n_classes).type_as(index).float()
+    onehot.scatter_(1, index, 1)
+
+    return onehot
