@@ -46,10 +46,10 @@ def load_data_loader(
     dataset,
     loaders,
     transform,
-    batch_size=16,
-    num_workers=0,
+    batch_size, # =16,
+    num_workers, # =0,
     shuffle=False,
-    weights_col="ClassWeights",
+    weights_col, # ="ClassWeights",
 ):
     """ Load a pytorch DataLoader from the provided dataset. """
 

@@ -37,14 +37,14 @@ class ClassificationModel(pl.LightningModule):
     def __init__(
         self,
         network,
-        x_label="projection_image",
-        y_label="mitotic_class",
-        in_channels=3,
-        classes=("M0", "M1/M2", "M3", "M4/M5", "M6/M7"),
-        dimensions=None,
-        lr=1e-3,
-        optimizer="adam",
-        scheduler="reduce_lr_plateau",
+        x_label: str, # ="projection_image",
+        y_label: str, # ="mitotic_class",
+        in_channels: int, # =3,
+        classes: tuple, # =("M0", "M1/M2", "M3", "M4/M5", "M6/M7"),
+        dimensions, # =None,
+        lr: float, # =1e-3,
+        optimizer: str, # ="adam",
+        scheduler: str, # ="reduce_lr_plateau",
         projection: Optional[dict] = None,
     ):
         super().__init__()
