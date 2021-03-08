@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from os import listdir
 from pathlib import Path
+from typing import List
 
 import pytorch_lightning as pl
 from torchvision import transforms
@@ -11,20 +12,32 @@ from ..data import load_data_loader
 class BaseDataModule(pl.LightningDataModule):
     def __init__(
         self,
-        config: dict,
         transform_list: list,
         train_transform_list: list,
         x_label: str,
         y_label: str,
         batch_size: int,
         num_workers: int,
-        data_dir: str = "./",
+        id_fields: List[str],
+        channels: List,
+        select_channels: List,
+        data_dir: str,
+        **kwargs,
     ):
         super().__init__()
 
+        self.channels = channels
+        self.select_channels = select_channels
+        self.num_channels = len(self.channels)
+
+        self.channel_indexes, self.num_channels = subset_channels(
+            channel_subset=self.select_channels,
+            channels=self.channels,
+        )
+
         self.data_dir = data_dir
 
-        self.id_fields = config["id_fields"]
+        self.id_fields = id_fields
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.datasets = {}

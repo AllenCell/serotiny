@@ -45,25 +45,20 @@ def cellpath2dict(path):
 class AICS_MNIST_DataModule(BaseDataModule):
     def __init__(
         self,
-        config: dict,
         batch_size: int,
         num_workers: int,
         data_dir: str,
         x_label: str,
         y_label: str,
+        channels: list,
+        select_channels: list,
+        id_fields: list,
+        **kwargs
     ):
 
-        self.channels = config["channels"]
-        self.select_channels = config["select_channels"]
-        self.num_channels = len(self.channels)
-
-        self.channel_indexes, self.num_channels = subset_channels(
-            channel_subset=self.select_channels,
-            channels=self.channels,
-        )
-
         super().__init__(
-            config=config,
+            channels=channels,
+            select_channels=select_channels,
             batch_size=batch_size,
             num_workers=num_workers,
             transform_list=[],
@@ -74,10 +69,11 @@ class AICS_MNIST_DataModule(BaseDataModule):
             x_label=x_label,
             y_label=y_label,
             data_dir=data_dir,
+            **kwargs
         )
 
         self.y_encoded_label = y_label + "_encoded"
-        self.id_fields = config["id_fields"]
+        self.id_fields = id_fields
         self.num_classes = 10
 
         self.loaders = {

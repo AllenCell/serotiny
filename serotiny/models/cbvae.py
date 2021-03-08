@@ -58,7 +58,7 @@ class CBVAEModel(pl.LightningModule):
         class_label="class",
         num_classes=0,
         reference="ref",
-        target_channel=0,
+        target_channels=0,
         reference_channels=[1, 2],
         input_dims=[28, 28],
         auto_padding=True,
@@ -83,9 +83,10 @@ class CBVAEModel(pl.LightningModule):
 
     def parse_batch(self, batch):
         x = batch[self.hparams.x_label].float()
-        x_target = x[:, self.hparams.target_channel]
+        print(x.shape)
+        x_target = x[:, self.hparams.target_channels]
         if self.hparams.reference_channels is not None:
-            x_reference = x[self.hparams.reference_channels]
+            x_reference = x[:,self.hparams.reference_channels]
         else:
             x_reference = None
         if self.hparams.num_classes > 0:
@@ -94,7 +95,6 @@ class CBVAEModel(pl.LightningModule):
         else:
             x_class_one_hot = None
 
-        # Return floats because this is expected dtype for nn.Loss
         return x_target, x_reference, x_class_one_hot
 
     def forward(self, x_target, x_reference, x_class):

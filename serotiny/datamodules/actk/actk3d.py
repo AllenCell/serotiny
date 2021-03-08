@@ -1,3 +1,5 @@
+from typing import List, Tuple
+
 import numpy as np
 import torch
 
@@ -16,23 +18,24 @@ from ..utils import subset_channels
 class ACTK3DDataModule(BaseDataModule):
     def __init__(
         self,
-        config: dict,
         batch_size: int,
         num_workers: int,
         x_label: str,
         y_label: str,
         data_dir: str,
-        resize_dims=(64, 128, 96),
+        channels: List,
+        select_channels: List,
+        classes: List,
+        resize_dims: Tuple[int],
+        encoded_label_suffix: str,
+        **kwargs,
     ):
-
-        self.channels = config["channels"]
-        self.select_channels = config["select_channels"]
-        self.classes = config["classes"]
-        self.num_channels = len(self.select_channels)
         self.resize_dims = resize_dims
+        self.classes = classes
 
         super().__init__(
-            config=config,
+            channels=channels,
+            select_channels=select_channels,
             batch_size=batch_size,
             num_workers=num_workers,
             transform_list=[
@@ -52,11 +55,12 @@ class ACTK3DDataModule(BaseDataModule):
             x_label=x_label,
             y_label=y_label,
             data_dir=data_dir,
+            **kwargs,
         )
 
         self.x_label = x_label
         self.y_label = y_label
-        self.y_encoded_label = y_label + "Integer"
+        self.y_encoded_label = y_label + encoded_label_suffix
 
         self.loaders = {
             # Use callable class objects here because lambdas aren't picklable

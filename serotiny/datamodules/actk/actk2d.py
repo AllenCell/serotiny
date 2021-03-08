@@ -11,38 +11,36 @@ from ..utils import subset_channels
 class ACTK2DDataModule(BaseDataModule):
     def __init__(
         self,
-        config: dict,
         batch_size: int,
         num_workers: int,
         x_label: str,
         y_label: str,
         data_dir: str,
+        resize_to: int,
+        encoded_label_suffix: str,
+        channels: list,
+        select_channels: list,
+        classes: list,
+        **kwargs,
     ):
 
-        self.channels = config["channels"]
-        self.select_channels = config["select_channels"]
-        self.classes = config["classes"]
-        self.num_channels = len(self.channels)
-
-        self.channel_indexes, self.num_channels = subset_channels(
-            channel_subset=self.select_channels,
-            channels=self.channels,
-        )
+        self.classes = classes
 
         super().__init__(
-            config=config,
+            channels=channels,
+            select_channels=select_channels,
             batch_size=batch_size,
             num_workers=num_workers,
             transform_list=[
                 transforms.ToPILImage(),
-                transforms.Resize(256),
-                transforms.CenterCrop(256),
+                transforms.Resize(resize_to),
+                transforms.CenterCrop(resize_to),
                 transforms.ToTensor(),
             ],
             train_transform_list=[
                 transforms.ToPILImage(),
-                transforms.Resize(256),
-                transforms.CenterCrop(256),
+                transforms.Resize(resize_to),
+                transforms.CenterCrop(resize_to),
                 transforms.RandomHorizontalFlip(),
                 transforms.RandomVerticalFlip(),
                 transforms.ToTensor(),
@@ -50,11 +48,12 @@ class ACTK2DDataModule(BaseDataModule):
             x_label=x_label,
             y_label=y_label,
             data_dir=data_dir,
+            **kwargs,
         )
 
         self.x_label = x_label
         self.y_label = y_label
-        self.y_encoded_label = y_label + "Integer"
+        self.y_encoded_label = y_label + encoded_label_suffix
 
         self.loaders = {
             # Use callable class objects here because lambdas aren't picklable
@@ -67,11 +66,6 @@ class ACTK2DDataModule(BaseDataModule):
                 self.transform,
             ),
         }
-
-        # self.dims is returned when you call dm.size()
-        # Setting default dims here because we know them.
-        # Could optionally be assigned dynamically in dm.setup()
-        self.dims = (1, 28, 28)
 
     def load_image(self, dataset):
         return png_loader(
