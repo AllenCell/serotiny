@@ -17,8 +17,6 @@ class BasicLayer(nn.Module):
         activation: str, # ="relu",
         bn: bool, # =True,
     ):
-        self, ch_in, ch_out, ksize=4, dstep=2, padding=1, activation="relu", bn=True
-    ):
         super(BasicLayer, self).__init__()
 
         self.conv = spectral_norm(
