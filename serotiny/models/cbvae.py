@@ -1,7 +1,7 @@
 """
-General conditional beta variational autoencoder module, implemented as a Pytorch Lightning module
+General conditional beta variational autoencoder module, 
+implemented as a Pytorch Lightning module
 """
-from pathlib import Path
 import inspect
 
 import torch
@@ -9,10 +9,6 @@ from torch.nn import functional as F
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.parsing import get_init_args
 
-from ..networks._2d import CBVAEEncoder as CBVAE2DEncoder
-from ..networks._2d import CBVAEDecoder as CBVAE2DDecoder
-from ..networks._3d import CBVAEEncoder as CBVAE3DEncoder
-from ..networks._3d import CBVAEDecoder as CBVAE3DDecoder
 from ..losses import KLDLoss
 from .utils import index_to_onehot
 
@@ -86,7 +82,7 @@ class CBVAEModel(pl.LightningModule):
         print(x.shape)
         x_target = x[:, self.hparams.target_channels]
         if self.hparams.reference_channels is not None:
-            x_reference = x[:,self.hparams.reference_channels]
+            x_reference = x[:, self.hparams.reference_channels]
         else:
             x_reference = None
         if self.hparams.num_classes > 0:

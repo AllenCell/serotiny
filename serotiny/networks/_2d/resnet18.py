@@ -10,8 +10,31 @@ import torchvision.models as models
 
 
 class ResNet18Network(nn.Module):
+    """
+    A pytorch nn Module that implement a Resnet18 network
+    by adding a Conv2D layer to the front of a pretrained
+    resnet18 network and a linear layer at the end
+
+    Parameters
+    ----------
+    in_channels: int
+        Number of input channels for the first layer.
+        Example: 3
+
+    num_classes: int
+        Number of classes for the final layer
+        Example: 5
+
+    dimensions: tuple
+        Dimensions of input image
+
+    pretrained: bool
+        If true, return model pretrained on ImageNet
+
+    """
+
     def __init__(
-        self, in_channels=3, num_classes=5, dimensions=(176, 104), pretrained=True
+        self, in_channels=int, num_classes=int, dimensions=tuple, pretrained=bool
     ):
         super().__init__()
         self.network_name = "Resnet18"

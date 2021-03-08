@@ -1,14 +1,15 @@
 import warnings
 import multiprocessing as mp
 from itertools import chain, combinations
+from typing import Union
 
 import numpy as np
 import pandas as pd
 import quilt3
+import torch
 
 from sklearn.preprocessing import OneHotEncoder
 from torch.utils.data import DataLoader, WeightedRandomSampler
-from ..image import png_loader, tiff_loader_CZYX
 from .dataframe_dataset import DataframeDataset
 
 
@@ -24,13 +25,29 @@ def powerset(iterable):
 
 
 def download_quilt_data(
-    package,
-    bucket,
-    data_save_loc,
+    package: str,
+    bucket: str,
+    data_save_loc: str,
     ignore_warnings=True,
 ):
     """
-    download a quilt dataset and supress nfs file attribe warnings
+    Download a quilt dataset and supress nfs file attribe warnings
+
+    Parameters
+    ----------
+    package: str
+        Name of the package on s3.
+        Example: "aics/hipsc_single_cell_image_dataset"
+
+    bucket: str
+        The s3 bucket storing the package
+        Example: "s3://allencell"
+
+    data_save_loc: str,
+        Path to save data
+
+    ignore_warnings: bool,
+        Whether to suppress nfs file attribute warnings or not
     """
     dataset_manifest = quilt3.Package.browse(package, bucket)
 
@@ -43,15 +60,49 @@ def download_quilt_data(
 
 
 def load_data_loader(
-    dataset,
-    loaders,
-    transform,
-    batch_size=16,
-    num_workers=0,
-    shuffle=False,
+    dataset: pd.DataFrame,
+    loaders: dict,
+    transform: Union[list, torch.nn.Module],
+    batch_size: int,
+    num_workers: int,
+    shuffle: bool,
     weights_col="ClassWeights",
 ):
-    """ Load a pytorch DataLoader from the provided dataset. """
+    """
+    Load a pytorch DataLoader from the provided dataset.
+
+    Parameters
+    ----------
+    dataset: pd.DataFrame
+        Dataframe to convert into a pytorch dataloader. Pass in a separate dataframe
+        for train, val and test to make dataloaders for each
+
+    loaders: dict
+        Dictionary containing information about how to load the CellID, Image
+        and Label from the dataframe per row.
+
+    transform: Union[list, torch.nn.Module]
+        Pytorch transforms to apply to the images
+
+    batch_size: int
+        Batch size used in the dataloader. Example: 64
+
+    num_workers: int
+        Number of worker processes to create in the dataloader
+
+    shuffle: bool
+        Whether to shuffle the dataset or not. Example: True for train dataloader
+
+    weights_col: str
+        Use a column if class weights to instantiate a weighted random sampler
+        that handles class imbalances
+
+    Returns
+    --------
+    dataloader
+        A pytorch dataloader based on a pandas dataframe
+
+    """
 
     # Load a dataframe from the dataset, using the provided row processing fns
     dataframe = DataframeDataset(dataset, loaders=loaders, transform=transform)
@@ -78,6 +129,22 @@ def load_data_loader(
 
 
 def one_hot_encoding(dataset: pd.DataFrame, column: str):
+    """
+    Make one hot encoding of a column in a pandas dataframe
+
+    Parameters
+    -----------
+    dataset: pd.DataFrame
+        Input dataframe
+
+    columns: str
+        Column to convert into one hot encoding
+
+    Returns
+    ---------
+    one_hot: np.array
+        One hot encoding of input column
+    """
     # Make a one hot encoding for this column in the dataset.
 
     enc = OneHotEncoder(sparse=False, dtype=np.float64)
@@ -90,7 +157,18 @@ def one_hot_encoding(dataset: pd.DataFrame, column: str):
 def append_one_hot(dataset: pd.DataFrame, column: str, index: str):
     """
     Modifies its argument by appending the one hot encoding columns
-    into the given dataset.
+    into the given dataset. Calls function one_hot_encoding
+
+    Parameters
+    -----------
+    dataset: pd.DataFrame
+        Input dataframe
+
+    column: str
+        Column to convert into one hot encoding
+
+    index: str
+        Index to merge the one hot encoding back onto original dataframe
     """
 
     one_hot = one_hot_encoding(dataset, column)

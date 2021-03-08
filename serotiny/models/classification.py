@@ -32,20 +32,55 @@ AVAILABLE_SCHEDULERS = {"reduce_lr_plateau": torch.optim.lr_scheduler.ReduceLROn
 class ClassificationModel(pl.LightningModule):
     """
     Pytorch lightning module that implements classification model logic
+
+    Parameters
+    -----------
+    network:
+        Instantiated neural network for training a classification problem
+
+    x_label: str
+        Key for loading input image
+        Example: "projection_image"
+
+    y_label: str
+        Key for loading image label
+        Example: "mitotic_class"
+
+    in_channels: int
+        Number of input channels in the image
+        Example: 3
+
+    classes: tuple
+        all available classes in the given class column
+        Example: ("M0", "M1/M2", "M3", "M4/M5", "M6/M7")
+
+    lr: float
+        Learning rate for the optimizer. Example: 1e-3
+
+    optimizer: str
+        Str key to instantiate optimizer. Example: "adam"
+
+    scheduler: str
+        str key to instantiate learning rate scheduler
+        Example: "reduce_lr_plateau"
+
+    dimensions: Optional[tuple, list]:
+        Dimensions of each image channel. Only used for printing
+        out the network/model to the command line. Set to None
+        if this is not wanted
     """
 
     def __init__(
         self,
         network,
-        x_label="projection_image",
-        y_label="mitotic_class",
-        in_channels=3,
-        classes=("M0", "M1/M2", "M3", "M4/M5", "M6/M7"),
-        dimensions=None,
-        lr=1e-3,
-        optimizer="adam",
-        scheduler="reduce_lr_plateau",
-        projection: Optional[dict] = None,
+        x_label: str,
+        y_label: str,
+        in_channels: int,
+        classes: tuple,
+        lr: float,
+        optimizer: str,
+        scheduler: str,
+        dimensions: Optional[tuple, list] = None,
     ):
         super().__init__()
         # Can be accessed via checkpoint['hyper_parameters']

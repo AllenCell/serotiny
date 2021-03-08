@@ -36,30 +36,33 @@ pl.seed_everything(42)
 def train_model_config(
     config,
 ):
+    """
+    Config version of train_model
+    Only used in tune_model.py
+    """
     train_model(
         datasets_path=config["datasets_path"],
         output_path=config["output_path"],
-        classes=config["classes"],
+        data_config=config["data_config"],
+        datamodule=config["datamodule"],
         model=config["model"],
         batch_size=config["batch_size"],
         num_gpus=config["num_gpus"],
         num_workers=config["num_workers"],
-        channel_indexes=config["channel_indexes"],
         num_epochs=config["num_epochs"],
         lr=config["lr"],
         optimizer=config["optimizer"],
         scheduler=config["scheduler"],
-        id_fields=config["id_fields"],
-        channels=config["channels"],
         test=config["test"],
         tune_bool=config["tune_bool"],
+        x_label=config["x_label"],
+        y_label=config["y_label"],
     )
 
 
 def train_model(
     datasets_path: str,
     output_path: str,
-    data_config: dict,
     datamodule: str,
     model: str,
     batch_size: int,
@@ -73,10 +76,64 @@ def train_model(
     tune_bool: bool,
     x_label: str,
     y_label: str,
+    classes: str,
 ):
     """
     Initialize dataloaders and model
     Call trainer.fit()
+
+    Parameters
+    ------------
+    datasets_path: str,
+        Path to data directory containing csv's for train
+        tes and val splits
+
+    output_path: str,
+        Path to output diectory for saving trained model
+        and tensorboard logs
+
+    datamodule: str,
+        String key to retrieve a datamodule
+
+    model: str,
+        String key to instantiate a model
+
+    batch_size: int,
+        Batch size for dataloader
+
+    num_gpus: int,
+        Number of gpus to use
+
+    num_workers: int,
+        Number of worker processes to use in dataloader
+
+    num_epochs: int,
+        Number of epochs to train model
+
+    lr: float,
+        Learning rate for optimizer
+
+    optimizer: str,
+        String key to retrive an optimizer
+
+    scheduler: str,
+        String key to retrive a scheduler
+
+    test: bool,
+        Whether to test the model or not
+
+    tune_bool: bool,
+        Whether to tune hyper params or not
+
+    x_label: str,
+        x label key for loading image in datamodule
+
+    y_label: str,
+        y label key for loading image label
+        in datamodule
+
+    classes: List
+        list of classes in y_label
     """
     # Load data module
     dm_class = datamodules.__dict__[datamodule]
@@ -84,10 +141,11 @@ def train_model(
     dm = dm_class(
         batch_size=batch_size,
         num_workers=num_workers,
-        config=data_config,
         data_dir=datasets_path,
         x_label=x_label,
         y_label=y_label,
+        classes=classes,
+        **kwargs,
     )
     dm.setup()
 
@@ -97,7 +155,7 @@ def train_model(
     # init model
     network_config = {
         "in_channels": in_channels,
-        "num_classes": len(data_config["classes"]),
+        "num_classes": len(classes),
         "dimensions": dimensions,
     }
     model = {"type": model}
@@ -119,7 +177,7 @@ def train_model(
         x_label=dm.x_label,
         y_label=dm.y_label,
         in_channels=in_channels,
-        classes=data_config["classes"],
+        classes=classes,
         dimensions=dimensions,
         lr=lr,
         optimizer=optimizer,
