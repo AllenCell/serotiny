@@ -3,10 +3,8 @@ import torch
 
 from torch import nn
 
-from ..norm import spectral_norm
-from ..layers.activation import activation_map
+from torch.nn.utils import spectral_norm
 from ..layers._2d.down_residual import DownResidualLayer
-from ..layers._2d.pad import PadLayer
 
 
 class CBVAEEncoder(nn.Module):
@@ -48,9 +46,15 @@ class CBVAEEncoder(nn.Module):
         # pass a dummy input through the convolutions to obtain the dimensions
         # before the last linear layer
         with torch.no_grad():
+            self.eval()
             self.imsize_compressed = tuple(
-                self.conv_forward(torch.zeros(1, n_ch_target, *input_dims)).shape[2:]
+                self.conv_forward(
+                    torch.zeros(1, n_ch_target, *input_dims),
+                    (torch.zeros(1, n_ch_ref, *input_dims) if n_ch_ref > 0 else None),
+                    (torch.zeros(1, n_classes) if n_classes > 0 else None),
+                ).shape[2:]
             )
+        self.train()
 
         if self.n_latent_dim > 0:
             self.latent_out_mu = spectral_norm(

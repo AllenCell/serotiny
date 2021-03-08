@@ -4,7 +4,7 @@
 import logging
 import fire
 
-from data.csv import load_csv
+from serotiny.data.csv import load_csv
 
 ###############################################################################
 
@@ -18,6 +18,9 @@ def select_fields(
     output_path,
     fields,
 ):
+    """
+    Select some columns from a dataset
+    """
     dataset = load_csv(dataset_path, [])
     manifest = dataset[fields]
     manifest.to_csv(output_path, index=False)

@@ -3,8 +3,7 @@ import torch
 
 from torch import nn
 
-from ..norm import spectral_norm
-from ..layers.activation import activation_map
+from torch.nn.utils import spectral_norm
 from ..layers._2d.up_residual import UpResidualLayer
 
 

@@ -3,7 +3,7 @@ import torch
 
 from torch import nn
 
-from ...norm import spectral_norm
+from torch.nn.utils import spectral_norm
 from ..activation import activation_map
 from .pad import PadLayer
 from .basic import BasicLayer
@@ -12,17 +12,19 @@ from .basic import BasicLayer
 class UpResidualLayer(nn.Module):
     def __init__(
         self,
-        ch_in,
-        ch_out,
-        activation="relu",
-        output_padding=0,
-        ch_cond_list=[],
-        activation_last=None,
+        ch_in: int,
+        ch_out: int,
+        activation: str, # ="relu",
+        output_padding: int, # =0,
+        ch_cond_list: Optional[list], # =None,
+        activation_last: Optional[str], # =None
     ):
         super().__init__()
 
         if activation_last is None:
             activation_last = activation
+        if ch_cond_list is None:
+            ch_cond_list = []
 
         self.bypass = nn.Sequential(
             spectral_norm(nn.Conv2d(ch_in, ch_out, 1, 1, padding=0, bias=True)),

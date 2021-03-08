@@ -81,8 +81,8 @@ extra_requirements = {
 }
 
 setup(
-    author="Ryan Spangler, Ritvik Vasan",
-    author_email="ryan.spangler@alleninstitute.org, ritvik.vasan@alleninstitute.org",
+    author="Ryan Spangler, Ritvik Vasan, Guilherme Pires, Caleb Chan, Theo Knijnenburg",
+    author_email="ryan.spangler@alleninstitute.org, ritvik.vasan@alleninstitute.org, guilherme.pires@alleninstitute.org, caleb.chan@alleninstitute.org, theo.knijnenburg@alleninstitute.org",
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",
@@ -95,7 +95,17 @@ setup(
     description="library and commands for deep learning workflows",
     entry_points={
         "console_scripts": [
-            "my_example=serotiny.bin.my_example:main"
+            "apply_projection=serotiny_steps.apply_projection",
+            "change_resolution=serotiny_steps.change_resolution",
+            "diagnostic_sheets=serotiny_steps.diagnostic_sheets",
+            "filter_data=serotiny_steps.filter_data",
+            "merge_data=serotiny_steps.merge_data",
+            "one_hot=serotiny_steps.one_hot",
+            "select_fields=serotiny_steps.select_fields",
+            "split_data=serotiny_steps.split_data",
+            "train_classifier=serotiny_steps.train_classifier",
+            "train_vae=serotiny_steps.train_vae",
+            "tune_model=serotiny_steps.tune_model",
         ],
     },
     install_requires=requirements,

@@ -2,19 +2,26 @@ import numpy as np
 import torch
 from torch import nn
 
-from ...norm import spectral_norm
+from torch.nn.utils import spectral_norm
 from ..activation import activation_map
 from .basic import BasicLayer
 
 
 class DownResidualLayer(nn.Module):
     def __init__(
-        self, ch_in, ch_out, activation="relu", ch_cond_list=[], activation_last=None
+        self,
+        ch_in: int,
+        ch_out: int,
+        activation: str, # ="relu",
+        ch_cond_list: Optional[list], # =[],
+        activation_last: Optional[str], # =None
     ):
         super().__init__()
 
         if activation_last is None:
             activation_last = activation
+        if ch_cond_list is None:
+            ch_cond_list = []
 
         self.bypass = nn.Sequential(
             nn.AvgPool3d(2, stride=2, padding=0),

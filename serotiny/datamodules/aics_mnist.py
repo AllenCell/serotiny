@@ -12,10 +12,12 @@ from ..data import download_quilt_data
 from ..data import load_data_loader
 from ..data.loaders import Load2DImage, LoadClass, LoadColumns
 from .base_datamodule import BaseDataModule
-from .utils import subset_channels
 
 
 def make_manifest(dataset_path):
+    """
+    Make a manifest from dataset path
+    """
     cells = []
     for split in ["train", "test"]:
         _split_path = str((Path(dataset_path) / split) / "*")
@@ -36,6 +38,9 @@ def make_manifest(dataset_path):
 
 
 def cellpath2dict(path):
+    """
+    Convert a given cell path to a dict
+    """
     cell = path.split("/")[-1]
     cell = cell.split(".")[0]
     cell = cell.split("_")
@@ -43,27 +48,55 @@ def cellpath2dict(path):
 
 
 class AICS_MNIST_DataModule(BaseDataModule):
+    """
+    A pytorch lightning datamodule that handles the logic for
+    loading the AICS MNIST dataset
+
+    Parameters
+    -----------
+    x_label: str
+        Column name used to load an image (x)
+
+    y_label: str
+        Column name used to load the image label (y)
+
+    batch_size: int
+        Batch size for the dataloader
+
+    num_workers: int
+        Number of worker processes to create in dataloader
+
+    id_fields: List[str]
+        Id column name for loader
+
+    channels: List
+        List of channels in the images
+
+    select_channels: List
+        List of channels to subset the original channel list
+
+    data_dir: str
+        Path to data folder containing csv's for train, val,
+        and test splits
+
+    """
+
     def __init__(
         self,
-        config: dict,
         batch_size: int,
         num_workers: int,
         data_dir: str,
         x_label: str,
         y_label: str,
+        channels: list,
+        select_channels: list,
+        id_fields: list,
+        **kwargs
     ):
 
-        self.channels = config["channels"]
-        self.select_channels = config["select_channels"]
-        self.num_channels = len(self.channels)
-
-        self.channel_indexes, self.num_channels = subset_channels(
-            channel_subset=self.select_channels,
-            channels=self.channels,
-        )
-
         super().__init__(
-            config=config,
+            channels=channels,
+            select_channels=select_channels,
             batch_size=batch_size,
             num_workers=num_workers,
             transform_list=[],
@@ -74,10 +107,11 @@ class AICS_MNIST_DataModule(BaseDataModule):
             x_label=x_label,
             y_label=y_label,
             data_dir=data_dir,
+            **kwargs
         )
 
         self.y_encoded_label = y_label + "_encoded"
-        self.id_fields = config["id_fields"]
+        self.id_fields = id_fields
         self.num_classes = 10
 
         self.loaders = {
@@ -120,6 +154,9 @@ class AICS_MNIST_DataModule(BaseDataModule):
             manifest.to_csv(data_dir / "aics_mnist_rgb.csv", index=False)
 
     def setup(self, stage=None):
+        """
+        Setup train, val and test dataframes. Get image dimensions
+        """
         self.data_dir = Path(self.data_dir)
 
         all_data = pd.read_csv(self.data_dir / "aics_mnist_rgb.csv")
@@ -145,9 +182,15 @@ class AICS_MNIST_DataModule(BaseDataModule):
         self.dims = (28, 28)
 
     def prepare_data(self):
+        """
+        Download dataset
+        """
         self.get_dataset(self.data_dir)
 
     def load_image(self, dataset):
+        """
+        Load a single 2D image given a path
+        """
         return png_loader(
             dataset["path"].iloc[0],
             channel_order="CYX",
@@ -156,9 +199,15 @@ class AICS_MNIST_DataModule(BaseDataModule):
         )
 
     def get_dims(self, img):
+        """
+        Get dimensions of input image
+        """
         return (img.shape[1], img.shape[2])
 
     def train_dataloader(self):
+        """
+        Instantiate train dataloader.
+        """
         train_dataset = self.datasets["train"]
         train_loaders = self.loaders.copy()
         train_loaders[self.x_label] = Load2DImage(
@@ -180,6 +229,10 @@ class AICS_MNIST_DataModule(BaseDataModule):
         return train_dataloader
 
     def val_dataloader(self):
+        """
+        Instantiate val dataloader. This should ideally be implemented
+        in base_datamodule
+        """
         val_dataset = self.datasets["valid"]
         val_loaders = self.loaders.copy()
         val_loaders[self.x_label] = Load2DImage(
@@ -201,6 +254,10 @@ class AICS_MNIST_DataModule(BaseDataModule):
         return val_dataloader
 
     def test_dataloader(self):
+        """
+        Instantiate test dataloader. This should ideally be implemented
+        in base_datamodule
+        """
         test_dataset = self.datasets["test"]
         test_loaders = self.loaders.copy()
         test_loaders[self.x_label] = Load2DImage(

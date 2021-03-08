@@ -1,3 +1,5 @@
+from typing import List, Tuple
+
 import numpy as np
 import torch
 
@@ -10,29 +12,75 @@ from ...data import load_data_loader
 from ...data.loaders import Load3DImage, LoadClass, LoadColumns
 from ..constants import DatasetFields
 from ..base_datamodule import BaseDataModule
-from ..utils import subset_channels
 
 
 class ACTK3DDataModule(BaseDataModule):
+    """
+    A pytorch lightning datamodule that handles the logic for
+    loading 3D ACTK images
+
+    Parameters
+    -----------
+    x_label: str
+        Column name used to load an image (x)
+
+    y_label: str
+        Column name used to load the image label (y)
+
+    batch_size: int
+        Batch size for the dataloader
+
+    num_workers: int
+        Number of worker processes to create in dataloader
+
+    id_fields: List[str]
+        Id column name for loader
+
+    channels: List
+        List of channels in the images
+
+    select_channels: List
+        List of channels to subset the original channel list
+
+    data_dir: str
+        Path to data folder containing csv's for train, val,
+        and test splits
+
+    resize_dims: Tuple[int]
+        Resize input images to this size
+
+    encoded_label_suffix: str
+        a column of categorical variables is converted into an integer
+        representation. This column in named
+        encoded_label + encoded_label_suffix
+        Example:
+            encoded_label = "ChosenMitoticClass"
+            encoded_label_suffix = "Integer"
+
+    classes: list
+        List of classes in the encoded_label column
+    """
+
     def __init__(
         self,
-        config: dict,
         batch_size: int,
         num_workers: int,
         x_label: str,
         y_label: str,
         data_dir: str,
-        resize_dims=(64, 128, 96),
+        channels: List,
+        select_channels: List,
+        classes: List,
+        resize_dims: Tuple[int],
+        encoded_label_suffix: str,
+        **kwargs,
     ):
-
-        self.channels = config["channels"]
-        self.select_channels = config["select_channels"]
-        self.classes = config["classes"]
-        self.num_channels = len(self.select_channels)
         self.resize_dims = resize_dims
+        self.classes = classes
 
         super().__init__(
-            config=config,
+            channels=channels,
+            select_channels=select_channels,
             batch_size=batch_size,
             num_workers=num_workers,
             transform_list=[
@@ -52,11 +100,12 @@ class ACTK3DDataModule(BaseDataModule):
             x_label=x_label,
             y_label=y_label,
             data_dir=data_dir,
+            **kwargs,
         )
 
         self.x_label = x_label
         self.y_label = y_label
-        self.y_encoded_label = y_label + "Integer"
+        self.y_encoded_label = y_label + encoded_label_suffix
 
         self.loaders = {
             # Use callable class objects here because lambdas aren't picklable
@@ -71,6 +120,9 @@ class ACTK3DDataModule(BaseDataModule):
         }
 
     def load_image(self, dataset):
+        """
+        Load a single 2D image given a path
+        """
         return self.transform(
             tiff_loader_CZYX(
                 path_str=dataset[DatasetFields.CellImage3DPath].iloc[0],
@@ -80,9 +132,15 @@ class ACTK3DDataModule(BaseDataModule):
         )
 
     def get_dims(self, img):
+        """
+        Get dimensions of input image
+        """
         return img.shape[1:]
 
     def train_dataloader(self):
+        """
+        Instantiate train dataloader.
+        """
         train_dataset = self.datasets["train"]
         train_loaders = self.loaders.copy()
         train_loaders[self.x_label] = Load3DImage(

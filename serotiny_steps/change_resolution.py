@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 import logging
 
 from pathlib import Path
@@ -62,11 +61,13 @@ def apply_resolution(
     manifest_in: Union[str, Path]
         The path to the manifest csv file with original images
     path_3d_column: str
-        The name of the column in manifest_in that lists the paths to the input OME TIFF files
+        The name of the column in manifest_in that lists the paths
+        to the input OME TIFF files
     manifest_out: Union[str, Path]
         The path to the manifest csv file with resampled images
     path_3d_resized_column: str
-        The name of the column in manifest_out that lists the paths to the output OME TIFF files
+        The name of the column in manifest_out that lists the paths
+        to the output OME TIFF files
     path_out: Union[str, Path]
         The path to the root folder where the output OME TIFF files is stored
     resolution: Union[scalar, list]

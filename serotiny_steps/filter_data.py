@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import numpy as np
+from typing import Optional, List
 import pandas as pd
 
 import fire
@@ -17,8 +17,32 @@ log = logging.getLogger(__name__)
 
 
 def filter_data(
-    dataset_path, output_path, filter_options, required_fields=None, seed=42
+    dataset_path: str,
+    output_path: str,
+    filter_options: dict,
+    seed: int,
+    required_fields: Optional[List] = None,
 ):
+    """
+    Filter dataframe down to speicifed columns
+
+    Parameters
+    ------------
+    dataset_path: str
+        Path to dataframe
+
+    output_path: str
+        Output path to save filtered dataset
+
+    filter_options: dict
+        Dict containing some filtering options
+
+    seed: int
+        Example: 42
+
+    required_fields:
+        List of required fields in the input dataset
+    """
     if required_fields is None:
         required_fields = {}
 
