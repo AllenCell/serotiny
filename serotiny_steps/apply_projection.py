@@ -37,16 +37,49 @@ def find_projection_path(projection):
 
     return projection_path
 
+
 def apply_projection(
-    dataset_path,
-    output_path,
-    projection,
+    dataset_path: str,
+    output_path: str,
+    projection: dict,
     path_3d_column: str,
     chosen_projection: str,
-    source_path=None,
-    proj_all=False,
+    proj_all: bool,
     executor_address: Optional[str] = None,
+    source_path: Optional[str] = None,
 ):
+    """
+    Compute projection of 3D images
+
+    Parameters
+    -----------
+    dataset_path: str
+        Path to dataset containing 3D images
+
+    output_path: str
+        Path to save projection images
+
+    projection: dict
+        Dictionary config containing details like
+        channels, method, masks, axis
+
+    path_3d_column: str
+        Column containing 3D image paths
+
+    chosen_projection: str
+        Add the new column of proejcted images
+        to the dataset with this key
+
+    proj_all: bool
+        Whether to do all axis max projection or not
+
+    executor_address: Optional[str] = None
+        Address for dask distributed compute
+
+    source_path: Optional[str] = None
+        If source path, append source path to
+        3D image paths
+    """
 
     print(f"applying projection {projection}")
 
@@ -106,8 +139,6 @@ def apply_projection(
                 [masks for _ in range(len(projections))],
                 [proj_all for _ in range(len(projections))],
             )
-
-    dimensions = find_dimensions(dataset[chosen_projection][0])
 
     dataset.to_csv(output_path, index=False)
 

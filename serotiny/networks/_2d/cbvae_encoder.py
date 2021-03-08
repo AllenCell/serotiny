@@ -4,9 +4,7 @@ import torch
 from torch import nn
 
 from torch.nn.utils import spectral_norm
-from ..layers.activation import activation_map
 from ..layers._2d.down_residual import DownResidualLayer
-from ..layers._2d.pad import PadLayer
 
 
 class CBVAEEncoder(nn.Module):

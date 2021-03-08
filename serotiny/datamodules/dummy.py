@@ -4,7 +4,26 @@ import pytorch_lightning as pl
 import torch
 from torch.utils.data import Dataset, DataLoader
 
+
 class DummyDataset(Dataset):
+    """
+    Instantiate a dummy pytorch dataset
+
+    Parameters:
+    x_label: str
+        Key to retrieve image
+
+    y_label: str
+        Key to retrieve image label
+
+    dims: str
+        Dimensions of image
+
+    length:
+        Length of the dummy dataset
+
+    """
+
     def __init__(self, x_label, y_label, length, dims, *args, **kwargs):
         self.length = length
         self.dims = dims
@@ -17,10 +36,14 @@ class DummyDataset(Dataset):
     def __getitem__(self, idx):
         return {
             self.x_label: torch.randn(self.dims),
-            self.y_label: torch.randint(high=10, size=(1,))
+            self.y_label: torch.randint(high=10, size=(1,)),
         }
 
+
 def make_dataloader(x_label, y_label, length, dims, batch_size, num_workers):
+    """
+    Instantiate dummy dataset and return dataloader
+    """
     dataset = DummyDataset(x_label, y_label, length, dims)
     return DataLoader(
         dataset,
@@ -31,7 +54,36 @@ def make_dataloader(x_label, y_label, length, dims, batch_size, num_workers):
         multiprocessing_context=mp.get_context("fork"),
     )
 
+
 class DummyDatamodule(pl.LightningDataModule):
+    """
+    A pytorch lightning datamodule that handles the logic for
+    loading a dummy dataset
+
+    Parameters
+    -----------
+    batch_size: int
+        batch size for dataloader
+
+    num_workers: int
+        Number of worker processes for dataloader
+
+    x_label: str
+        x_label key to retrive image
+
+    y_label: str
+        y_label key to retrieve image label
+
+    dims: list
+        Dimensions for dummy images
+
+    length: int
+        Length of dummy dataset
+
+    channels: list = [],
+        Number of channels for dummy images
+    """
+
     def __init__(
         self,
         batch_size: int,
@@ -58,9 +110,9 @@ class DummyDatamodule(pl.LightningDataModule):
             x_label,
             y_label,
             length,
-            tuple([n_channels]+dims),
+            tuple([n_channels] + dims),
             batch_size,
-            num_workers
+            num_workers,
         )
 
     def train_dataloader(self):

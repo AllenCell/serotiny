@@ -5,10 +5,55 @@ from ...data import load_data_loader
 from ...data.loaders import Load2DImage, LoadClass, LoadColumns
 from ..constants import DatasetFields
 from ..base_datamodule import BaseDataModule
-from ..utils import subset_channels
 
 
 class ACTK2DDataModule(BaseDataModule):
+    """
+    A pytorch lightning datamodule that handles the logic for
+    loading 2D ACTK images
+
+    Parameters
+    -----------
+    x_label: str
+        Column name used to load an image (x)
+
+    y_label: str
+        Column name used to load the image label (y)
+
+    batch_size: int
+        Batch size for the dataloader
+
+    num_workers: int
+        Number of worker processes to create in dataloader
+
+    id_fields: List[str]
+        Id column name for loader
+
+    channels: List
+        List of channels in the images
+
+    select_channels: List
+        List of channels to subset the original channel list
+
+    data_dir: str
+        Path to data folder containing csv's for train, val,
+        and test splits
+
+    resize_to: int
+        Resize input images to a square of this size
+
+    encoded_label_suffix: str
+        a column of categorical variables is converted into an integer
+        representation. This column in named
+        encoded_label + encoded_label_suffix
+        Example:
+            encoded_label = "ChosenMitoticClass"
+            encoded_label_suffix = "Integer"
+
+    classes: list
+        List of classes in the encoded_label column
+    """
+
     def __init__(
         self,
         batch_size: int,
@@ -68,6 +113,9 @@ class ACTK2DDataModule(BaseDataModule):
         }
 
     def load_image(self, dataset):
+        """
+        Load a single 2D image given a path
+        """
         return png_loader(
             dataset[DatasetFields.Chosen2DProjectionPath].iloc[0],
             channel_order="CYX",
@@ -76,9 +124,15 @@ class ACTK2DDataModule(BaseDataModule):
         )
 
     def get_dims(self, img):
+        """
+        Get dimensions of input image
+        """
         return (img.shape[1], img.shape[2])
 
     def train_dataloader(self):
+        """
+        Instantiate train dataloader.
+        """
         train_dataset = self.datasets["train"]
         train_loaders = self.loaders.copy()
         train_loaders[self.x_label] = Load2DImage(
