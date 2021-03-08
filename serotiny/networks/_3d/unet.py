@@ -10,18 +10,43 @@ from ..layers._3d.double_convolution import DoubleConvolution
 class Unet(nn.Module):
     def __init__(
             self,
-            in_channels=1,
-            channel_fan=2,
-            dimensions=(176, 104, 52),
-            pooling='average'):
+            depth: int = 4,
+            in_channels: int = 1,
+            channel_fan: int = 2,
+            kernel_size: int = 3,
+            padding: int = 1,
+            pooling: str = 'average',
+            # dimensions: tuple, # =(176, 104, 52),
+        ):
+        '''
+        Implementation of the Unet network architecture https://arxiv.org/pdf/1505.04597.pdf
+        Just one level for now TODO: add more levels : )
+
+        Parameters:
+            pooling: options are (average, max)
+        '''
+
         super().__init__()
         self.network_name = "Unet"
         
+        current_depth = depth
+        n_in, n_out = in_channels, in_channels * channel_fan
+        subnetworks = []
+        for current_depth in range(depth + 1):
+            if current_depth == 0:
+                # we are at the bottom
+                subnetworks.append(DoubleConvolution(n_in, n_out))
+            else:
+                down = DoubleConvolution(n_in, n_out, kernel_size=kernel_size, padding=padding)
+                subnetwork =
+            n_in = n_out
+            n_out *= channel_fan
+
         out_channels = in_channels * channel_fan
             
-        self.step_down = DoubleConvolution(in_channels, out_channels)
-        self.step_bottom = DoubleConvolution(out_channels, out_channels * channel_fan)
-        self.step_up = DoubleConvolution(out_channels * channel_fan, out_channels)
+        self.step_down = DoubleConvolution(in_channels, out_channels, kernel_size=kernel_size, padding=padding)
+        self.step_bottom = DoubleConvolution(out_channels, out_channels * channel_fan, kernel_size=kernel_size, padding=padding)
+        self.step_up = DoubleConvolution(out_channels * channel_fan, out_channels, kernel_size=kernel_size, padding=padding)
 
         if pooling == 'average':
             self.pooling = nn.AvgPool3d(kernel_size=channel_fan)
