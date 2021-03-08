@@ -1,0 +1,107 @@
+from typing import List, Tuple
+
+import numpy as np
+import torch
+
+from torchvision import transforms
+import torchio.transforms as tiotransforms
+from aicsimageprocessing.resize import resize_to
+
+from ...image import tiff_loader_CZYX
+from ...data import load_data_loader
+from ...data.loaders import Load3DImage, LoadClass, LoadColumns
+from ..constants import DatasetFields
+from ..base_datamodule import BaseDataModule
+from ..utils import subset_channels
+
+
+class ACTK3DDataModule(BaseDataModule):
+    def __init__(
+        self,
+        batch_size: int,
+        num_workers: int,
+        x_label: str,
+        y_label: str,
+        data_dir: str,
+        channels: List,
+        select_channels: List,
+        classes: List,
+        resize_dims: Tuple[int],
+        encoded_label_suffix: str,
+        **kwargs,
+    ):
+        self.resize_dims = resize_dims
+        self.classes = classes
+
+        super().__init__(
+            channels=channels,
+            select_channels=select_channels,
+            batch_size=batch_size,
+            num_workers=num_workers,
+            transform_list=[
+                transforms.Lambda(
+                    lambda x: resize_to(x, (self.num_channels, *resize_dims))
+                ),
+                transforms.Lambda(lambda x: torch.tensor(x)),
+            ],
+            train_transform_list=[
+                transforms.Lambda(
+                    lambda x: resize_to(x, (self.num_channels, *resize_dims))
+                ),
+                transforms.Lambda(lambda x: torch.tensor(x)),
+                tiotransforms.ToCanonical(),
+                tiotransforms.RandomFlip(),
+            ],
+            x_label=x_label,
+            y_label=y_label,
+            data_dir=data_dir,
+            **kwargs,
+        )
+
+        self.x_label = x_label
+        self.y_label = y_label
+        self.y_encoded_label = y_label + encoded_label_suffix
+
+        self.loaders = {
+            # Use callable class objects here because lambdas aren't picklable
+            "id": LoadColumns(self.id_fields),
+            self.y_label: LoadClass(len(self.classes), self.y_encoded_label),
+            self.x_label: Load3DImage(
+                DatasetFields.CellImage3DPath,
+                self.num_channels,
+                self.select_channels,
+                self.transform,
+            ),
+        }
+
+    def load_image(self, dataset):
+        return self.transform(
+            tiff_loader_CZYX(
+                path_str=dataset[DatasetFields.CellImage3DPath].iloc[0],
+                select_channels=self.select_channels,
+                output_dtype=np.float32,
+            )
+        )
+
+    def get_dims(self, img):
+        return img.shape[1:]
+
+    def train_dataloader(self):
+        train_dataset = self.datasets["train"]
+        train_loaders = self.loaders.copy()
+        train_loaders[self.x_label] = Load3DImage(
+            DatasetFields.CellImage3DPath,
+            self.num_channels,
+            self.select_channels,
+            self.train_transform,
+        )
+        train_dataloader = load_data_loader(
+            train_dataset,
+            train_loaders,
+            transform=self.train_transform,
+            shuffle=False,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+        )
+
+        return train_dataloader
