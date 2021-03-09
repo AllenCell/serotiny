@@ -83,7 +83,6 @@ class CBVAEModel(pl.LightningModule):
 
     def parse_batch(self, batch):
         x = batch[self.hparams.x_label].float()
-        print(x.shape)
         x_target = x[:, self.hparams.target_channels]
         if self.hparams.reference_channels is not None:
             x_reference = x[:,self.hparams.reference_channels]
