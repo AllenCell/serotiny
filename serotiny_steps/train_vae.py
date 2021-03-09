@@ -83,7 +83,7 @@ def train_vae(
                        f"available.\n Available datamodules:\n"
                        f"{datamodules.__all__}")
 
-    crit_recon = losses.__dict__[crit_recon]
+    crit_recon = losses.__dict__[crit_recon]()
 
     encoder = CBVAEEncoder(
         n_latent_dim=n_latent_dim,
@@ -138,11 +138,11 @@ def train_vae(
         # if save_top_k = 1, all files in this local staging dir
         # will be deleted when a checkpoint is saved
         # save_top_k=1,
-        monitor="val_loss",
+        monitor="validation_loss",
         verbose=True,
     )
 
-    early_stopping = EarlyStopping("val_loss")
+    early_stopping = EarlyStopping("validation_loss")
 
     callbacks = [
         GPUStatsMonitor(),
@@ -151,8 +151,8 @@ def train_vae(
     ]
     trainer = pl.Trainer(
         logger=[tb_logger],
-        accelerator="ddp",
-        replace_sampler_ddp=False,
+        #accelerator="ddp",
+        #replace_sampler_ddp=False,
         gpus=num_gpus,
         max_epochs=100,
         progress_bar_refresh_rate=5,

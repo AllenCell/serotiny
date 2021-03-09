@@ -22,13 +22,13 @@ def test_vae_step():
         n_ch_target=2,
         n_ch_ref=1,
         conv_channels_list=[8, 16, 32],
-        input_dims=[28, 28],
+        input_dims=[32, 32],
         target_channels=[1, 2],
         reference_channels=[0],
         beta=0.5,
         is_2d_or_3d=2,
         length=100, #kwarg for dummy datamodule
-        dims=[28, 28], #kwarg for dummy datamodule
+        dims=[32, 32], #kwarg for dummy datamodule
         channels=[0, 0, 0] #kwarg for dummy datamodule
     )
 
