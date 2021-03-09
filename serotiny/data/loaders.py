@@ -37,6 +37,21 @@ class LoadClass:
         return torch.tensor(row[self.y_encoded_label])
 
 
+class LoadSpharmCoeffs:
+    """
+    Loader class, used to retrieve spharm coeffs from the dataframe,
+    """
+
+    def __init__(self):
+        pass
+
+    def __call__(self, row):
+        dna_spharm_cols = [col for col in row.keys() if "dna_shcoeffs" in col]
+        mem_spharm_cols = [col for col in row.keys() if "mem_shcoeffs" in col]
+        str_spharm_cols = [col for col in row.keys() if "str_shcoeffs" in col]
+        return torch.tensor(row[dna_spharm_cols])
+
+
 class Load2DImage:
     """
     Loader class, used to retrieve images from paths given in a dataframe column

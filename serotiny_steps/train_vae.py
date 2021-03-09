@@ -20,6 +20,7 @@ import serotiny.losses as losses
 log = logging.getLogger(__name__)
 pl.seed_everything(42)
 
+
 def train_vae(
     data_dir: str,
     output_path: str,
@@ -45,7 +46,7 @@ def train_vae(
     reference_channels: Optional[List[int]],
     beta: float,
     is_2d_or_3d: int,
-    **kwargs
+    **kwargs,
 ):
     """
     Instantiate and train a bVAE.
@@ -62,10 +63,11 @@ def train_vae(
     else:
         raise ValueError(f"Parameter `is_2d_or_3d` should be 2 or 3")
 
-
     if datamodule not in datamodules.__dict__:
-        raise KeyError(f"Chosen datamodule {datamodule} not available.\n"
-                       f"Available datamodules:\n{datamodules.__all__}")
+        raise KeyError(
+            f"Chosen datamodule {datamodule} not available.\n"
+            f"Available datamodules:\n{datamodules.__all__}"
+        )
 
     # Load data module
     datamodule = datamodules.__dict__[datamodule](
@@ -74,14 +76,16 @@ def train_vae(
         data_dir=data_dir,
         x_label=x_label,
         y_label=class_label,
-        **kwargs
+        **kwargs,
     )
     datamodule.setup()
 
     if crit_recon not in losses.__dict__:
-        raise KeyError(f"Chosen reconstruction criterion {crit_recon} not"
-                       f"available.\n Available datamodules:\n"
-                       f"{datamodules.__all__}")
+        raise KeyError(
+            f"Chosen reconstruction criterion {crit_recon} not"
+            f"available.\n Available datamodules:\n"
+            f"{datamodules.__all__}"
+        )
 
     crit_recon = losses.__dict__[crit_recon]
 
@@ -91,7 +95,7 @@ def train_vae(
         n_ch_target=n_ch_target,
         n_ch_ref=n_ch_ref,
         conv_channels_list=conv_channels_list,
-        input_dims=input_dims
+        input_dims=input_dims,
     )
 
     decoder = CBVAEDecoder(
@@ -117,7 +121,7 @@ def train_vae(
         target_channels=target_channels,
         reference_channels=reference_channels,
         lr=lr,
-        beta=beta
+        beta=beta,
     )
 
     tb_logger = TensorBoardLogger(
@@ -161,7 +165,7 @@ def train_vae(
         benchmark=False,
         profiler=False,
         deterministic=True,
-        automatic_optimization=False
+        automatic_optimization=False,
     )
 
     trainer.fit(vae, datamodule)
@@ -171,6 +175,7 @@ def train_vae(
         trainer.test(datamodule=datamodule)
 
     return checkpoint_callback.best_model_path
+
 
 if __name__ == "__main__":
     # example command:

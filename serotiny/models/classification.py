@@ -80,7 +80,7 @@ class ClassificationModel(pl.LightningModule):
         lr: float,
         optimizer: str,
         scheduler: str,
-        dimensions: Optional[tuple, list] = None,
+        dimensions: Optional[tuple] = None,
     ):
         super().__init__()
         # Can be accessed via checkpoint['hyper_parameters']
