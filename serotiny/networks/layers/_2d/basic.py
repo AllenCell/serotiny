@@ -12,11 +12,11 @@ class BasicLayer(nn.Module):
         self,
         ch_in: int,
         ch_out: int,
-        ksize: int, # =4,
-        dstep: int, # =2,
-        padding: int, # =1,
-        activation: str, # ="relu",
-        bn: bool, # =True,
+        ksize: int,
+        dstep: int,
+        padding: int,
+        activation: str,
+        bn: bool,
     ):
         super(BasicLayer, self).__init__()
 

@@ -1,24 +1,32 @@
+from typing import List, Optional
+
 import numpy as np
 import torch
 
 from torch import nn
 
 from torch.nn.utils import spectral_norm
-from ..layers._2d.up_residual import UpResidualLayer
+from ...layers._2d.up_residual import UpResidualLayer
 
 
 class CBVAEDecoder(nn.Module):
     def __init__(
         self,
-        n_latent_dim,
-        n_classes,
-        padding_latent=[0, 0],
-        imsize_compressed=[5, 3],
-        n_ch_target=1,
-        n_ch_ref=2,
-        conv_channels_list=[1024, 512, 256, 128, 64],
-        activation_last="sigmoid",
+        n_latent_dim: int,
+        n_classes: int,
+        imsize_compressed: List[int],
+        n_ch_target: int,
+        n_ch_ref: int,
+        conv_channels_list: List[int],
+        activation: str,
+        activation_last: str,
+        padding_latent: Optional[List[int]] = None,
     ):
+
+        if padding_latent is None:
+            padding_latent = [0, 0]
+
+        assert len(imsize_compressed) == 2
 
         super().__init__()
 
@@ -61,8 +69,10 @@ class CBVAEDecoder(nn.Module):
                 UpResidualLayer(
                     l_sizes[i],
                     l_sizes[i + 1],
-                    output_padding=padding,
                     ch_cond_list=target_cond_list,
+                    activation=activation,
+                    activation_last=activation,
+                    output_padding=padding,
                 )
             )
 
@@ -71,7 +81,9 @@ class CBVAEDecoder(nn.Module):
                 l_sizes[i + 1],
                 n_ch_target,
                 ch_cond_list=target_cond_list,
+                activation=activation,
                 activation_last=activation_last,
+                output_padding=0
             )
         )
 

@@ -39,12 +39,16 @@ def train_vae(
     n_classes: int,
     n_ch_target: int,
     n_ch_ref: int,
+    activation: str,
+    activation_last: str,
     conv_channels_list: List[int],
     input_dims: List[int],
     target_channels: List[int],
     reference_channels: Optional[List[int]],
     beta: float,
-    is_2d_or_3d: int,
+    dimensionality: int,
+    auto_padding: bool = False,
+    kld_reduction: str = "sum",
     **kwargs
 ):
     """
@@ -55,12 +59,14 @@ def train_vae(
 
     """
 
-    if is_2d_or_3d == 2:
-        from serotiny.networks._2d import CBVAEDecoder, CBVAEEncoder
-    elif is_2d_or_3d == 3:
-        from serotiny.networks._3d import CBVAEDecoder, CBVAEEncoder
+    if dimensionality == 2:
+        from serotiny.networks.vae._2d import CBVAEDecoder, CBVAEEncoder
+    elif dimensionality == 3:
+        from serotiny.networks.vae._3d import CBVAEDecoder, CBVAEEncoder
+    elif dimensionality == 1:
+        raise NotImplementedError("No networks for 1-dimensional inputs available (yet)")
     else:
-        raise ValueError(f"Parameter `is_2d_or_3d` should be 2 or 3")
+        raise ValueError(f"Parameter `dimensionality` should be 2 or 3")
 
 
     if datamodule not in datamodules.__dict__:
@@ -91,7 +97,8 @@ def train_vae(
         n_ch_target=n_ch_target,
         n_ch_ref=n_ch_ref,
         conv_channels_list=conv_channels_list,
-        input_dims=input_dims
+        input_dims=input_dims,
+        activation=activation,
     )
 
     decoder = CBVAEDecoder(
@@ -103,6 +110,8 @@ def train_vae(
         # the reverse of that for the encoder
         conv_channels_list=conv_channels_list[::-1],
         imsize_compressed=encoder.imsize_compressed,
+        activation=activation,
+        activation_last=activation_last
     )
 
     vae = CBVAEModel(
@@ -117,7 +126,10 @@ def train_vae(
         target_channels=target_channels,
         reference_channels=reference_channels,
         lr=lr,
-        beta=beta
+        beta=beta,
+        kld_reduction=kld_reduction,
+        input_dims=input_dims,
+        auto_padding=True,
     )
 
     tb_logger = TensorBoardLogger(

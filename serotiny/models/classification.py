@@ -2,7 +2,7 @@
 General classifier module, implemented as a Pytorch Lightning module
 """
 
-from typing import Optional
+from typing import Optional, Union
 from pathlib import Path
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -12,22 +12,11 @@ import numpy as np
 import torch
 from torch import nn
 from torch.nn import functional as F
+import torch.optim as opt
+
 import pytorch_lightning as pl
 
-from ..networks._2d import BasicCNN_2D, BasicNeuralNetwork, ResNet18Network
-from ..networks._3d import BasicCNN_3D, ResNet18_3D
 from .utils import acc_prec_recall, add_pr_curve_tensorboard
-
-AVAILABLE_NETWORKS = {
-    "mlp": BasicNeuralNetwork,
-    "basic2D": BasicCNN_2D,
-    "resnet18_2D": ResNet18Network,
-    "basic3D": BasicCNN_3D,
-    "resnet18_3D": ResNet18_3D,
-}
-AVAILABLE_OPTIMIZERS = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}
-AVAILABLE_SCHEDULERS = {"reduce_lr_plateau": torch.optim.lr_scheduler.ReduceLROnPlateau}
-
 
 class ClassificationModel(pl.LightningModule):
     """
@@ -80,7 +69,7 @@ class ClassificationModel(pl.LightningModule):
         lr: float,
         optimizer: str,
         scheduler: str,
-        dimensions: Optional[tuple, list] = None,
+        dimensions: Optional[Union[tuple, list]] = None,
     ):
         super().__init__()
         # Can be accessed via checkpoint['hyper_parameters']
@@ -327,27 +316,24 @@ class ClassificationModel(pl.LightningModule):
             )
 
     def configure_optimizers(self):
-        # with it like shceduler
-        if self.hparams.optimizer in AVAILABLE_OPTIMIZERS:
-            optimizer_class = AVAILABLE_OPTIMIZERS[self.hparams.optimizer]
+        available_optimizers = [cls for cls in opt.__all__ if issubclass(cls, opt.Optimizer)]
+        if self.hparams.optimizer in available_optimizers:
+            optimizer_class = opt.__dict__[self.hparams.optimizer]
             optimizer = optimizer_class(self.parameters(), lr=self.hparams.lr)
         else:
-            raise Exception(
-                (
-                    f"optimizer {self.hparams.optimizer} not available, "
-                    f"options are {list(AVAILABLE_OPTIMIZERS.keys())}"
-                )
+            raise KeyError(
+                f"optimizer {self.hparams.optimizer} not available, "
+                f"options are {available_optimizers}"
             )
 
-        if self.hparams.scheduler in AVAILABLE_SCHEDULERS:
-            scheduler_class = AVAILABLE_SCHEDULERS[self.hparams.scheduler]
+        available_schedulers = opt.lr_scheduler.__all__
+        if self.hparams.scheduler in available_schedulers:
+            scheduler_class = opt.lr_scheduler.__dict__[self.hparams.scheduler]
             scheduler = scheduler_class(optimizer)
         else:
             raise Exception(
-                (
-                    f"scheduler {self.hparams.scheduler} not available, "
-                    f"options are {list(AVAILABLE_SCHEDULERS.keys())}"
-                )
+                f"scheduler {self.hparams.scheduler} not available, "
+                f"options are {available_schedulers}"
             )
 
         return (

@@ -15,10 +15,10 @@ class UpResidualLayer(nn.Module):
         self,
         ch_in: int,
         ch_out: int,
-        activation: str, # ="relu",
-        output_padding: int, # =0,
-        ch_cond_list: Optional[list], # =None,
-        activation_last: Optional[str], # =None
+        activation: str,
+        output_padding: int,
+        ch_cond_list: Optional[list],
+        activation_last: Optional[str],
     ):
         super().__init__()
 
@@ -53,7 +53,9 @@ class UpResidualLayer(nn.Module):
 
         self.cond_paths = nn.ModuleList([])
         for ch_cond in ch_cond_list:
-            self.cond_paths.append(BasicLayer(ch_cond, ch_out, 1, 1, 0))
+            self.cond_paths.append(
+                BasicLayer(ch_cond, ch_out, 1, 1, 0, activation=activation, bn=True)
+            )
 
         self.activation = activation_map(activation_last)
 

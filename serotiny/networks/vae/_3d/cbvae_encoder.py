@@ -4,7 +4,8 @@ import torch
 from torch import nn
 
 from torch.nn.utils import spectral_norm
-from ..layers._2d.down_residual import DownResidualLayer
+from ...layers.activation import activation_map
+from ...layers._3d.down_residual import DownResidualLayer
 
 
 class CBVAEEncoder(nn.Module):
@@ -12,13 +13,15 @@ class CBVAEEncoder(nn.Module):
         self,
         n_latent_dim,
         n_classes,
+        gpu_ids,
         n_ch_target=1,
         n_ch_ref=2,
-        conv_channels_list=[64, 128, 256, 512, 1024],
-        input_dims=[28, 28],
+        conv_channels_list=[32, 64, 128, 256, 512],
+        input_dims=[28, 28, 28],
     ):
-        # super(Enc, self).__init__()
         super().__init__()
+
+        self.gpu_ids = gpu_ids
 
         self.n_latent_dim = n_latent_dim
 
@@ -36,6 +39,7 @@ class CBVAEEncoder(nn.Module):
                 )
             ]
         )
+
         for ch_in, ch_out in zip(conv_channels_list[0:-1], conv_channels_list[1:]):
             self.target_path.append(
                 DownResidualLayer(ch_in, ch_out, ch_cond_list=target_cond_list)
@@ -43,18 +47,10 @@ class CBVAEEncoder(nn.Module):
 
             ch_in = ch_out
 
-        # pass a dummy input through the convolutions to obtain the dimensions
-        # before the last linear layer
         with torch.no_grad():
-            self.eval()
             self.imsize_compressed = tuple(
-                self.conv_forward(
-                    torch.zeros(1, n_ch_target, *input_dims),
-                    (torch.zeros(1, n_ch_ref, *input_dims) if n_ch_ref > 0 else None),
-                    (torch.zeros(1, n_classes) if n_classes > 0 else None),
-                ).shape[2:]
+                self.conv_forward(torch.zeros(1, n_ch_target, *input_dims)).shape[2:]
             )
-        self.train()
 
         if self.n_latent_dim > 0:
             self.latent_out_mu = spectral_norm(

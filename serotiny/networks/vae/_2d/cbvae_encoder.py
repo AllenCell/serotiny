@@ -1,27 +1,27 @@
+from typing import List
+
 import numpy as np
 import torch
 
 from torch import nn
 
 from torch.nn.utils import spectral_norm
-from ..layers.activation import activation_map
-from ..layers._3d.down_residual import DownResidualLayer
+from ...layers._2d.down_residual import DownResidualLayer
 
 
 class CBVAEEncoder(nn.Module):
     def __init__(
         self,
-        n_latent_dim,
-        n_classes,
-        gpu_ids,
-        n_ch_target=1,
-        n_ch_ref=2,
-        conv_channels_list=[32, 64, 128, 256, 512],
-        input_dims=[28, 28, 28],
+        n_latent_dim: int,
+        n_classes: int,
+        n_ch_target: int,
+        n_ch_ref: int,
+        conv_channels_list: List[int],
+        input_dims: List[int],
+        activation: str,
     ):
+        assert len(input_dims) == 2
         super().__init__()
-
-        self.gpu_ids = gpu_ids
 
         self.n_latent_dim = n_latent_dim
 
@@ -35,22 +35,31 @@ class CBVAEEncoder(nn.Module):
         self.target_path = nn.ModuleList(
             [
                 DownResidualLayer(
-                    n_ch_target, conv_channels_list[0], ch_cond_list=target_cond_list
+                    n_ch_target, conv_channels_list[0], ch_cond_list=target_cond_list,
+                    activation=activation, activation_last=activation
                 )
             ]
         )
-
         for ch_in, ch_out in zip(conv_channels_list[0:-1], conv_channels_list[1:]):
             self.target_path.append(
-                DownResidualLayer(ch_in, ch_out, ch_cond_list=target_cond_list)
+                DownResidualLayer(ch_in, ch_out, ch_cond_list=target_cond_list,
+                                  activation=activation, activation_last=activation)
             )
 
             ch_in = ch_out
 
+        # pass a dummy input through the convolutions to obtain the dimensions
+        # before the last linear layer
         with torch.no_grad():
+            self.eval()
             self.imsize_compressed = tuple(
-                self.conv_forward(torch.zeros(1, n_ch_target, *input_dims)).shape[2:]
+                self.conv_forward(
+                    torch.zeros(1, n_ch_target, *input_dims),
+                    (torch.zeros(1, n_ch_ref, *input_dims) if n_ch_ref > 0 else None),
+                    (torch.zeros(1, n_classes) if n_classes > 0 else None),
+                ).shape[2:]
             )
+        self.train()
 
         if self.n_latent_dim > 0:
             self.latent_out_mu = spectral_norm(

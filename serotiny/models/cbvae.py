@@ -1,31 +1,20 @@
 """
-General conditional beta variational autoencoder module, 
+General conditional beta variational autoencoder module,
 implemented as a Pytorch Lightning module
 """
+from typing import List
 import inspect
 
 import torch
-from torch.nn import functional as F
+import torch.optim as opt
+import torch.nn as nn
+import torch.nn.functional as F
+
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.parsing import get_init_args
 
 from ..losses import KLDLoss
-from .utils import index_to_onehot
-
-AVAILABLE_OPTIMIZERS = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}
-AVAILABLE_SCHEDULERS = {"reduce_lr_plateau": torch.optim.lr_scheduler.ReduceLROnPlateau}
-
-
-def find_optimizer(optimizer_name, parameters, lr):
-    if optimizer_name in AVAILABLE_OPTIMIZERS:
-        optimizer_class = AVAILABLE_OPTIMIZERS[optimizer_name]
-        optimizer = optimizer_class(parameters, lr=lr)
-    else:
-        raise KeyError(
-            f"optimizer {optimizer_name} not available, "
-            f"options are {list(AVAILABLE_OPTIMIZERS.keys())}"
-        )
-    return optimizer
+from .utils import index_to_onehot, find_optimizer
 
 
 def reparameterize(mu, log_var, add_noise=True):
@@ -42,22 +31,21 @@ def reparameterize(mu, log_var, add_noise=True):
 class CBVAEModel(pl.LightningModule):
     def __init__(
         self,
-        encoder,
-        decoder,
-        optimizer_encoder,
-        optimizer_decoder,
-        crit_recon,
-        lr=1e-3,
-        beta=1,
-        kld_reduction="sum",
-        x_label="x",
-        class_label="class",
-        num_classes=0,
-        reference="ref",
-        target_channels=0,
-        reference_channels=[1, 2],
-        input_dims=[28, 28],
-        auto_padding=True,
+        encoder: nn.Module,
+        decoder: nn.Module,
+        optimizer_encoder: opt.Optimizer,
+        optimizer_decoder: opt.Optimizer,
+        crit_recon: nn.Module,
+        lr: float,
+        beta: float,
+        kld_reduction: str, #="sum",
+        x_label: str,
+        class_label: str,
+        num_classes: int,
+        target_channels: List[int],
+        reference_channels: List[int],
+        input_dims: List[int],
+        auto_padding: bool,
     ):
         super().__init__()
 
@@ -182,13 +170,11 @@ class CBVAEModel(pl.LightningModule):
         }
 
     def configure_optimizers(self):
-        encoder_optimizer = find_optimizer(
-            self.hparams.optimizer_encoder, self.encoder.parameters(), self.hparams.lr
-        )
+        opt_class = find_optimizer(self.hparams.optimizer_encoder)
+        encoder_optimizer = opt_class(self.encoder.parameters(), self.hparams.lr)
 
-        decoder_optimizer = find_optimizer(
-            self.hparams.optimizer_decoder, self.decoder.parameters(), self.hparams.lr
-        )
+        opt_class = find_optimizer(self.hparams.optimizer_decoder)
+        decoder_optimizer = opt_class(self.decoder.parameters(), self.hparams.lr)
 
         return (
             {

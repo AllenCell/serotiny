@@ -15,10 +15,7 @@ from ray.tune.integration.pytorch_lightning import TuneReportCallback
 from ray import tune
 
 from serotiny.progress_bar import GlobalProgressBar
-from serotiny.models.classification import (
-    ClassificationModel,
-    AVAILABLE_NETWORKS,
-)
+from serotiny.models.classification import ClassificationModel
 
 # from ..library.models.callbacks import (
 #     MyPrintingCallback,
@@ -33,14 +30,14 @@ pl.seed_everything(42)
 ###############################################################################
 
 
-def train_model_config(
+def train_classifier_config(
     config,
 ):
     """
-    Config version of train_model
+    Config version of train_classifier
     Only used in tune_model.py
     """
-    train_model(
+    train_classifier(
         datasets_path=config["datasets_path"],
         output_path=config["output_path"],
         data_config=config["data_config"],
@@ -60,7 +57,7 @@ def train_model_config(
     )
 
 
-def train_model(
+def train_classifier(
     datasets_path: str,
     output_path: str,
     datamodule: str,
@@ -76,7 +73,8 @@ def train_model(
     tune_bool: bool,
     x_label: str,
     y_label: str,
-    classes: str,
+    classes: list,
+    dimensionality: int,
 ):
     """
     Initialize dataloaders and model
@@ -134,8 +132,38 @@ def train_model(
 
     classes: List
         list of classes in y_label
+
+    dimensionality: int
+        Dimensionality of input data
     """
+
+    if dimensionality == 2:
+        import serotiny.networks.classification._2d as available_nets
+    elif dimensionality == 3:
+        import serotiny.networks.classification._3d as available_nets
+    elif dimensionality == 1:
+        raise NotImplementedError("No networks for 1-dimensional inputs available (yet)")
+    else:
+        raise ValueError("Parameter `dimensionality` should be 1, 2 or 3")
+
+    if model not in available_nets.__dict__:
+        raise KeyError(f"Chosen network {model} not available.\n"
+                       f"Available networks, for the selected dimensionality "
+                       f"({dimensionality}):\n{available_nets.__all__}")
+
+    model = available_nets.__dict__[model]
+
     # Load data module
+    datamodule = datamodules.__dict__[datamodule](
+        batch_size=batch_size,
+        num_workers=num_workers,
+        data_dir=data_dir,
+        x_label=x_label,
+        y_label=class_label,
+        **kwargs
+    )
+    datamodule.setup()
+
     dm_class = datamodules.__dict__[datamodule]
 
     dm = dm_class(
@@ -283,8 +311,8 @@ def train_model(
 
 if __name__ == "__main__":
     # example command:
-    # python -m serotiny.steps.train_model \
+    # python -m serotiny.steps.train_classifier \
     #     --datasets_path "./results/splits/" \
     #     --output_path "./results/models/" \
 
-    fire.Fire(train_model)
+    fire.Fire(train_classifier)

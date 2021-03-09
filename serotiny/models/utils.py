@@ -1,9 +1,10 @@
-#!/usr/bin/env python3
-
+import inspect
 from collections import OrderedDict
 import torch
 import torch.nn as nn
-from torch.nn import functional as F
+import torch.nn.functional as F
+import torch.optim as opt
+
 import pytorch_lightning as pl
 import matplotlib.pyplot as plt
 import numpy as np
@@ -166,3 +167,23 @@ def index_to_onehot(index, n_classes):
     onehot.scatter_(1, index, 1)
 
     return onehot
+
+
+def find_optimizer(optimizer_name):
+    """
+    Given optimizer name, get it from torch.optim
+    """
+    available_optimizers = []
+    for cls_name, cls in opt.__dict__.items():
+        if inspect.isclass(cls):
+            if issubclass(cls, opt.Optimizer):
+                available_optimizers.append(cls_name)
+
+    if optimizer_name in available_optimizers:
+        optimizer_class = opt.__dict__[optimizer_name]
+    else:
+        raise KeyError(
+            f"optimizer {optimizer_name} not available, "
+            f"options are {available_optimizers}"
+        )
+    return optimizer_class

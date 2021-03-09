@@ -4,8 +4,8 @@ import torch
 from torch import nn
 
 from torch.nn.utils import spectral_norm
-from ..layers.activation import activation_map
-from ..layers._3d.up_residual import UpResidualLayer
+from ...layers.activation import activation_map
+from ...layers._3d.up_residual import UpResidualLayer
 
 
 class CBVAEDecoder(nn.Module):

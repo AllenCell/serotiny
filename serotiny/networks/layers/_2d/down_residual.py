@@ -14,9 +14,9 @@ class DownResidualLayer(nn.Module):
         self,
         ch_in: int,
         ch_out: int,
-        activation: str, # ="relu",
-        ch_cond_list: Optional[list], # =[],
-        activation_last: Optional[str], # =None
+        activation: str,
+        ch_cond_list: Optional[list],
+        activation_last: Optional[str],
     ):
         super().__init__()
 
@@ -40,7 +40,9 @@ class DownResidualLayer(nn.Module):
 
         self.cond_paths = nn.ModuleList([])
         for ch_cond in ch_cond_list:
-            self.cond_paths.append(BasicLayer(ch_cond, ch_out, 1, 1, 0))
+            self.cond_paths.append(
+                BasicLayer(ch_cond, ch_out, 1, 1, 0, activation=activation, bn=True)
+            )
 
         self.activation = activation_map(activation_last)
 
