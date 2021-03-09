@@ -42,6 +42,7 @@ class CBVAELinearModel(pl.LightningModule):
         self.network = network
         self.crit_recon = crit_recon
         self.kld_loss = KLDLoss(reduction=kld_reduction)
+        self.mse_loss = torch.nn.MSELoss(size_average=False)
         self.beta = beta
 
     def parse_batch(self, batch):
@@ -63,9 +64,9 @@ class CBVAELinearModel(pl.LightningModule):
         kld_loss = self.kld_loss(mu, logsigma)
 
         z_latent = mu.data.cpu()
-        mse_loss = torch.nn.MSELoss(size_average=False)
+
         # recon_loss = self.crit_recon(x_hat, x)
-        recon_loss = mse_loss(x_hat, x)
+        recon_loss = self.mse_loss(x_hat, x)
 
         return x_hat, z_latent, recon_loss, kld_loss
 
@@ -93,7 +94,7 @@ class CBVAELinearModel(pl.LightningModule):
         self.log("validation kld loss", kld_loss, logger=True)
 
         return {
-            "validation_loss": loss,
+            "val_loss": loss,
             "x_hat": x_hat,
             "x_class": x_class,
             "z_latent": z_latent,
