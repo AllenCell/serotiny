@@ -166,7 +166,7 @@ def train_vae(
         #accelerator="ddp",
         #replace_sampler_ddp=False,
         gpus=num_gpus,
-        max_epochs=100,
+        max_epochs=num_epochs,
         progress_bar_refresh_rate=5,
         checkpoint_callback=checkpoint_callback,
         callbacks=callbacks,
