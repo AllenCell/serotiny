@@ -38,8 +38,7 @@ class GlobalProgressBar(ProgressBarBase):
     def enable(self) -> None:
         self._enabled = True
 
-    def on_train_start(self, trainer, pl_module):
-        super().on_train_start(trainer, pl_module)
+    def on_init_end(self, trainer):
         self.main_progress_bar = tqdm(
             desc="Total Epochs",
             initial=trainer.current_epoch,
