@@ -6,6 +6,7 @@ import torch
 import numpy as np
 
 from ..image import tiff_loader_CZYX, png_loader
+from serotiny.models.utils import index_to_onehot
 
 
 class LoadColumns:
@@ -37,6 +38,24 @@ class LoadClass:
         return torch.tensor(row[self.y_encoded_label])
 
 
+class LoadOneHotClass:
+    """
+    Loader class, used to retrieve class values from the dataframe,
+    """
+
+    def __init__(self, num_classes, y_encoded_label):
+        self.num_classes = num_classes
+        self.y_encoded_label = y_encoded_label
+
+    def __call__(self, row):
+        x_cond = torch.tensor(row[self.y_encoded_label])
+        x_cond = torch.unsqueeze(x_cond, 0)
+        x_cond = torch.unsqueeze(x_cond, 0)
+        x_cond_one_hot = index_to_onehot(x_cond, self.num_classes)
+        x_cond_one_hot = x_cond_one_hot.squeeze(0)
+        return x_cond_one_hot
+
+
 class LoadSpharmCoeffs:
     """
     Loader class, used to retrieve spharm coeffs from the dataframe,
@@ -47,8 +66,8 @@ class LoadSpharmCoeffs:
 
     def __call__(self, row):
         dna_spharm_cols = [col for col in row.keys() if "dna_shcoeffs" in col]
-        mem_spharm_cols = [col for col in row.keys() if "mem_shcoeffs" in col]
-        str_spharm_cols = [col for col in row.keys() if "str_shcoeffs" in col]
+        # mem_spharm_cols = [col for col in row.keys() if "mem_shcoeffs" in col]
+        # str_spharm_cols = [col for col in row.keys() if "str_shcoeffs" in col]
         return torch.tensor(row[dna_spharm_cols])
 
 

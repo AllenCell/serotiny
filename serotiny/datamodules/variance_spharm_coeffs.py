@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
 from ..data import load_data_loader
-from ..data.loaders import LoadSpharmCoeffs, LoadClass, LoadColumns
+from ..data.loaders import LoadSpharmCoeffs, LoadOneHotClass, LoadColumns
 import pytorch_lightning as pl
 
 
@@ -37,7 +37,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         batch_size: int,
         num_workers: int,
         x_label: str,
-        y_label: str,
+        c_label: str,
         id_fields: list,
         **kwargs
     ):
@@ -45,8 +45,8 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         super().__init__()
 
         self.x_label = x_label
-        self.y_label = y_label
-        self.y_encoded_label = y_label + "_encoded"
+        self.c_label = c_label
+        self.c_encoded_label = c_label + "_encoded"
         self.id_fields = id_fields
         self.num_classes = 25
         self.data_dir = "/allen/aics/modeling/ritvik/projects/serotiny/"
@@ -57,7 +57,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         self.loaders = {
             # Use callable class objects here because lambdas aren't picklable
             "id": LoadColumns(self.id_fields),
-            self.y_label: LoadClass(self.num_classes, self.y_encoded_label),
+            self.c_label: LoadOneHotClass(self.num_classes, self.c_encoded_label),
             self.x_label: LoadSpharmCoeffs(),
         }
 
@@ -78,8 +78,8 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
             all_data["structure_name"]
         )
 
-        all_data[self.y_label] = all_data["structure_name"]
-        all_data[self.y_encoded_label] = all_data["structure_name_encoded"]
+        all_data[self.c_label] = all_data["structure_name"]
+        all_data[self.c_encoded_label] = all_data["structure_name_encoded"]
 
         self.datasets["test"] = all_data.loc[all_data.split == "test"]
         self.datasets["train"] = all_data.loc[all_data.split == "train"]
