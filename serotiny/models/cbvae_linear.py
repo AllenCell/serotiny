@@ -208,7 +208,7 @@ class CBVAELinearModel(pl.LightningModule):
         # Forward passes
         # x_hat, mu, logsigma = self.network(x, x_cond)
         mu, logsigma, z = self.encoder(x, x_cond)
-        if z_inference:
+        if z_inference is not None:
             x_hat = self.decoder(z_inference, x_cond)
         else:
             x_hat = self.decoder(z, x_cond)
