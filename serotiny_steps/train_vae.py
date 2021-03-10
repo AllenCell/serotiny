@@ -11,11 +11,12 @@ import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
 from pytorch_lightning.callbacks import ModelCheckpoint, GPUStatsMonitor, EarlyStopping
 
-from serotiny.progress_bar import GlobalProgressBar
+from serotiny.networks.vae import CBVAEDecoder, CBVAEEncoder
 from serotiny.models import CBVAEModel
 
 import serotiny.datamodules as datamodules
 import serotiny.losses as losses
+from serotiny.progress_bar import GlobalProgressBar
 
 log = logging.getLogger(__name__)
 pl.seed_everything(42)
@@ -59,16 +60,6 @@ def train_vae(
 
     """
 
-    if dimensionality == 2:
-        from serotiny.networks.vae._2d import CBVAEDecoder, CBVAEEncoder
-    elif dimensionality == 3:
-        from serotiny.networks.vae._3d import CBVAEDecoder, CBVAEEncoder
-    elif dimensionality == 1:
-        raise NotImplementedError("No networks for 1-dimensional inputs available (yet)")
-    else:
-        raise ValueError(f"Parameter `dimensionality` should be 2 or 3")
-
-
     if datamodule not in datamodules.__dict__:
         raise KeyError(f"Chosen datamodule {datamodule} not available.\n"
                        f"Available datamodules:\n{datamodules.__all__}")
@@ -92,6 +83,7 @@ def train_vae(
     crit_recon = losses.__dict__[crit_recon]()
 
     encoder = CBVAEEncoder(
+        dimensionality=dimensionality,
         n_latent_dim=n_latent_dim,
         n_classes=n_classes,
         n_ch_target=n_ch_target,
@@ -102,6 +94,7 @@ def train_vae(
     )
 
     decoder = CBVAEDecoder(
+        dimensionality=dimensionality,
         n_latent_dim=n_latent_dim,
         n_classes=n_classes,
         n_ch_target=n_ch_target,
@@ -129,7 +122,7 @@ def train_vae(
         beta=beta,
         kld_reduction=kld_reduction,
         input_dims=input_dims,
-        auto_padding=True,
+        auto_padding=auto_padding,
     )
 
     tb_logger = TensorBoardLogger(
@@ -185,9 +178,4 @@ def train_vae(
     return checkpoint_callback.best_model_path
 
 if __name__ == "__main__":
-    # example command:
-    # python -m serotiny.steps.train_model \
-    #     --datasets_path "./results/splits/" \
-    #     --output_path "./results/models/" \
-
     fire.Fire(train_vae)
