@@ -15,8 +15,8 @@ class BasicLayer(nn.Module):
         ksize: int,
         dstep: int,
         padding: int,
-        activation: str,
-        bn: bool,
+        activation: str = "relu",
+        bn: bool = True,
     ):
         super(BasicLayer, self).__init__()
 
