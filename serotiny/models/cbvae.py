@@ -5,6 +5,10 @@ implemented as a Pytorch Lightning module
 from typing import List
 import inspect
 
+import logging
+logger = logging.getLogger("lightning")
+logger.propagate = False
+
 import torch
 import torch.optim as opt
 import torch.nn as nn
@@ -156,18 +160,26 @@ class CBVAEModel(pl.LightningModule):
         x_hat, z_latent, recon_loss, kld_loss = self(x_target, x_reference, x_class)
         loss = recon_loss + self.beta * kld_loss
 
-        # Default logger=False for training_step
-        # set it to true to log train loss to all lggers
-        self.log("test reconstruction loss", recon_loss, logger=True)
-        self.log("test kld loss", kld_loss, logger=True)
-
         return {
-            "test_loss": loss,
+            "total_loss": loss,
+            "kld_loss": self.beta * kld_loss,
+            "recon_loss": recon_loss,
             "x_hat": x_hat,
             "x_class": x_class,
             "z_latent": z_latent,
             "batch_idx": batch_idx,
         }
+
+    def test_step_end(self, output):
+        # TODO: this should be using a callback defined elsewhere to decide
+        # what to do after the test step. Sometimes we want metrics, sometimes
+        # we want to store the latent representations, etc.
+        recon_loss = output["recon_loss"]
+        kld_loss = output["kld_loss"]
+        total_loss = output["total_loss"]
+        self.log("test reconstruction loss", recon_loss, logger=True)
+        self.log("test kld loss", kld_loss, logger=True)
+        self.log("test total loss", total_loss, logger=True)
 
     def configure_optimizers(self):
         opt_class = find_optimizer(self.hparams.optimizer_encoder)
