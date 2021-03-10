@@ -6,12 +6,12 @@ import torch
 from torch import nn
 
 from torch.nn.utils import spectral_norm
-from ...layers._2d.up_residual import UpResidualLayer
 
 
 class CBVAEDecoder(nn.Module):
     def __init__(
         self,
+        dimensionality: int,
         n_latent_dim: int,
         n_classes: int,
         imsize_compressed: List[int],
@@ -22,11 +22,20 @@ class CBVAEDecoder(nn.Module):
         activation_last: str,
         padding_latent: Optional[List[int]] = None,
     ):
+        if dimensionality == 2:
+            from ..layers._2d.up_residual import UpResidualLayer
+            batch_norm = nn.BatchNorm2d
+        elif dimensionality == 3:
+            from ..layers._3d.up_residual import UpResidualLayer
+            batch_norm = nn.BatchNorm3d
+        else:
+            raise ValueError("`dimensionality` has to be 2 or 3")
 
         if padding_latent is None:
-            padding_latent = [0, 0]
+            padding_latent = [0] * dimensionality
 
-        assert len(imsize_compressed) == 2
+        assert len(padding_latent) == dimensionality
+        assert len(imsize_compressed) == dimensionality
 
         super().__init__()
 
@@ -46,7 +55,7 @@ class CBVAEDecoder(nn.Module):
         )
 
         self.target_bn_relu = nn.Sequential(
-            nn.BatchNorm2d(conv_channels_list[0]), nn.ReLU(inplace=True)
+            batch_norm(conv_channels_list[0]), nn.ReLU(inplace=True)
         )
 
         self.target_path = nn.ModuleList([])
@@ -102,8 +111,7 @@ class CBVAEDecoder(nn.Module):
         x_target = self.target_fc(z_target).view(
             z_target.size()[0],
             self.ch_first,
-            self.imsize_compressed[0],
-            self.imsize_compressed[1],
+            *self.imsize_compressed,
         )
         x_target = self.target_bn_relu(x_target)
 

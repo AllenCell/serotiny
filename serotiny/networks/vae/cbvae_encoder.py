@@ -6,12 +6,11 @@ import torch
 from torch import nn
 
 from torch.nn.utils import spectral_norm
-from ...layers._2d.down_residual import DownResidualLayer
-
 
 class CBVAEEncoder(nn.Module):
     def __init__(
         self,
+        dimensionality: int,
         n_latent_dim: int,
         n_classes: int,
         n_ch_target: int,
@@ -20,7 +19,15 @@ class CBVAEEncoder(nn.Module):
         input_dims: List[int],
         activation: str,
     ):
-        assert len(input_dims) == 2
+        assert len(input_dims) == dimensionality
+
+        if dimensionality == 2:
+            from ..layers._2d.down_residual import DownResidualLayer
+        elif dimensionality == 3:
+            from ..layers._3d.down_residual import DownResidualLayer
+        else:
+            raise ValueError("`dimensionality` has to be 2 or 3")
+
         super().__init__()
 
         self.n_latent_dim = n_latent_dim
@@ -40,10 +47,13 @@ class CBVAEEncoder(nn.Module):
                 )
             ]
         )
+
         for ch_in, ch_out in zip(conv_channels_list[0:-1], conv_channels_list[1:]):
             self.target_path.append(
-                DownResidualLayer(ch_in, ch_out, ch_cond_list=target_cond_list,
-                                  activation=activation, activation_last=activation)
+                DownResidualLayer(
+                    ch_in, ch_out, ch_cond_list=target_cond_list,
+                    activation=activation, activation_last=activation
+                )
             )
 
             ch_in = ch_out

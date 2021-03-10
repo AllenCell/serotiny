@@ -1,2 +1,2 @@
-from . import _2d
-from . import _3d
+from .cbvae_decoder import CBVAEDecoder
+from .cbvae_encoder import CBVAEEncoder
