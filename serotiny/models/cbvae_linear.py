@@ -11,7 +11,6 @@ from pathlib import Path
 from typing import Optional
 
 from ..losses import KLDLoss
-from .utils import index_to_onehot
 import pandas as pd
 
 AVAILABLE_OPTIMIZERS = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}
@@ -21,7 +20,8 @@ AVAILABLE_SCHEDULERS = {"reduce_lr_plateau": torch.optim.lr_scheduler.ReduceLROn
 class CBVAELinearModel(pl.LightningModule):
     def __init__(
         self,
-        network,
+        encoder,
+        decoder,
         optimizer,
         scheduler,
         lr=1e-3,
@@ -38,11 +38,14 @@ class CBVAELinearModel(pl.LightningModule):
         # large objects unnecessarily
         frame = inspect.currentframe()
         init_args = get_init_args(frame)
-        self.save_hyperparameters(*[arg for arg in init_args if arg not in ["network"]])
+        self.save_hyperparameters(
+            *[arg for arg in init_args if arg not in ["encoder", "decoder"]]
+        )
 
         self.log_grads = True
 
-        self.network = network
+        self.encoder = encoder
+        self.decoder = decoder
         self.kld_loss = KLDLoss(reduction=kld_reduction)
         self.mse_loss = torch.nn.MSELoss(size_average=False)
         self.mse_loss_per_element = torch.nn.MSELoss(size_average=False, reduce=False)
@@ -196,13 +199,19 @@ class CBVAELinearModel(pl.LightningModule):
 
         return outputs
 
-    def forward(self, x, x_cond):
+    def forward(self, x, x_cond, z_inference=None):
+        # z is for inference
         #####################
         # train autoencoder
         #####################
 
         # Forward passes
-        x_hat, mu, logsigma = self.network(x, x_cond)
+        # x_hat, mu, logsigma = self.network(x, x_cond)
+        mu, logsigma, z = self.encoder(x, x_cond)
+        if z_inference:
+            x_hat = self.decoder(z_inference, x_cond)
+        else:
+            x_hat = self.decoder(z, x_cond)
 
         # if x is masked, find indices in x
         # that are 0 and set reconstructed x to 0 as well
