@@ -3,7 +3,7 @@
 
 import os
 import logging
-from typing import Optional, List
+from typing import Optional, Sequence
 from datetime import datetime
 
 import fire
@@ -40,10 +40,10 @@ def train_vae(
     n_classes: int,
     activation: str,
     activation_last: str,
-    conv_channels_list: List[int],
-    input_dims: List[int],
-    target_channels: List[int],
-    reference_channels: Optional[List[int]],
+    conv_channels_list: Sequence[int],
+    input_dims: Sequence[int],
+    target_channels: Sequence[int],
+    reference_channels: Optional[Sequence[int]],
     beta: float,
     dimensionality: int,
     auto_padding: bool = False,
@@ -87,19 +87,19 @@ def train_vae(
         Dimension of the latent space
     n_classes: int
         Number of classes (0 if not conditioning)
-    target_channels: List[int]
+    target_channels: Sequence[int]
         Which channel (indices) to use as target
-    reference_channels: Optional[List[int]],
+    reference_channels: Optional[Sequence[int]],
         Which channel (indices) to use as reference
     activation: str
         String to specify the activation function to be used in inner layers
     activation_last: str
         String to specify the activation function to be used in the decoder's last
         layer. For binary outputs, sigmoid should be used
-    conv_channels_list: List[int]
-        List of channels of the intermediate steps in the encoder. For the decoder,
+    conv_channels_list: Sequence[int]
+        Sequence of channels of the intermediate steps in the encoder. For the decoder,
         the reverse of this list will be used.
-    input_dims: List[int]
+    input_dims: Sequence[int]
         Dimensions of the input images
     beta: float
         Value of Beta, the weight of the KLD term in the loss function
