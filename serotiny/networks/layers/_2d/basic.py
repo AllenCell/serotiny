@@ -18,6 +18,27 @@ class BasicLayer(nn.Module):
         activation: str = "relu",
         bn: bool = True,
     ):
+        """
+        Instantiate a basic layer that applies a convolution, batch norm and
+        some activation.
+
+        Parameters
+        ----------
+        ch_in: int
+            Number of input channels
+        ch_out: int
+            Number of output channels
+        ksize: int
+            Size of the convolutional kernel (assumes a symmetric kernel)
+        dstep: int
+            Stride of the convolutional layer
+        padding: int
+            Padding of the conv layer
+        activation: str
+            Activation function to use
+        bn: bool = True
+            Whether to use batch norm
+        """
         super(BasicLayer, self).__init__()
 
         self.conv = spectral_norm(

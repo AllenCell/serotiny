@@ -1,11 +1,11 @@
-from typing import List, Union
+from typing import Sequence, Union
 from pathlib import Path
 import pandas as pd
 
 from actk.utils import dataset_utils
 
 
-def load_csv(dataset: Union[str, Path, pd.DataFrame], required: List[str]):
+def load_csv(dataset: Union[str, Path, pd.DataFrame], required: Sequence[str]):
     """
     Read dataframe from either a path or an existing pd.DataFrame, checking
     the fields given by `required` are present

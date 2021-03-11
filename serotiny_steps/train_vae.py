@@ -38,8 +38,6 @@ def train_vae(
     class_label: str,
     n_latent_dim: int,
     n_classes: int,
-    n_ch_target: int,
-    n_ch_ref: int,
     activation: str,
     activation_last: str,
     conv_channels_list: List[int],
@@ -57,6 +55,60 @@ def train_vae(
 
     Parameters
     ----------
+    data_dir: str
+        Path to dataset, read by the datamodule
+    output_path: str
+        Path to store model and logs
+    datamodule: str,
+        String specifying which datamodule to use
+    batch_size: int
+        Batch size used for trainig and evaluation
+    num_gpus: int
+        Number of GPU cards to use
+    num_workers: int
+        Number of workers allocated to the dataloader
+    num_epochs: int
+        Maximum number of epochs to train on
+    lr: float
+        Learning rate used for training
+    optimizer_encoder: str
+        String to specify the optimizer to use for the encoder net
+    optimizer_decoder: str
+        String to specify the optimizer to use for the decoder net
+    crit_recon: str
+        String to specify the loss function to use for reconstruction
+    test: bool
+        Flag to tell whether to run the test step after training
+    x_label: str
+        String to specify the inputs (x)
+    class_label: str
+        String to specify the classes
+    n_latent_dim: int
+        Dimension of the latent space
+    n_classes: int
+        Number of classes (0 if not conditioning)
+    target_channels: List[int]
+        Which channel (indices) to use as target
+    reference_channels: Optional[List[int]],
+        Which channel (indices) to use as reference
+    activation: str
+        String to specify the activation function to be used in inner layers
+    activation_last: str
+        String to specify the activation function to be used in the decoder's last
+        layer. For binary outputs, sigmoid should be used
+    conv_channels_list: List[int]
+        List of channels of the intermediate steps in the encoder. For the decoder,
+        the reverse of this list will be used.
+    input_dims: List[int]
+        Dimensions of the input images
+    beta: float
+        Value of Beta, the weight of the KLD term in the loss function
+    dimensionality: int
+        Whether this is a 2d or 3d model.
+    auto_padding: bool = False
+        Whether to apply padding to ensure generated images match the input size
+    kld_reduction: str = "sum"
+        Reduction operation to use for the KLD term
 
     """
 
@@ -86,8 +138,8 @@ def train_vae(
         dimensionality=dimensionality,
         n_latent_dim=n_latent_dim,
         n_classes=n_classes,
-        n_ch_target=n_ch_target,
-        n_ch_ref=n_ch_ref,
+        n_ch_target=len(target_channels),
+        n_ch_ref=len(reference_channels),
         conv_channels_list=conv_channels_list,
         input_dims=input_dims,
         activation=activation,
@@ -97,8 +149,8 @@ def train_vae(
         dimensionality=dimensionality,
         n_latent_dim=n_latent_dim,
         n_classes=n_classes,
-        n_ch_target=n_ch_target,
-        n_ch_ref=n_ch_ref,
+        n_ch_target=len(target_channels),
+        n_ch_ref=len(reference_channels),
         # assuming that conv_channels_list for the decoder is
         # the reverse of that for the encoder
         conv_channels_list=conv_channels_list[::-1],

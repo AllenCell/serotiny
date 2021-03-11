@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Sequence, Optional
 
 import numpy as np
 import torch
@@ -14,14 +14,48 @@ class CBVAEDecoder(nn.Module):
         dimensionality: int,
         n_latent_dim: int,
         n_classes: int,
-        imsize_compressed: List[int],
+        imsize_compressed: Sequence[int],
         n_ch_target: int,
         n_ch_ref: int,
-        conv_channels_list: List[int],
+        conv_channels_list: Sequence[int],
         activation: str,
         activation_last: str,
-        padding_latent: Optional[List[int]] = None,
+        padding_latent: Optional[Sequence[int]] = None,
     ):
+        """
+        Decoder used in the final version of the pytorch_integrated_cell project.
+
+        Leverages UpResidualLayer, defined and described in `layers/_xd/up_residual.py`
+
+        This class works for both 2d and 3d data, according to what is given by
+        `dimensionality`.
+
+        Parameters
+        ----------
+        dimensionality: int
+            Whether to instantiate a 2d or 3d model
+        n_latent_dim: int
+            Dimensionality of the latent space
+        n_classes: int
+            Number of classes (for conditioning)
+        imsize_compressed: Sequence[int]
+            Dimensions of the input before being fed through the convolutional
+            portion of the net. (Corresponds to the dimensions of the output
+            of the encoder's convolutional path)
+        n_ch_target: int
+            Number of channels on the target input
+        n_ch_ref: int
+            Number of channels on the reference input
+        conv_channels_list: Sequence[int]
+            Number of channels on the intermediate conv layers. Also used
+            to tell how many layers to use.
+        activation: str
+            String to specify activation function to be used in inner layers
+        activation_last: str
+            String to specify activation function to be used in final layers
+        padding_latent: Optional[Sequence[int]] = None
+            Size of padding to apply to inner layers
+        """
         if dimensionality == 2:
             from ..layers._2d.up_residual import UpResidualLayer
             batch_norm = nn.BatchNorm2d

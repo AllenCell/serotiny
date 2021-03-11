@@ -9,7 +9,7 @@ from torch import nn
 import torchvision.models as models
 
 
-class ResNet18Network(nn.Module):
+class ResNet18(nn.Module):
     """
     A pytorch nn Module that implement a Resnet18 network
     by adding a Conv2D layer to the front of a pretrained
@@ -34,7 +34,7 @@ class ResNet18Network(nn.Module):
     """
 
     def __init__(
-        self, in_channels=int, num_classes=int, dimensions=tuple, pretrained=bool
+        self, in_channels=int, num_classes=int, input_dims=tuple, pretrained=bool
     ):
         super().__init__()
         self.network_name = "Resnet18"

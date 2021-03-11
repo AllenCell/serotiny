@@ -17,9 +17,6 @@ from ray import tune
 from serotiny.progress_bar import GlobalProgressBar
 from serotiny.models.classification import ClassificationModel
 
-# from ..library.models.callbacks import (
-#     MyPrintingCallback,
-# )
 import serotiny.datamodules as datamodules
 
 ###############################################################################
@@ -37,24 +34,7 @@ def train_classifier_config(
     Config version of train_classifier
     Only used in tune_model.py
     """
-    train_classifier(
-        datasets_path=config["datasets_path"],
-        output_path=config["output_path"],
-        data_config=config["data_config"],
-        datamodule=config["datamodule"],
-        model=config["model"],
-        batch_size=config["batch_size"],
-        num_gpus=config["num_gpus"],
-        num_workers=config["num_workers"],
-        num_epochs=config["num_epochs"],
-        lr=config["lr"],
-        optimizer=config["optimizer"],
-        scheduler=config["scheduler"],
-        test=config["test"],
-        tune_bool=config["tune_bool"],
-        x_label=config["x_label"],
-        y_label=config["y_label"],
-    )
+    train_classifier(**config)
 
 
 def train_classifier(
@@ -68,13 +48,15 @@ def train_classifier(
     num_epochs: int,
     lr: float,
     optimizer: str,
-    scheduler: str,
+    lr_scheduler: str,
     test: bool,
     tune_bool: bool,
     x_label: str,
     y_label: str,
     classes: list,
     dimensionality: int,
+    precision: int,
+    **datamodule_kwargs
 ):
     """
     Initialize dataloaders and model
@@ -114,7 +96,7 @@ def train_classifier(
     optimizer: str,
         String key to retrive an optimizer
 
-    scheduler: str,
+    lr_scheduler: str,
         String key to retrive a scheduler
 
     test: bool,
@@ -135,7 +117,16 @@ def train_classifier(
 
     dimensionality: int
         Dimensionality of input data
+
+    precision: int
+        Select 32-bit or 16-bit precision for training
+
+    **datamodule_kwargs:
+        Any additional keyword arguments required by the datamodule
     """
+
+    if precision not in [16, 32]:
+        raise ValueError("Precision must be 16 or 32")
 
     if dimensionality == 2:
         import serotiny.networks.classification._2d as available_nets
@@ -151,65 +142,41 @@ def train_classifier(
                        f"Available networks, for the selected dimensionality "
                        f"({dimensionality}):\n{available_nets.__all__}")
 
-    model = available_nets.__dict__[model]
+    network_class = available_nets.__dict__[model]
 
     # Load data module
     datamodule = datamodules.__dict__[datamodule](
         batch_size=batch_size,
         num_workers=num_workers,
-        data_dir=data_dir,
-        x_label=x_label,
-        y_label=class_label,
-        **kwargs
-    )
-    datamodule.setup()
-
-    dm_class = datamodules.__dict__[datamodule]
-
-    dm = dm_class(
-        batch_size=batch_size,
-        num_workers=num_workers,
         data_dir=datasets_path,
         x_label=x_label,
         y_label=y_label,
-        classes=classes,
-        **kwargs,
+        **datamodule_kwargs
     )
-    dm.setup()
+    datamodule.setup()
 
-    in_channels = dm.num_channels
-    dimensions = dm.dims
+    in_channels = datamodule.num_channels
+    input_dims = datamodule.dims
 
     # init model
     network_config = {
         "in_channels": in_channels,
         "num_classes": len(classes),
-        "dimensions": dimensions,
+        "input_dims": input_dims,
     }
-    model = {"type": model}
-    network_config.update(model)
-    model_type = network_config.pop("type")
 
-    if model_type in AVAILABLE_NETWORKS:
-        network = AVAILABLE_NETWORKS[model_type](**network_config)
-    else:
-        raise Exception(
-            (
-                f"network type {model_type} not available, "
-                f"options are {list(AVAILABLE_NETWORKS.keys())}"
-            )
-        )
+    network = network_class(**network_config)
 
     classification_model = ClassificationModel(
         network,
-        x_label=dm.x_label,
-        y_label=dm.y_label,
+        x_label=datamodule.x_label,
+        y_label=datamodule.y_label,
         in_channels=in_channels,
         classes=classes,
-        dimensions=dimensions,
+        dimensions=input_dims,
         lr=lr,
         optimizer=optimizer,
-        scheduler=scheduler,
+        lr_scheduler=lr_scheduler,
     )
 
     # Initialize a logger
@@ -235,7 +202,7 @@ def train_classifier(
 
         # Initialize model checkpoint
         checkpoint_callback = ModelCheckpoint(
-            filepath=ckpt_path,
+            dirpath=ckpt_path,
             # if save_top_k = 1, all files in this local staging dir
             # will be deleted when a checkpoint is saved
             # save_top_k=1,
@@ -247,10 +214,12 @@ def train_classifier(
 
         callbacks = [
             PrintTableMetricsCallback(),
-            GPUStatsMonitor(),
             GlobalProgressBar(),
             early_stopping,
         ]
+
+        if num_gpus > 0:
+            callbacks.append(GPUStatsMonitor())
 
         # Initialize a trainer
         trainer = pl.Trainer(
@@ -262,7 +231,7 @@ def train_classifier(
             progress_bar_refresh_rate=20,
             checkpoint_callback=checkpoint_callback,
             callbacks=callbacks,
-            precision=16,
+            precision=precision,
             benchmark=False,
             profiler=False,
             weights_summary="full",
@@ -270,11 +239,11 @@ def train_classifier(
         )
 
         # Train the model ⚡
-        trainer.fit(classification_model, dm)
+        trainer.fit(classification_model, datamodule)
 
         # test the model
         if test is True:
-            trainer.test(datamodule=dm)
+            trainer.test(datamodule=datamodule)
 
         # Use this to get best model path from callback
         print("Best mode path is", checkpoint_callback.best_model_path)
@@ -305,7 +274,7 @@ def train_classifier(
             callbacks=[tune_callback],
         )
         # Train the model ⚡
-        trainer.fit(classification_model, dm)
+        trainer.fit(classification_model, datamodule)
     # return
 
 

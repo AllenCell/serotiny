@@ -1,13 +1,18 @@
-def subset_channels(channel_subset, channels):
+from typing import Sequence, Union
+
+def subset_channels(
+        channel_subset: Sequence[Union[int, str]],
+        channels: Sequence[Union[int, str]]
+):
     """
     Subset channels given a list of both
      
     Parameters
     -----------
-    channel_subset: List
+    channel_subset: Sequence[Union[int, str]]
         List of subset channels
 
-    channels: List
+    channels: Sequence[Union[int, str]]
         List of all channels
 
     Returns:

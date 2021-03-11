@@ -103,14 +103,14 @@ class DummyDatamodule(pl.LightningDataModule):
         self.y_label = y_label
         self.length = length
 
-        n_channels = len(channels)
+        self.num_channels = len(channels)
         self.dims = dims
 
         self.dataloader = make_dataloader(
             x_label,
             y_label,
             length,
-            tuple([n_channels] + dims),
+            tuple([self.num_channels] + dims),
             batch_size,
             num_workers,
         )

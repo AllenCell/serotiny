@@ -2,7 +2,7 @@
 General conditional beta variational autoencoder module,
 implemented as a Pytorch Lightning module
 """
-from typing import List
+from typing import Sequence
 import inspect
 
 import logging
@@ -22,6 +22,10 @@ from .utils import index_to_onehot, find_optimizer
 
 
 def reparameterize(mu, log_var, add_noise=True):
+    """
+    Util function to apply the reparameterization trick, for the isotropic
+    gaussian case
+    """
     if add_noise:
         std = torch.exp(0.5 * log_var)
         eps = torch.randn_like(std)
@@ -42,15 +46,53 @@ class CBVAEModel(pl.LightningModule):
         crit_recon: nn.Module,
         lr: float,
         beta: float,
-        kld_reduction: str, #="sum",
         x_label: str,
         class_label: str,
         num_classes: int,
-        target_channels: List[int],
-        reference_channels: List[int],
-        input_dims: List[int],
-        auto_padding: bool,
+        target_channels: Sequence[int],
+        reference_channels: Sequence[int],
+        input_dims: Sequence[int],
+        kld_reduction: str = "sum",
+        auto_padding: bool = True,
     ):
+        """
+        Instantiate a CBVAEModel, which implements the final version of the
+        pytorch_integrated_cell project.
+
+        Parameters
+        ----------
+        encoder: nn.Module
+            Encoder network. (Untested with other than CBVAEEncoder)
+        decoder: nn.Module
+            Decoder network. (Untested with other than CBVAEDecoder)
+        optimizer_encoder: opt.Optimizer
+            Optimizer for the encoder network
+        optimizer_decoder: opt.Optimizer
+            Optimizer for the decoder network
+        crit_recon: nn.Module
+            Loss function for the recognition loss term
+        lr: float
+            Learning rate for training
+        beta: float
+            Beta parameter - the weight of the KLD term in the loss function
+        x_label: str
+            Label for the input, to retrieve it from the batches
+        class_label: str
+            Label for the class, to retrieve it from the batches
+        num_classes: int
+            Number of classes in the dataset
+        target_channels: Sequence[int]
+            Indices of target channels
+        reference_channels: Sequence[int]
+            Indices of reference channels
+        input_dims: Sequence[int]
+            Dimensions of the input images
+        kld_reduction: str
+            Reduction operation for the KLD loss term
+        auto_padding: bool
+            Whether to apply automatic padding to the generated images, to match
+            the input_dimensions
+        """
         super().__init__()
 
         # store init args except for encoder & decoder, to avoid copying

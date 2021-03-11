@@ -21,8 +21,6 @@ def test_vae_step():
                 class_label="dummy_y",
                 n_latent_dim=32,
                 n_classes=10,
-                n_ch_target=2,
-                n_ch_ref=1,
                 activation="relu",
                 activation_last="sigmoid",
                 conv_channels_list=[8, 16, 32],

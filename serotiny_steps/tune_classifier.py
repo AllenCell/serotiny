@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 ###############################################################################
 
 
-def tune_model(
+def tune_classifier(
     datasets_path: str,
     output_path: str,
     datamodule: str,
@@ -110,7 +110,7 @@ def tune_model(
     tune_scheduler = ASHAScheduler(max_t=num_epochs, grace_period=1, reduction_factor=2)
 
     analysis = tune.run(
-        train_model_config,
+        train_classifier_config,
         resources_per_trial={"cpu": 10, "gpu": gpus_per_trial},
         config=config,
         # search_alg=hyperopt,

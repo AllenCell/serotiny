@@ -16,7 +16,7 @@ import torch.optim as opt
 
 import pytorch_lightning as pl
 
-from .utils import acc_prec_recall, add_pr_curve_tensorboard
+from .utils import acc_prec_recall, add_pr_curve_tensorboard, find_optimizer, find_lr_scheduler
 
 class ClassificationModel(pl.LightningModule):
     """
@@ -47,11 +47,10 @@ class ClassificationModel(pl.LightningModule):
         Learning rate for the optimizer. Example: 1e-3
 
     optimizer: str
-        Str key to instantiate optimizer. Example: "adam"
+        str key to instantiate optimizer. Example: "Adam"
 
-    scheduler: str
+    lr_scheduler: str
         str key to instantiate learning rate scheduler
-        Example: "reduce_lr_plateau"
 
     dimensions: Optional[tuple, list]:
         Dimensions of each image channel. Only used for printing
@@ -68,7 +67,7 @@ class ClassificationModel(pl.LightningModule):
         classes: tuple,
         lr: float,
         optimizer: str,
-        scheduler: str,
+        lr_scheduler: str,
         dimensions: Optional[Union[tuple, list]] = None,
     ):
         super().__init__()
@@ -125,7 +124,7 @@ class ClassificationModel(pl.LightningModule):
         x = batch[self.hparams.x_label]
         y = batch[self.hparams.y_label]
         # Return floats because this is expected dtype for nn.Loss
-        return x.float(), y.long()
+        return x.float(), y.long().squeeze()
 
     def forward(self, x):
         output = self.network(x)
@@ -215,16 +214,6 @@ class ClassificationModel(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
 
         x, y = self.parse_batch(batch)
-        # if batch_idx == 0:
-        #     self.logger.experiment.add_figure(
-        #         "predictions vs actuals (val).",
-        #         plot_classes_preds(
-        # self.network,
-        # x,
-        # y,
-        # self.hparams.classes),
-        #         global_step=self.current_epoch,
-        #     )
         yhat = self(x)
         loss = nn.CrossEntropyLoss()(yhat, y)
         # Default logger for validation step is True
@@ -273,6 +262,8 @@ class ClassificationModel(pl.LightningModule):
                 global_step=self.current_epoch,
             )
 
+        return {"val_loss": avg_loss}
+
     def test_step(self, batch, batch_idx):
 
         x, y = self.parse_batch(batch)
@@ -316,25 +307,11 @@ class ClassificationModel(pl.LightningModule):
             )
 
     def configure_optimizers(self):
-        available_optimizers = [cls for cls in opt.__all__ if issubclass(cls, opt.Optimizer)]
-        if self.hparams.optimizer in available_optimizers:
-            optimizer_class = opt.__dict__[self.hparams.optimizer]
-            optimizer = optimizer_class(self.parameters(), lr=self.hparams.lr)
-        else:
-            raise KeyError(
-                f"optimizer {self.hparams.optimizer} not available, "
-                f"options are {available_optimizers}"
-            )
+        optimizer_class = find_optimizer(self.hparams.optimizer)
+        optimizer = optimizer_class(self.parameters(), lr=self.hparams.lr)
 
-        available_schedulers = opt.lr_scheduler.__all__
-        if self.hparams.scheduler in available_schedulers:
-            scheduler_class = opt.lr_scheduler.__dict__[self.hparams.scheduler]
-            scheduler = scheduler_class(optimizer)
-        else:
-            raise Exception(
-                f"scheduler {self.hparams.scheduler} not available, "
-                f"options are {available_schedulers}"
-            )
+        scheduler_class = find_lr_scheduler(self.hparams.lr_scheduler)
+        scheduler = scheduler_class(optimizer)
 
         return (
             {

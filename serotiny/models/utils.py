@@ -88,7 +88,7 @@ def add_pr_curve_tensorboard(
     tensorboard_probs = test_probs[:, class_index]
 
     logger.experiment.add_pr_curve(
-        classes[class_index] + name,
+        str(classes[class_index]) + name,
         tensorboard_preds,
         tensorboard_probs,
         global_step=global_step,
@@ -187,3 +187,22 @@ def find_optimizer(optimizer_name):
             f"options are {available_optimizers}"
         )
     return optimizer_class
+
+def find_lr_scheduler(scheduler_name):
+    """
+    Given scheduler name, get it from torch.optim.lr_scheduler
+    """
+    available_schedulers = []
+    for cls_name, cls in opt.lr_scheduler.__dict__.items():
+        if inspect.isclass(cls):
+            if "LR" in cls_name and cls_name[0] != "_":
+                available_schedulers.append(cls_name)
+
+    if scheduler_name in available_schedulers:
+        scheduler_class = opt.lr_scheduler.__dict__[scheduler_name]
+    else:
+        raise Exception(
+            f"scheduler {scheduler_name} not available, "
+            f"options are {available_schedulers}"
+        )
+    return scheduler_class
