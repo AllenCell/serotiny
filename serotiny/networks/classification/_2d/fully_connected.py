@@ -2,12 +2,14 @@
 Basic Neural Net for 2D classification
 """
 
+from typing import Sequence
+
 import torch
 from torch import nn
 from torch.nn import functional as F
 
 
-class BasicNeuralNetwork(nn.Module):
+class FullyConnected(nn.Module):
     """
     A pytorch nn Module that implement a 3 layer MLP with
     dropout.
@@ -22,7 +24,7 @@ class BasicNeuralNetwork(nn.Module):
         Number of classes for the final layer
         Example: 5
 
-    dimensions: tuple
+    dimensions: list
         Dimensions of input image
     """
 
@@ -30,12 +32,12 @@ class BasicNeuralNetwork(nn.Module):
         self,
         in_channels: int,
         num_classes: int,
-        dimensions: tuple,
+        input_dims: Sequence[int],
     ):
         super().__init__()
         self.network_name = "BasicNeuralNetwork"
         self.num_classes = num_classes
-        self.layer_1 = torch.nn.Linear(dimensions[1] * dimensions[0] * in_channels, 128)
+        self.layer_1 = torch.nn.Linear(input_dims[1] * input_dims[0] * in_channels, 128)
         self.layer_2 = torch.nn.Linear(128, 256)
         self.layer_3 = torch.nn.Linear(256, num_classes)
 
