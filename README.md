@@ -4,13 +4,20 @@
 [![Documentation](https://github.com/AllenCellModeling/serotiny/workflows/Documentation/badge.svg)](https://AllenCellModeling.github.io/serotiny/)
 [![Code Coverage](https://codecov.io/gh/AllenCellModeling/serotiny/branch/main/graph/badge.svg)](https://codecov.io/gh/AllenCellModeling/serotiny)
 
-Pytorch/pytorch-lightning based library and commands for deep learning workflows, modularized as a set of steps to facilitate integration into existing workflow pipelines and packages.
+Library and commands for pytorch/lightning deep-learning workflows
 
 ![SEROTINY](https://github.com/AllenCellModeling/serotiny/blob/master/resources/serotiny.png)
 
 Serotiny (n) - when fire triggers the release of a seed
 
 ---
+
+Serotiny is essentially two things:
+
+* A place to gather all of the useful image/data processing, network construction and model training code in one place, to generalize it and provide a clean interface to its functionality.
+* A set of commands built out of this functionality that are intended to be invoked in deep-learning workflows. 
+
+The deep-learning functionality is built on [pytorch](https://github.com/pytorch/pytorch) and [pytorch-lightning](https://github.com/PyTorchLightning/pytorch-lightning). 
 
 ## Features
 
@@ -21,7 +28,6 @@ Serotiny (n) - when fire triggers the release of a seed
   - Change resolution of input images
   - Apply 2D projections for 3D input images
   - Train classifier and autoencoder models
-    
 
 ## Installation
 
