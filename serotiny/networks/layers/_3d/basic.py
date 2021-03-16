@@ -2,14 +2,43 @@ import numpy as np
 import torch
 from torch import nn
 
-from ...norm import spectral_norm
+from torch.nn.utils import spectral_norm
 from ..activation import activation_map
 
 
 class BasicLayer(nn.Module):
     def __init__(
-        self, ch_in, ch_out, ksize=4, dstep=2, padding=1, activation="relu", bn=True
+        self,
+        ch_in: int,
+        ch_out: int,
+        ksize: int,
+        dstep: int,
+        padding: int,
+        activation: str = "relu",
+        bn: bool = True,
     ):
+        """
+        Instantiate a basic layer that applies a convolution, batch norm and
+        some activation.
+
+        Parameters
+        ----------
+        ch_in: int
+            Number of input channels
+        ch_out: int
+            Number of output channels
+        ksize: int
+            Size of the convolutional kernel (assumes a symmetric kernel)
+        dstep: int
+            Stride of the convolutional layer
+        padding: int
+            Padding of the conv layer
+        activation: str
+            Activation function to use
+        bn: bool = True
+            Whether to use batch norm
+        """
+
         super(BasicLayer, self).__init__()
 
         self.conv = spectral_norm(

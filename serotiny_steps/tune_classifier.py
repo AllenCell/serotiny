@@ -22,30 +22,27 @@ log = logging.getLogger(__name__)
 ###############################################################################
 
 
-def tune_model(
+def tune_classifier(
     datasets_path: str,
     output_path: str,
-    classes: list = ["M0", "M1/M2", "M3", "M4/M5", "M6/M7"],
-    model: str = "basic",
-    label: str = "Draft mitotic state resolved",
-    batch_size: int = 64,
-    num_gpus: int = 4,
-    num_cpus: int = 40,
-    num_workers: int = 50,
-    channel_indexes: list = ["dna", "membrane"],
-    num_epochs: int = 10,
-    lr: int = 0.001,
-    model_optimizer: str = "sgd",
-    model_scheduler: str = "reduce_lr_plateau",
-    id_fields: list = ["CellId", "CellIndex", "FOVId"],
-    channels: list = ["membrane", "structure", "dna"],
-    num_samples: int = 16,
-    gpus_per_trial: int = 1,
-    search_space: dict = {
-        "lr": tune.loguniform(1e-4, 1e-1),
-        "batch_size": tune.choice([32, 64, 128]),
-        "model_optimizer": tune.choice(["sgd", "adam"]),
-    },
+    datamodule: str,
+    model: str,
+    batch_size: int,
+    num_gpus: int,
+    num_workers: int,
+    num_epochs: int,
+    lr: float,
+    optimizer: str,
+    scheduler: str,
+    test: bool,
+    tune_bool: bool,
+    x_label: str,
+    y_label: str,
+    classes: str,
+    num_cpus: int,
+    num_samples: int,
+    gpus_per_trial: int,
+    search_space: dict,
 ):
     """
     Initialize ray instance with specified number of cpus
@@ -53,6 +50,27 @@ def tune_model(
     a number of samples to choose from that space, and
     resources per trial. Other
     training arguments are the same as train_model
+
+    Extra parameters compared to train_classifier
+    -----------
+    num_cpus: int
+        Number of cpus to initialize ray instance with
+
+    num_samples: int
+        Number of samples per hyperparam search
+        Example: 16
+
+    gpus_per_trials: int
+        Example: 1
+
+    search_space: dict
+        Parameters to perform hyper param search on
+        Example: 
+        {
+        "lr": tune.loguniform(1e-4, 1e-1),
+        "batch_size": tune.choice([32, 64, 128]),
+        "model_optimizer": tune.choice(["sgd", "adam"]),
+        }
     """
 
     # Initialize ray
@@ -70,20 +88,19 @@ def tune_model(
         "datasets_path": datasets_path,
         "output_path": output_path,
         "classes": classes,
+        "datamodule": datamodule,
         "model": model,
-        "label": label,
         "batch_size": batch_size,
         "num_gpus": gpus_per_trial,
         "num_workers": num_workers,
-        "channel_indexes": channel_indexes,
         "num_epochs": num_epochs,
         "lr": lr,
-        "model_optimizer": model_optimizer,
-        "model_scheduler": model_scheduler,
-        "id_fields": id_fields,
-        "channels": channels,
+        "optimizer": optimizer,
+        "scheduler": scheduler,
         "test": False,
         "tune_bool": True,
+        "x_label": x_label,
+        "y_label": y_label
     }
 
     config.update(search_space)
@@ -93,7 +110,7 @@ def tune_model(
     tune_scheduler = ASHAScheduler(max_t=num_epochs, grace_period=1, reduction_factor=2)
 
     analysis = tune.run(
-        train_model_config,
+        train_classifier_config,
         resources_per_trial={"cpu": 10, "gpu": gpus_per_trial},
         config=config,
         # search_alg=hyperopt,

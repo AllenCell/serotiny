@@ -2,6 +2,9 @@ from torch import nn
 
 
 def activation_map(activation):
+    """
+    Map from strings to activation functions
+    """
     if activation is None or activation.lower() == "none":
         return nn.Sequential()
 
@@ -16,9 +19,6 @@ def activation_map(activation):
 
     elif activation.lower() == "leakyrelu":
         return nn.LeakyReLU(0.2, inplace=True)
-
-    elif activation.lower() == "channelsoftmax":
-        return layers.ChannelSoftmax()
 
     elif activation.lower() == "softplus":
         return nn.Softplus()

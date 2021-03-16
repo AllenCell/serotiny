@@ -3,7 +3,7 @@
 
 import os
 import logging
-from typing import Optional, List
+from typing import Optional, Sequence
 from datetime import datetime
 
 import fire
@@ -11,11 +11,12 @@ import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
 from pytorch_lightning.callbacks import ModelCheckpoint, GPUStatsMonitor, EarlyStopping
 
-from serotiny.progress_bar import GlobalProgressBar
+from serotiny.networks.vae import CBVAEDecoder, CBVAEEncoder
 from serotiny.models import CBVAEModel
 
 import serotiny.datamodules as datamodules
 import serotiny.losses as losses
+from serotiny.progress_bar import GlobalProgressBar
 
 log = logging.getLogger(__name__)
 pl.seed_everything(42)
@@ -37,14 +38,16 @@ def train_vae(
     class_label: str,
     n_latent_dim: int,
     n_classes: int,
-    n_ch_target: int,
-    n_ch_ref: int,
-    conv_channels_list: List[int],
-    input_dims: List[int],
-    target_channels: List[int],
-    reference_channels: Optional[List[int]],
+    activation: str,
+    activation_last: str,
+    conv_channels_list: Sequence[int],
+    input_dims: Sequence[int],
+    target_channels: Sequence[int],
+    reference_channels: Optional[Sequence[int]],
     beta: float,
-    is_2d_or_3d: int,
+    dimensionality: int,
+    auto_padding: bool = False,
+    kld_reduction: str = "sum",
     **kwargs
 ):
     """
@@ -52,16 +55,62 @@ def train_vae(
 
     Parameters
     ----------
+    data_dir: str
+        Path to dataset, read by the datamodule
+    output_path: str
+        Path to store model and logs
+    datamodule: str,
+        String specifying which datamodule to use
+    batch_size: int
+        Batch size used for trainig and evaluation
+    num_gpus: int
+        Number of GPU cards to use
+    num_workers: int
+        Number of workers allocated to the dataloader
+    num_epochs: int
+        Maximum number of epochs to train on
+    lr: float
+        Learning rate used for training
+    optimizer_encoder: str
+        String to specify the optimizer to use for the encoder net
+    optimizer_decoder: str
+        String to specify the optimizer to use for the decoder net
+    crit_recon: str
+        String to specify the loss function to use for reconstruction
+    test: bool
+        Flag to tell whether to run the test step after training
+    x_label: str
+        String to specify the inputs (x)
+    class_label: str
+        String to specify the classes
+    n_latent_dim: int
+        Dimension of the latent space
+    n_classes: int
+        Number of classes (0 if not conditioning)
+    target_channels: Sequence[int]
+        Which channel (indices) to use as target
+    reference_channels: Optional[Sequence[int]],
+        Which channel (indices) to use as reference
+    activation: str
+        String to specify the activation function to be used in inner layers
+    activation_last: str
+        String to specify the activation function to be used in the decoder's last
+        layer. For binary outputs, sigmoid should be used
+    conv_channels_list: Sequence[int]
+        Sequence of channels of the intermediate steps in the encoder. For the decoder,
+        the reverse of this list will be used.
+    input_dims: Sequence[int]
+        Dimensions of the input images
+    beta: float
+        Value of Beta, the weight of the KLD term in the loss function
+    dimensionality: int
+        Whether this is a 2d or 3d model.
+    auto_padding: bool = False
+        Whether to apply padding to ensure generated images match the input size
+    kld_reduction: str = "sum"
+        Reduction operation to use for the KLD term
 
     """
-
-    if is_2d_or_3d == 2:
-        from serotiny.networks._2d import CBVAEDecoder, CBVAEEncoder
-    elif is_2d_or_3d == 3:
-        from serotiny.networks._3d import CBVAEDecoder, CBVAEEncoder
-    else:
-        raise ValueError(f"Parameter `is_2d_or_3d` should be 2 or 3")
-
 
     if datamodule not in datamodules.__dict__:
         raise KeyError(f"Chosen datamodule {datamodule} not available.\n"
@@ -86,23 +135,28 @@ def train_vae(
     crit_recon = losses.__dict__[crit_recon]()
 
     encoder = CBVAEEncoder(
+        dimensionality=dimensionality,
         n_latent_dim=n_latent_dim,
         n_classes=n_classes,
-        n_ch_target=n_ch_target,
-        n_ch_ref=n_ch_ref,
+        n_ch_target=len(target_channels),
+        n_ch_ref=len(reference_channels),
         conv_channels_list=conv_channels_list,
-        input_dims=input_dims
+        input_dims=input_dims,
+        activation=activation,
     )
 
     decoder = CBVAEDecoder(
+        dimensionality=dimensionality,
         n_latent_dim=n_latent_dim,
         n_classes=n_classes,
-        n_ch_target=n_ch_target,
-        n_ch_ref=n_ch_ref,
+        n_ch_target=len(target_channels),
+        n_ch_ref=len(reference_channels),
         # assuming that conv_channels_list for the decoder is
         # the reverse of that for the encoder
         conv_channels_list=conv_channels_list[::-1],
         imsize_compressed=encoder.imsize_compressed,
+        activation=activation,
+        activation_last=activation_last
     )
 
     vae = CBVAEModel(
@@ -117,7 +171,10 @@ def train_vae(
         target_channels=target_channels,
         reference_channels=reference_channels,
         lr=lr,
-        beta=beta
+        beta=beta,
+        kld_reduction=kld_reduction,
+        input_dims=input_dims,
+        auto_padding=auto_padding,
     )
 
     tb_logger = TensorBoardLogger(
@@ -154,7 +211,7 @@ def train_vae(
         #accelerator="ddp",
         #replace_sampler_ddp=False,
         gpus=num_gpus,
-        max_epochs=100,
+        max_epochs=num_epochs,
         progress_bar_refresh_rate=5,
         checkpoint_callback=checkpoint_callback,
         callbacks=callbacks,
@@ -173,9 +230,4 @@ def train_vae(
     return checkpoint_callback.best_model_path
 
 if __name__ == "__main__":
-    # example command:
-    # python -m serotiny.steps.train_model \
-    #     --datasets_path "./results/splits/" \
-    #     --output_path "./results/models/" \
-
     fire.Fire(train_vae)

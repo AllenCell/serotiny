@@ -15,14 +15,8 @@ from ray.tune.integration.pytorch_lightning import TuneReportCallback
 from ray import tune
 
 from serotiny.progress_bar import GlobalProgressBar
-from serotiny.models.classification import (
-    ClassificationModel,
-    AVAILABLE_NETWORKS,
-)
+from serotiny.models.classification import ClassificationModel
 
-# from ..library.models.callbacks import (
-#     MyPrintingCallback,
-# )
 import serotiny.datamodules as datamodules
 
 ###############################################################################
@@ -33,33 +27,19 @@ pl.seed_everything(42)
 ###############################################################################
 
 
-def train_model_config(
+def train_classifier_config(
     config,
 ):
-    train_model(
-        datasets_path=config["datasets_path"],
-        output_path=config["output_path"],
-        classes=config["classes"],
-        model=config["model"],
-        batch_size=config["batch_size"],
-        num_gpus=config["num_gpus"],
-        num_workers=config["num_workers"],
-        channel_indexes=config["channel_indexes"],
-        num_epochs=config["num_epochs"],
-        lr=config["lr"],
-        optimizer=config["optimizer"],
-        scheduler=config["scheduler"],
-        id_fields=config["id_fields"],
-        channels=config["channels"],
-        test=config["test"],
-        tune_bool=config["tune_bool"],
-    )
+    """
+    Config version of train_classifier
+    Only used in tune_model.py
+    """
+    train_classifier(**config)
 
 
-def train_model(
+def train_classifier(
     datasets_path: str,
     output_path: str,
-    data_config: dict,
     datamodule: str,
     model: str,
     batch_size: int,
@@ -68,62 +48,135 @@ def train_model(
     num_epochs: int,
     lr: float,
     optimizer: str,
-    scheduler: str,
+    lr_scheduler: str,
     test: bool,
     tune_bool: bool,
     x_label: str,
     y_label: str,
+    classes: list,
+    dimensionality: int,
+    precision: int,
+    **datamodule_kwargs
 ):
     """
     Initialize dataloaders and model
     Call trainer.fit()
-    """
-    # Load data module
-    dm_class = datamodules.__dict__[datamodule]
 
-    dm = dm_class(
+    Parameters
+    ------------
+    datasets_path: str,
+        Path to data directory containing csv's for train
+        tes and val splits
+
+    output_path: str,
+        Path to output diectory for saving trained model
+        and tensorboard logs
+
+    datamodule: str,
+        String key to retrieve a datamodule
+
+    model: str,
+        String key to instantiate a model
+
+    batch_size: int,
+        Batch size for dataloader
+
+    num_gpus: int,
+        Number of gpus to use
+
+    num_workers: int,
+        Number of worker processes to use in dataloader
+
+    num_epochs: int,
+        Number of epochs to train model
+
+    lr: float,
+        Learning rate for optimizer
+
+    optimizer: str,
+        String key to retrive an optimizer
+
+    lr_scheduler: str,
+        String key to retrive a scheduler
+
+    test: bool,
+        Whether to test the model or not
+
+    tune_bool: bool,
+        Whether to tune hyper params or not
+
+    x_label: str,
+        x label key for loading image in datamodule
+
+    y_label: str,
+        y label key for loading image label
+        in datamodule
+
+    classes: List
+        list of classes in y_label
+
+    dimensionality: int
+        Dimensionality of input data
+
+    precision: int
+        Select 32-bit or 16-bit precision for training
+
+    **datamodule_kwargs:
+        Any additional keyword arguments required by the datamodule
+    """
+
+    if precision not in [16, 32]:
+        raise ValueError("Precision must be 16 or 32")
+
+    if dimensionality == 2:
+        import serotiny.networks.classification._2d as available_nets
+    elif dimensionality == 3:
+        import serotiny.networks.classification._3d as available_nets
+    elif dimensionality == 1:
+        raise NotImplementedError("No networks for 1-dimensional inputs available (yet)")
+    else:
+        raise ValueError("Parameter `dimensionality` should be 1, 2 or 3")
+
+    if model not in available_nets.__dict__:
+        raise KeyError(f"Chosen network {model} not available.\n"
+                       f"Available networks, for the selected dimensionality "
+                       f"({dimensionality}):\n{available_nets.__all__}")
+
+    network_class = available_nets.__dict__[model]
+
+    # Load data module
+    datamodule = datamodules.__dict__[datamodule](
         batch_size=batch_size,
         num_workers=num_workers,
-        config=data_config,
         data_dir=datasets_path,
         x_label=x_label,
         y_label=y_label,
+        **datamodule_kwargs
     )
-    dm.setup()
+    datamodule.setup()
 
-    in_channels = dm.num_channels
-    dimensions = dm.dims
+    in_channels = datamodule.num_channels
+    input_dims = datamodule.dims
 
     # init model
     network_config = {
         "in_channels": in_channels,
-        "num_classes": len(data_config["classes"]),
-        "dimensions": dimensions,
+        "num_classes": len(classes),
+        "input_dims": input_dims,
     }
-    model = {"type": model}
-    network_config.update(model)
-    model_type = network_config.pop("type")
 
-    if model_type in AVAILABLE_NETWORKS:
-        network = AVAILABLE_NETWORKS[model_type](**network_config)
-    else:
-        raise Exception(
-            (
-                f"network type {model_type} not available, "
-                f"options are {list(AVAILABLE_NETWORKS.keys())}"
-            )
-        )
+    network = network_class(**network_config)
 
     classification_model = ClassificationModel(
         network,
-        x_label=dm.x_label,
-        y_label=dm.y_label,
+        x_label=datamodule.x_label,
+        y_label=datamodule.y_label,
         in_channels=in_channels,
-        classes=data_config["classes"],
-        dimensions=dimensions,
+        classes=classes,
+        dimensions=input_dims,
         lr=lr,
         optimizer=optimizer,
-        scheduler=scheduler,
+        lr_scheduler=lr_scheduler,
     )
 
     # Initialize a logger
@@ -149,7 +202,7 @@ def train_model(
 
         # Initialize model checkpoint
         checkpoint_callback = ModelCheckpoint(
-            filepath=ckpt_path,
+            dirpath=ckpt_path,
             # if save_top_k = 1, all files in this local staging dir
             # will be deleted when a checkpoint is saved
             # save_top_k=1,
@@ -161,10 +214,12 @@ def train_model(
 
         callbacks = [
             PrintTableMetricsCallback(),
-            GPUStatsMonitor(),
             GlobalProgressBar(),
             early_stopping,
         ]
+
+        if num_gpus > 0:
+            callbacks.append(GPUStatsMonitor())
 
         # Initialize a trainer
         trainer = pl.Trainer(
@@ -176,7 +231,7 @@ def train_model(
             progress_bar_refresh_rate=20,
             checkpoint_callback=checkpoint_callback,
             callbacks=callbacks,
-            precision=16,
+            precision=precision,
             benchmark=False,
             profiler=False,
             weights_summary="full",
@@ -184,11 +239,11 @@ def train_model(
         )
 
         # Train the model ⚡
-        trainer.fit(classification_model, dm)
+        trainer.fit(classification_model, datamodule)
 
         # test the model
         if test is True:
-            trainer.test(datamodule=dm)
+            trainer.test(datamodule=datamodule)
 
         # Use this to get best model path from callback
         print("Best mode path is", checkpoint_callback.best_model_path)
@@ -219,14 +274,14 @@ def train_model(
             callbacks=[tune_callback],
         )
         # Train the model ⚡
-        trainer.fit(classification_model, dm)
+        trainer.fit(classification_model, datamodule)
     # return
 
 
 if __name__ == "__main__":
     # example command:
-    # python -m serotiny.steps.train_model \
+    # python -m serotiny.steps.train_classifier \
     #     --datasets_path "./results/splits/" \
     #     --output_path "./results/models/" \
 
-    fire.Fire(train_model)
+    fire.Fire(train_classifier)

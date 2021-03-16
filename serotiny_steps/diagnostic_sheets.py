@@ -22,17 +22,58 @@ def diagnostic_sheets(
     dataset_path: str,
     output_path: str,
     projection: dict,
-    path_3d_column="CellImage3DPath",
-    chosen_projection="Chosen2DProjectionPath",
-    chosen_class="ChosenMitoticClass",
-    label="Draft mitotic state resolved",
-    source_path=None,
-    metadata="ChosenMitoticClass",
-    proj_all=True,
-    num_images=200,
+    path_3d_column: str,
+    chosen_projection: str,
+    metadata: str,
+    proj_all: bool,
+    num_images: int,
     executor_address: Optional[str] = None,
+    source_path: Optional[str] = None,
     overwrite: bool = False,
 ):
+    """
+    Call actk.steps.diagnostic_sheets to generate diagnostic sheets
+    for a dataset of 3D images. Calls apply_projection
+
+    Parameters
+    -----------
+    dataset_path: str
+        Path to input dataset containing 3D images
+
+    output_path: str
+        Path to save diagnostic sheet manifest
+
+    projection: dict
+        Config containing projection details
+
+    path_3d_column: str
+        Column name containing 3D image paths
+        Example: "CellImage3DPath"
+
+    chosen_projection: str
+        Column name to append projected image paths to
+        original dataset
+        Example: "Chosen2DProjectionPath"
+
+    metadata: str
+        Column containing class label information
+        Example: "ChosenMitoticClass"
+
+    proj_all: bool
+        Whether to do all axis max projection or not
+
+    num_images: int
+        Number of images to sample to make diagnostic sheet
+        Example: 200
+
+    executor_address: Optional[str] = None
+        Address for dask distributed compute
+
+    source_path: Optional[str] = None
+        If source path, append source path to
+        3D image paths
+
+    """
 
     # make a visualization manifest
     dataset_path = Path(dataset_path)
@@ -53,8 +94,6 @@ def diagnostic_sheets(
         projection=projection,
         path_3d_column=path_3d_column,
         chosen_projection=chosen_projection,
-        chosen_class=chosen_class,
-        label=label,
         source_path=source_path,
         proj_all=proj_all,
         executor_address=executor_address,
@@ -99,7 +138,5 @@ if __name__ == "__main__":
     # 'axis': 'Y', 'method': 'max'}" \
     #     --path_3d_column "CellImage3DPath" \
     #     --chosen_projection "Chosen2DProjectionPath" \
-    #     --chosen_class "ChosenMitoticClass" \
-    #     --label "Draft mitotic state resolved"
 
     fire.Fire(diagnostic_sheets)

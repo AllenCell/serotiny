@@ -2,7 +2,7 @@ import pytest
 import numpy as np
 import pandas as pd
 
-from serotiny.library.data import DataframeDataset, one_hot_encoding, append_one_hot
+from serotiny.data import DataframeDataset, one_hot_encoding, append_one_hot
 
 
 @pytest.mark.parametrize(

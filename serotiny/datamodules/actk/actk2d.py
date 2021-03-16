@@ -1,26 +1,73 @@
-# Note - you must have torchvision installed for this example
+from typing import Sequence, Union, Callable
 from torchvision import transforms
 from ...image import png_loader
 from ...data import load_data_loader
 from ...data.loaders import Load2DImage, LoadClass, LoadColumns
 from ..constants import DatasetFields
 from ..base_datamodule import BaseDataModule
-from ..utils import subset_channels
 
 
 class ACTK2DDataModule(BaseDataModule):
+    """
+    A pytorch lightning datamodule that handles the logic for
+    loading 2D ACTK images
+
+    Parameters
+    -----------
+    x_label: str
+        Column name used to load an image (x)
+
+    y_label: str
+        Column name used to load the image label (y)
+
+    batch_size: int
+        Batch size for the dataloader
+
+    num_workers: int
+        Number of worker processes to create in dataloader
+
+    id_fields: Sequence[Union[str, int]]
+        Id column name for loader
+
+    channels: Sequence[Union[str, int]]
+        List of channels in the images
+
+    select_channels: Sequence[Union[str, int]]
+        List of channels to subset the original channel list
+
+    data_dir: str
+        Path to data folder containing csv's for train, val,
+        and test splits
+
+    resize_to: int
+        Resize input images to a square of this size
+
+    encoded_label_suffix: str
+        a column of categorical variables is converted into an integer
+        representation. This column in named
+        encoded_label + encoded_label_suffix
+        Example:
+            encoded_label = "ChosenMitoticClass"
+            encoded_label_suffix = "Integer"
+
+    classes: list
+        List of classes in the encoded_label column
+    """
+
     def __init__(
         self,
-        batch_size: int,
-        num_workers: int,
+        transform_list: Sequence[Callable],
+        train_transform_list: Sequence[Callable],
         x_label: str,
         y_label: str,
-        data_dir: str,
-        resize_to: int,
+        batch_size: int,
+        num_workers: int,
+        id_fields: Sequence[Union[str, int]],
+        channels: Sequence[Union[str, int]],
+        select_channels: Sequence[Union[str, int]],
         encoded_label_suffix: str,
-        channels: list,
-        select_channels: list,
         classes: list,
+        data_dir: str,
         **kwargs,
     ):
 
@@ -68,6 +115,9 @@ class ACTK2DDataModule(BaseDataModule):
         }
 
     def load_image(self, dataset):
+        """
+        Load a single 2D image given a path
+        """
         return png_loader(
             dataset[DatasetFields.Chosen2DProjectionPath].iloc[0],
             channel_order="CYX",
@@ -76,9 +126,15 @@ class ACTK2DDataModule(BaseDataModule):
         )
 
     def get_dims(self, img):
+        """
+        Get dimensions of input image
+        """
         return (img.shape[1], img.shape[2])
 
     def train_dataloader(self):
+        """
+        Instantiate train dataloader.
+        """
         train_dataset = self.datasets["train"]
         train_loaders = self.loaders.copy()
         train_loaders[self.x_label] = Load2DImage(

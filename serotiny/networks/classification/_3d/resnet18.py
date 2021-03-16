@@ -2,6 +2,7 @@
 ResNet18 module, leveraging pretrained weights +
 """
 
+from typing import Sequence
 from collections import OrderedDict
 
 import torch
@@ -12,6 +13,11 @@ from ._resnet_utils import resnet18 as make_3D_resnet18
 
 
 def make_3D_resnet_from_2D(depth):
+    """
+    Util to instantiate a 3d resnet from a pretrained 2d resnet.
+    Replicate the weights of a pretrained 2d resnet across the extra dimension
+    in the 3d model
+    """
     resnet_3d = make_3D_resnet18(sample_size=224, sample_duration=depth)
     resnet_2d = models.resnet18(pretrained=True)
 
@@ -43,12 +49,31 @@ def make_3D_resnet_from_2D(depth):
     return resnet_3d
 
 
-class ResNet18_3D(nn.Module):
+class ResNet18(nn.Module):
     def __init__(
-        self, in_channels=3, num_classes=5, dimensions=(64, 128, 96), pretrained=True
+        self,
+        in_channels: int,
+        input_dims: Sequence[int],
+        num_classes: int,
+        pretrained=True,
     ):
+        """
+        Instantiate a 3D Resnet for classification
+
+        Parameters
+        ----------
+        in_channels: int
+            Number of input channels
+        input_dims: Sequence[int]
+            Dimensions of input channels
+        num_classes: int
+            Number of classes in the dataset
+        pretrained: bool
+            Flag to decide whether to train model from scratch or initialize by
+            leveraging a pretrained 2d resnet
+
+        """
         super().__init__()
-        self.network_name = "Resnet18"
         self.num_classes = num_classes
         self.feature_extractor_first_layer = nn.Sequential(
             OrderedDict(
@@ -81,7 +106,7 @@ class ResNet18_3D(nn.Module):
         # and I initialize it to all zeros so the cases that don't need padding get
         # bypassed.
         padding = [0] * 6
-        for ix, dim in enumerate(dimensions):
+        for ix, dim in enumerate(input_dims):
             if dim < 224:
                 padding[ix] = (224 - dim) // 2
                 padding[ix + 1] = (224 - dim) // 2
@@ -89,10 +114,10 @@ class ResNet18_3D(nn.Module):
         self.zero_padding = torch.nn.ConstantPad3d(tuple(padding), 0)
 
         if pretrained:
-            self.classifier = make_3D_resnet_from_2D(dimensions[0])
+            self.classifier = make_3D_resnet_from_2D(input_dims[0])
         else:
             self.classifier = resnet18_3d(
-                sample_size=224, sample_duration=dimensions[0]
+                sample_size=224, sample_duration=input_dims[0]
             )
 
         # Replace final layer
