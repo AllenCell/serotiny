@@ -84,12 +84,12 @@ def make_folder_dataset(
     extension: Optional[str] = None,
     manifest: Optional[Union[Path, str]] = None,
     path_col: Optional[str] = None,
-    loaders: Dict[str, Union[Callable, Dict[str, Tuple[str, Dict]]]] = {},
+    loader_dict: Dict[str, Union[Callable, Dict[str, Tuple[str, Dict]]]] = {},
     split_col: Optional[str] = None,
     x_label: str = "images",
 ):
-    loaders = copy.copy(loaders)
-    loaders = _resolve_loaders(loaders)
+    loader_dict = copy.copy(loader_dict)
+    loader_dict = _resolve_loaders(loader_dict)
     if (path is None) and (manifest is None):
         raise ValueError("Either `path` or `manifest` must be specified")
 
@@ -109,7 +109,7 @@ def make_folder_dataset(
         df = pd.Series({f.name: f for f in list_of_files},
                         name="true_paths").to_frame()
 
-        loaders[x_label] = infer_extension_loader(extension)
+        loader_dict[x_label] = infer_extension_loader(extension)
 
     manifest_df = None
     if manifest is not None:
@@ -120,11 +120,11 @@ def make_folder_dataset(
         manifest_df["basename"] = manifest_df[path_col].apply(lambda f: Path(f).name)
 
     if (df is not None) and (manifest_df is not None):
-        df = df.merge(how="left", left_index=True, right_on="basename")
+        df = df.merge(right=manifest_df, how="left", left_index=True, right_on="basename")
     elif (manifest_df is not None):
         df = manifest_df
 
-    return DataframeDataset(dataframe=df, loaders=loaders, iloc=True)
+    return DataframeDataset(dataframe=df, loaders=loader_dict, iloc=True, split_col=split_col)
 
 def make_dataloader(dataset, batch_size, num_workers, sampler):
     return DataLoader(
@@ -167,7 +167,7 @@ class FolderDatamodule(pl.LightningDataModule):
         Name of the manifest columns which should contain paths. If a folder path
         was passed as `path`, the basename of these paths should match that of
         the files in the folder.
-    loaders: Dict[str, Union[Callable, Dict[str, Tuple[str, Dict]]]] = {}
+    loader_dict: Dict[str, Union[Callable, Dict[str, Tuple[str, Dict]]]] = {}
         Dictionary of loader specifications for each given key. When the value
         is callable, that is the assumed loader. When the value is a tuple, it
         is assumed to be of the form (loader class name, loader class args) and
@@ -193,7 +193,7 @@ class FolderDatamodule(pl.LightningDataModule):
         extension: Optional[str] = None,
         manifest: Optional[Union[Path, str]] = None,
         path_col: Optional[str] = None,
-        loaders: Dict[str, Union[Callable, Dict[str, Tuple[str, Dict]]]] = {},
+        loader_dict: Dict[str, Union[Callable, Dict[str, Tuple[str, Dict]]]] = {},
         split_col: Optional[str] = None,
         train_frac: float = 1.0,
         test_set: bool = False,
@@ -206,7 +206,7 @@ class FolderDatamodule(pl.LightningDataModule):
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.dataset = make_folder_dataset(path, extension, manifest, path_col,
-                                           loaders, split_col, x_label)
+                                           loader_dict, split_col, x_label)
         self.length = len(self.dataset)
 
         indices = list(range(self.length))
