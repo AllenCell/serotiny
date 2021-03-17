@@ -1,6 +1,8 @@
 import torch
+from torch import nn
 
-class DoubleConvolution(torch.nn.Module):
+# In original paper, kernel_size = 3 and padding = 0
+class DoubleConvolution(nn.Module):
     def __init__(
             self,
             n_in: int,
@@ -9,12 +11,13 @@ class DoubleConvolution(torch.nn.Module):
             padding: int,
             ):
         super().__init__()
-        self.conv1 = torch.nn.Conv3d(n_in, n_out, kernel_size=kernel_size, padding=padding)
-        self.bn1 = torch.nn.BatchNorm3d(n_out)
-        self.relu1 = torch.nn.ReLU()
-        self.conv2 = torch.nn.Conv3d(n_out, n_out, kernel_size=kernel_size, padding=padding)
-        self.bn2 = torch.nn.BatchNorm3d(n_out)
-        self.relu2 = torch.nn.ReLU()
+        
+        self.conv1 = nn.Conv3d(n_in, n_out, kernel_size=kernel_size, padding=padding)
+        self.bn1   = nn.BatchNorm3d(n_out)
+        self.relu1 = nn.ReLU()
+        self.conv2 = nn.Conv3d(n_out, n_out, kernel_size=kernel_size, padding=padding)
+        self.bn2   = nn.BatchNorm3d(n_out)
+        self.relu2 = nn.ReLU()
 
     def forward(self, x):
         print(f'  x.shape = {x.shape}')
