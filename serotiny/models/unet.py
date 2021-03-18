@@ -6,6 +6,7 @@ from typing import Sequence
 import inspect
 
 import logging
+
 logger = logging.getLogger("lightning")
 logger.propagate = False
 
@@ -81,9 +82,7 @@ class UnetModel(pl.LightningModule):
         # large objects unnecessarily
         frame = inspect.currentframe()
         init_args = get_init_args(frame)
-        self.save_hyperparameters(
-            *[arg for arg in init_args if arg not in ["network"]]
-        )
+        self.save_hyperparameters(*[arg for arg in init_args if arg not in ["network"]])
 
         self.log_grads = True
 
@@ -92,102 +91,56 @@ class UnetModel(pl.LightningModule):
 
     def parse_batch(self, batch):
         x = batch[self.hparams.x_label].float()
-        x_target = x[:, self.hparams.target_channels]
-        if self.hparams.reference_channels is not None:
-            x_reference = x[:, self.hparams.reference_channels]
-        else:
-            x_reference = None
-        if self.hparams.num_classes > 0:
-            x_class = batch[self.hparams.class_label]
-            x_class_one_hot = index_to_onehot(x_class, self.hparams.num_classes)
-        else:
-            x_class_one_hot = None
+        y = batch[self.hparams.y_label].float()
 
-        return x_target, x_reference, x_class_one_hot
+        return x, y
 
-    def forward(self, x_target, x_reference, x_class):
+    def forward(self, x, y):
         #####################
-        # train autoencoder
+        # train unet
         #####################
-
-        # because of the structure of the down residual layers, the output
-        # shape of the convolutional portion of this network is going to be
-        # equal to the input shape downscaled by np.ceil(dim/div)
 
         # Forward passes
-        mu, logsigma = self.encoder(x_target, x_reference, x_class)
+        y_hat = self.network(x)
+        loss = self.loss(y_hat, y)
 
-        kld_loss = self.kld_loss(mu, logsigma)
-
-        z_latent = mu.data.cpu()
-        z = reparameterize(mu, logsigma)
-
-        x_hat = self.decoder(z, x_reference, x_class)
-
-        if self.hparams.auto_padding:
-            padding = [
-                (x_dim - xhat_dim) // 2
-                for x_dim, xhat_dim in zip(x_target.shape[2:], x_hat.shape[2:])
-            ]
-
-            # make padding symmetric in every dimension
-            padding = sum([[p, p] for p in padding], [])
-            x_hat = F.pad(x_hat, padding, mode="constant", value=0)
-
-        recon_loss = self.crit_recon(x_hat, x_target)
-
-        return x_hat, z_latent, recon_loss, kld_loss
+        return y_hat, loss
 
     def training_step(self, batch, batch_idx, optimizer_idx):
-        x_target, x_reference, x_class = self.parse_batch(batch)
-        _, _, recon_loss, kld_loss = self(x_target, x_reference, x_class)
-
-        loss = recon_loss + self.beta * kld_loss
+        x, y = self.parse_batch(batch)
+        y_hat, loss = self(x, y)
 
         self.manual_backward(loss)
-        (opt_enc, opt_dec) = self.optimizers()
-        opt_enc.step()
-        opt_dec.step()
-        opt_enc.zero_grad()
-        opt_dec.zero_grad()
+        optimizer = self.hparams.optimizer
+        optimizer.step()
+        optimizer.zero_grad()
 
         # Default logger=False for training_step
         # set it to true to log train loss to all lggers
-        self.log("train reconstruction loss", recon_loss, logger=True)
-        self.log("train kld loss", kld_loss, logger=True)
-
+        self.log("train loss", loss, logger=True)
         return {"loss": loss, "batch_idx": batch_idx}
 
     def validation_step(self, batch, batch_idx):
-        x_target, x_reference, x_class = self.parse_batch(batch)
-        x_hat, z_latent, recon_loss, kld_loss = self(x_target, x_reference, x_class)
-        loss = recon_loss + self.beta * kld_loss
+        x, y = self.parse_batch(batch)
+        y_hat, loss = self(x, y)
 
         # Default logger=False for training_step
         # set it to true to log train loss to all lggers
-        self.log("validation reconstruction loss", recon_loss, logger=True)
-        self.log("validation kld loss", kld_loss, logger=True)
+        self.log("validation loss", loss, logger=True)
 
         return {
             "validation_loss": loss,
-            "x_hat": x_hat,
-            "x_class": x_class,
-            "z_latent": z_latent,
+            "y_hat": y_hat,
             "batch_idx": batch_idx,
         }
 
     def test_step(self, batch, batch_idx):
-        x_target, x_reference, x_class = self.parse_batch(batch)
-        x_hat, z_latent, recon_loss, kld_loss = self(x_target, x_reference, x_class)
-        loss = recon_loss + self.beta * kld_loss
+        x, y = self.parse_batch(batch)
+        y_hat, loss = self(x, y)
 
         return {
-            "total_loss": loss,
-            "kld_loss": self.beta * kld_loss,
-            "recon_loss": recon_loss,
-            "x_hat": x_hat,
-            "x_class": x_class,
-            "z_latent": z_latent,
+            "test_loss": loss,
+            "y_hat": y_hat,
             "batch_idx": batch_idx,
         }
 
@@ -195,30 +148,16 @@ class UnetModel(pl.LightningModule):
         # TODO: this should be using a callback defined elsewhere to decide
         # what to do after the test step. Sometimes we want metrics, sometimes
         # we want to store the latent representations, etc.
-        recon_loss = output["recon_loss"]
-        kld_loss = output["kld_loss"]
-        total_loss = output["total_loss"]
-        self.log("test reconstruction loss", recon_loss, logger=True)
-        self.log("test kld loss", kld_loss, logger=True)
-        self.log("test total loss", total_loss, logger=True)
+        loss = output["loss"]
+        self.log("test loss", loss, logger=True)
 
     def configure_optimizers(self):
-        opt_class = find_optimizer(self.hparams.optimizer_encoder)
-        encoder_optimizer = opt_class(self.encoder.parameters(), self.hparams.lr)
-
-        opt_class = find_optimizer(self.hparams.optimizer_decoder)
-        decoder_optimizer = opt_class(self.decoder.parameters(), self.hparams.lr)
+        opt_class = find_optimizer(self.hparams.optimizer)
+        optimizer = opt_class(self.network.parameters(), self.hparams.lr)
 
         return (
             {
-                "optimizer": encoder_optimizer,
-                "monitor": "val_accuracy",
-                "interval": "epoch",
-                "frequency": 1,
-                "strict": True,
-            },
-            {
-                "optimizer": decoder_optimizer,
+                "optimizer": optimizer,
                 "monitor": "val_accuracy",
                 "interval": "epoch",
                 "frequency": 1,

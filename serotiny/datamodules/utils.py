@@ -1,12 +1,12 @@
 from typing import Sequence, Union
 
+
 def subset_channels(
-        channel_subset: Sequence[Union[int, str]],
-        channels: Sequence[Union[int, str]]
+    channel_subset: Sequence[Union[int, str]], channels: Sequence[Union[int, str]]
 ):
     """
     Subset channels given a list of both
-     
+
     Parameters
     -----------
     channel_subset: Sequence[Union[int, str]]
@@ -16,10 +16,10 @@ def subset_channels(
         List of all channels
 
     Returns:
-    channel_indexes: 
+    channel_indexes:
         Indexes of subset channels in original channel list
-    
-    num_channels: 
+
+    num_channels:
         New length of channels
     """
     if channel_subset is not None:

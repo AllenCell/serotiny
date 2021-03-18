@@ -107,13 +107,13 @@ class ImageImage(BaseDataModule):
         self.loaders = {
             # Use callable class objects here because lambdas aren't picklable
             "id": LoadColumns(self.id_fields),
-            self.y_label: Load3DImage(
+            self.x_label: Load3DImage(
                 DatasetFields.CellImage3DPath,
                 self.num_channels,
                 self.input_channels,
                 self.transform,
             ),
-            self.x_label: Load3DImage(
+            self.y_label: Load3DImage(
                 DatasetFields.CellImage3DPath,
                 self.num_channels,
                 self.output_channels,
@@ -123,7 +123,7 @@ class ImageImage(BaseDataModule):
 
     def load_image(self, dataset):
         """
-        Load a single 2D image given a path
+        Load a single 3D image given a path
         """
         return self.transform(
             tiff_loader_CZYX(

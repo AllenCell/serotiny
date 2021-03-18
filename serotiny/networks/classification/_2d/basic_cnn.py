@@ -10,10 +10,7 @@ import torch.nn as nn
 
 
 def _conv_layer(
-    in_c: int,
-    out_c: int,
-    kernel_size: Sequence[int] = (3, 3),
-    padding: int = 0
+    in_c: int, out_c: int, kernel_size: Sequence[int] = (3, 3), padding: int = 0
 ):
     """
     Util function to instantiate a convolutional block.
@@ -34,6 +31,7 @@ def _conv_layer(
         nn.ReLU(),
         nn.BatchNorm2d(out_c),
     )
+
 
 class BasicCNN(nn.Module):
     def __init__(

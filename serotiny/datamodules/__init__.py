@@ -3,5 +3,9 @@ from .actk.actk3d import ACTK3DDataModule
 from .aics_mnist import AICS_MNIST_DataModule
 from .dummy import DummyDatamodule
 
-__all__ = ["ACTK2DDataModule", "ACTK3DDataModule", "AICS_MNIST_DataModule",
-           "DummyDatamodule"]
+__all__ = [
+    "ACTK2DDataModule",
+    "ACTK3DDataModule",
+    "AICS_MNIST_DataModule",
+    "DummyDatamodule",
+]

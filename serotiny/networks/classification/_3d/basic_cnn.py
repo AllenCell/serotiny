@@ -10,10 +10,7 @@ import torch.nn as nn
 
 
 def _conv_layer(
-    in_c: int,
-    out_c: int,
-    kernel_size: Sequence[int] = (3, 3, 3),
-    padding: int = 0
+    in_c: int, out_c: int, kernel_size: Sequence[int] = (3, 3, 3), padding: int = 0
 ):
     """
     Util function to instantiate a convolutional block.
@@ -74,7 +71,9 @@ class BasicCNN(nn.Module):
         out_channels = 4
         _in_channels = in_channels
         for i in range(num_layers):
-            layers.append(_conv_layer(_in_channels, out_channels, kernel_size=(3, 3, 3)))
+            layers.append(
+                _conv_layer(_in_channels, out_channels, kernel_size=(3, 3, 3))
+            )
             _in_channels = out_channels
             out_channels = out_channels * int(1.5 ** (i))
 
