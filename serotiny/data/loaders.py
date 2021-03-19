@@ -52,8 +52,10 @@ class LoadOneHotClass:
         x_cond = torch.unsqueeze(x_cond, 0)
         x_cond = torch.unsqueeze(x_cond, 0)
         x_cond_one_hot = index_to_onehot(x_cond, self.num_classes)
-        x_cond_one_hot = x_cond_one_hot.squeeze(0)
-        return x_cond_one_hot
+        # x_cond_one_hot = x_cond_one_hot.squeeze(0)
+        x_cond_argmax = torch.argmax(x_cond_one_hot, axis=1)
+        x_cond_argmax[x_cond_argmax != 0] = 0
+        return x_cond_argmax
 
 
 class LoadSpharmCoeffs:
