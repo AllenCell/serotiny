@@ -7,6 +7,7 @@ from torch.nn import functional as F
 import pytorch_lightning as pl
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 
 def acc_prec_recall(n_classes):
@@ -166,3 +167,140 @@ def index_to_onehot(index, n_classes):
     onehot.scatter_(1, index, 1)
 
     return onehot
+
+
+def log_metrics(outputs, prefix, current_epoch, dir_path):
+    """
+    Produce metrics and save them
+    """
+
+    dataframe = {
+        "epoch": [],
+        f"total_{prefix}_losses": [],
+        f"total_{prefix}_ELBO": [],
+        f"total_{prefix}_rcl": [],
+        f"total_{prefix}_klds": [],
+        "condition": [],
+        f"{prefix}_rcl": [],
+        f"{prefix}_kld": [],
+    }
+
+    batch_rcl, batch_kld = (
+        torch.empty([0]),
+        torch.empty([0]),
+    )
+
+    batch_length = 0
+    loss, rcl_loss, kld_loss = 0, 0, 0
+
+    total_x = torch.stack([x["input"] for x in outputs])
+    num_batches = len(total_x)
+
+    rcl_per_condition_loss, kld_per_condition_loss = (
+        torch.zeros(total_x.size()[-1] + 1),
+        torch.zeros(total_x.size()[-1] + 1),
+    )
+
+    for output in outputs:
+        rcl_per_element = output["rcl_per_elem"]
+        kld_per_element = output["kld_per_elem"]
+        loss += output[f"{prefix}_loss"].item()
+        rcl_loss += output["recon_loss"].item()
+        kld_loss += output["kld_loss"].item()
+        for jj, ii in enumerate(torch.unique(output["cond_labels"])):
+            this_cond_positions = output["cond_labels"] == ii
+
+            batch_rcl = torch.cat(
+                [
+                    batch_rcl.type_as(rcl_per_element),
+                    torch.sum(rcl_per_element[this_cond_positions], dim=0).view(1, -1),
+                ],
+                0,
+            )
+            batch_kld = torch.cat(
+                [
+                    batch_kld.type_as(kld_per_element),
+                    torch.sum(kld_per_element[this_cond_positions], dim=0).view(1, -1),
+                ],
+                0,
+            )
+            batch_length += 1
+
+            this_cond_rcl = torch.sum(rcl_per_element[this_cond_positions])
+            this_cond_kld = torch.sum(kld_per_element[this_cond_positions])
+
+            rcl_per_condition_loss[jj] += this_cond_rcl.item()
+            kld_per_condition_loss[jj] += this_cond_kld.item()
+
+    loss = loss / num_batches
+    rcl_loss = rcl_loss / num_batches
+    kld_loss = kld_loss / num_batches
+    rcl_per_condition_loss = rcl_per_condition_loss / num_batches
+    kld_per_condition_loss = kld_per_condition_loss / num_batches
+
+    for j in range(len(rcl_per_condition_loss)):
+        dataframe["epoch"].append(current_epoch)
+        dataframe["condition"].append(j)
+        dataframe[f"total_{prefix}_losses"].append(loss)
+        dataframe[f"total_{prefix}_ELBO"].append(rcl_loss + kld_loss)
+        dataframe[f"total_{prefix}_rcl"].append(rcl_loss)
+        dataframe[f"total_{prefix}_klds"].append(kld_loss)
+        dataframe[f"{prefix}_rcl"].append(rcl_per_condition_loss[j].item())
+        dataframe[f"{prefix}_kld"].append(kld_per_condition_loss[j].item())
+
+    stats = pd.DataFrame(dataframe)
+
+    path = dir_path / f"stats_{prefix}.csv"
+    if prefix == "train":
+        print(f"====> {prefix}")
+        print("====> Epoch: {} losses: {:.4f}".format(current_epoch, loss))
+        print("====> RCL loss: {:.4f}".format(rcl_loss))
+        print("====> KLD loss: {:.4f}".format(kld_loss))
+
+    if path.exists():
+        stats.to_csv(path, mode="a", header=False, index=False)
+    else:
+        stats.to_csv(path, header="column_names", index=False)
+
+    if prefix == "test":
+        dataframe2 = {
+            "epoch": [],
+            "dimension": [],
+            "test_kld_per_dim": [],
+            "condition": [],
+        }
+
+        for j in range(len(rcl_per_condition_loss)):
+            # this_cond_rcl = test_batch_rcl[j::X_train.shape[2] + 1, :]
+
+            this_cond_kld = batch_kld[j :: len(torch.unique(output["cond_labels"])), :]
+
+            # summed_rcl = torch.sum(this_cond_rcl, dim=0) / batch_num_test
+            summed_kld = torch.sum(this_cond_kld, dim=0) / batch_length
+
+            for k in range(len(summed_kld)):
+                dataframe2["epoch"].append(current_epoch)
+                dataframe2["dimension"].append(k)
+                dataframe2["condition"].append(j)
+                dataframe2["test_kld_per_dim"].append(summed_kld[k].item())
+
+        stats_per_dim = pd.DataFrame(dataframe2)
+
+        path2 = dir_path / f"stats_per_dim_{prefix}.csv"
+        if path2.exists():
+            stats_per_dim.to_csv(path2, mode="a", header=False, index=False)
+        else:
+            stats_per_dim.to_csv(path2, header="column_names", index=False)
+
+        path_all = dir_path / "stats_all.csv"
+        all_stats = pd.DataFrame()
+        for prefix in ["train", "val", "test"]:
+            stats = pd.read_csv(dir_path / f"stats_{prefix}.csv")
+            all_stats = all_stats.append(stats)
+
+        if path_all.exists():
+            all_stats.to_csv(path_all, mode="a", header=False, index=False)
+        else:
+            all_stats.to_csv(path_all, header="column_names", index=False)
+
+    return outputs
