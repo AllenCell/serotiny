@@ -13,22 +13,6 @@ def test_unet():
     
     output = unet(input)
     
-    #print(unet)
-    
-    '''
-    print('networks_down:')
-    unet.print_network(unet.networks_down, reverse=True)
-    print()
-
-    print('networks_up:')
-    unet.print_network(unet.networks_up, reverse=False)
-    print()
-    
-    print('conv_out:')
-    print(unet.conv_out)
-    print()
-    '''
-    
     unet.print_network()
     
     print(f"UNET shape input: {input.shape} output: {output.shape}")

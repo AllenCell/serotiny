@@ -22,21 +22,6 @@ from ..losses import KLDLoss
 from .utils import index_to_onehot, find_optimizer
 
 
-def reparameterize(mu, log_var, add_noise=True):
-    """
-    Util function to apply the reparameterization trick, for the isotropic
-    gaussian case
-    """
-    if add_noise:
-        std = torch.exp(0.5 * log_var)
-        eps = torch.randn_like(std)
-        out = mu + eps * std
-    else:
-        out = mu
-
-    return out
-
-
 class UnetModel(pl.LightningModule):
     def __init__(
         self,
