@@ -1,10 +1,10 @@
 from .classification import ClassificationModel, AVAILABLE_NETWORKS
 from .cbvae import CBVAEModel
-from .cbvae_linear import CBVAELinearModel
+from .cbvae_mlp import CBVAEMLPModel
 
 __all__ = [
     "ClassificationModel",
     "CBVAEModel",
-    "CBVAELinearModel",
+    "CBVAEMLPModel",
     "AVAILABLE_NETWORKS",
 ]
