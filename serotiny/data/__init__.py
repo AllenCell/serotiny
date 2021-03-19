@@ -4,4 +4,5 @@ from .data import (
     load_data_loader,
     one_hot_encoding,
     append_one_hot,
+    DataframeDataset,
 )

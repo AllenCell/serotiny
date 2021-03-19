@@ -4,7 +4,7 @@
 [![Documentation](https://github.com/AllenCellModeling/serotiny/workflows/Documentation/badge.svg)](https://AllenCellModeling.github.io/serotiny/)
 [![Code Coverage](https://codecov.io/gh/AllenCellModeling/serotiny/branch/main/graph/badge.svg)](https://codecov.io/gh/AllenCellModeling/serotiny)
 
-library and commands for deep learning workflows
+Library and commands for pytorch/lightning deep-learning workflows
 
 ![SEROTINY](https://github.com/AllenCellModeling/serotiny/blob/master/resources/serotiny.png)
 
@@ -12,29 +12,80 @@ Serotiny (n) - when fire triggers the release of a seed
 
 ---
 
+Serotiny is essentially two things:
+
+* A place to gather all of the useful image/data processing, network construction and model training code in one place, to generalize it and provide a clean interface to its functionality.
+* A set of commands built out of this functionality that are intended to be invoked in deep-learning workflows. 
+
+The deep-learning functionality is built on [pytorch](https://github.com/pytorch/pytorch) and [pytorch-lightning](https://github.com/PyTorchLightning/pytorch-lightning). 
+
 ## Features
 
--   An array of useful functionality for deep learning with pytorch and pytorch-lightning and associated data processing tasks. 
--   A set of modular "steps" that act as commands which can be assembled into a larger machine learning pipeline. 
-
-## Quick Start
-
-```python
-from serotiny.library.image import project_2d
-
-project_2d(
-    "path/to/3d/image.ome.tiff",
-    "Z",
-    "mean",
-    "path/to/2d/projection.png",
-    channels=['membrane', 'dna', 'brightfield'],
-    masks={'membrane': 'membrane_segmentation', 'dna': 'nucleus_segmentation'})
-```
+- Provides an array of commonly-used functionality for pytorch/pytorch-lightning based deep learning tasks and associated data processing tasks. 
+- Structured as a set of modular "steps" that act as commands which can be easily assembled into a larger machine learning pipeline, including steps that:
+  - Split data into training, validation, and test sets
+  - Apply one-hot encoding to class labels
+  - Change resolution of input images
+  - Apply 2D projections for 3D input images
+  - Train classifier and autoencoder models
 
 ## Installation
 
 **Stable Release:** `pip install serotiny`<br>
 **Development Head:** `pip install git+https://github.com/AllenCellModeling/serotiny.git`
+
+## Quick Start
+
+### To change the resolution of input images:
+
+```python
+python -m  serotiny.steps.change_resolution \
+    --manifest_in "data/manifest_merged.csv" \
+    --path_3d_column "CellImage3DPath" \
+    --manifest_out "/allen/aics/modeling/spanglry/data/mitotic-classifier/sampled_output/manifest.csv" \
+    --path_3d_resized_column "CellSampledImage3DPath" \
+    --path_out "/allen/aics/modeling/spanglry/data/mitotic-classifier/sampled_output/" \
+    --resolution [10,20,50]
+```
+
+### To apply 2D projections to 3D images:
+
+```python
+python -m serotiny.steps.apply_projection \
+    --dataset_path "data/manifest_merged.csv" \
+    --output_path "data/projection.csv" \
+    --projection "{'channels': ['membrane', 'structure', 'dna'], \
+                   'masks': {'membrane': 'membrane_segmentation', 'dna': 'nucleus_segmentation'}, \
+                   'axis': 'Y', 'method': 'max', \
+                   'output': '/allen/aics/modeling/spanglry/data/mitotic-classifier/projections/'}" \
+    --path_3d_column "CellImage3DPath" \
+    --chosen_projection "Chosen2DProjectionPath" \
+    --chosen_class "ChosenMitoticClass" \
+    --label "Draft mitotic state resolved"
+```
+
+### To train a model:
+
+```python
+python -m serotiny.steps.train_model \
+    --datamodule 'ACTK2DDataModule' \
+    --datasets_path 'data/draft-mitotic-state/split/Z.mean.membrane_segmentation.nucleus_segmentation.brightfield.brightfield-membrane_segmentation/' \
+    --output_path 'data/draft-mitotic-state/models/basic/Z.mean.membrane_segmentation.nucleus_segmentation.brightfield.brightfield-membrane_segmentation/membrane_segmentation-nucleus_segmentation/adam' \
+    --data_config '{"classes": ["M0", "M1/M2", "M3", "M4/M5", "M6/M7"], "channel_indexes": ["membrane_segmentation", "nucleus_segmentation"], "id_fields": ["CellId", "CellIndex", "FOVId"], "channels": ["membrane_segmentation", "nucleus_segmentation", "brightfield"], "projection_path"
+: "data/draft-mitotic-state/projections/Z.mean.membrane_segmentation.nucleus_segmentation.brightfield.brightfield-membrane_segmentation.csv"}' \
+    --model 'basic' \
+    --batch_size 10 \
+    --num_gpus 1 \
+    --num_workers 20 \
+    --num_epochs 1 \
+    --lr 0.001 \
+    --optimizer 'adam' \
+    --scheduler 'reduce_lr_plateau' \
+    --tune_bool False \
+    --test True \
+    --x_label 'projection_image' \
+    --y_label 'ChosenMitoticClass'
+```
 
 ## Documentation
 
@@ -44,55 +95,4 @@ For full package documentation please visit [AllenCellModeling.github.io/serotin
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for information related to developing the code.
 
-## The Four Commands You Need To Know
-
-1. `pip install -e .[dev]`
-
-    This will install your package in editable mode with all the required development
-    dependencies (i.e. `tox`).
-
-2. `make build`
-
-    This will run `tox` which will run all your tests in both Python 3.7
-    and Python 3.8 as well as linting your code.
-
-3. `make clean`
-
-    This will clean up various Python and build generated files so that you can ensure
-    that you are working in a clean environment.
-
-4. `make docs`
-
-    This will generate and launch a web browser to view the most up-to-date
-    documentation for your Python package.
-
-#### Additional Optional Setup Steps:
-
--   Turn your project into a GitHub repository:
-    -   Make an account on [github.com](https://github.com)
-    -   Go to [make a new repository](https://github.com/new)
-    -   _Recommendations:_
-        -   _It is strongly recommended to make the repository name the same as the Python
-            package name_
-        -   _A lot of the following optional steps are *free* if the repository is Public,
-            plus open source is cool_
-    -   After a GitHub repo has been created, run the commands listed under:
-        "...or push an existing repository from the command line"
--   Register your project with Codecov:
-    -   Make an account on [codecov.io](https://codecov.io)(Recommended to sign in with GitHub)
-        everything else will be handled for you.
--   Ensure that you have set GitHub pages to build the `gh-pages` branch by selecting the
-    `gh-pages` branch in the dropdown in the "GitHub Pages" section of the repository settings.
-    ([Repo Settings](https://github.com/AllenCellModeling/serotiny/settings))
--   Register your project with PyPI:
-    -   Make an account on [pypi.org](https://pypi.org)
-    -   Go to your GitHub repository's settings and under the
-        [Secrets tab](https://github.com/AllenCellModeling/serotiny/settings/secrets/actions),
-        add a secret called `PYPI_TOKEN` with your password for your PyPI account.
-        Don't worry, no one will see this password because it will be encrypted.
-    -   Next time you push to the branch `main` after using `bump2version`, GitHub
-        actions will build and deploy your Python package to PyPI.
-
-
 **MIT license**
-
