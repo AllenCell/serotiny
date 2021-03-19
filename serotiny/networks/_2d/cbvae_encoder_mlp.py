@@ -5,7 +5,7 @@ from torch import nn
 from ..weight_init import weight_init
 
 
-class CBVAEEncoderLinear(nn.Module):
+class CBVAEEncoderMLP(nn.Module):
     def __init__(
         self,
         x_dim=295,
@@ -17,6 +17,7 @@ class CBVAEEncoderLinear(nn.Module):
 
         self.xdim = x_dim
         self.cdim = c_dim
+        self.enc_layers = enc_layers
         # encoder part
 
         encoder_layers = []

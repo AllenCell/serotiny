@@ -5,7 +5,7 @@ from torch import nn
 from ..weight_init import weight_init
 
 
-class CBVAEDecoderLinear(nn.Module):
+class CBVAEDecoderMLP(nn.Module):
     def __init__(
         self,
         x_dim=295,
@@ -17,6 +17,7 @@ class CBVAEDecoderLinear(nn.Module):
 
         self.xdim = x_dim
         self.cdim = c_dim
+        self.dec_layers = dec_layers
 
         # decoder part
         decoder_layers = []
