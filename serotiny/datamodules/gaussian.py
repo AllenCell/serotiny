@@ -17,7 +17,6 @@ class GaussianDataset(Dataset):
         x_dim,
         shuffle=True,
         corr=False,
-        mask=False,
     ):
         """
         Args:
@@ -95,7 +94,6 @@ class GaussianDataset(Dataset):
         It tells us how many of the condition
         columns have been masked
         """
-        # self._batches_x[idx], self._batches_c[idx], self._batches_conds[idx]
         return {
             self.x_label: self._batches_x[idx].squeeze(0),
             self.c_label: self._batches_c[idx].squeeze(0),
@@ -138,7 +136,6 @@ def make_dataloader(
     num_workers,
     shuffle,
     corr,
-    mask,
 ):
     """
     Instantiate gaussian dataset and return dataloader
@@ -151,7 +148,6 @@ def make_dataloader(
         x_dim,
         shuffle=shuffle,
         corr=corr,
-        mask=mask,
     )
     return DataLoader(
         dataset,
@@ -203,7 +199,6 @@ class GaussianDataModule(pl.LightningDataModule):
         length: int,
         shuffle: Optional[bool] = False,
         corr: Optional[bool] = False,
-        mask: Optional[bool] = False,
         **kwargs
     ):
 
@@ -226,7 +221,6 @@ class GaussianDataModule(pl.LightningDataModule):
             num_workers,
             shuffle,
             corr,
-            mask,
         )
 
     def train_dataloader(self):
