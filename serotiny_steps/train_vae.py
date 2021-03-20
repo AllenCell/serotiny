@@ -46,6 +46,7 @@ def train_vae(
     reference_channels: Optional[List[int]],
     beta: float,
     is_2d_or_3d: int,
+    is_mlp: bool,
     **kwargs,
 ):
     """
@@ -61,7 +62,7 @@ def train_vae(
     elif is_2d_or_3d == 3:
         from serotiny.networks._3d import CBVAEDecoder, CBVAEEncoder
     else:
-        raise ValueError(f"Parameter `is_2d_or_3d` should be 2 or 3")
+        raise ValueError("Parameter `is_2d_or_3d` should be 2 or 3")
 
     if datamodule not in datamodules.__dict__:
         raise KeyError(
