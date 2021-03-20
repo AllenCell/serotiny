@@ -115,7 +115,7 @@ class SpharmLatentWalk(Callback):
                     fig.savefig(
                         self.save_dir
                         / Path(
-                            f"./latent_walk/z_dim_{z_dim}_rank_{rank}_"
+                            f"./z_dim_{z_dim}_rank_{rank}_"
                             + f"value_{value}_project_{proj}.png"
                         ),
                         dpi=200,
@@ -143,6 +143,9 @@ class SpharmLatentWalk(Callback):
 
             ranked_z_dim_list = [i for i in stats["dimension"][::-1]]
 
+            if len(ranked_z_dim_list) > 10:
+                ranked_z_dim_list = ranked_z_dim_list[:10]
+
             batch_size = trainer.test_dataloaders[0].batch_size
             latent_dims = pl_module.encoder.enc_layers[-1]
 
@@ -150,7 +153,7 @@ class SpharmLatentWalk(Callback):
             test_iter = next(iter(test_dataloader))
             _, c_label, _ = [i for i in test_iter.keys()]
             c = test_iter[c_label]
-            c_shape = c.shape
+            c_shape = c.shape[-1]
 
             self.make_plots(
                 trainer, pl_module, ranked_z_dim_list, batch_size, latent_dims, c_shape

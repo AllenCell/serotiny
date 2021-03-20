@@ -13,8 +13,9 @@ class MLPVAELogging(Callback):  # pragma: no cover
 
     def __init__(
         self,
-        test_dataloader,
+        datamodule,
         resample_n: int = 10,
+        conds_list: Optional[list] = None,
         save_dir: Optional[str] = None,
     ):
         """
@@ -28,7 +29,8 @@ class MLPVAELogging(Callback):  # pragma: no cover
 
         self.save_dir = save_dir
         self.resample_n = resample_n
-        self.test_dataloader = test_dataloader
+        self.datamodule = datamodule
+        self.conds_list = conds_list
 
     def to_device(
         self, batch_x: Sequence, batch_y: Sequence, device: Union[str, device]
@@ -43,8 +45,10 @@ class MLPVAELogging(Callback):  # pragma: no cover
     def on_test_epoch_end(self, trainer: Trainer, pl_module: LightningModule):
 
         with torch.no_grad():
-            test_iter = next(iter(self.test_dataloader))
-            x_label, c_label, c_label_ind = [i for i in test_iter.keys()]
+            test_dataloader = self.datamodule.test_dataloader()
+            test_iter = next(iter(test_dataloader))
+            x_label, c_label = self.datamodule.x_label, self.datamodule.c_label
+
             x = test_iter[x_label].float()
             c = test_iter[c_label].float()
 
@@ -59,6 +63,25 @@ class MLPVAELogging(Callback):  # pragma: no cover
             if not self.save_dir:
                 self.save_dir = dir_path
 
+            if not self.conds_list:
+                if self.datamodule.__module__ == "serotiny.datamodules.gaussian":
+                    # Example for a 2D Gaussian
+                    # conds_list = [[], [0], [0, 1]]
+                    conds_list = []
+                    for i in range(x.shape[-1] + 1):
+                        conds_list.append([j for j in range(i)])
+
+                elif (
+                    self.datamodule.__module__
+                    == "serotiny.datamodules.variance_spharm_coeffs"
+                ):
+                    # For 2 structure integer conditions this is
+                    # say [0, 1]
+                    num_classes = pl_module.num_classes
+                    conds_list = []
+                    for i in range(num_classes):
+                        conds_list.append(i)
+
             make_plot_encoding(
                 self.save_dir,
                 pl_module,
@@ -67,6 +90,8 @@ class MLPVAELogging(Callback):  # pragma: no cover
                 stats,
                 x,
                 c,
+                conds_list=conds_list,
+                datamodule=self.datamodule,
                 beta=pl_module.beta,
                 resample_n=self.resample_n,
                 this_dataloader_color=None,
