@@ -3,6 +3,7 @@ from pathlib import Path
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
+from typing import Optional
 from ..data import load_data_loader
 from ..data.loaders import LoadSpharmCoeffs, LoadOneHotClass, LoadColumns
 import pytorch_lightning as pl
@@ -39,6 +40,9 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         x_label: str,
         c_label: str,
         id_fields: list,
+        x_dim: int,
+        data_dir: Optional[str] = None,
+        c_label_ind: Optional[int] = None,
         **kwargs
     ):
 
@@ -49,10 +53,14 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         self.c_encoded_label = c_label + "_encoded"
         self.id_fields = id_fields
         self.num_classes = 25
-        self.data_dir = "/allen/aics/modeling/ritvik/projects/serotiny/"
+        self.data_dir = data_dir
+        if not self.data_dir:
+            self.data_dir = "/allen/aics/modeling/ritvik/projects/serotiny/"
         self.datasets = {}
         self.batch_size = batch_size
         self.num_workers = num_workers
+        self.x_dim = x_dim
+        self.c_label_ind = c_label_ind
 
         self.loaders = {
             # Use callable class objects here because lambdas aren't picklable
@@ -81,9 +89,15 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         all_data[self.c_label] = all_data["structure_name"]
         all_data[self.c_encoded_label] = all_data["structure_name_encoded"]
 
-        self.datasets["test"] = all_data.loc[all_data.split == "test"]
-        self.datasets["train"] = all_data.loc[all_data.split == "train"]
-        self.datasets["valid"] = all_data.loc[all_data.split == "val"]
+        self.datasets["test"] = (
+            all_data.loc[all_data.split == "test"].iloc[:300].reset_index(drop=True)
+        )
+        self.datasets["train"] = (
+            all_data.loc[all_data.split == "train"].iloc[:300].reset_index(drop=True)
+        )
+        self.datasets["valid"] = (
+            all_data.loc[all_data.split == "val"].iloc[:300].reset_index(drop=True)
+        )
 
     def prepare_data(self):
         """
