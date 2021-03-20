@@ -289,7 +289,7 @@ def make_plot_encoding(
     bax.set_ylabel("KLD")
     bax.set_title("KLD per latent dim (test set)")
 
-    if len(conds_list[0]) > 30:
+    if len(conds_list) > 30:
         ax.get_legend().remove()
         ax2.get_legend().remove()
 
