@@ -50,6 +50,10 @@ class CBVAEMLPModel(pl.LightningModule):
         self.decoder = decoder
         self.beta = beta
         self.mask = mask
+        self.num_classes = num_classes
+        self.x_label = x_label
+        self.c_label_ind = c_label_ind
+        self.c_label = c_label
 
     def parse_batch(self, batch):
         x = batch[self.hparams.x_label].float()
