@@ -28,8 +28,6 @@ def make_plot_fid(
     X_test = X_test.view(-1, X_test.size()[-1])
     C_test = C_test.view(-1, C_test.size()[-1])
 
-    print(X_test.size(), C_test.size())
-
     sns.set_context("talk")
 
     csv_greedy_features = pd.read_csv(feature_path)
@@ -89,7 +87,8 @@ def make_plot_encoding(
     stats_all,
     X_test,
     C_test,
-    datamodule_name="Gaussian",
+    conds_list,
+    datamodule,
     beta=1,
     resample_n=10,
     this_dataloader_color=None,
@@ -119,6 +118,12 @@ def make_plot_encoding(
 
     C_test: The condition C to pass through the model. Pass in a batch
 
+    conds_list: List of all conditions
+    In the case of Gaussian datamodule, this specifies
+    which columns in condition to set to 0
+    In the case of Spharm datamodule, this specifies
+    which integer to provide as condition
+
     beta: Beta to use to compute loss (default=1)
 
     resample_n: How many times to sample from the latent space (default=10)
@@ -131,9 +136,6 @@ def make_plot_encoding(
     Default True
     """
     sns.set_context("talk")
-
-    # Number of conditions is the same as the input/output size
-    conds = [i for i in range(dec_layers[-1])]
 
     # Latent dims is the size of last encoder layer
     latent_dims = enc_layers[-1]
@@ -177,13 +179,9 @@ def make_plot_encoding(
         ax1.legend(["Train loss", "Val loss"])
     ax1.set_title("ELBO (beta*KLD + RCL) vs epoch")
 
-    this_kwargs = dec_layers[-1]
-
-    conds = [i for i in range(this_kwargs)]
-
     color = this_dataloader_color
 
-    for i in range(len(conds) + 1):
+    for i in range(len(conds_list)):
         if i == 0:
             (
                 z_means_x,
@@ -194,10 +192,10 @@ def make_plot_encoding(
                 kl_vs_rcl,
             ) = visualize_encoder_tabular(
                 model,
-                conds,
+                conds_list[i],
                 X_test.clone(),
                 C_test.clone(),
-                datamodule_name,
+                datamodule,
                 beta,
                 resample_n,
                 mask,
@@ -207,7 +205,12 @@ def make_plot_encoding(
             ax.scatter(z_means_x, z_means_y, marker=".", s=30, label=str(i))
             if color is not None:
                 colormap_plot(
-                    path_save_dir, X_test.clone(), z_means_x, z_means_y, color, conds
+                    path_save_dir,
+                    X_test.clone(),
+                    z_means_x,
+                    z_means_y,
+                    color,
+                    conds_list[i],
                 )
         else:
             (
@@ -219,10 +222,10 @@ def make_plot_encoding(
                 kl_vs_rcl,
             ) = visualize_encoder_tabular(
                 model,
-                conds,
+                conds_list[i],
                 X_test.clone(),
                 C_test.clone(),
-                datamodule_name,
+                datamodule,
                 beta,
                 resample_n,
                 mask,
@@ -232,12 +235,13 @@ def make_plot_encoding(
             ax.scatter(z_means_x, z_means_y, marker=".", s=30, label=str(i))
             if color is not None:
                 colormap_plot(
-                    path_save_dir, X_test.clone(), z_means_x, z_means_y, color, conds
+                    path_save_dir,
+                    X_test.clone(),
+                    z_means_x,
+                    z_means_y,
+                    color,
+                    conds_list[i],
                 )
-        try:
-            conds.pop()
-        except:
-            pass
 
     kl_per_lt = pd.DataFrame(kl_per_lt)
     kl_vs_rcl = pd.DataFrame(kl_vs_rcl)
@@ -253,14 +257,12 @@ def make_plot_encoding(
     ax.set_title("Latent space")
     ax.legend()
 
-    conds = [i for i in range(this_kwargs)]
-
-    for i in range(len(conds) + 1):
+    for i in range(len(conds_list)):
         # if conds = [0,1,2] for a 2D Gaussian (X_test.size()[-1]),
         # then num_conds = 0, so
         # num_conds = X_test.size()[-1] - len(conds)
-        tmp = kl_per_lt.loc[kl_per_lt["condition"] == X_test.size()[-1] - len(conds)]
-        tmp_2 = kl_vs_rcl.loc[kl_vs_rcl["condition"] == X_test.size()[-1] - len(conds)]
+        tmp = kl_per_lt.loc[kl_per_lt["condition"] == str(conds_list[i])]
+        tmp_2 = kl_vs_rcl.loc[kl_vs_rcl["condition"] == str(conds_list[i])]
         tmp = tmp.sort_values(by="kl_divergence", ascending=False)
         tmp = tmp.reset_index(drop=True)
         x = tmp.index.values
@@ -275,18 +277,6 @@ def make_plot_encoding(
         )
         bax.plot(x, y)
         ax3.scatter(tmp_2["RCL"].mean(), tmp_2["KLD"].mean(), label=str(i))
-        # sns.scatterplot(
-        #     ax=ax3,
-        #     data=tmp,
-        #     x="rcl",
-        #     y="kl_divergence",
-        #     label=str(i),
-        #     legend='brief'
-        #     )
-        try:
-            conds.pop()
-        except:
-            pass
 
     ax2.set_xlabel("Latent dimension")
     ax2.set_ylabel("KLD")
@@ -299,8 +289,7 @@ def make_plot_encoding(
     bax.set_ylabel("KLD")
     bax.set_title("KLD per latent dim (test set)")
 
-    conds = [i for i in range(this_kwargs)]
-    if len(conds) > 30:
+    if len(conds_list[0]) > 30:
         ax.get_legend().remove()
         ax2.get_legend().remove()
 

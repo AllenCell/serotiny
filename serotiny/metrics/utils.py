@@ -15,7 +15,7 @@ def visualize_encoder_tabular(
     conds,
     X_test,
     C_test,
-    datamodule_name="Gaussian",
+    datamodule,
     beta=1,
     resample_n=10,
     mask=True,
@@ -37,6 +37,11 @@ def visualize_encoder_tabular(
     X_test: The input X to the model. Pass in a batch
 
     C_test: The input C (condition) to the model. Pass in a batch
+
+    conds: In the case of Gaussian datamodule, this specifies
+    which columns in condition to set to 0
+    In the case of Spharm datamodule, this specifies
+    which integer to provide as condition
 
     beta: What beta to use to compute the loss
 
@@ -69,7 +74,10 @@ def visualize_encoder_tabular(
         # Split condition into tmp1 that contains the condition, and
         # tmp2 that contains the mask info of whether the condition
         # is there or not
-        if isinstance(conds, list) and datamodule_name == "Gaussian":
+        if (
+            isinstance(conds, list)
+            and datamodule.__module__ == "serotiny.datamodules.gaussian"
+        ):
             tmp1, tmp2 = torch.split(C_test, int(C_test.size()[-1] / 2), dim=1)
 
             # conds can be, for example [0,1,2]
@@ -80,9 +88,12 @@ def visualize_encoder_tabular(
 
             # New condition tensor for the model
             cond_d = torch.cat((tmp1, tmp2), 1)
-        else:
-            C_test = torch.zeros(C_test.shape)
-            cond_d = C_test
+        elif (
+            isinstance(conds, int)
+            and datamodule.__module__ == "serotiny.datamodules.variance_spharm_coeffs"
+        ):
+            cond_d = torch.zeros(C_test.shape)
+            cond_d[:, 0] = conds
 
         # Make empty list
         my_recon_list, my_z_means_list, my_log_var_list = [], [], []
@@ -121,7 +132,7 @@ def visualize_encoder_tabular(
         # if conds = [0,1,2] for a 2D Gaussian (X_test.size()[-1]),
         # then num_conds = 0, so
         # num_conds = X_test.size()[-1] - len(conds)
-        kl_vs_rcl["condition"].append(X_test.size()[-1] - len(conds))
+        kl_vs_rcl["condition"].append(str(conds))
         kl_vs_rcl["KLD"].append(kl_per_lt_temp_total.item())
         kl_vs_rcl["RCL"].append(rcl_per_lt_temp_total.item())
         kl_vs_rcl["ELBO"].append(elbo_loss_total.item())
@@ -140,7 +151,7 @@ def visualize_encoder_tabular(
             # Save all_kl and all_lt, useful for sorting later
             all_kl = np.append(all_kl, kl_per_lt_temp.item())
             all_lt.append(ii)
-            kl_per_lt["condition"].append(X_test.size()[-1] - len(conds))
+            kl_per_lt["condition"].append(str(conds))
             kl_per_lt["latent_dim"].append(ii)
             kl_per_lt["kl_divergence"].append(kl_per_lt_temp.item())
 
