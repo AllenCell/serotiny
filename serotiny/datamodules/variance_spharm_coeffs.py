@@ -89,15 +89,9 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         all_data[self.c_label] = all_data["structure_name"]
         all_data[self.c_encoded_label] = all_data["structure_name_encoded"]
 
-        self.datasets["test"] = (
-            all_data.loc[all_data.split == "test"].iloc[:300].reset_index(drop=True)
-        )
-        self.datasets["train"] = (
-            all_data.loc[all_data.split == "train"].iloc[:300].reset_index(drop=True)
-        )
-        self.datasets["valid"] = (
-            all_data.loc[all_data.split == "val"].iloc[:300].reset_index(drop=True)
-        )
+        self.datasets["test"] = all_data.loc[all_data.split == "test"]
+        self.datasets["train"] = all_data.loc[all_data.split == "train"]
+        self.datasets["valid"] = all_data.loc[all_data.split == "val"]
 
     def prepare_data(self):
         """
