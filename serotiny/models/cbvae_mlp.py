@@ -29,7 +29,6 @@ class CBVAEMLPModel(pl.LightningModule):
         beta=1,
         x_label="cell_coeffs",
         c_label="structure",
-        num_classes: Optional[int] = None,
         c_label_ind: Optional[str] = None,
         mask: Optional[bool] = True,
     ):
@@ -50,7 +49,6 @@ class CBVAEMLPModel(pl.LightningModule):
         self.decoder = decoder
         self.beta = beta
         self.mask = mask
-        self.num_classes = num_classes
         self.x_label = x_label
         self.c_label_ind = c_label_ind
         self.c_label = c_label
