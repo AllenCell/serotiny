@@ -209,7 +209,6 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
         kld_loss += output["kld_loss"].item()
         for jj, ii in enumerate(torch.unique(output["cond_labels"])):
             this_cond_positions = output["cond_labels"] == ii
-
             batch_rcl = torch.cat(
                 [
                     batch_rcl.type_as(rcl_per_element),
@@ -238,7 +237,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
     rcl_per_condition_loss = rcl_per_condition_loss / num_batches
     kld_per_condition_loss = kld_per_condition_loss / num_batches
 
-    for j in range(len(rcl_per_condition_loss)):
+    for j in range(len(torch.unique(output["cond_labels"]))):
         dataframe["epoch"].append(current_epoch)
         dataframe["condition"].append(j)
         dataframe[f"total_{prefix}_losses"].append(loss)
@@ -270,7 +269,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
             "condition": [],
         }
 
-        for j in range(len(rcl_per_condition_loss)):
+        for j in range(len(torch.unique(output["cond_labels"]))):
             # this_cond_rcl = test_batch_rcl[j::X_train.shape[2] + 1, :]
 
             this_cond_kld = batch_kld[j :: len(torch.unique(output["cond_labels"])), :]
