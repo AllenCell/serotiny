@@ -151,7 +151,7 @@ class SpharmLatentWalk(Callback):
 
             test_dataloader = trainer.test_dataloaders[0]
             test_iter = next(iter(test_dataloader))
-            _, c_label, _ = [i for i in test_iter.keys()]
+            _, c_label, _, _ = [i for i in test_iter.keys()]
             c = test_iter[c_label]
             c_shape = c.shape[-1]
 
