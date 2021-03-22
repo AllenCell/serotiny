@@ -46,16 +46,10 @@ def train_vae(
     target_channels: Sequence[int],
     reference_channels: Optional[Sequence[int]],
     beta: float,
-<<<<<<< HEAD
-    is_2d_or_3d: int,
-    is_mlp: bool,
-    **kwargs,
-=======
     dimensionality: int,
     auto_padding: bool = False,
     kld_reduction: str = "sum",
-    **kwargs
->>>>>>> 2187a8d750cfd541f37d39a4cadbe7882b675b98
+    **kwargs,
 ):
     """
     Instantiate and train a bVAE.
@@ -119,16 +113,6 @@ def train_vae(
 
     """
 
-<<<<<<< HEAD
-    if is_2d_or_3d == 2:
-        from serotiny.networks._2d import CBVAEDecoder, CBVAEEncoder
-    elif is_2d_or_3d == 3:
-        from serotiny.networks._3d import CBVAEDecoder, CBVAEEncoder
-    else:
-        raise ValueError("Parameter `is_2d_or_3d` should be 2 or 3")
-
-=======
->>>>>>> 2187a8d750cfd541f37d39a4cadbe7882b675b98
     if datamodule not in datamodules.__dict__:
         raise KeyError(
             f"Chosen datamodule {datamodule} not available.\n"
@@ -163,10 +147,7 @@ def train_vae(
         n_ch_ref=len(reference_channels),
         conv_channels_list=conv_channels_list,
         input_dims=input_dims,
-<<<<<<< HEAD
-=======
         activation=activation,
->>>>>>> 2187a8d750cfd541f37d39a4cadbe7882b675b98
     )
 
     decoder = CBVAEDecoder(
@@ -180,7 +161,7 @@ def train_vae(
         conv_channels_list=conv_channels_list[::-1],
         imsize_compressed=encoder.imsize_compressed,
         activation=activation,
-        activation_last=activation_last
+        activation_last=activation_last,
     )
 
     vae = CBVAEModel(
@@ -196,12 +177,9 @@ def train_vae(
         reference_channels=reference_channels,
         lr=lr,
         beta=beta,
-<<<<<<< HEAD
-=======
         kld_reduction=kld_reduction,
         input_dims=input_dims,
         auto_padding=auto_padding,
->>>>>>> 2187a8d750cfd541f37d39a4cadbe7882b675b98
     )
 
     tb_logger = TensorBoardLogger(
@@ -235,8 +213,8 @@ def train_vae(
     ]
     trainer = pl.Trainer(
         logger=[tb_logger],
-        #accelerator="ddp",
-        #replace_sampler_ddp=False,
+        # accelerator="ddp",
+        # replace_sampler_ddp=False,
         gpus=num_gpus,
         max_epochs=num_epochs,
         progress_bar_refresh_rate=5,
