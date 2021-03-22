@@ -40,12 +40,38 @@ class LoadClass:
 
 class LoadOneHotClass:
     """
-    Loader class, used to retrieve class values from the dataframe,
+    A hacky one hot loader
+    Load one hot encoding, also set it to 0 if
+    we dont want any condition
     """
 
-    def __init__(self, num_classes, y_encoded_label):
+    def __init__(self, num_classes, y_encoded_label, set_zero=False):
         self.num_classes = num_classes
         self.y_encoded_label = y_encoded_label
+        self.set_zero = set_zero
+
+    def __call__(self, row):
+        x_cond = torch.tensor(row[self.y_encoded_label])
+        x_cond = torch.unsqueeze(x_cond, 0)
+        x_cond = torch.unsqueeze(x_cond, 0)
+        x_cond_one_hot = index_to_onehot(x_cond, self.num_classes)
+        x_cond_one_hot = x_cond_one_hot.squeeze(0)
+        if self.set_zero:
+            x_cond_one_hot[x_cond_one_hot != 0] = 0
+        return x_cond_one_hot
+
+
+class LoadIntClass:
+    """
+    A hacky int class loader
+    Load int values for classes, also set to 0 if
+    we dont want any condition
+    """
+
+    def __init__(self, num_classes, y_encoded_label, set_zero=False):
+        self.num_classes = num_classes
+        self.y_encoded_label = y_encoded_label
+        self.set_zero = set_zero
 
     def __call__(self, row):
         x_cond = torch.tensor(row[self.y_encoded_label])
@@ -54,8 +80,28 @@ class LoadOneHotClass:
         x_cond_one_hot = index_to_onehot(x_cond, self.num_classes)
         # x_cond_one_hot = x_cond_one_hot.squeeze(0)
         x_cond_argmax = torch.argmax(x_cond_one_hot, axis=1)
-        x_cond_argmax[x_cond_argmax != 0] = 0
+        if self.set_zero:
+            x_cond_argmax[x_cond_argmax != 0] = 0
+        x_cond_argmax = x_cond_argmax.squeeze(0)
         return x_cond_argmax
+
+
+class LoadPCA:
+    """
+    Loader class, used to retrieve PCA from the dataframe,
+    also set to 0 if we dont want any pca values
+    """
+
+    def __init__(self, x_label, set_zero=False):
+        self.x_label = x_label  # DNA_PC1...
+        self.set_zero = set_zero
+
+    def __call__(self, row):
+        pca_cols = [col for col in row.keys() if self.x_label in col]
+        pca = torch.tensor(row[pca_cols]).float()
+        if self.set_zero:
+            pca = torch.zeros(1).squeeze(0)
+        return pca
 
 
 class LoadSpharmCoeffs:
@@ -63,14 +109,12 @@ class LoadSpharmCoeffs:
     Loader class, used to retrieve spharm coeffs from the dataframe,
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, x_label):
+        self.x_label = x_label
 
     def __call__(self, row):
-        dna_spharm_cols = [col for col in row.keys() if "dna_shcoeffs" in col]
-        # mem_spharm_cols = [col for col in row.keys() if "mem_shcoeffs" in col]
-        # str_spharm_cols = [col for col in row.keys() if "str_shcoeffs" in col]
-        return torch.tensor(row[dna_spharm_cols])
+        spharm_cols = [col for col in row.keys() if self.x_label in col]
+        return torch.tensor(row[spharm_cols])
 
 
 class Load2DImage:
