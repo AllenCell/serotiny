@@ -1,12 +1,20 @@
 from pathlib import Path
 
 import pandas as pd
+import numpy as np
 from sklearn.preprocessing import LabelEncoder
 
 from typing import Optional
 from ..data import load_data_loader
-from ..data.loaders import LoadSpharmCoeffs, LoadOneHotClass, LoadColumns
+from ..data.loaders import (
+    LoadSpharmCoeffs,
+    LoadOneHotClass,
+    LoadColumns,
+    LoadIntClass,
+    LoadPCA,
+)
 import pytorch_lightning as pl
+from sklearn.model_selection import train_test_split
 
 
 class VarianceSpharmCoeffs(pl.LightningDataModule):
@@ -16,20 +24,52 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
 
     Parameters
     -----------
-    x_label: str
-        Column name used to load an image (x)
-
-    y_label: str
-        Column name used to load the image label (y)
-
     batch_size: int
-        Batch size for the dataloader
+        Batch size for dataloader
 
     num_workers: int
-        Number of worker processes to create in dataloader
+        Num of workers for dataloader
 
-    id_fields: List[str]
-        Id column name for loader
+    x_label: str
+        Column name used to load the input (x)
+        Example: "dna_shcoeffs"
+
+    c_label: str
+        Column name used to load the input condition (c)
+        and make it a one hot encoding.
+        Example: "structure_name"
+
+    c_label_ind: str
+        Column name used to load the input condition (c)
+        as an integer value and not on hot
+        NOT related to actual column names in any manifest
+        this is just a new name set in this datamodule
+        Example: "structure_int"
+
+    id_fields: list
+        Column names used to load the Cell ID
+        Example: ['CellId']
+
+    x_dim: Size (batch*size) of input data.
+        Example: 295
+
+    num_classes: Optional, int
+        Example and Default: 25 for structure_name
+
+    data_dir: Optional, str
+       Where to save the manifest
+
+    set_zero: Optional, bool
+        Whether to set all conditions to 0
+        Example and Default: False
+
+    subset: Optional, int
+        Whethet to slice train val amd test dataloaders
+        Example: 300
+
+    overwrite: Optional, bool
+        Whether to overwrite existing file or not
+        Default: False
 
     """
 
@@ -39,40 +79,64 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         num_workers: int,
         x_label: str,
         c_label: str,
+        c_label_ind: str,
         id_fields: list,
         x_dim: int,
+        num_classes: Optional[int] = None,
         data_dir: Optional[str] = None,
-        c_label_ind: Optional[int] = None,
-        **kwargs
+        set_zero: Optional[bool] = False,
+        subset: Optional[int] = None,
+        overwrite: Optional[bool] = False,
+        **kwargs,
     ):
 
         super().__init__()
 
         self.x_label = x_label
+        if not self.x_label:
+            self.x_label = "dna_shcoeffs"
+
         self.c_label = c_label
+        if not self.c_label:
+            self.c_label = "structure_name"
+
         self.c_encoded_label = c_label + "_encoded"
         self.id_fields = id_fields
-        self.num_classes = 25
+
+        self.num_classes = num_classes
+        if not self.num_classes:
+            self.num_classes = 25
+
         self.data_dir = data_dir
         if not self.data_dir:
             self.data_dir = "/allen/aics/modeling/ritvik/projects/serotiny/"
+
         self.datasets = {}
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.x_dim = x_dim
         self.c_label_ind = c_label_ind
+        self.set_zero = set_zero
+        self.subset = subset
+        self.overwrite = overwrite
+        self.stratify_column = self.c_label
 
         self.loaders = {
             # Use callable class objects here because lambdas aren't picklable
             "id": LoadColumns(self.id_fields),
-            self.c_label: LoadOneHotClass(self.num_classes, self.c_encoded_label),
-            self.x_label: LoadSpharmCoeffs(),
+            self.c_label: LoadOneHotClass(
+                self.num_classes, self.c_encoded_label, self.set_zero
+            ),
+            self.x_label: LoadSpharmCoeffs(self.x_label),
+            self.c_label_ind: LoadIntClass(
+                self.num_classes, self.c_encoded_label, self.set_zero
+            ),
         }
 
-        # self.dims is returned when you call dm.size()
-        # Setting default dims here because we know them.
-        # Could optionally be assigned dynamically in dm.setup()
-        self.dims = (28, 28)
+        if self.c_label in ["DNA_PC", "MEM_PC", "DNA_MEM_PC"]:
+            self.loaders[self.c_label] = LoadPCA(self.c_label)
+            self.loaders[self.c_label_ind] = LoadPCA(self.c_label, set_zero=True)
+            self.stratify_column = "structure_name"
 
     def setup(self, stage=None):
         """
@@ -80,24 +144,95 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         """
         self.data_dir = Path(self.data_dir)
 
-        all_data = pd.read_csv(self.data_dir / "variance_spharm_coeffs.csv")
-
-        all_data["structure_name_encoded"] = LabelEncoder().fit_transform(
-            all_data["structure_name"]
+        all_data = pd.read_csv(
+            self.data_dir / f"variance_{self.x_label}_{self.c_label}.csv"
         )
 
-        all_data[self.c_label] = all_data["structure_name"]
-        all_data[self.c_encoded_label] = all_data["structure_name_encoded"]
+        if not self.subset:
+            self.datasets["test"] = all_data.loc[all_data.split == "test"]
+            self.datasets["train"] = all_data.loc[all_data.split == "train"]
+            self.datasets["valid"] = all_data.loc[all_data.split == "val"]
+        else:
+            self.datasets["test"] = (
+                all_data.loc[all_data.split == "test"]
+                .iloc[: self.subset]
+                .reset_index(drop=True)
+            )
+            self.datasets["train"] = (
+                all_data.loc[all_data.split == "train"]
+                .iloc[: self.subset]
+                .reset_index(drop=True)
+            )
+            self.datasets["valid"] = (
+                all_data.loc[all_data.split == "val"]
+                .iloc[: self.subset]
+                .reset_index(drop=True)
+            )
 
-        self.datasets["test"] = all_data.loc[all_data.split == "test"]
-        self.datasets["train"] = all_data.loc[all_data.split == "train"]
-        self.datasets["valid"] = all_data.loc[all_data.split == "val"]
+    def _label_splits(self, row):
+        if row.name in self.train_inds:
+            return "train"
+        elif row.name in self.val_inds:
+            return "val"
+        elif row.name in self.test_inds:
+            return "test"
 
     def prepare_data(self):
         """
-        Download dataset
+        Prepare dataset
         """
-        pass
+        my_file = Path(self.data_dir) / f"variance_{self.x_label}_{self.c_label}.csv"
+        if my_file.is_file() and self.overwrite is False:
+            pass
+        else:
+            df = pd.read_csv(
+                "/allen/aics/assay-dev/MicroscopyOtherData/Viana/projects/cell_shape_variation/local_staging_beta/shapemode/manifest.csv"
+            )
+            train_inds, test_inds = train_test_split(
+                df.index,
+                test_size=30557,
+                train_size=173180,
+                stratify=df[self.stratify_column],
+                random_state=42,
+            )
+
+            dfs = {}
+            dfs["train"], dfs["test"] = df.loc[train_inds], df.loc[test_inds]
+
+            train_inds, val_inds = train_test_split(
+                dfs["train"].index,
+                test_size=30557,
+                stratify=dfs["train"][self.stratify_column],
+                random_state=42,
+            )
+
+            self.train_inds = train_inds
+            self.val_inds = val_inds
+            self.test_inds = test_inds
+
+            df["split"] = df.apply(lambda row: self._label_splits(row), axis=1)
+
+            # Add class weights
+            labels_unique, counts = np.unique(
+                df[self.stratify_column], return_counts=True
+            )
+            class_weights = [sum(counts) / c for c in counts]
+            class_weights_dict = {i: j for (i, j) in zip(labels_unique, class_weights)}
+            weights = [class_weights_dict[e] for e in df[self.stratify_column]]
+            df["ClassWeights"] = weights
+
+            if self.c_label not in ["DNA_PC" and "MEM_PC" and "DNA_MEM_PC"]:
+                # Add label encoding for str names
+                df[self.c_label + "_encoded"] = LabelEncoder().fit_transform(
+                    df[self.c_label]
+                )
+
+                df[self.c_label] = df[self.c_label]
+                df[self.c_encoded_label] = df[self.c_label + "_encoded"]
+
+            df.to_csv(
+                Path(self.data_dir) / f"variance_{self.x_label}_{self.c_label}.csv"
+            )
 
     def train_dataloader(self):
         """
