@@ -35,12 +35,12 @@ def train_mlp_vae(
     scheduler: str,
     x_label: str,
     c_label: str,
+    c_label_ind: str,
     x_dim: int,
     c_dim: int,
     enc_layers: list,
     dec_layers: list,
     beta: float,
-    c_label_ind: Optional[str] = None,
     num_classes: Optional[int] = None,
     **kwargs,
 ):
@@ -58,30 +58,43 @@ def train_mlp_vae(
         )
 
     # Load data module
-
-    datamodule = datamodules.__dict__[datamodule](
-        batch_size=batch_size,
-        num_workers=num_workers,
-        data_dir=data_dir,
-        x_label=x_label,
-        y_label=c_label,
-        c_label_ind=c_label_ind,
-        **kwargs,
-    )
-    datamodule.setup()
-
     if datamodule == "GaussianDataModule":
-        datamodule_no_shuffle = datamodules.__dict__[datamodule](
+        dm = datamodules.__dict__[datamodule](
             batch_size=batch_size,
             num_workers=num_workers,
             data_dir=data_dir,
             x_label=x_label,
-            y_label=c_label,
+            c_label=c_label,
             c_label_ind=c_label_ind,
+            x_dim=x_dim,
+            shuffle=True,
+            **kwargs,  # Like corr, length
+        )
+
+        dm_no_shuffle = datamodules.__dict__[datamodule](
+            batch_size=batch_size,
+            num_workers=num_workers,
+            data_dir=data_dir,
+            x_label=x_label,
+            c_label=c_label,
+            c_label_ind=c_label_ind,
+            x_dim=x_dim,
             shuffle=False,
             **kwargs,
         )
-        datamodule_no_shuffle.setup()
+    else:
+        dm = datamodules.__dict__[datamodule](
+            batch_size=batch_size,
+            num_workers=num_workers,
+            data_dir=data_dir,
+            x_label=x_label,
+            c_label=c_label,
+            c_label_ind=c_label_ind,
+            x_dim=x_dim,
+            **kwargs,
+        )
+        dm.prepare_data()
+        dm.setup()
 
     encoder = CBVAEEncoderMLP(
         x_dim=x_dim,
@@ -103,7 +116,6 @@ def train_mlp_vae(
         x_label=x_label,
         c_label=c_label,
         c_label_ind=c_label_ind,
-        num_classes=num_classes,
     )
 
     tb_logger = TensorBoardLogger(
@@ -134,21 +146,17 @@ def train_mlp_vae(
         verbose=True,
     )
 
-    early_stopping = EarlyStopping("val_loss")
-
     if datamodule == "GaussianDataModule":
         callbacks = [
             GPUStatsMonitor(),
             GlobalProgressBar(),
-            MLPVAELogging(datamodule=datamodule_no_shuffle),
-            early_stopping(),
+            MLPVAELogging(datamodule=dm_no_shuffle),
         ]
     elif datamodule == "VarianceSpharmCoeffs":
         callbacks = [
             GPUStatsMonitor(),
             GlobalProgressBar(),
-            MLPVAELogging(datamodule=datamodule),
-            early_stopping(),
+            MLPVAELogging(datamodule=dm),
             SpharmLatentWalk(),
         ]
 
@@ -167,10 +175,13 @@ def train_mlp_vae(
         automatic_optimization=False,
     )
 
-    trainer.fit(vae, datamodule)
+    trainer.fit(vae, dm)
 
     # test the model
-    trainer.test(datamodule=datamodule)
+    if datamodule == "GaussianDataModule":
+        trainer.test(datamodule=dm_no_shuffle)
+    else:
+        trainer.test(datamodule=dm)
 
     return checkpoint_callback.best_model_path
 
