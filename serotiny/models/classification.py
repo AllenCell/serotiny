@@ -2,7 +2,7 @@
 General classifier module, implemented as a Pytorch Lightning module
 """
 
-from typing import Optional
+from typing import Optional, Union
 from pathlib import Path
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -12,21 +12,16 @@ import numpy as np
 import torch
 from torch import nn
 from torch.nn import functional as F
+import torch.optim as opt
+
 import pytorch_lightning as pl
 
-from ..networks._2d import BasicCNN_2D, BasicNeuralNetwork, ResNet18Network
-from ..networks._3d import BasicCNN_3D, ResNet18_3D
-from .utils import acc_prec_recall, add_pr_curve_tensorboard
-
-AVAILABLE_NETWORKS = {
-    "mlp": BasicNeuralNetwork,
-    "basic2D": BasicCNN_2D,
-    "resnet18_2D": ResNet18Network,
-    "basic3D": BasicCNN_3D,
-    "resnet18_3D": ResNet18_3D,
-}
-AVAILABLE_OPTIMIZERS = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}
-AVAILABLE_SCHEDULERS = {"reduce_lr_plateau": torch.optim.lr_scheduler.ReduceLROnPlateau}
+from .utils import (
+    acc_prec_recall,
+    add_pr_curve_tensorboard,
+    find_optimizer,
+    find_lr_scheduler,
+)
 
 
 class ClassificationModel(pl.LightningModule):
@@ -58,11 +53,10 @@ class ClassificationModel(pl.LightningModule):
         Learning rate for the optimizer. Example: 1e-3
 
     optimizer: str
-        Str key to instantiate optimizer. Example: "adam"
+        str key to instantiate optimizer. Example: "Adam"
 
-    scheduler: str
+    lr_scheduler: str
         str key to instantiate learning rate scheduler
-        Example: "reduce_lr_plateau"
 
     dimensions: Optional[tuple, list]:
         Dimensions of each image channel. Only used for printing
@@ -79,8 +73,8 @@ class ClassificationModel(pl.LightningModule):
         classes: tuple,
         lr: float,
         optimizer: str,
-        scheduler: str,
-        dimensions: Optional[tuple] = None,
+        lr_scheduler: str,
+        dimensions: Optional[Union[tuple, list]] = None,
     ):
         super().__init__()
         # Can be accessed via checkpoint['hyper_parameters']
@@ -136,7 +130,7 @@ class ClassificationModel(pl.LightningModule):
         x = batch[self.hparams.x_label]
         y = batch[self.hparams.y_label]
         # Return floats because this is expected dtype for nn.Loss
-        return x.float(), y.long()
+        return x.float(), y.long().squeeze()
 
     def forward(self, x):
         output = self.network(x)
@@ -226,16 +220,6 @@ class ClassificationModel(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
 
         x, y = self.parse_batch(batch)
-        # if batch_idx == 0:
-        #     self.logger.experiment.add_figure(
-        #         "predictions vs actuals (val).",
-        #         plot_classes_preds(
-        # self.network,
-        # x,
-        # y,
-        # self.hparams.classes),
-        #         global_step=self.current_epoch,
-        #     )
         yhat = self(x)
         loss = nn.CrossEntropyLoss()(yhat, y)
         # Default logger for validation step is True
@@ -284,6 +268,8 @@ class ClassificationModel(pl.LightningModule):
                 global_step=self.current_epoch,
             )
 
+        return {"val_loss": avg_loss}
+
     def test_step(self, batch, batch_idx):
 
         x, y = self.parse_batch(batch)
@@ -327,28 +313,11 @@ class ClassificationModel(pl.LightningModule):
             )
 
     def configure_optimizers(self):
-        # with it like shceduler
-        if self.hparams.optimizer in AVAILABLE_OPTIMIZERS:
-            optimizer_class = AVAILABLE_OPTIMIZERS[self.hparams.optimizer]
-            optimizer = optimizer_class(self.parameters(), lr=self.hparams.lr)
-        else:
-            raise Exception(
-                (
-                    f"optimizer {self.hparams.optimizer} not available, "
-                    f"options are {list(AVAILABLE_OPTIMIZERS.keys())}"
-                )
-            )
+        optimizer_class = find_optimizer(self.hparams.optimizer)
+        optimizer = optimizer_class(self.parameters(), lr=self.hparams.lr)
 
-        if self.hparams.scheduler in AVAILABLE_SCHEDULERS:
-            scheduler_class = AVAILABLE_SCHEDULERS[self.hparams.scheduler]
-            scheduler = scheduler_class(optimizer)
-        else:
-            raise Exception(
-                (
-                    f"scheduler {self.hparams.scheduler} not available, "
-                    f"options are {list(AVAILABLE_SCHEDULERS.keys())}"
-                )
-            )
+        scheduler_class = find_lr_scheduler(self.hparams.lr_scheduler)
+        scheduler = scheduler_class(optimizer)
 
         return (
             {

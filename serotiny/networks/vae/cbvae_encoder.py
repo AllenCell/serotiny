@@ -1,23 +1,62 @@
+from typing import Sequence
+
 import numpy as np
 import torch
 
 from torch import nn
 
 from torch.nn.utils import spectral_norm
-from ..layers._2d.down_residual import DownResidualLayer
-
 
 class CBVAEEncoder(nn.Module):
     def __init__(
         self,
-        n_latent_dim,
-        n_classes,
-        n_ch_target=1,
-        n_ch_ref=2,
-        conv_channels_list=[64, 128, 256, 512, 1024],
-        input_dims=[28, 28],
+        dimensionality: int,
+        n_latent_dim: int,
+        n_classes: int,
+        n_ch_target: int,
+        n_ch_ref: int,
+        conv_channels_list: Sequence[int],
+        input_dims: Sequence[int],
+        activation: str,
     ):
-        # super(Enc, self).__init__()
+        """
+        Decoder used in the final version of the pytorch_integrated_cell project.
+
+        Leverages DownResidualLayers, defined and described `layers/_xd/down_residual.py`
+
+        This class works for both 2d and 3d data, according to what is given by
+        `dimensionality`.
+
+        Parameters
+        ----------
+        dimensionality: int
+            Whether to instantiate a 2d or 3d model
+        n_latent_dim: int
+            Dimensionality of the latent space
+        n_classes: int
+            Number of classes (for conditioning)
+        n_ch_target: int
+            Number of channels on the target input
+        n_ch_ref: int
+            Number of channels on the reference input
+        conv_channels_list: Sequence[int]
+            Number of channels on the intermediate conv layers. Also used
+            to tell how many layers to use.
+        input_dims:
+            Dimensions of the input images
+        activation: str
+            String to specify activation function to be used in inner layers
+        """
+
+        assert len(input_dims) == dimensionality
+
+        if dimensionality == 2:
+            from ..layers._2d.down_residual import DownResidualLayer
+        elif dimensionality == 3:
+            from ..layers._3d.down_residual import DownResidualLayer
+        else:
+            raise ValueError("`dimensionality` has to be 2 or 3")
+
         super().__init__()
 
         self.n_latent_dim = n_latent_dim
@@ -32,13 +71,18 @@ class CBVAEEncoder(nn.Module):
         self.target_path = nn.ModuleList(
             [
                 DownResidualLayer(
-                    n_ch_target, conv_channels_list[0], ch_cond_list=target_cond_list
+                    n_ch_target, conv_channels_list[0], ch_cond_list=target_cond_list,
+                    activation=activation, activation_last=activation
                 )
             ]
         )
+
         for ch_in, ch_out in zip(conv_channels_list[0:-1], conv_channels_list[1:]):
             self.target_path.append(
-                DownResidualLayer(ch_in, ch_out, ch_cond_list=target_cond_list)
+                DownResidualLayer(
+                    ch_in, ch_out, ch_cond_list=target_cond_list,
+                    activation=activation, activation_last=activation
+                )
             )
 
             ch_in = ch_out

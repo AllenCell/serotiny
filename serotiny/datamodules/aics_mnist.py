@@ -1,3 +1,5 @@
+from typing import Sequence, Any
+
 import glob
 import tarfile
 from pathlib import Path
@@ -66,13 +68,13 @@ class AICS_MNIST_DataModule(BaseDataModule):
     num_workers: int
         Number of worker processes to create in dataloader
 
-    id_fields: List[str]
+    id_fields: Sequence
         Id column name for loader
 
-    channels: List
+    channels: Sequence
         List of channels in the images
 
-    select_channels: List
+    select_channels: Sequence
         List of channels to subset the original channel list
 
     data_dir: str
@@ -88,9 +90,9 @@ class AICS_MNIST_DataModule(BaseDataModule):
         data_dir: str,
         x_label: str,
         y_label: str,
-        channels: list,
-        select_channels: list,
-        id_fields: list,
+        channels: Sequence[Any],
+        select_channels: Sequence[Any],
+        id_fields: Sequence[Any],
         **kwargs
     ):
 

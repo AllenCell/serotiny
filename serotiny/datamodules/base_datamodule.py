@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from os import listdir
 from pathlib import Path
-from typing import List
+from typing import Sequence, Callable, Union
 
 import pytorch_lightning as pl
 from torchvision import transforms
@@ -20,10 +20,10 @@ class BaseDataModule(pl.LightningDataModule):
 
     Parameters
     -----------
-    transform_list: list
+    transform_list: Sequence[Callable]
         List of transforms to apply to val and test images
 
-    train_transform_list: list
+    train_transform_list: Sequence[Callable]
         List of transforms to apply to train images
 
     x_label: str
@@ -38,13 +38,13 @@ class BaseDataModule(pl.LightningDataModule):
     num_workers: int
         Number of worker processes to create in dataloader
 
-    id_fields: List[str]
+    id_fields: Sequence[Union[str, int]]
         Id column name for loader
 
-    channels: List
+    channels: Sequence[Union[str, int]]
         List of channels in the images
 
-    select_channels: List
+    select_channels: Sequence[Union[str, int]]
         List of channels to subset the original channel list
 
     data_dir: str
@@ -54,15 +54,15 @@ class BaseDataModule(pl.LightningDataModule):
 
     def __init__(
         self,
-        transform_list: list,
-        train_transform_list: list,
+        transform_list: Sequence[Callable],
+        train_transform_list: Sequence[Callable],
         x_label: str,
         y_label: str,
         batch_size: int,
         num_workers: int,
-        id_fields: List[str],
-        channels: List,
-        select_channels: List,
+        id_fields: Sequence[Union[str, int]],
+        channels: Sequence[Union[str, int]],
+        select_channels: Sequence[Union[str, int]],
         data_dir: str,
         **kwargs,
     ):

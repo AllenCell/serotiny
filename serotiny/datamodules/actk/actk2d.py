@@ -1,4 +1,4 @@
-# Note - you must have torchvision installed for this example
+from typing import Sequence, Union, Callable
 from torchvision import transforms
 from ...image import png_loader
 from ...data import load_data_loader
@@ -26,13 +26,13 @@ class ACTK2DDataModule(BaseDataModule):
     num_workers: int
         Number of worker processes to create in dataloader
 
-    id_fields: List[str]
+    id_fields: Sequence[Union[str, int]]
         Id column name for loader
 
-    channels: List
+    channels: Sequence[Union[str, int]]
         List of channels in the images
 
-    select_channels: List
+    select_channels: Sequence[Union[str, int]]
         List of channels to subset the original channel list
 
     data_dir: str
@@ -56,16 +56,18 @@ class ACTK2DDataModule(BaseDataModule):
 
     def __init__(
         self,
-        batch_size: int,
-        num_workers: int,
+        transform_list: Sequence[Callable],
+        train_transform_list: Sequence[Callable],
         x_label: str,
         y_label: str,
-        data_dir: str,
-        resize_to: int,
+        batch_size: int,
+        num_workers: int,
+        id_fields: Sequence[Union[str, int]],
+        channels: Sequence[Union[str, int]],
+        select_channels: Sequence[Union[str, int]],
         encoded_label_suffix: str,
-        channels: list,
-        select_channels: list,
         classes: list,
+        data_dir: str,
         **kwargs,
     ):
 

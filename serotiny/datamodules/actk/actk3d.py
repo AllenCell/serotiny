@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import Sequence, Union
 
 import numpy as np
 import torch
@@ -33,20 +33,20 @@ class ACTK3DDataModule(BaseDataModule):
     num_workers: int
         Number of worker processes to create in dataloader
 
-    id_fields: List[str]
+    id_fields: Sequence[Union[str, int]]
         Id column name for loader
 
-    channels: List
+    channels: Sequence[Union[str, int]]
         List of channels in the images
 
-    select_channels: List
+    select_channels: Sequence[Union[str, int]]
         List of channels to subset the original channel list
 
     data_dir: str
         Path to data folder containing csv's for train, val,
         and test splits
 
-    resize_dims: Tuple[int]
+    resize_dims: Sequence[int]
         Resize input images to this size
 
     encoded_label_suffix: str
@@ -68,10 +68,10 @@ class ACTK3DDataModule(BaseDataModule):
         x_label: str,
         y_label: str,
         data_dir: str,
-        channels: List,
-        select_channels: List,
-        classes: List,
-        resize_dims: Tuple[int],
+        channels: Sequence[Union[str, int]],
+        select_channels: Sequence[Union[str, int]],
+        classes: Sequence[Union[str, int]],
+        resize_dims: Sequence[int],
         encoded_label_suffix: str,
         **kwargs,
     ):

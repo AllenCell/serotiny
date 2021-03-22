@@ -1,34 +1,31 @@
 """
-General conditional beta variational autoencoder module, 
+General conditional beta variational autoencoder module,
 implemented as a Pytorch Lightning module
 """
+from typing import Sequence
 import inspect
 
+import logging
+logger = logging.getLogger("lightning")
+logger.propagate = False
+
 import torch
-from torch.nn import functional as F
+import torch.optim as opt
+import torch.nn as nn
+import torch.nn.functional as F
+
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.parsing import get_init_args
 
 from ..losses import KLDLoss
-from .utils import index_to_onehot
-
-AVAILABLE_OPTIMIZERS = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}
-AVAILABLE_SCHEDULERS = {"reduce_lr_plateau": torch.optim.lr_scheduler.ReduceLROnPlateau}
-
-
-def find_optimizer(optimizer_name, parameters, lr):
-    if optimizer_name in AVAILABLE_OPTIMIZERS:
-        optimizer_class = AVAILABLE_OPTIMIZERS[optimizer_name]
-        optimizer = optimizer_class(parameters, lr=lr)
-    else:
-        raise KeyError(
-            f"optimizer {optimizer_name} not available, "
-            f"options are {list(AVAILABLE_OPTIMIZERS.keys())}"
-        )
-    return optimizer
+from .utils import index_to_onehot, find_optimizer
 
 
 def reparameterize(mu, log_var, add_noise=True):
+    """
+    Util function to apply the reparameterization trick, for the isotropic
+    gaussian case
+    """
     if add_noise:
         std = torch.exp(0.5 * log_var)
         eps = torch.randn_like(std)
@@ -42,23 +39,60 @@ def reparameterize(mu, log_var, add_noise=True):
 class CBVAEModel(pl.LightningModule):
     def __init__(
         self,
-        encoder,
-        decoder,
-        optimizer_encoder,
-        optimizer_decoder,
-        crit_recon,
-        lr=1e-3,
-        beta=1,
-        kld_reduction="sum",
-        x_label="x",
-        class_label="class",
-        num_classes=0,
-        reference="ref",
-        target_channels=0,
-        reference_channels=[1, 2],
-        input_dims=[28, 28],
-        auto_padding=True,
+        encoder: nn.Module,
+        decoder: nn.Module,
+        optimizer_encoder: opt.Optimizer,
+        optimizer_decoder: opt.Optimizer,
+        crit_recon: nn.Module,
+        lr: float,
+        beta: float,
+        x_label: str,
+        class_label: str,
+        num_classes: int,
+        target_channels: Sequence[int],
+        reference_channels: Sequence[int],
+        input_dims: Sequence[int],
+        kld_reduction: str = "sum",
+        auto_padding: bool = True,
     ):
+        """
+        Instantiate a CBVAEModel, which implements the final version of the
+        pytorch_integrated_cell project.
+
+        Parameters
+        ----------
+        encoder: nn.Module
+            Encoder network. (Untested with other than CBVAEEncoder)
+        decoder: nn.Module
+            Decoder network. (Untested with other than CBVAEDecoder)
+        optimizer_encoder: opt.Optimizer
+            Optimizer for the encoder network
+        optimizer_decoder: opt.Optimizer
+            Optimizer for the decoder network
+        crit_recon: nn.Module
+            Loss function for the recognition loss term
+        lr: float
+            Learning rate for training
+        beta: float
+            Beta parameter - the weight of the KLD term in the loss function
+        x_label: str
+            Label for the input, to retrieve it from the batches
+        class_label: str
+            Label for the class, to retrieve it from the batches
+        num_classes: int
+            Number of classes in the dataset
+        target_channels: Sequence[int]
+            Indices of target channels
+        reference_channels: Sequence[int]
+            Indices of reference channels
+        input_dims: Sequence[int]
+            Dimensions of the input images
+        kld_reduction: str
+            Reduction operation for the KLD loss term
+        auto_padding: bool
+            Whether to apply automatic padding to the generated images, to match
+            the input_dimensions
+        """
         super().__init__()
 
         # store init args except for encoder & decoder, to avoid copying
@@ -79,7 +113,6 @@ class CBVAEModel(pl.LightningModule):
 
     def parse_batch(self, batch):
         x = batch[self.hparams.x_label].float()
-        print(x.shape)
         x_target = x[:, self.hparams.target_channels]
         if self.hparams.reference_channels is not None:
             x_reference = x[:, self.hparams.reference_channels]
@@ -169,27 +202,33 @@ class CBVAEModel(pl.LightningModule):
         x_hat, z_latent, recon_loss, kld_loss = self(x_target, x_reference, x_class)
         loss = recon_loss + self.beta * kld_loss
 
-        # Default logger=False for training_step
-        # set it to true to log train loss to all lggers
-        self.log("test reconstruction loss", recon_loss, logger=True)
-        self.log("test kld loss", kld_loss, logger=True)
-
         return {
-            "test_loss": loss,
+            "total_loss": loss,
+            "kld_loss": self.beta * kld_loss,
+            "recon_loss": recon_loss,
             "x_hat": x_hat,
             "x_class": x_class,
             "z_latent": z_latent,
             "batch_idx": batch_idx,
         }
 
-    def configure_optimizers(self):
-        encoder_optimizer = find_optimizer(
-            self.hparams.optimizer_encoder, self.encoder.parameters(), self.hparams.lr
-        )
+    def test_step_end(self, output):
+        # TODO: this should be using a callback defined elsewhere to decide
+        # what to do after the test step. Sometimes we want metrics, sometimes
+        # we want to store the latent representations, etc.
+        recon_loss = output["recon_loss"]
+        kld_loss = output["kld_loss"]
+        total_loss = output["total_loss"]
+        self.log("test reconstruction loss", recon_loss, logger=True)
+        self.log("test kld loss", kld_loss, logger=True)
+        self.log("test total loss", total_loss, logger=True)
 
-        decoder_optimizer = find_optimizer(
-            self.hparams.optimizer_decoder, self.decoder.parameters(), self.hparams.lr
-        )
+    def configure_optimizers(self):
+        opt_class = find_optimizer(self.hparams.optimizer_encoder)
+        encoder_optimizer = opt_class(self.encoder.parameters(), self.hparams.lr)
+
+        opt_class = find_optimizer(self.hparams.optimizer_decoder)
+        decoder_optimizer = opt_class(self.decoder.parameters(), self.hparams.lr)
 
         return (
             {
