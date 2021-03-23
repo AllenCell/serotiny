@@ -13,8 +13,8 @@ from pytorch_lightning.callbacks import ModelCheckpoint, GPUStatsMonitor, EarlyS
 
 #from serotiny.networks.vae import CBVAEDecoder, CBVAEEncoder
 #from serotiny.models import CBVAEModel
-from serotiny.networks._3d import Unet
-from serotiny.models import UnetModel
+from serotiny.networks._3d.unet import Unet
+from serotiny.models.unet import UnetModel
 
 import serotiny.datamodules as datamodules
 import serotiny.losses as losses
@@ -47,7 +47,7 @@ def train_unet(
     #activation: str,
     #activation_last: str,
     #conv_channels_list: Sequence[int],
-    input_dims: Sequence[int],  # Unet: Do we need this?
+    #input_dims: Sequence[int],  # Unet: Do we need this?
     #target_channels: Sequence[int],
     #reference_channels: Optional[Sequence[int]],
     #beta: float,
@@ -56,11 +56,11 @@ def train_unet(
     #kld_reduction: str = "sum",
     input_channels: Sequence[str],  # Unet
     output_channels: Sequence[str],  # Unet
-    depth int,  # Unet
-    channel_fan int,  # Unet
-    pooling, str,  # Unet
-    kernel_size int,  # Unet
-    padding,  # Unet
+    depth: int,  # Unet
+    channel_fan: int,  # Unet
+    pooling: str,  # Unet
+    kernel_size: int,  # Unet
+    padding: int,  # Unet
     **kwargs,
 ):
     """
@@ -154,61 +154,16 @@ def train_unet(
     #crit_recon = losses.__dict__[crit_recon]()
     loss = losses.__dict__[loss]()
     
-    '''
-    encoder = CBVAEEncoder(
-        dimensionality=dimensionality,
-        n_latent_dim=n_latent_dim,
-        n_classes=n_classes,
-        n_ch_target=len(target_channels),
-        n_ch_ref=len(reference_channels),
-        conv_channels_list=conv_channels_list,
-        input_dims=input_dims,
-        activation=activation,
-    )
-
-    decoder = CBVAEDecoder(
-        dimensionality=dimensionality,
-        n_latent_dim=n_latent_dim,
-        n_classes=n_classes,
-        n_ch_target=len(target_channels),
-        n_ch_ref=len(reference_channels),
-        # assuming that conv_channels_list for the decoder is
-        # the reverse of that for the encoder
-        conv_channels_list=conv_channels_list[::-1],
-        imsize_compressed=encoder.imsize_compressed,
-        activation=activation,
-        activation_last=activation_last,
-    )
-    '''
-    
     network = Unet(
         depth=depth, 
         in_channels=len(input_channels), 
         channel_fan=channel_fan, 
-        out_channels=len(input_channels), 
+        out_channels=len(output_channels), 
         pooling=pooling, 
         kernel_size=kernel_size, 
         padding=padding)
     
-    '''
-    vae = CBVAEModel(
-        encoder,
-        decoder,
-        optimizer_encoder=optimizer_encoder,
-        optimizer_decoder=optimizer_decoder,
-        crit_recon=crit_recon,
-        x_label=x_label,
-        class_label=class_label,
-        num_classes=n_classes,
-        target_channels=target_channels,
-        reference_channels=reference_channels,
-        lr=lr,
-        beta=beta,
-        kld_reduction=kld_reduction,
-        input_dims=input_dims,
-        auto_padding=auto_padding,
-    )
-    '''
+    #network.print_network()
     
     unet_model = UnetModel(
         network=network,
@@ -219,7 +174,7 @@ def train_unet(
         input_channels=input_channels,
         output_channels=output_channels,
         lr=lr,
-        input_dims=input_dims,
+        #input_dims=network.dims,  # TODO: Passing input image dims to model, but is not used there?
     )
     
     tb_logger = TensorBoardLogger(
@@ -251,6 +206,7 @@ def train_unet(
         GlobalProgressBar(),
         early_stopping,
     ]
+    
     trainer = pl.Trainer(
         logger=[tb_logger],
         # accelerator="ddp",
@@ -263,7 +219,7 @@ def train_unet(
         benchmark=False,
         profiler=False,
         deterministic=True,
-        automatic_optimization=False,
+        #automatic_optimization=False,  # Set this to True (default) for automatic optimization
     )
 
     trainer.fit(unet_model, datamodule)
@@ -276,4 +232,4 @@ def train_unet(
 
 
 if __name__ == "__main__":
-    fire.Fire(train_vae)
+    fire.Fire(train_unet)

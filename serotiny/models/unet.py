@@ -33,7 +33,7 @@ class UnetModel(pl.LightningModule):
         input_channels: Sequence[str],
         output_channels: Sequence[str],
         lr: float,
-        input_dims: Sequence[int],
+        #input_dims: Sequence[int],
     ):
         """
         Instantiate a UnetModel.
@@ -75,6 +75,9 @@ class UnetModel(pl.LightningModule):
         self.loss = loss
 
     def parse_batch(self, batch):
+        # TODO: The values of x_label and y_label are used as keys in the batch dictionary.
+        #       If they are the same column names, there may be conflict
+        #print(f'batch = {batch}')
         x = batch[self.hparams.x_label].float()
         y = batch[self.hparams.y_label].float()
 
@@ -91,14 +94,23 @@ class UnetModel(pl.LightningModule):
 
         return y_hat, loss
 
-    def training_step(self, batch, batch_idx, optimizer_idx):
+    # NOTE: Had to remove optimizer_idx if using automatic backprop
+    #def training_step(self, batch, batch_idx, optimizer_idx):
+    def training_step(self, batch, batch_idx):
         x, y = self.parse_batch(batch)
         y_hat, loss = self(x, y)
 
-        self.manual_backward(loss)
-        optimizer = self.hparams.optimizer
-        optimizer.step()
-        optimizer.zero_grad()
+        # NOTE: Nothing needs to be done here with backprop if using
+        #       automatic optimization
+        
+        #optimizer = self.hparams.optimizer
+        
+        #opt = self.optimizers()
+        #self.manual_backward(loss, opt)
+        #optimizer.step()
+        #optimizer.zero_grad()
+        #opt.step()
+        #opt.zero_grad()
 
         # Default logger=False for training_step
         # set it to true to log train loss to all lggers
@@ -133,7 +145,7 @@ class UnetModel(pl.LightningModule):
         # TODO: this should be using a callback defined elsewhere to decide
         # what to do after the test step. Sometimes we want metrics, sometimes
         # we want to store the latent representations, etc.
-        loss = output["loss"]
+        loss = output["test_loss"]
         self.log("test loss", loss, logger=True)
 
     def configure_optimizers(self):

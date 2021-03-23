@@ -7,11 +7,11 @@ from torchvision import transforms
 import torchio.transforms as tiotransforms
 from aicsimageprocessing.resize import resize_to
 
-from ...image import tiff_loader_CZYX
-from ...data import load_data_loader
-from ...data.loaders import Load3DImage, LoadClass, LoadColumns
-from ..constants import DatasetFields
-from ..base_datamodule import BaseDataModule
+from ..image import tiff_loader_CZYX
+from ..data import load_data_loader
+from ..data.loaders import Load3DImage, LoadClass, LoadColumns
+from .constants import DatasetFields
+from .base_datamodule import BaseDataModule
 
 
 class ImageImage(BaseDataModule):
@@ -93,7 +93,7 @@ class ImageImage(BaseDataModule):
                 ),
                 transforms.Lambda(lambda x: torch.tensor(x)),
                 tiotransforms.ToCanonical(),
-                tiotransforms.RandomFlip(),
+                #tiotransforms.RandomFlip(),  # NOTE: Gui suggestion - we don't want to do random flip for unet
             ],
             x_label=x_label,
             y_label=y_label,

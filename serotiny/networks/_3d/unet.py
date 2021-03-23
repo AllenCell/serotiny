@@ -36,7 +36,12 @@ class Unet(nn.Module):
             pooling: options are (average, max)
 
         TODO:
-            - Combine channels_down/up with networks_down/up
+            - Add auto-padding so we don't see mismatches when performing the cross-branch
+              concatenations
+            - Separate channel_fan between first layer and the next for double_conv (right
+              now this calculation is entirely done in the unet.py)
+            - Separate kernel_size, stride, and padding for double_conv, pooling, up_conv,
+              UpConv, DownConv, and conv_out
         """
 
         super().__init__()
@@ -57,11 +62,17 @@ class Unet(nn.Module):
 
         # Create the down pathway by traversing the downward path, including the bottom-most layer
 
-        self.networks_down = {}
+        # NOTE: To store nn modules, we need to use nn.ModuleDict{} instead of a regular dictionary,
+        #       and the keys (which indicates the network levels) must be strings. Also, we cannot
+        #       store non-module info in nn.ModuleDict{}, such as the n_in and n_out tuples, so we
+        #       need to use separate channels_down{} and channels_up{} dictionaries for that purpose,
+        #       and also use their keys (integers) to traverse up and down the network
+        self.channels_down = {}
+        self.networks_down = nn.ModuleDict({})
 
         for current_depth in range(depth, -1, -1):
 
-            self.networks_down[current_depth] = {}
+            self.networks_down[str(current_depth)] = nn.ModuleDict({})
 
             # At the top layer
             if current_depth == depth:
@@ -71,11 +82,11 @@ class Unet(nn.Module):
                 )  # BUG? Was only channel_fan before. Not bug: label-free applied channel_fan only in the top layer
 
             else:
-                n_in = self.networks_down[current_depth + 1]["channels_n_inout"][1]
+                n_in = self.channels_down[current_depth + 1][1]
                 n_out = n_in * channel_fan  # TODO: Was hardcoded to 2 in label-free?
 
-            self.networks_down[current_depth]["channels_n_inout"] = (n_in, n_out)
-            self.networks_down[current_depth]["subnet"] = DownConvolution(
+            self.channels_down[current_depth] = (n_in, n_out)
+            self.networks_down[str(current_depth)]["subnet"] = DownConvolution(
                 current_depth,
                 n_in,
                 n_out,
@@ -86,28 +97,29 @@ class Unet(nn.Module):
 
         # Create the up pathway by traversing the upward path
 
-        self.networks_up = {}
+        self.channels_up = {}
+        self.networks_up = nn.ModuleDict({})
 
-        for current_depth in sorted(list(self.networks_down.keys())):
+        for current_depth in sorted(list(self.channels_down.keys())):
 
             if current_depth == 0:
                 pass
             else:
-                self.networks_up[current_depth] = {}
+                self.networks_up[str(current_depth)] = nn.ModuleDict({})
 
-                n_in = self.networks_down[current_depth - 1]["channels_n_inout"][1]
+                n_in = self.channels_down[current_depth - 1][1]
                 n_out = (
                     n_in // channel_fan
                 )  # TODO: Support values of channel_fan other than 2 (was hardcoded to 2 in label-free for calling _Net_recurse)
 
-                self.networks_up[current_depth]["channels_n_inout"] = (n_in, n_out)
-                self.networks_up[current_depth]["subnet"] = UpConvolution(
+                self.channels_up[current_depth] = (n_in, n_out)
+                self.networks_up[str(current_depth)]["subnet"] = UpConvolution(
                     current_depth, n_in, n_out, kernel_size=kernel_size, padding=padding
                 )
 
         # In original paper, kernel_size = 1
-        self.conv_out = torch.nn.Conv3d(
-            self.networks_up[depth]["channels_n_inout"][1],
+        self.conv_out = nn.Conv3d(
+            self.channels_up[depth][1],
             out_channels,
             kernel_size=kernel_size,
             stride=1,
@@ -140,27 +152,22 @@ class Unet(nn.Module):
 
     def forward(self, x):
 
-        network_layers_down = sorted(self.networks_down.keys(), reverse=True)
-        network_layers_up = sorted(self.networks_up.keys(), reverse=False)
+        network_layers_down = sorted(self.channels_down.keys(), reverse=True)
+        network_layers_up = sorted(self.channels_up.keys(), reverse=False)
 
         x_previous_layer = x
         doubleconv_down_out = {}
-
+        
         for current_depth in network_layers_down:
             print(f"Level = {current_depth}")
 
-            x_previous_layer, x_doubleconv_down = self.networks_down[current_depth][
-                "subnet"
-            ](x_previous_layer)
-            doubleconv_down_out[
-                current_depth
-            ] = x_doubleconv_down  # Save the double conv output for concatenation
-
+            x_previous_layer, x_doubleconv_down = self.networks_down[str(current_depth)]["subnet"](x_previous_layer)
+            
+            doubleconv_down_out[current_depth] = x_doubleconv_down  # Save the double conv output for concatenation
+            
         for current_depth in network_layers_up:
             print(f"Level = {current_depth}")
 
-            x_previous_layer = self.networks_up[current_depth]["subnet"](
-                x_previous_layer, doubleconv_down_out[current_depth]
-            )
-
+            x_previous_layer = self.networks_up[str(current_depth)]["subnet"](x_previous_layer, doubleconv_down_out[current_depth])
+            
         return self.conv_out(x_previous_layer)
