@@ -12,7 +12,7 @@ from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
 from pytorch_lightning.callbacks import ModelCheckpoint, GPUStatsMonitor, EarlyStopping
 
 from serotiny.progress_bar import GlobalProgressBar
-from serotiny.networks._2d import CBVAEEncoderMLP, CBVAEDecoderMLP
+from serotiny.networks.vae import CBVAEEncoderMLP, CBVAEDecoderMLP
 from serotiny.models import CBVAEMLPModel
 
 import serotiny.datamodules as datamodules
