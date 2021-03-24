@@ -41,8 +41,11 @@ def train_mlp_vae(
     enc_layers: list,
     dec_layers: list,
     beta: float,
-    num_classes: Optional[int] = None,
-    **kwargs,
+    length: Optional[int] = None,  # For Gaussian
+    corr: Optional[bool] = False,  # For Gaussian
+    id_fields: Optional[list] = None,  # For Spharm
+    set_zero: Optional[bool] = False,  # For Spharm
+    overwrite: Optional[bool] = False,  # For Spharm
 ):
     """
     Instantiate and train a bVAE.
@@ -68,7 +71,8 @@ def train_mlp_vae(
             c_label_ind=c_label_ind,
             x_dim=x_dim,
             shuffle=True,
-            **kwargs,  # Like corr, length
+            length=length,
+            corr=corr,
         )
 
         dm_no_shuffle = datamodules.__dict__[datamodule](
@@ -80,7 +84,8 @@ def train_mlp_vae(
             c_label_ind=c_label_ind,
             x_dim=x_dim,
             shuffle=False,
-            **kwargs,
+            length=length,
+            corr=corr,
         )
     else:
         dm = datamodules.__dict__[datamodule](
@@ -91,7 +96,9 @@ def train_mlp_vae(
             c_label=c_label,
             c_label_ind=c_label_ind,
             x_dim=x_dim,
-            **kwargs,
+            set_zero=set_zero,
+            overwrite=overwrite,
+            id_fields=id_fields,
         )
         dm.prepare_data()
         dm.setup()
@@ -169,10 +176,6 @@ def train_mlp_vae(
         progress_bar_refresh_rate=5,
         checkpoint_callback=checkpoint_callback,
         callbacks=callbacks,
-        benchmark=False,
-        profiler=False,
-        deterministic=True,
-        automatic_optimization=False,
     )
 
     trainer.fit(vae, dm)
