@@ -86,12 +86,13 @@ class SpharmLatentWalk(Callback):
         for rank, z_dim in enumerate(ranked_z_dim_list):
             # Set subplots
             fig, ax_array = plt.subplots(
-                3, len(self.latent_walk_range),
+                3,
+                len(self.latent_walk_range),
                 squeeze=False,
                 figsize=(30, 30),
             )
             count = 0
-            for value in self.latent_walk_range:
+            for value_index, value in enumerate(self.latent_walk_range):
                 z_inf = torch.zeros(batch_size, latent_dims)
                 z_inf[:, z_dim] = value
                 z_inf = z_inf.cuda(device=0)
@@ -115,24 +116,19 @@ class SpharmLatentWalk(Callback):
                 img, origin = cytoparam.voxelize_meshes([mesh])
 
                 for proj in [0, 1, 2]:
-                    ax = ax_array.flatten()[count]
 
-                    ax.set_xlim([0, 150])
-                    ax.set_ylim([0,120])
-                    ax.set_title(f"value_{value}_project_{proj}")
-                    ax.imshow(img.max(proj), cmap='gray')
+                    ax_array[proj, value_index].set_title(
+                        f"value_{value}_project_{proj}"
+                    )
+                    ax_array[proj, value_index].imshow(img.max(proj), cmap="gray")
                     count += 1
 
             [ax.axis("off") for ax in ax_array.flatten()]
             # Save figure
             ax_array.flatten()[0].get_figure().savefig(
-                        self.save_dir
-                        / Path(
-                            f"./z_dim_{z_dim}_rank_{rank}_"
-                            + f"value_{value}_project_{proj}.png"
-                        ),
-                        dpi=200,
-                            )
+                self.save_dir / Path(f"./z_dim_{z_dim}_rank_{rank}"),
+                dpi=200,
+            )
 
             # Close figure, otherwise clogs memory
             plt.close(fig)
