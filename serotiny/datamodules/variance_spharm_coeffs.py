@@ -221,7 +221,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
             weights = [class_weights_dict[e] for e in df[self.stratify_column]]
             df["ClassWeights"] = weights
 
-            if self.c_label not in ["DNA_PC" and "MEM_PC" and "DNA_MEM_PC"]:
+            if self.c_label not in ["DNA_PC", "MEM_PC", "DNA_MEM_PC"]:
                 # Add label encoding for str names
                 df[self.c_label + "_encoded"] = LabelEncoder().fit_transform(
                     df[self.c_label]
