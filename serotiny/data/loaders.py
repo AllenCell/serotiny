@@ -82,3 +82,19 @@ class Load3DImage:
             mask_thresh=0,
             transform=self.transform,
         )
+
+def infer_extension_loader(extension, chosen_col="true_paths"):
+    if extension == ".png":
+        return Load2DImage(
+            chosen_col=chosen_col,
+            num_channels=3,
+            channel_indexes=[0,1,2],
+            transform=None
+        )
+
+    if extension == ".tiff":
+        return Load3DImage(
+            chosen_col=chosen_col,
+        )
+
+    raise NotImplementedError(f"Can't determine appropriate loader for given extension {extension}")
