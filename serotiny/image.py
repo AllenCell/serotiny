@@ -56,13 +56,13 @@ def normalize_img_zero_one(img_arr):
 
 
 def png_loader(
-    path_str, channel_order=None, indexes=None, transform=None, output_dtype=np.float64
+    path, channel_order=None, indexes=None, transform=None, output_dtype=np.float64
 ):
     """
-    Load an image from a png file given by `path_str` into a torch tensor.
+    Load an image from a png file given by `path` into a torch tensor.
     ---
     Parameters:
-      path_str: str -> path of the image to load
+      path: str -> path of the image to load
       channel_order: list (optional) -> order in which to load the channels
       indexes: TODO: explain this
       transform: callable (optional) -> transform to apply before returning
@@ -74,7 +74,7 @@ def png_loader(
     orientation, channel_indexes = define_channels(channel_order, indexes)
 
     aicsimageio.use_dask(False)
-    img = aicsimageio.AICSImage(path_str)
+    img = aicsimageio.AICSImage(path)
 
     # Adding this as a separate line since it may
     # speed up array loading
@@ -94,9 +94,27 @@ def png_loader(
 
     return img
 
+def infer_dims(img):
+    dims = dict(zip(img.dims, img.shape))
 
-def tiff_loader_CZYX(
-    path_str,
+    if "S" in dims:
+        if (dims["S"] > 1):
+            raise ValueError("Expected image with no S dimensions")
+    if "T" in dims:
+        if (dims["T"] > 1):
+            raise ValueError("Expected image with no T dimensions")
+
+    if (dims["X"] < 1) or (dims["Y"] < 1):
+        raise ValueError("Expected image with height and width")
+
+    if dims["Z"] <= 1:
+        # 2D tiff
+        return "CYX"
+    # 3D tiff
+    return "CZYX"
+
+def tiff_loader(
+    path,
     select_channels=None,
     output_dtype=np.float32,
     channel_masks=None,
@@ -104,24 +122,32 @@ def tiff_loader_CZYX(
     transform=None,
 ):
     """
-    Load TIFF image from path given by `path_str`.
-    ---
-    Parameters:
-      path_str: str -> path of the image to load
-      select_channels: list -> channels to be retrieved from the image
-      output_dtype: numpy dtype TODO: explain
-      channel_masks: TODO: explain
-      mask_thresh: float -> TODO: explain this
-      transform: callable (optional) -> transform to apply before returning
-    Returns:
-      torch.Tensor
-    """
-    aicsimg = aicsimageio.AICSImage(path_str)
-    channel_names = aicsimg.get_channel_names()
-    data = aicsimg.get_image_data("CZYX", S=0, T=0)
+    Load TIFF image from path given by `path`.
 
-    if select_channels is None:
+    Parameters
+    ----------
+    path: str
+        path of the image to load
+    select_channels: list
+        channels to be retrieved from the image
+    output_dtype: np.dtype
+        numpy dtype of output image
+    channel_masks: dict
+        dictionary with channel names as keys, and the names of the channels
+        that should be used to masked them as values.
+    mask_thresh: float
+        value under which a pixel value in the mask will signify masking off
+        the corresponding pixel in the original channel
+    transform: callable (optional)
+        transform to apply before returning the image
+
+    """
+    aicsimg = aicsimageio.AICSImage(path)
+    channel_names = aicsimg.get_channel_names()
+    if (select_channels is None) or (len(select_channels) == 0):
         select_channels = channel_names
+    if channel_masks is None:
+        channel_masks = {}
 
     if (not set(select_channels).issubset(channel_names)) or (
         not set(channel_masks.keys()).issubset(channel_names)
@@ -134,8 +160,18 @@ def tiff_loader_CZYX(
             f"\tselect_channels:: {select_channels}"
         )
 
+    loaded_channels = select_channels+list(channel_masks.values())
+    loaded_channels_idx = [channel_names.index(channel) for channel in loaded_channels]
+
+    dims = infer_dims(aicsimg)
+
+    if "Z" in dims:
+        data = aicsimg.get_image_data(dims, S=0, T=0, channels=loaded_channels_idx)
+    else:
+        data = aicsimg.get_image_data(dims, Z=0, S=0, T=0, channels=loaded_channels_idx)
+
     channel_map = {
-        channel_name: index for index, channel_name in enumerate(channel_names)
+        channel_name: index for index, channel_name in enumerate(loaded_channels)
     }
 
     if channel_masks is not None:
@@ -145,16 +181,11 @@ def tiff_loader_CZYX(
             mask = data[mask_index] > mask_thresh
             data[channel_index][~mask] = 0
 
-    if select_channels:
-        channel_indexes = [channel_map[channel] for channel in select_channels]
-        data = data[channel_indexes, ...]
-
     data = data.astype(output_dtype)
     if transform:
         data = transform(data)
 
     return data
-
 
 def change_resolution(
     path_in: Union[str, Path],
