@@ -77,7 +77,7 @@ class MLPVAELogging(Callback):  # pragma: no cover
                 ):
                     # For 2 structure integer conditions this is
                     # say [0, 1]
-                    num_classes = pl_module.num_classes
+                    num_classes = c.shape[1]
                     conds_list = []
                     for i in range(num_classes):
                         conds_list.append(i)

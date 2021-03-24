@@ -202,7 +202,7 @@ def make_plot_encoding(
                 kl_per_lt=None,
                 kl_vs_rcl=None,
             )
-            ax.scatter(z_means_x, z_means_y, marker=".", s=30, label=str(i))
+            ax.scatter(z_means_x, z_means_y, marker=".", s=30, label=str(conds_list[i]))
             if color is not None:
                 colormap_plot(
                     path_save_dir,
@@ -232,7 +232,7 @@ def make_plot_encoding(
                 kl_per_lt,
                 kl_vs_rcl,
             )
-            ax.scatter(z_means_x, z_means_y, marker=".", s=30, label=str(i))
+            ax.scatter(z_means_x, z_means_y, marker=".", s=30, label=str(conds_list[i]))
             if color is not None:
                 colormap_plot(
                     path_save_dir,
@@ -261,6 +261,7 @@ def make_plot_encoding(
         # if conds = [0,1,2] for a 2D Gaussian (X_test.size()[-1]),
         # then num_conds = 0, so
         # num_conds = X_test.size()[-1] - len(conds)
+
         tmp = kl_per_lt.loc[kl_per_lt["condition"] == str(conds_list[i])]
         tmp_2 = kl_vs_rcl.loc[kl_vs_rcl["condition"] == str(conds_list[i])]
         tmp = tmp.sort_values(by="kl_divergence", ascending=False)
@@ -272,7 +273,7 @@ def make_plot_encoding(
             data=tmp,
             x=tmp.index,
             y="kl_divergence",
-            label=str(i),
+            label=str(conds_list[i]),
             legend="brief",
         )
         bax.plot(x, y)
