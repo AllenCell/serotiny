@@ -7,7 +7,7 @@ from torchvision import transforms
 import torchio.transforms as tiotransforms
 from aicsimageprocessing.resize import resize_to
 
-from ...image import tiff_loader_CZYX
+from ...image import tiff_loader
 from ...data import load_data_loader
 from ...data.loaders import Load3DImage, LoadClass, LoadColumns
 from ..constants import DatasetFields
@@ -124,7 +124,7 @@ class ACTK3DDataModule(BaseDataModule):
         Load a single 2D image given a path
         """
         return self.transform(
-            tiff_loader_CZYX(
+            tiff_loader(
                 path_str=dataset[DatasetFields.CellImage3DPath].iloc[0],
                 select_channels=self.select_channels,
                 output_dtype=np.float32,

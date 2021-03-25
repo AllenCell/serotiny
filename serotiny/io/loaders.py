@@ -5,7 +5,7 @@ Module to define classes used to load values from manifest dataframes
 import torch
 import numpy as np
 
-from ..image import tiff_loader_CZYX, png_loader
+from .image import tiff_loader, png_loader
 
 __all__ = [
     "LoadColumns",
@@ -74,7 +74,7 @@ class Load3DImage:
         self.transform = transform
 
     def __call__(self, row):
-        return tiff_loader_CZYX(
+        return tiff_loader(
             path_str=row[self.chosen_col],
             select_channels=self.select_channels,
             output_dtype=np.float32,

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Union
+from typing import Union, Sequence, Optional
 import numpy as np
 import torch
 
@@ -7,10 +7,9 @@ from imageio import imwrite
 
 import aicsimageio
 import aicsimageio.transforms as transforms
-import aicsimageio.writers.ome_tiff_writer as ome_tiff_writer
-import aicsimageprocessing
+from aicsimageio.writers import OmeTiffWriter
 
-from skimage.transform import resize
+import aicsimageprocessing
 
 ALL_CHANNELS = ["C", "Y", "X", "S", "T", "Z"]
 EMPTY_INDEXES = {channel: 0 for channel in ALL_CHANNELS}
@@ -20,7 +19,6 @@ EMPTY_INDEXES = {channel: 0 for channel in ALL_CHANNELS}
 # Membrane to Red
 # Structure to Green
 # DNA to Blue
-DEFAULT_CHANNELS = ["membrane", "structure", "dna"]
 CHANNEL_COLORS = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
 
 DEFAULT_TRANSFORM = "CZYX"
@@ -44,15 +42,6 @@ def define_channels(channel_order, indexes=None):
         if isinstance(channels[channel], int):
             del channels[channel]
     return orientation, channels
-
-
-def normalize_img_zero_one(img_arr):
-    """
-    min-max-scale each channel in an image.
-    """
-    for i, channel in enumerate(img_arr.astype(np.float64)):
-        img_arr[i] = (channel - channel.min()) / (channel.max() - channel.min())
-    return img_arr
 
 
 def png_loader(
@@ -94,6 +83,7 @@ def png_loader(
 
     return img
 
+
 def infer_dims(img):
     dims = dict(zip(img.dims, img.shape))
 
@@ -113,6 +103,7 @@ def infer_dims(img):
     # 3D tiff
     return "CZYX"
 
+
 def tiff_loader(
     path,
     select_channels=None,
@@ -120,6 +111,7 @@ def tiff_loader(
     channel_masks=None,
     mask_thresh=0,
     transform=None,
+    return_channels=False,
 ):
     """
     Load TIFF image from path given by `path`.
@@ -140,6 +132,9 @@ def tiff_loader(
         the corresponding pixel in the original channel
     transform: callable (optional)
         transform to apply before returning the image
+    return_channels: bool
+        flag to determine whether to return a channel-index map when loading
+        the image
 
     """
     aicsimg = aicsimageio.AICSImage(path)
@@ -185,72 +180,30 @@ def tiff_loader(
     if transform:
         data = transform(data)
 
+    if return_channels:
+        return data, channel_map
     return data
 
-def change_resolution(
-    path_in: Union[str, Path],
-    path_out: Union[str, Path],
-    ZYX_resolution: Union[float, list],
+
+def tiff_writer(
+    img,
+    path: Union[str, Path],
+    channels: Optional[Sequence] = None,
 ):
-    """
-    Changes the resolution of a 3D OME TIFF file
-    Parameters
-    ----------
-    path_in: Union[str, Path]
-        The path to the input OME TIFF file
-    path_out: Union[str, Path]
-        The path to the output OME TIFF file
-    ZYX_resolution: Union[float, list]
-        Resolution scaling factor or desired ZYX dimensions (list of 3)
-    Returns
-    -------
-    data_new.shape: Tuple
-        Tuple that contains the image dimensions of output image
-    """
 
-    aicsimageio.use_dask(False)
-
-    # Read in image and get channel names
-    aicsimg = aicsimageio.AICSImage(path_in)
-    channel_names = aicsimg.get_channel_names()
-    data = aicsimg.get_image_data("CZYX", S=0, T=0)
-    # this function should change when we have multiple scenes (S>0) or time series (T>0)
-
-    # Get image dimensions
-    num_channels, z_dim, y_dim, x_dim = data.shape
-
-    # Get image dimensions of new image
-    if isinstance(ZYX_resolution, list):
-        if len(ZYX_resolution) != 3:
-            raise ValueError(
-                f"Resolution must be three long (Z Y X) not {len(ZYX_resolution)}"
-            )
-        z_dim_new, y_dim_new, x_dim_new = ZYX_resolution
+    if len(img.shape) == 4:
+        dims = "CZYX"
+    elif len(img.shape) == 3:
+        dims = "CYX"
     else:
-        z_dim_new = np.round(z_dim * ZYX_resolution).astype(np.int)
-        y_dim_new = np.round(y_dim * ZYX_resolution).astype(np.int)
-        x_dim_new = np.round(x_dim * ZYX_resolution).astype(np.int)
-    # Resize to get desired resolution
-    data_new = np.zeros(
-        (1, num_channels, z_dim_new, y_dim_new, x_dim_new), dtype="uint8"
-    )
-    for channel in np.arange(num_channels):
-        data_new[0, channel, :, :, :] = resize(
-            data[channel, :, :, :].squeeze(),
-            (z_dim_new, y_dim_new, x_dim_new),
-            preserve_range=True,
+        raise ValueError(f"Unexpected image shape {img.shape}")
+
+    with OmeTiffWriter(path) as writer:
+        writer.save(
+            img,
+            dimension_order=dims,
+            channel_names=channels
         )
-    data_new = data_new.astype((np.uint8))
-    # change this to do it across all channels at once, perhaps this can be done without for loop
-
-    # Write output image
-    with ome_tiff_writer.OmeTiffWriter(path_out, overwrite_file=True) as writer2:
-        writer2.save(
-            data=data_new, channel_names=channel_names, dimension_order="STCZYX"
-        )
-
-    return data_new.shape
-
 
 def project_2d(
     path_3d,
@@ -263,6 +216,7 @@ def project_2d(
 ):
     """
     Apply 2d projection to 3d image in path given by `path_3d`
+
     Parameters
     ----------
     path_3d: Union[str, Path]
@@ -279,6 +233,7 @@ def project_2d(
         TODO explain
     proj_all: bool
         TODO explain
+
     Returns
     -------
     projection.shape: Tuple
@@ -287,8 +242,8 @@ def project_2d(
     aicsimageio.use_dask(False)
 
     # load the 3d image
-    image_3d = tiff_loader_CZYX(
-        path_3d, select_channels=channels or DEFAULT_CHANNELS, channel_masks=masks
+    image_3d = tiff_loader(
+        path_3d, select_channels=channels, channel_masks=masks
     )
 
     # find the argument based on the axis
@@ -315,13 +270,10 @@ def project_2d(
         colors=CHANNEL_COLORS,
     )
 
-    # Convert to YXC for PNG writing
-    projection = transforms.transpose_to_dims(projection, "CYX", "YXC")
-
     # Drop size to uint8
     projection = projection.astype(np.uint8)
 
-    # Save to PNG
-    imwrite(path_2d, projection)
+    # Save to TIFF
+    tiff_writer(projection, path_2d, channels)
 
     return projection.shape
