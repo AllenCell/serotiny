@@ -5,7 +5,7 @@ import logging
 import fire
 
 from serotiny.csv import load_csv
-from serotiny.data import append_one_hot
+from serotiny.io import append_one_hot
 
 ###############################################################################
 

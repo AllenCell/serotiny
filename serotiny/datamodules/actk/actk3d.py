@@ -7,9 +7,9 @@ from torchvision import transforms
 import torchio.transforms as tiotransforms
 from aicsimageprocessing.resize import resize_to
 
-from ...image import tiff_loader
-from ...data import load_data_loader
-from ...data.loaders import Load3DImage, LoadClass, LoadColumns
+from ...io.image import tiff_loader
+from ...io import load_data_loader
+from ...io.loaders import Load3DImage, LoadClass, LoadColumns
 from ..constants import DatasetFields
 from ..base_datamodule import BaseDataModule
 
