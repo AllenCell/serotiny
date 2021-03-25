@@ -7,8 +7,9 @@ import pandas as pd
 
 from serotiny.datamodules import FolderDatamodule
 from serotiny.models.zoo import get_model
+from serotiny.io.image import tiff_writer
 
-def store_batch(batch, result, target_folder, mode):
+def store_batch(batch, result, target_folder, mode, channels):
     target_folder = Path(target_folder)
     if mode == "csv":
         df = pd.DataFrame(result)
@@ -21,7 +22,11 @@ def store_batch(batch, result, target_folder, mode):
     else:
         for field_name, tensors in result.items():
             for basename, tensor in zip(batch["basename"], tensors):
-                torch.save(tensor, target_folder / f"{basename}_{field_name}.pt")
+                tiff_writer(
+                    tensor,
+                    target_folder / f"{basename}_{field_name}.pt",
+                    channels
+                )
 
 def apply_model(
     model_path: str,
@@ -30,6 +35,7 @@ def apply_model(
     batch_size_dl: int,
     num_workers_dl: int,
     store_mode: str,
+    target_channels: Optional[str] = None,
     gpu_id: Optional[int] = None,
     model_root: Optional[Union[str, Path]] = None,
     manifest_path: Optional[Union[str, Path]] = None,
@@ -66,4 +72,4 @@ def apply_model(
                 batch = batch.cpu()
                 result = result.cpu()
 
-            store_batch(batch, result, target_path, store_mode)
+            store_batch(batch, result, target_path, store_mode, channels)
