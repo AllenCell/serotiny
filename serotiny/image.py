@@ -120,6 +120,9 @@ def tiff_loader_CZYX(
     channel_names = aicsimg.get_channel_names()
     data = aicsimg.get_image_data("CZYX", S=0, T=0)
 
+    if select_channels is None:
+        select_channels = channel_names
+
     if (not set(select_channels).issubset(channel_names)) or (
         not set(channel_masks.keys()).issubset(channel_names)
     ):
