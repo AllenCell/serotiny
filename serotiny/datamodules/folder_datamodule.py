@@ -17,6 +17,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 import serotiny.data.loaders as loaders
 from ..data.dataframe_dataset import DataframeDataset
 from ..data.loader_inference import infer_extension_loader
+from ..data.loaders import LoadColumns
 
 def _unnest_list(l):
     res = []
@@ -87,6 +88,7 @@ def make_folder_dataset(
     loader_dict: Dict[str, Union[Callable, Dict[str, Tuple[str, Dict]]]] = {},
     split_col: Optional[str] = None,
     x_label: str = "images",
+    return_paths: bool = False,
 ):
     loader_dict = copy.copy(loader_dict)
     loader_dict = _resolve_loaders(loader_dict)
@@ -108,8 +110,11 @@ def make_folder_dataset(
 
         df = pd.Series({f.name: f for f in list_of_files},
                         name="true_paths").to_frame()
+        df["basename"] = df.index.values
 
         loader_dict[x_label] = infer_extension_loader(extension)
+        if return_paths:
+            loader_dict["paths"] = LoadColumns(["basename"])
 
     manifest_df = None
     if manifest is not None:
@@ -118,10 +123,12 @@ def make_folder_dataset(
 
         manifest_df = pd.read_csv(manifest)
         manifest_df["basename"] = manifest_df[path_col].apply(lambda f: Path(f).name)
+        if return_paths:
+            loader_dict["paths"] = LoadColumns(["basename"])
 
     if (df is not None) and (manifest_df is not None):
         df = df.merge(right=manifest_df, how="left", left_index=True, right_on="basename")
-    elif (manifest_df is not None):
+    elif manifest_df is not None:
         df = manifest_df
 
     return DataframeDataset(dataframe=df, loaders=loader_dict, iloc=True, split_col=split_col)
@@ -183,6 +190,8 @@ class FolderDatamodule(pl.LightningDataModule):
         `test_set` is ignored.
     seed: int = 42,
         Seed used to make splits reproducible.
+    return_paths: bool = False,
+        Flag to determine whether to return the file paths in the generated batches
     """
 
     def __init__(
@@ -199,6 +208,7 @@ class FolderDatamodule(pl.LightningDataModule):
         test_set: bool = False,
         seed: int = 42,
         x_label: str = "images",
+        return_paths: bool = False,
     ):
 
         super().__init__()
@@ -206,7 +216,7 @@ class FolderDatamodule(pl.LightningDataModule):
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.dataset = make_folder_dataset(path, extension, manifest, path_col,
-                                           loader_dict, split_col, x_label)
+                                           loader_dict, split_col, x_label, return_paths)
         self.length = len(self.dataset)
 
         indices = list(range(self.length))
