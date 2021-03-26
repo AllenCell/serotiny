@@ -2,17 +2,18 @@ import pytest
 from serotiny_steps.train_unet import train_unet
 
 def test_unet_step():
-    input_channels = [1, 2]
-    output_channels = [0]
+    input_channels = ['dna']
+    output_channels = ['nucleus_segmentation']
     try:
         train_unet(
-            data_dir="./tmp",
+            data_dir="/allen/aics/modeling/VariancePlayground/manifests/",
             output_path="./tmp",
-            datamodule="DummyImageDatamodule",
-            #datamodule="ImageImage",
+            #datamodule="DummyImageDatamodule",
+            datamodule="ImageImage",
             batch_size=1,
             num_gpus=[1],
             num_workers=4,
+            id_fields=['CellId', 'CellIndex', 'FOVId'],
             num_epochs=1,
             lr=1e-3,
             optimizer="Adam",
@@ -20,6 +21,8 @@ def test_unet_step():
             test=True,
             x_label="dummy_x",
             y_label="dummy_y",
+            input_column="actk_rawseg",
+            output_column="actk_rawseg",
             input_channels=input_channels,
             output_channels=output_channels,
             depth=3,  # Unet-specific

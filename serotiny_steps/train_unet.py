@@ -31,6 +31,7 @@ def train_unet(
     batch_size: int,
     num_gpus: int,
     num_workers: int,
+    id_fields: Sequence[str],
     num_epochs: int,
     lr: float,
     optimizer: str,
@@ -38,6 +39,8 @@ def train_unet(
     test: bool,
     x_label: str,
     y_label: str,  # Unet
+    input_column: str,
+    output_column: str,
     input_channels: Sequence[str],  # Unet
     output_channels: Sequence[str],  # Unet
     depth: int,  # Unet
@@ -96,9 +99,12 @@ def train_unet(
     datamodule = datamodules.__dict__[datamodule](
         batch_size=batch_size,
         num_workers=num_workers,
+        id_fields=id_fields,
         data_dir=data_dir,
         x_label=x_label,
         y_label=y_label,
+        input_column=input_column,
+        output_column=output_column,
         input_channels=input_channels,
         output_channels=output_channels,
         **kwargs,

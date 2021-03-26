@@ -150,13 +150,13 @@ class UnetModel(pl.LightningModule):
         #####################
 
         if self.hparams.auto_padding:
-            #print(f'self.network.depth = {self.network.depth}')
-            #print(f'self.network.channel_fan = {self.network.channel_fan}')
-            #print(f'self.input_dims = {self.input_dims}')
+            print(f'self.network.depth = {self.network.depth}')
+            print(f'self.network.channel_fan = {self.network.channel_fan}')
+            print(f'self.input_dims = {self.input_dims}')
             
             # Ignore the first dimension (number of channels)
-            input_dims_xyz = self.input_dims[1:]
-            #print(f'input_dims_xyz = {input_dims_xyz}')
+            input_dims_xyz = self.input_dims
+            print(f'input_dims_xyz = {input_dims_xyz}')
             
             padding = self.get_unet_padding(list(input_dims_xyz), self.network.depth, self.network.channel_fan)
             #print(f'padding = {padding}')

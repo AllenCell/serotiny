@@ -120,8 +120,10 @@ def tiff_loader_CZYX(
     channel_names = aicsimg.get_channel_names()
     data = aicsimg.get_image_data("CZYX", S=0, T=0)
 
+    mask_keys = channel_masks.keys() if channel_masks else {}
+    
     if (not set(select_channels).issubset(channel_names)) or (
-        not set(channel_masks.keys()).issubset(channel_names)
+        not set(mask_keys).issubset(channel_names)
     ):
         raise KeyError(
             "Some elements of `select_channels` or `channel_masks` "

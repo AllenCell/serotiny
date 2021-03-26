@@ -67,30 +67,41 @@ class ImageImage(BaseDataModule):
         num_workers: int,
         x_label: str,
         y_label: str,
+        input_column: str,
+        output_column: str,
         data_dir: str,
         input_channels: Sequence[Union[str, int]],
         output_channels: Sequence[Union[str, int]],
-        resize_dims: Sequence[int],
+        id_fields: Sequence[str],
+        #resize_dims: Sequence[int],
         **kwargs,
     ):
-        self.resize_dims = resize_dims
+        #self.resize_dims = resize_dims
         #self.classes = classes
+        
+        self.input_column = input_column
+        self.output_column = output_column
+        
+        self.input_channels = input_channels
+        self.output_channels = output_channels
 
         super().__init__(
-            channels=channels,
-            select_channels=select_channels,
+            # TODO: Adjust base class parameters to match with this datamodule
+            channels=input_channels,
+            select_channels=input_channels,
             batch_size=batch_size,
             num_workers=num_workers,
+            id_fields=id_fields,
             transform_list=[
-                transforms.Lambda(
-                    lambda x: resize_to(x, (self.num_channels, *resize_dims))
-                ),
+                #transforms.Lambda(
+                #    lambda x: resize_to(x, (self.num_channels, *resize_dims))
+                #),
                 transforms.Lambda(lambda x: torch.tensor(x)),
             ],
             train_transform_list=[
-                transforms.Lambda(
-                    lambda x: resize_to(x, (self.num_channels, *resize_dims))
-                ),
+                #transforms.Lambda(
+                #    lambda x: resize_to(x, (self.num_channels, *resize_dims))
+                #),
                 transforms.Lambda(lambda x: torch.tensor(x)),
                 tiotransforms.ToCanonical(),
                 #tiotransforms.RandomFlip(),  # NOTE: Gui suggestion - we don't want to do random flip for unet
@@ -108,14 +119,16 @@ class ImageImage(BaseDataModule):
             # Use callable class objects here because lambdas aren't picklable
             "id": LoadColumns(self.id_fields),
             self.x_label: Load3DImage(
-                DatasetFields.CellImage3DPath,
-                self.num_channels,
+                #DatasetFields.CellImage3DPath,
+                self.input_column,
+                len(self.input_channels),
                 self.input_channels,
                 self.transform,
             ),
             self.y_label: Load3DImage(
-                DatasetFields.CellImage3DPath,
-                self.num_channels,
+                #DatasetFields.CellImage3DPath,
+                self.output_column,
+                len(self.output_channels),
                 self.output_channels,
                 self.transform,
             ),
@@ -127,8 +140,8 @@ class ImageImage(BaseDataModule):
         """
         return self.transform(
             tiff_loader_CZYX(
-                path_str=dataset[DatasetFields.CellImage3DPath].iloc[0],
-                select_channels=self.select_channels,
+                path_str=dataset[self.input_column].iloc[0],
+                select_channels=self.input_channels,
                 output_dtype=np.float32,
             )
         )
@@ -146,9 +159,9 @@ class ImageImage(BaseDataModule):
         train_dataset = self.datasets["train"]
         train_loaders = self.loaders.copy()
         train_loaders[self.x_label] = Load3DImage(
-            DatasetFields.CellImage3DPath,
-            self.num_channels,
-            self.select_channels,
+            self.input_column,
+            len(self.input_channels),
+            self.input_channels,
             self.train_transform,
         )
         train_dataloader = load_data_loader(
