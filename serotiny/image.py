@@ -122,6 +122,9 @@ def tiff_loader_CZYX(
 
     mask_keys = channel_masks.keys() if channel_masks else {}
     
+    if select_channels is None:
+        select_channels = channel_names
+
     if (not set(select_channels).issubset(channel_names)) or (
         not set(mask_keys).issubset(channel_names)
     ):
