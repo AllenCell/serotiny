@@ -5,8 +5,7 @@ Module to define classes used to load values from manifest dataframes
 import torch
 import numpy as np
 
-from ..image import tiff_loader_CZYX, png_loader
-from serotiny.models.utils import index_to_onehot
+from .image import tiff_loader, png_loader
 
 __all__ = [
     "LoadColumns",
@@ -156,7 +155,7 @@ class Load3DImage:
         self.transform = transform
 
     def __call__(self, row):
-        return tiff_loader_CZYX(
+        return tiff_loader(
             path_str=row[self.chosen_col],
             select_channels=self.select_channels,
             output_dtype=np.float32,
@@ -164,3 +163,19 @@ class Load3DImage:
             mask_thresh=0,
             transform=self.transform,
         )
+
+def infer_extension_loader(extension, chosen_col="true_paths"):
+    if extension == ".png":
+        return Load2DImage(
+            chosen_col=chosen_col,
+            num_channels=3,
+            channel_indexes=[0,1,2],
+            transform=None
+        )
+
+    if extension == ".tiff":
+        return Load3DImage(
+            chosen_col=chosen_col,
+        )
+
+    raise NotImplementedError(f"Can't determine appropriate loader for given extension {extension}")
