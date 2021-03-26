@@ -3,13 +3,13 @@
 
 import os
 import logging
-from typing import Optional, List
+from typing import Optional
 from datetime import datetime
 
 import fire
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
-from pytorch_lightning.callbacks import ModelCheckpoint, GPUStatsMonitor, EarlyStopping
+from pytorch_lightning.callbacks import ModelCheckpoint, GPUStatsMonitor
 
 from serotiny.progress_bar import GlobalProgressBar
 from serotiny.networks.vae import CBVAEEncoderMLP, CBVAEDecoderMLP
@@ -46,6 +46,7 @@ def train_mlp_vae(
     id_fields: Optional[list] = None,  # For Spharm
     set_zero: Optional[bool] = False,  # For Spharm
     overwrite: Optional[bool] = False,  # For Spharm
+    values: Optional[list] = None,  # For Spharm
 ):
     """
     Instantiate and train a bVAE.
@@ -163,7 +164,7 @@ def train_mlp_vae(
         callbacks = [
             GPUStatsMonitor(),
             GlobalProgressBar(),
-            MLPVAELogging(datamodule=dm),
+            MLPVAELogging(datamodule=dm, values=values),
             SpharmLatentWalk(),
         ]
 

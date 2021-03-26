@@ -15,6 +15,7 @@ class MLPVAELogging(Callback):  # pragma: no cover
         self,
         datamodule,
         resample_n: int = 10,
+        values: list = [-1, 1],
         conds_list: Optional[list] = None,
         save_dir: Optional[str] = None,
     ):
@@ -31,6 +32,7 @@ class MLPVAELogging(Callback):  # pragma: no cover
         self.resample_n = resample_n
         self.datamodule = datamodule
         self.conds_list = conds_list
+        self.values = values
 
     def to_device(
         self, batch_x: Sequence, batch_y: Sequence, device: Union[str, device]
@@ -82,19 +84,21 @@ class MLPVAELogging(Callback):  # pragma: no cover
                     for i in range(num_classes):
                         conds_list.append(i)
 
-            make_plot_encoding(
-                self.save_dir,
-                pl_module,
-                dec_layers,
-                enc_layers,
-                stats,
-                x,
-                c,
-                conds_list=conds_list,
-                datamodule=self.datamodule,
-                beta=pl_module.beta,
-                resample_n=self.resample_n,
-                this_dataloader_color=None,
-                save=True,
-                mask=True,
-            )
+            for value in self.values:
+                make_plot_encoding(
+                    self.save_dir,
+                    pl_module,
+                    dec_layers,
+                    enc_layers,
+                    stats,
+                    x,
+                    c,
+                    conds_list=conds_list,
+                    datamodule=self.datamodule,
+                    value=value,
+                    beta=pl_module.beta,
+                    resample_n=self.resample_n,
+                    this_dataloader_color=None,
+                    save=True,
+                    mask=True,
+                )

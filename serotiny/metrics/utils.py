@@ -16,6 +16,7 @@ def visualize_encoder_tabular(
     X_test,
     C_test,
     datamodule,
+    value=1,
     beta=1,
     resample_n=10,
     mask=True,
@@ -93,7 +94,7 @@ def visualize_encoder_tabular(
             and datamodule.__module__ == "serotiny.datamodules.variance_spharm_coeffs"
         ):
             cond_d = torch.zeros(C_test.shape)
-            cond_d[:, 0] = conds
+            cond_d[:, conds] = value
 
         # Make empty list
         my_recon_list, my_z_means_list, my_log_var_list = [], [], []

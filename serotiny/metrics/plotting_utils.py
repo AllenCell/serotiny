@@ -89,6 +89,7 @@ def make_plot_encoding(
     C_test,
     conds_list,
     datamodule,
+    value,
     beta=1,
     resample_n=10,
     this_dataloader_color=None,
@@ -123,6 +124,8 @@ def make_plot_encoding(
     which columns in condition to set to 0
     In the case of Spharm datamodule, this specifies
     which integer to provide as condition
+
+    value: int - what value to set condition to.
 
     beta: Beta to use to compute loss (default=1)
 
@@ -196,6 +199,7 @@ def make_plot_encoding(
                 X_test.clone(),
                 C_test.clone(),
                 datamodule,
+                value,
                 beta,
                 resample_n,
                 mask,
@@ -226,6 +230,7 @@ def make_plot_encoding(
                 X_test.clone(),
                 C_test.clone(),
                 datamodule,
+                value,
                 beta,
                 resample_n,
                 mask,
@@ -295,12 +300,12 @@ def make_plot_encoding(
         ax2.get_legend().remove()
 
     if save is True:
-        path_save_fig = path_save_dir / Path("encoding_test_plots.png")
+        path_save_fig = path_save_dir / Path(f"encoding_test_plots_value_{value}.png")
         fig.savefig(path_save_fig, bbox_inches="tight")
         LOGGER.info(f"Saved: {path_save_fig}")
 
     if save is True:
-        path_save_fig = path_save_dir / Path("brokenaxes_KLD_per_dim.png")
+        path_save_fig = path_save_dir / Path(f"brokenaxes_KLD_per_dim_{value}.png")
         fig2.savefig(path_save_fig, bbox_inches="tight")
         LOGGER.info(f"Saved: {path_save_fig}")
 
