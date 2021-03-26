@@ -21,6 +21,7 @@ from serotiny.progress_bar import GlobalProgressBar
 log = logging.getLogger(__name__)
 pl.seed_everything(42)
 
+
 def train_vae(
     data_dir: str,
     output_path: str,
@@ -48,7 +49,7 @@ def train_vae(
     dimensionality: int,
     auto_padding: bool = False,
     kld_reduction: str = "sum",
-    **kwargs
+    **kwargs,
 ):
     """
     Instantiate and train a bVAE.
@@ -113,8 +114,10 @@ def train_vae(
     """
 
     if datamodule not in datamodules.__dict__:
-        raise KeyError(f"Chosen datamodule {datamodule} not available.\n"
-                       f"Available datamodules:\n{datamodules.__all__}")
+        raise KeyError(
+            f"Chosen datamodule {datamodule} not available.\n"
+            f"Available datamodules:\n{datamodules.__all__}"
+        )
 
     # Load data module
     datamodule = datamodules.__dict__[datamodule](
@@ -123,14 +126,16 @@ def train_vae(
         data_dir=data_dir,
         x_label=x_label,
         y_label=class_label,
-        **kwargs
+        **kwargs,
     )
     datamodule.setup()
 
     if crit_recon not in losses.__dict__:
-        raise KeyError(f"Chosen reconstruction criterion {crit_recon} not"
-                       f"available.\n Available datamodules:\n"
-                       f"{datamodules.__all__}")
+        raise KeyError(
+            f"Chosen reconstruction criterion {crit_recon} not"
+            f"available.\n Available datamodules:\n"
+            f"{datamodules.__all__}"
+        )
 
     crit_recon = losses.__dict__[crit_recon]()
 
@@ -156,7 +161,7 @@ def train_vae(
         conv_channels_list=conv_channels_list[::-1],
         imsize_compressed=encoder.imsize_compressed,
         activation=activation,
-        activation_last=activation_last
+        activation_last=activation_last,
     )
 
     vae = CBVAEModel(
@@ -208,8 +213,8 @@ def train_vae(
     ]
     trainer = pl.Trainer(
         logger=[tb_logger],
-        #accelerator="ddp",
-        #replace_sampler_ddp=False,
+        # accelerator="ddp",
+        # replace_sampler_ddp=False,
         gpus=num_gpus,
         max_epochs=num_epochs,
         progress_bar_refresh_rate=5,
@@ -218,7 +223,7 @@ def train_vae(
         benchmark=False,
         profiler=False,
         deterministic=True,
-        automatic_optimization=False
+        automatic_optimization=False,
     )
 
     trainer.fit(vae, datamodule)
@@ -228,6 +233,7 @@ def train_vae(
         trainer.test(datamodule=datamodule)
 
     return checkpoint_callback.best_model_path
+
 
 if __name__ == "__main__":
     fire.Fire(train_vae)

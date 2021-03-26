@@ -16,7 +16,13 @@ import torch.optim as opt
 
 import pytorch_lightning as pl
 
-from .utils import acc_prec_recall, add_pr_curve_tensorboard, find_optimizer, find_lr_scheduler
+from .utils import (
+    acc_prec_recall,
+    add_pr_curve_tensorboard,
+    find_optimizer,
+    find_lr_scheduler,
+)
+
 
 class ClassificationModel(pl.LightningModule):
     """
