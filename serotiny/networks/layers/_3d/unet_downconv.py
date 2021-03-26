@@ -10,32 +10,36 @@ class DownConvolution(nn.Module):
         current_depth: int,
         n_in: int,
         n_out: int,
-        kernel_size: int,
-        padding: int,
-        pooling: str = "average",
+        
+        kernel_size_doubleconv: int = 3,  # Original paper = 3
+        stride_doubleconv: int = 1,       # Original paper = no mention, label-free = default
+        padding_doubleconv: int = 1,      # Original paper = 0, label-free = 1
+        
+        pooling: str = "mean",            # Original paper = max
+        kernel_size_pooling: int = 2,     # Original paper = 2
+        stride_pooling: int = 2,          # Original paper = no mention, label-free = 2
+        padding_pooling: int = 0,         # Original paper = no mention, label-free = default
     ):
         super().__init__()
 
         self.current_depth = current_depth
 
-        # If we're at the bottom, only instantiate one double_conv
+        self.double_conv = DoubleConvolution(
+            n_in, n_out, kernel_size=kernel_size_doubleconv, stride=stride_doubleconv, padding=padding_doubleconv
+        )
+        
+        # If we're at the bottom, only instantiate one double_conv and nothing else
         if self.current_depth == 0:
-            self.double_conv = DoubleConvolution(
-                n_in, n_out, kernel_size=kernel_size, padding=padding
-            )
+            pass
         else:
-            self.double_conv = DoubleConvolution(
-                n_in, n_out, kernel_size=kernel_size, padding=padding
-            )
-
-            # In original paper, kernel_size = 2 and stride = 2 (TODO: Use channel_fan?)
-            if pooling == "average":
-                self.pooling = nn.AvgPool3d(kernel_size=2, stride=2)
+            # In original paper, pooling = max, kernel_size = 2 and stride = 2
+            if pooling == "mean":
+                self.pooling = nn.AvgPool3d(kernel_size=kernel_size_pooling, stride=stride_pooling, padding=padding_pooling)
             elif pooling == "max":
-                self.pooling = nn.MaxPool3d(kernel_size=2, stride=2)
+                self.pooling = nn.MaxPool3d(kernel_size=kernel_size_pooling, stride=stride_pooling, padding=padding_pooling)
             else:
                 # Use convolution to perform pooling
-                self.pooling = nn.Conv3d(n_out, n_out, kernel_size=2, stride=2)
+                self.pooling = nn.Conv3d(n_out, n_out, kernel_size=kernel_size_pooling, stride=stride_pooling, padding=padding_pooling)
 
             self.batch_norm = nn.BatchNorm3d(n_out)
             self.activation = nn.ReLU()

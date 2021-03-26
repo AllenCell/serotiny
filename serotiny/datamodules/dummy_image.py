@@ -1,3 +1,5 @@
+from typing import Sequence, Union
+
 import multiprocessing as mp
 import pytorch_lightning as pl
 
@@ -15,11 +17,14 @@ class DummyImageDataset(Dataset):
     y_label: str
         Key to retrieve image label
 
-    dims: str
-        Dimensions of image
-
     length:
         Length of the dummy dataset
+
+    input_dims: str
+        Dimensions of input image
+
+    output_dims: str
+        Dimensions of output image
 
     """
 
@@ -70,13 +75,16 @@ class DummyImageDatamodule(pl.LightningDataModule):
         Number of worker processes for dataloader
 
     x_label: str
-        x_label key to retrive image
+        x_label key to retrive input image
 
     y_label: str
-        y_label key to retrieve image label
+        y_label key to retrieve output image
 
-    dims: list
-        Dimensions for dummy images
+    input_dims: list
+        Dimensions for dummy input images
+
+    output_dims: list
+        Dimensions for dummy output images
 
     length: int
         Length of dummy dataset
@@ -91,11 +99,12 @@ class DummyImageDatamodule(pl.LightningDataModule):
         num_workers: int,
         x_label: str,
         y_label: str,
+        input_channels: Sequence[Union[str, int]],
+        output_channels: Sequence[Union[str, int]],
+        
         input_dims: list,
         output_dims: list,
         length: int,
-        input_channels: list = [],
-        output_channels: list = [],
         **kwargs
     ):
 
@@ -108,6 +117,7 @@ class DummyImageDatamodule(pl.LightningDataModule):
 
         self.num_input_channels = len(input_channels)
         self.num_output_channels = len(output_channels)
+        
         self.input_dims = input_dims
         self.output_dims = output_dims
         
@@ -124,7 +134,12 @@ class DummyImageDatamodule(pl.LightningDataModule):
 
 
     def setup(self, stage=None):
-        self.dataset = DummyImageDataset(self.x_label, self.y_label, self.length, self.input_dims, self.output_dims)
+        self.dataset = DummyImageDataset(
+            self.x_label, 
+            self.y_label, 
+            self.length, 
+            [self.num_input_channels] + self.input_dims, 
+            [self.num_output_channels] + self.output_dims)
         
         self.dataloader = make_dataloader(
             self.dataset,

@@ -13,13 +13,36 @@ class Unet(nn.Module):
     def __init__(
         self,
         depth: int = 4,
-        in_channels: int = 1,
-        out_channels: int = 1,
-        channel_fan: int = 2,
-        kernel_size: int = 3,
-        padding: int = 1,
-        pooling: str = "average",
+        
+        n_in_channels: int = 1,
+        n_out_channels: int = 1,
+        
+        channel_fan_top: int = 64,        # Original paper = 64
+        channel_fan: int = 2,             # Original paper = 2
+        
+        # Parameters for double convolution
+        kernel_size_doubleconv: int = 3,  # Original paper = 3
+        stride_doubleconv: int = 1,       # Original paper = no mention, label-free = default
+        padding_doubleconv: int = 1,      # Original paper = 0, label-free = 1
+        
+        # Parameters for pooling
+        pooling: str = "mean",            # Original paper = max
+        kernel_size_pooling: int = 2,     # Original paper = 2
+        stride_pooling: int = 2,          # Original paper = no mention, label-free = 2
+        padding_pooling: int = 0,         # Original paper = no mention, label-free = default
+        
+        # Parameters for up convolution
+        kernel_size_upconv: int = 2,      # Original paper = 2
+        stride_upconv: int = 2,           # Original paper = no mention, label-free = 2
+        padding_upconv: int = 0,          # Original paper = no mention, label-free = default
+        
+        # Parameters for final convolution
+        kernel_size_finalconv: int = 3,   # Original paper = 1, label-free = 3
+        stride_finalconv: int = 1,        # Original paper = no mention, label-free = default
+        padding_finalconv: int = 1,       # Original paper = no mention, label-free = 1
+        
         # dimensions: tuple, # =(176, 104, 52),
+        **kwargs
     ):
 
         """
@@ -37,17 +60,23 @@ class Unet(nn.Module):
 
         TODO:
             - Add auto-padding so we don't see mismatches when performing the cross-branch
-              concatenations
+              concatenations -> auto-pad at first level depending on depth and other
+              network parameters
+              
             - Separate channel_fan between first layer and the next for double_conv (right
-              now this calculation is entirely done in the unet.py)
+              now this calculation is entirely done in the unet.py)? Yes, separate into 2
+              parameters
+              
             - Separate kernel_size, stride, and padding for double_conv, pooling, up_conv,
-              UpConv, DownConv, and conv_out
+              UpConv, DownConv, and conv_out? No, just follow original paper
         """
 
         super().__init__()
 
         self.network_name = "Unet"
         self.depth = depth
+        self.channel_fan_top = channel_fan_top
+        self.channel_fan = channel_fan
 
         """
         An example of n_in and n_out for a network of depth = 4:
@@ -76,23 +105,27 @@ class Unet(nn.Module):
 
             # At the top layer
             if current_depth == depth:
-                n_in = in_channels
-                n_out = (
-                    n_in * channel_fan
-                )  # BUG? Was only channel_fan before. Not bug: label-free applied channel_fan only in the top layer
+                n_in = n_in_channels
+                n_out = channel_fan_top  # Similar to original paper and label-free, apply channel_fan_top only in the top layer
 
             else:
                 n_in = self.channels_down[current_depth + 1][1]
-                n_out = n_in * channel_fan  # TODO: Was hardcoded to 2 in label-free?
+                n_out = n_in * channel_fan  # Is hardcoded to 2 in original paper and label-free
 
             self.channels_down[current_depth] = (n_in, n_out)
             self.networks_down[str(current_depth)]["subnet"] = DownConvolution(
                 current_depth,
                 n_in,
                 n_out,
-                kernel_size=kernel_size,
-                padding=padding,
+                
+                kernel_size_doubleconv=kernel_size_doubleconv,
+                stride_doubleconv=stride_doubleconv,
+                padding_doubleconv=padding_doubleconv,
+                
                 pooling=pooling,
+                kernel_size_pooling=kernel_size_pooling,
+                stride_pooling=stride_pooling,
+                padding_pooling=padding_pooling,
             )
 
         # Create the up pathway by traversing the upward path
@@ -108,22 +141,31 @@ class Unet(nn.Module):
                 self.networks_up[str(current_depth)] = nn.ModuleDict({})
 
                 n_in = self.channels_down[current_depth - 1][1]
-                n_out = (
-                    n_in // channel_fan
-                )  # TODO: Support values of channel_fan other than 2 (was hardcoded to 2 in label-free for calling _Net_recurse)
+                n_out = n_in // channel_fan  # Is hardcoded to 2 in original paper and label-free
 
                 self.channels_up[current_depth] = (n_in, n_out)
                 self.networks_up[str(current_depth)]["subnet"] = UpConvolution(
-                    current_depth, n_in, n_out, kernel_size=kernel_size, padding=padding
+                    current_depth,
+                    n_in,
+                    n_out,
+                    
+                    kernel_size_upconv=kernel_size_upconv,
+                    stride_upconv=stride_upconv,
+                    padding_upconv=padding_upconv,
+                    
+                    kernel_size_doubleconv=kernel_size_doubleconv,
+                    stride_doubleconv=stride_doubleconv,
+                    padding_doubleconv=padding_doubleconv,
                 )
 
         # In original paper, kernel_size = 1
         self.conv_out = nn.Conv3d(
             self.channels_up[depth][1],
-            out_channels,
-            kernel_size=kernel_size,
-            stride=1,
-            padding=padding,
+            n_out_channels,
+            
+            kernel_size=kernel_size_finalconv,
+            stride=stride_finalconv,
+            padding=padding_finalconv,
         )
 
     def print_network(self):

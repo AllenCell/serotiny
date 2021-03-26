@@ -74,7 +74,7 @@ class ImageImage(BaseDataModule):
         **kwargs,
     ):
         self.resize_dims = resize_dims
-        self.classes = classes
+        #self.classes = classes
 
         super().__init__(
             channels=channels,

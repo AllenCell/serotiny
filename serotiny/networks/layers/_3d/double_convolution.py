@@ -7,15 +7,18 @@ class DoubleConvolution(nn.Module):
         self,
         n_in: int,
         n_out: int,
-        kernel_size: int,
-        padding: int,
+        
+        kernel_size: int = 3,  # Original paper = 3
+        stride: int = 1,       # Original paper = no mention, label-free = default
+        padding: int = 1,      # Original paper = 0, label-free = 1
     ):
         super().__init__()
 
-        self.conv1 = nn.Conv3d(n_in, n_out, kernel_size=kernel_size, padding=padding)
+        self.conv1 = nn.Conv3d(n_in, n_out, kernel_size=kernel_size, stride=stride, padding=padding)
         self.bn1 = nn.BatchNorm3d(n_out)
         self.relu1 = nn.ReLU()
-        self.conv2 = nn.Conv3d(n_out, n_out, kernel_size=kernel_size, padding=padding)
+        
+        self.conv2 = nn.Conv3d(n_out, n_out, kernel_size=kernel_size, stride=stride, padding=padding)
         self.bn2 = nn.BatchNorm3d(n_out)
         self.relu2 = nn.ReLU()
 

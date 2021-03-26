@@ -33,34 +33,15 @@ def train_unet(
     num_workers: int,
     num_epochs: int,
     lr: float,
-    #optimizer_encoder: str,
-    #optimizer_decoder: str,
     optimizer: str,
-    #crit_recon: str,
     loss: str,  # Unet
     test: bool,
     x_label: str,
     y_label: str,  # Unet
-    #class_label: str,
-    #n_latent_dim: int,
-    #n_classes: int,
-    #activation: str,
-    #activation_last: str,
-    #conv_channels_list: Sequence[int],
-    #input_dims: Sequence[int],  # Unet: Do we need this?
-    #target_channels: Sequence[int],
-    #reference_channels: Optional[Sequence[int]],
-    #beta: float,
-    #dimensionality: int,
-    #auto_padding: bool = False,
-    #kld_reduction: str = "sum",
     input_channels: Sequence[str],  # Unet
     output_channels: Sequence[str],  # Unet
     depth: int,  # Unet
-    channel_fan: int,  # Unet
-    pooling: str,  # Unet
-    kernel_size: int,  # Unet
-    padding: int,  # Unet
+    auto_padding: bool = False,
     **kwargs,
 ):
     """
@@ -84,44 +65,24 @@ def train_unet(
         Maximum number of epochs to train on
     lr: float
         Learning rate used for training
-    optimizer_encoder: str
-        String to specify the optimizer to use for the encoder net
-    optimizer_decoder: str
-        String to specify the optimizer to use for the decoder net
-    crit_recon: str
-        String to specify the loss function to use for reconstruction
+    optimizer: str
+        String to specify the optimizer to use
+    loss: str
+        String to specify the loss function to use
     test: bool
         Flag to tell whether to run the test step after training
     x_label: str
         String to specify the inputs (x)
-    class_label: str
-        String to specify the classes
-    n_latent_dim: int
-        Dimension of the latent space
-    n_classes: int
-        Number of classes (0 if not conditioning)
-    target_channels: Sequence[int]
-        Which channel (indices) to use as target
-    reference_channels: Optional[Sequence[int]],
-        Which channel (indices) to use as reference
-    activation: str
-        String to specify the activation function to be used in inner layers
-    activation_last: str
-        String to specify the activation function to be used in the decoder's last
-        layer. For binary outputs, sigmoid should be used
-    conv_channels_list: Sequence[int]
-        Sequence of channels of the intermediate steps in the encoder. For the decoder,
-        the reverse of this list will be used.
-    input_dims: Sequence[int]
-        Dimensions of the input images
-    beta: float
-        Value of Beta, the weight of the KLD term in the loss function
-    dimensionality: int
-        Whether this is a 2d or 3d model.
+    y_label: str
+        String to specify the outputs (y)
+    input_channels: Sequence[int]
+        Which channel (indices) to use as input
+    output_channels: Sequence[int]
+        Which channel (indices) to use as output
+    depth: int
+        How many layers the Unet will have
     auto_padding: bool = False
-        Whether to apply padding to ensure generated images match the input size
-    kld_reduction: str = "sum"
-        Reduction operation to use for the KLD term
+        Whether to apply padding to ensure images from down double conv match up double conv
 
     """
 
@@ -137,13 +98,13 @@ def train_unet(
         num_workers=num_workers,
         data_dir=data_dir,
         x_label=x_label,
-        #y_label=class_label,
         y_label=y_label,
+        input_channels=input_channels,
+        output_channels=output_channels,
         **kwargs,
     )
     datamodule.setup()
 
-    #if crit_recon not in losses.__dict__:
     if loss not in losses.__dict__:
         raise KeyError(
             f"Chosen reconstruction criterion {crit_recon} not"
@@ -151,17 +112,14 @@ def train_unet(
             f"{datamodules.__all__}"
         )
 
-    #crit_recon = losses.__dict__[crit_recon]()
     loss = losses.__dict__[loss]()
     
     network = Unet(
         depth=depth, 
-        in_channels=len(input_channels), 
-        channel_fan=channel_fan, 
-        out_channels=len(output_channels), 
-        pooling=pooling, 
-        kernel_size=kernel_size, 
-        padding=padding)
+        n_in_channels=len(input_channels), 
+        n_out_channels=len(output_channels), 
+        **kwargs,
+    )
     
     #network.print_network()
     
@@ -174,7 +132,8 @@ def train_unet(
         input_channels=input_channels,
         output_channels=output_channels,
         lr=lr,
-        #input_dims=network.dims,  # TODO: Passing input image dims to model, but is not used there?
+        input_dims=datamodule.dims,
+        auto_padding=auto_padding,
     )
     
     tb_logger = TensorBoardLogger(
