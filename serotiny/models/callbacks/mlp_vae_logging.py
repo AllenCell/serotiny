@@ -15,7 +15,7 @@ class MLPVAELogging(Callback):  # pragma: no cover
         self,
         datamodule,
         resample_n: int = 10,
-        values: list = [-1, 1],
+        values: list = [-1, 0, 1],
         conds_list: Optional[list] = None,
         save_dir: Optional[str] = None,
     ):
@@ -33,6 +33,8 @@ class MLPVAELogging(Callback):  # pragma: no cover
         self.datamodule = datamodule
         self.conds_list = conds_list
         self.values = values
+        if self.datamodule.__module__ == "serotiny.datamodules.gaussian":
+            self.values = [0]
 
     def to_device(
         self, batch_x: Sequence, batch_y: Sequence, device: Union[str, device]
@@ -83,6 +85,7 @@ class MLPVAELogging(Callback):  # pragma: no cover
                     conds_list = []
                     for i in range(num_classes):
                         conds_list.append(i)
+                    conds_list = [conds_list]
 
             for value in self.values:
                 make_plot_encoding(
