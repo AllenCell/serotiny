@@ -95,7 +95,7 @@ class CBVAEMLPModel(pl.LightningModule):
         x, x_cond, x_cond_inds = self.parse_batch(batch)
         # kld_elem is batch * num_latent_dims
         # rcl_elem is batch * Y shape of input
-        x_hat, _, _, loss, recon_loss, kld_loss, kld_elem, rcl_elem = self(x, x_cond)
+        x_hat, mu, _, loss, recon_loss, kld_loss, kld_elem, rcl_elem = self(x, x_cond)
 
         # Default logger=False for training_step
         # set it to true to log train loss to all lggers
@@ -115,6 +115,7 @@ class CBVAEMLPModel(pl.LightningModule):
             "kld_per_elem": kld_elem,
             "rcl_per_elem": rcl_elem,
             "batch_idx": batch_idx,
+            "mu_per_elem": mu,
         }
 
     def training_epoch_end(self, outputs):
@@ -123,7 +124,7 @@ class CBVAEMLPModel(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         x, x_cond, x_cond_inds = self.parse_batch(batch)
-        x_hat, _, _, loss, recon_loss, kld_loss, kld_elem, rcl_elem = self(x, x_cond)
+        x_hat, mu, _, loss, recon_loss, kld_loss, kld_elem, rcl_elem = self(x, x_cond)
 
         # Default logger=False for training_step
         # set it to true to log train loss to all lggers
@@ -143,6 +144,7 @@ class CBVAEMLPModel(pl.LightningModule):
             "rcl_per_elem": rcl_elem,
             "batch_idx": batch_idx,
             "batch": batch,
+            "mu_per_elem": mu,
         }
 
     def validation_epoch_end(self, outputs):
@@ -151,7 +153,7 @@ class CBVAEMLPModel(pl.LightningModule):
 
     def test_step(self, batch, batch_idx):
         x, x_cond, x_cond_inds = self.parse_batch(batch)
-        x_hat, _, _, loss, recon_loss, kld_loss, kld_elem, rcl_elem = self(x, x_cond)
+        x_hat, mu, _, loss, recon_loss, kld_loss, kld_elem, rcl_elem = self(x, x_cond)
 
         # Default logger=False for training_step
         # set it to true to log train loss to all lggers
@@ -170,6 +172,7 @@ class CBVAEMLPModel(pl.LightningModule):
             "kld_per_elem": kld_elem,
             "rcl_per_elem": rcl_elem,
             "batch_idx": batch_idx,
+            "mu_per_elem": mu,
         }
 
     def test_epoch_end(self, outputs):
