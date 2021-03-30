@@ -88,6 +88,8 @@ class MLPVAELogging(Callback):  # pragma: no cover
                     conds_list = [conds_list]
 
             for value in self.values:
+                print(self.datamodule.__module__)
+                print(conds_list)
                 make_plot_encoding(
                     self.save_dir,
                     pl_module,

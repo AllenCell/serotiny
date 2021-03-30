@@ -311,7 +311,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
 
         # Get ranked Z dim list
         stats_per_dim_ranked = (
-            stats_per_dim.loc[stats["test_kld_per_dim"] > 0.5]
+            stats_per_dim.loc[stats_per_dim["test_kld_per_dim"] > 0.5]
             .sort_values(by=["test_kld_per_dim"])
             .reset_index(drop=True)
         )

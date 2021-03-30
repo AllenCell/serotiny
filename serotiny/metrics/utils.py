@@ -71,7 +71,7 @@ def visualize_encoder_tabular(
         if kl_vs_rcl is None:
             kl_vs_rcl = {"condition": [], "KLD": [], "RCL": [], "ELBO": []}
         all_kl, all_lt = [], []
-
+        print(conds, "inside")
         # Split condition into tmp1 that contains the condition, and
         # tmp2 that contains the mask info of whether the condition
         # is there or not
@@ -90,7 +90,7 @@ def visualize_encoder_tabular(
             # New condition tensor for the model
             cond_d = torch.cat((tmp1, tmp2), 1)
         elif (
-            isinstance(conds, int)
+            isinstance(conds, list)
             and datamodule.__module__ == "serotiny.datamodules.variance_spharm_coeffs"
         ):
             cond_d = torch.zeros(C_test.shape)

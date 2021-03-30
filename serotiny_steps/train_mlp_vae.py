@@ -8,6 +8,7 @@ from datetime import datetime
 
 import fire
 import pytorch_lightning as pl
+import yaml
 from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
 from pytorch_lightning.callbacks import ModelCheckpoint, GPUStatsMonitor
 
@@ -161,11 +162,13 @@ def train_mlp_vae(
             MLPVAELogging(datamodule=dm_no_shuffle),
         ]
     elif datamodule == "VarianceSpharmCoeffs":
+        
+        config = yaml.load(open("/allen/aics/modeling/ritvik/projects/cvapipe_analysis/config.yaml", "r"), Loader=yaml.FullLoader)
         callbacks = [
             GPUStatsMonitor(),
             GlobalProgressBar(),
             MLPVAELogging(datamodule=dm, values=values),
-            SpharmLatentWalk(),
+            SpharmLatentWalk(config=config),
         ]
 
     trainer = pl.Trainer(
