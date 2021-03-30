@@ -9,6 +9,7 @@ import pytorch_lightning as pl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 
 
 def acc_prec_recall(n_classes):
@@ -186,7 +187,8 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
         f"{prefix}_kld": [],
     }
 
-    batch_rcl, batch_kld = (
+    batch_rcl, batch_kld, batch_mu = (
+        torch.empty([0]),
         torch.empty([0]),
         torch.empty([0]),
     )
@@ -205,6 +207,8 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
     for output in outputs:
         rcl_per_element = output["rcl_per_elem"]
         kld_per_element = output["kld_per_elem"]
+        mu_per_elem = output["mu_per_elem"]
+
         loss += output[f"{prefix}_loss"].item()
         rcl_loss += output["recon_loss"].item()
         kld_loss += output["kld_loss"].item()
@@ -224,6 +228,13 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
                 ],
                 0,
             )
+            batch_mu = torch.cat(
+                [
+                    batch_mu.type_as(mu_per_elem),
+                    torch.sum(mu_per_elem[this_cond_positions], dim=0).view(1, -1),
+                ],
+                0,
+            )
             batch_length += 1
 
             this_cond_rcl = torch.sum(rcl_per_element[this_cond_positions])
@@ -238,6 +249,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
     rcl_per_condition_loss = rcl_per_condition_loss / num_batches
     kld_per_condition_loss = kld_per_condition_loss / num_batches
 
+    # Save metrics averaged across all batches and dimension per condition
     for j in range(len(torch.unique(output["cond_labels"]))):
         dataframe["epoch"].append(current_epoch)
         dataframe["condition"].append(j)
@@ -263,26 +275,31 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
         stats.to_csv(path, header="column_names", index=False)
 
     if prefix == "test":
+
+        # Save test KLD and variance of mu per dimension, condition
+        # This is averaged across batch
         dataframe2 = {
-            "epoch": [],
             "dimension": [],
             "test_kld_per_dim": [],
             "condition": [],
+            "mu_variance_per_dim": [],
         }
 
         for j in range(len(torch.unique(output["cond_labels"]))):
-            # this_cond_rcl = test_batch_rcl[j::X_train.shape[2] + 1, :]
 
             this_cond_kld = batch_kld[j :: len(torch.unique(output["cond_labels"])), :]
+            this_cond_mu = batch_mu[j :: len(torch.unique(output["cond_labels"])), :]
 
-            # summed_rcl = torch.sum(this_cond_rcl, dim=0) / batch_num_test
             summed_kld = torch.sum(this_cond_kld, dim=0) / batch_length
+            dim_var = torch.var(this_cond_mu, dim=0)
 
             for k in range(len(summed_kld)):
-                dataframe2["epoch"].append(current_epoch)
                 dataframe2["dimension"].append(k)
-                dataframe2["condition"].append(j)
+                dataframe2["condition"].append(
+                    torch.unique(output["cond_labels"])[j].item()
+                )
                 dataframe2["test_kld_per_dim"].append(summed_kld[k].item())
+                dataframe2["mu_variance_per_dim"].append(dim_var[k].item())
 
         stats_per_dim = pd.DataFrame(dataframe2)
 
@@ -291,6 +308,65 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
             stats_per_dim.to_csv(path2, mode="a", header=False, index=False)
         else:
             stats_per_dim.to_csv(path2, header="column_names", index=False)
+
+        # Get ranked Z dim list
+        stats_per_dim_ranked = (
+            stats_per_dim.loc[stats["test_kld_per_dim"] > 0.5]
+            .sort_values(by=["test_kld_per_dim"])
+            .reset_index(drop=True)
+        )
+
+        ranked_z_dim_list = [i for i in stats_per_dim_ranked["dimension"][::-1]]
+
+        # Save mu per element, dimension and conditon
+        # Not averaged across batch
+        dataframe3 = {
+            "dimension": [],
+            "mu": [],
+            "element": [],
+            "condition": [],
+        }
+
+        for j in range(len(torch.unique(output["cond_labels"]))):
+
+            this_cond_mu = batch_mu[j :: len(torch.unique(output["cond_labels"])), :]
+
+            for element in range(this_cond_mu.shape[0]):
+                for dimension in range(this_cond_mu.shape[1]):
+                    dataframe3["dimension"].append(dimension)
+                    dataframe3["element"].append(element)
+                    dataframe3["condition"].append(
+                        torch.unique(output["cond_labels"])[j].item()
+                    )
+                    dataframe3["mu"].append(this_cond_mu[element, dimension].item())
+
+        mu_per_elem_and_dim = pd.DataFrame(dataframe3)
+
+        path3 = dir_path / f"mu_per_elem_and_dim_{prefix}.csv"
+        if path3.exists():
+            mu_per_elem_and_dim.to_csv(path3, mode="a", header=False, index=False)
+        else:
+            mu_per_elem_and_dim.to_csv(path3, header="column_names", index=False)
+
+        # Make correlation plot between top 20 latent dims
+        mu_per_elem_and_dim = mu_per_elem_and_dim[["dimension", "mu", "element"]]
+        table = pd.pivot_table(
+            mu_per_elem_and_dim, values="mu", index=["element"], columns=["dimension"]
+        )
+        mu_corrs = table[ranked_z_dim_list[:20]].corr()
+
+        plt.figure(figsize=(8, 8))
+        sns.heatmap(
+            mu_corrs.abs(),
+            cmap="Blues",
+            vmin=0,
+            vmax=1,
+            xticklabels=True,
+            yticklabels=True,
+            square=True,
+            cbar_kws={"shrink": 0.82},
+        )
+        plt.savefig(dir_path / "latent_dim_corrs.png", dpi=300, bbox_inches="tight")
 
         path_all = dir_path / "stats_all.csv"
         all_stats = pd.DataFrame()
@@ -304,6 +380,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
             all_stats.to_csv(path_all, header="column_names", index=False)
 
     return outputs
+
 
 def find_optimizer(optimizer_name):
     """
