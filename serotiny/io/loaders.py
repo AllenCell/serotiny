@@ -7,12 +7,8 @@ import numpy as np
 
 from .image import tiff_loader, png_loader
 
-__all__ = [
-    "LoadColumns",
-    "LoadClass",
-    "Load2DImage",
-    "Load3DImage"
-]
+__all__ = ["LoadColumns", "LoadClass", "Load2DImage", "Load3DImage"]
+
 
 class LoadColumns:
     """
@@ -97,17 +93,23 @@ class LoadPCA:
     also set to 0 if we dont want any pca values
     """
 
-    def __init__(self, x_label, set_zero=False):
+    def __init__(self, x_label, get_inds=False, set_zero=False):
         self.x_label = x_label  # DNA_PC1...
+        self.get_inds = get_inds
         self.set_zero = set_zero
 
     def __call__(self, row):
         pca_cols = [
-            col for col in row.keys() if self.x_label in col and len(col) == len(self.x_label) + 1
+            col
+            for col in row.keys()
+            if self.x_label in col and len(col) == len(self.x_label) + 1
         ]
         pca = torch.tensor(row[pca_cols]).float()
         if self.set_zero:
-            pca = torch.zeros(1).squeeze(0)
+            pca[pca != 0] = 0
+        if self.get_inds:
+            pca = torch.ones(1) * len(pca)
+            pca = pca.squeeze(0)
         return pca
 
 
@@ -164,13 +166,14 @@ class Load3DImage:
             transform=self.transform,
         )
 
+
 def infer_extension_loader(extension, chosen_col="true_paths"):
     if extension == ".png":
         return Load2DImage(
             chosen_col=chosen_col,
             num_channels=3,
-            channel_indexes=[0,1,2],
-            transform=None
+            channel_indexes=[0, 1, 2],
+            transform=None,
         )
 
     if extension == ".tiff":
@@ -178,4 +181,6 @@ def infer_extension_loader(extension, chosen_col="true_paths"):
             chosen_col=chosen_col,
         )
 
-    raise NotImplementedError(f"Can't determine appropriate loader for given extension {extension}")
+    raise NotImplementedError(
+        f"Can't determine appropriate loader for given extension {extension}"
+    )
