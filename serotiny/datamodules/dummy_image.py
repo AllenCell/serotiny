@@ -130,7 +130,7 @@ class DummyImageDatamodule(pl.LightningDataModule):
         """
         Get dimensions of input image
         """
-        return img.shape
+        return img.shape[1:]  # Remove the first dimension (channel), just like the other datamodules
 
 
     def setup(self, stage=None):

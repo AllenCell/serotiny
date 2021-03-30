@@ -114,21 +114,19 @@ class ImageImage(BaseDataModule):
 
         self.x_label = x_label
         self.y_label = y_label
-
+        
         self.loaders = {
             # Use callable class objects here because lambdas aren't picklable
             "id": LoadColumns(self.id_fields),
             self.x_label: Load3DImage(
-                #DatasetFields.CellImage3DPath,
                 self.input_column,
-                len(self.input_channels),
+                #len(self.input_channels),
                 self.input_channels,
                 self.transform,
             ),
             self.y_label: Load3DImage(
-                #DatasetFields.CellImage3DPath,
                 self.output_column,
-                len(self.output_channels),
+                #len(self.output_channels),
                 self.output_channels,
                 self.transform,
             ),
@@ -160,7 +158,7 @@ class ImageImage(BaseDataModule):
         train_loaders = self.loaders.copy()
         train_loaders[self.x_label] = Load3DImage(
             self.input_column,
-            len(self.input_channels),
+            #len(self.input_channels),
             self.input_channels,
             self.train_transform,
         )

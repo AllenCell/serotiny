@@ -110,6 +110,8 @@ def train_unet(
         **kwargs,
     )
     datamodule.setup()
+    
+    print(f'datamodule.dims = {datamodule.dims}')
 
     if loss not in losses.__dict__:
         raise KeyError(
@@ -127,7 +129,7 @@ def train_unet(
         **kwargs,
     )
     
-    #network.print_network()
+    network.print_network()
     
     unet_model = UnetModel(
         network=network,
@@ -186,7 +188,10 @@ def train_unet(
         deterministic=True,
         #automatic_optimization=False,  # Set this to True (default) for automatic optimization
     )
-
+    
+    #import torch
+    #print(f'GPU {num_gpus}: allocated memory = {torch.cuda.memory_allocated(num_gpus)}, cached memory = {torch.cuda.memory_reserved(num_gpus)}')
+    
     trainer.fit(unet_model, datamodule)
 
     # test the model

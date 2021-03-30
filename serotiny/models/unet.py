@@ -127,7 +127,7 @@ class UnetModel(pl.LightningModule):
                     new_size = orig_size
                     next_size = orig_size
 
-                print(f'{current_depth}: orig_size = {orig_size}, new_size = {new_size}, next_size = {next_size}')
+                #print(f'{current_depth}: orig_size = {orig_size}, new_size = {new_size}, next_size = {next_size}')
 
             # Calculate the new input image size given the padding, and save the padding
             # for all the dimensions in a format that is taken by F.pad() (which goes in the
@@ -137,7 +137,7 @@ class UnetModel(pl.LightningModule):
             padding_left = padding // 2
             padding_right = padding - padding_left
 
-            print(f'input_size = {input_size}, new_input_size = {new_input_size}, padding = {padding_left, padding_right}')
+            #print(f'input_size = {input_size}, new_input_size = {new_input_size}, padding = {padding_left, padding_right}')
 
             input_paddings.insert(0, padding_right)
             input_paddings.insert(0, padding_left)
@@ -150,15 +150,11 @@ class UnetModel(pl.LightningModule):
         #####################
 
         if self.hparams.auto_padding:
-            print(f'self.network.depth = {self.network.depth}')
-            print(f'self.network.channel_fan = {self.network.channel_fan}')
-            print(f'self.input_dims = {self.input_dims}')
+            #print(f'self.network.depth = {self.network.depth}')
+            #print(f'self.network.channel_fan = {self.network.channel_fan}')
+            #print(f'self.input_dims = {self.input_dims}')
             
-            # Ignore the first dimension (number of channels)
-            input_dims_xyz = self.input_dims
-            print(f'input_dims_xyz = {input_dims_xyz}')
-            
-            padding = self.get_unet_padding(list(input_dims_xyz), self.network.depth, self.network.channel_fan)
+            padding = self.get_unet_padding(list(self.input_dims), self.network.depth, self.network.channel_fan)
             #print(f'padding = {padding}')
             
             # We need to pad both x and y, otherwise, they will have different sizes.
