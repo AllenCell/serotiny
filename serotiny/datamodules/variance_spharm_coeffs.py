@@ -5,8 +5,8 @@ import numpy as np
 from sklearn.preprocessing import LabelEncoder
 
 from typing import Optional
-from ..data import load_data_loader
-from ..data.loaders import (
+from ..io import load_data_loader
+from ..io.loaders import (
     LoadSpharmCoeffs,
     LoadOneHotClass,
     LoadColumns,
@@ -134,8 +134,8 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         }
 
         if self.c_label in ["DNA_PC", "MEM_PC", "DNA_MEM_PC"]:
-            self.loaders[self.c_label] = LoadPCA(self.c_label)
-            self.loaders[self.c_label_ind] = LoadPCA(self.c_label, set_zero=True)
+            self.loaders[self.c_label] = LoadPCA(self.c_label, set_zero=self.set_zero)
+            self.loaders[self.c_label_ind] = LoadPCA(self.c_label, get_inds=True)
             self.stratify_column = "structure_name"
 
     def setup(self, stage=None):
@@ -242,7 +242,6 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         train_dataloader = load_data_loader(
             train_dataset,
             self.loaders,
-            transform=None,
             shuffle=False,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
@@ -260,7 +259,6 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         val_dataloader = load_data_loader(
             val_dataset,
             self.loaders,
-            transform=None,
             shuffle=False,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
@@ -278,7 +276,6 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         test_dataloader = load_data_loader(
             test_dataset,
             self.loaders,
-            transform=None,
             shuffle=False,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
