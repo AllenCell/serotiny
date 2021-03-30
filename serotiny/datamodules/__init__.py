@@ -3,6 +3,15 @@ from .actk.actk3d import ACTK3DDataModule
 from .aics_mnist import AICS_MNIST_DataModule
 from .dummy import DummyDatamodule
 from .folder_datamodule import FolderDatamodule
+from .variance_spharm_coeffs import VarianceSpharmCoeffs
+from .gaussian import GaussianDataModule
 
-__all__ = ["ACTK2DDataModule", "ACTK3DDataModule", "AICS_MNIST_DataModule",
-           "DummyDatamodule", "FolderDatamodule"]
+__all__ = [
+    "ACTK2DDataModule",
+    "ACTK3DDataModule",
+    "AICS_MNIST_DataModule",
+    "DummyDatamodule",
+    "VarianceSpharmCoeffs",
+    "GaussianDataModule",
+    "FolderDatamodule",
+]

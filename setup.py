@@ -58,16 +58,21 @@ requirements = [
     "numpy",
     "pandas",
     "Pillow",
-    'pytorch-lightning',
-    'pytorch-lightning-bolts',
-    'torch',
-    'torchvision',
+    "pytorch-lightning",
+    "pytorch-lightning-bolts",
+    "torch",
+    "torchvision",
     "tqdm",
     "seaborn",
-    'urllib3<1.26',
+    "urllib3<1.26",
     "ray",
     "hyperopt",
     "ray[tune]",
+    "brokenaxes",
+    "torchio",
+    "aicsshparam>=0.1.1",
+    "aicscytoparam>=0.1.2",
+    "cvapipe_analysis @ git+https://git@github.com/AllenCell/cvapipe_analysis",
 ]
 
 extra_requirements = {
@@ -77,7 +82,7 @@ extra_requirements = {
     "all": [
         *requirements,
         *dev_requirements,
-    ]
+    ],
 }
 
 setup(
