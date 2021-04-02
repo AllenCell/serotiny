@@ -145,7 +145,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         self.data_dir = Path(self.data_dir)
 
         all_data = pd.read_csv(
-            self.data_dir / f"variance_{self.x_label}_{self.c_label}.csv"
+            self.data_dir / f"variance_rotated_{self.x_label}_{self.c_label}.csv"
         )
 
         if not self.subset:
@@ -181,7 +181,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         """
         Prepare dataset
         """
-        my_file = Path(self.data_dir) / f"variance_{self.x_label}_{self.c_label}.csv"
+        my_file = Path(self.data_dir) / f"variance_rotated_{self.x_label}_{self.c_label}.csv"
         if my_file.is_file() and self.overwrite is False:
             pass
         else:
@@ -231,7 +231,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
                 df[self.c_encoded_label] = df[self.c_label + "_encoded"]
 
             df.to_csv(
-                Path(self.data_dir) / f"variance_{self.x_label}_{self.c_label}.csv"
+                Path(self.data_dir) / f"variance_rotated_{self.x_label}_{self.c_label}.csv"
             )
 
     def train_dataloader(self):

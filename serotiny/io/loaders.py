@@ -6,6 +6,7 @@ import torch
 import numpy as np
 
 from .image import tiff_loader, png_loader
+from serotiny.models.utils import index_to_onehot
 
 __all__ = ["LoadColumns", "LoadClass", "Load2DImage", "Load3DImage"]
 
@@ -123,6 +124,7 @@ class LoadSpharmCoeffs:
 
     def __call__(self, row):
         spharm_cols = [col for col in row.keys() if self.x_label in col]
+        spharm_cols = [f for f in spharm_cols if "L" in f]
         return torch.tensor(row[spharm_cols])
 
 

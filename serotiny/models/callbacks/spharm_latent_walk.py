@@ -56,8 +56,10 @@ class SpharmLatentWalk(Callback):
             "/allen/aics/modeling/ritvik/projects/serotiny/variance_spharm_coeffs.csv"
         )
         self.dna_spharm_cols = [col for col in dfg.columns if "dna_shcoeffs" in col]
+        self.dna_spharm_cols = [f for f in self.dna_spharm_cols if "L" in f]
         if self.latent_walk_range is None:
-            self.latent_walk_range = [-2, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0]
+            # self.latent_walk_range = [-2, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0]
+            self.latent_walk_range = [-0.5, -0.25, 0.1, 0, 0.1, 0.25, 0.5]
 
         if self.cutoff_kld_per_dim is None:
             self.cutoff_kld_per_dim = 0.5
@@ -310,7 +312,7 @@ class SpharmLatentWalk(Callback):
             )
 
             ranked_z_dim_list = [i for i in stats["dimension"][::-1]]
-            mu_variance_list = [i for i in stats["mu_variance_per_dim"][::-1]]
+            mu_variance_list = [i for i in stats["mu_std_per_dim"][::-1]]
 
             num_shapemodes = 8
             if len(ranked_z_dim_list) > num_shapemodes:

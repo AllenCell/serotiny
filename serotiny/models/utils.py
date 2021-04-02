@@ -282,7 +282,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
             "dimension": [],
             "test_kld_per_dim": [],
             "condition": [],
-            "mu_variance_per_dim": [],
+            "mu_std_per_dim": [],
         }
 
         for j in range(len(torch.unique(output["cond_labels"]))):
@@ -291,7 +291,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
             this_cond_mu = batch_mu[j :: len(torch.unique(output["cond_labels"])), :]
 
             summed_kld = torch.sum(this_cond_kld, dim=0) / batch_length
-            dim_var = torch.var(this_cond_mu, dim=0)
+            dim_var = torch.std(this_cond_mu, dim=0)
 
             for k in range(len(summed_kld)):
                 dataframe2["dimension"].append(k)
@@ -299,7 +299,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
                     torch.unique(output["cond_labels"])[j].item()
                 )
                 dataframe2["test_kld_per_dim"].append(summed_kld[k].item())
-                dataframe2["mu_variance_per_dim"].append(dim_var[k].item())
+                dataframe2["mu_std_per_dim"].append(dim_var[k].item())
 
         stats_per_dim = pd.DataFrame(dataframe2)
 
