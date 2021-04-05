@@ -7,7 +7,7 @@ from imageio import imwrite
 
 import aicsimageio
 import aicsimageio.transforms as transforms
-import aicsimageio.writers.ome_tiff_writer as ome_tiff_writer
+from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
 import aicsimageprocessing
 
 from skimage.transform import resize
@@ -215,7 +215,7 @@ def change_resolution(
     # change this to do it across all channels at once, perhaps this can be done without for loop
 
     # Write output image
-    with ome_tiff_writer.OmeTiffWriter(path_out, overwrite_file=True) as writer2:
+    with OmeTiffWriter(path_out, overwrite_file=True) as writer2:
         writer2.save(
             data=data_new, channel_names=channel_names, dimension_order="STCZYX"
         )

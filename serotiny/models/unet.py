@@ -7,6 +7,8 @@ import inspect
 
 import logging
 
+from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
+
 logger = logging.getLogger("lightning")
 logger.propagate = False
 
@@ -35,6 +37,7 @@ class UnetModel(pl.LightningModule):
         lr: float,
         input_dims: Sequence[int],
         auto_padding: bool = False,
+        test_image_output = None,
     ):
         """
         Instantiate a UnetModel.
@@ -75,7 +78,11 @@ class UnetModel(pl.LightningModule):
         self.network = network
         self.loss = loss
         
+        self.input_channels = input_channels
+        self.output_channels = output_channels
+
         self.input_dims = input_dims
+        self.test_image_output = test_image_output
 
     def parse_batch(self, batch):
         # TODO: The values of x_label and y_label are used as keys in the batch dictionary.
@@ -83,8 +90,9 @@ class UnetModel(pl.LightningModule):
         #print(f'batch = {batch}')
         x = batch[self.hparams.x_label].float()
         y = batch[self.hparams.y_label].float()
+        ids = batch["id"]
 
-        return x, y
+        return x, y, ids
 
     # Calculate the amount of padding required given an input image dimension,
     # a specific Unet depth and a channel_fan factor
@@ -172,7 +180,7 @@ class UnetModel(pl.LightningModule):
     #def training_step(self, batch, batch_idx, optimizer_idx):
     def training_step(self, batch, batch_idx):
         print(f'In training step (batch_idx = {batch_idx})')
-        x, y = self.parse_batch(batch)
+        x, y, ids = self.parse_batch(batch)
         y_hat, loss = self(x, y)
 
         # NOTE: Nothing needs to be done here with backprop if using
@@ -194,7 +202,7 @@ class UnetModel(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         print(f'In validation step (batch_idx = {batch_idx})')
-        x, y = self.parse_batch(batch)
+        x, y, ids = self.parse_batch(batch)
         y_hat, loss = self(x, y)
 
         # Default logger=False for training_step
@@ -209,8 +217,16 @@ class UnetModel(pl.LightningModule):
 
     def test_step(self, batch, batch_idx):
         print(f'In test step (batch_idx = {batch_idx})')
-        x, y = self.parse_batch(batch)
+        x, y, ids = self.parse_batch(batch)
         y_hat, loss = self(x, y)
+
+        for index, y_slice in enumerate(y_hat):
+            output_path = Path(self.test_image_output) / '-'.join(ids)
+            with OmeTiffWriter(self.test_image_output) as tiff_writer:
+                tiff_writer.save(
+                    data=y_hat,
+                    channel_names=self.output_channels,
+                    dimension_order="STCZYX")
 
         return {
             "test_loss": loss,

@@ -26,7 +26,7 @@ def test_unet_step():
             output_channels=['nucleus_segmentation'],
             depth=3,  # Unet-specific
             auto_padding=True,  # Unet-specific
-            
+            channel_fan_top=64,
             # kwargs for dummy image data module
             length=1,
             #input_dims=[572, 572, 60],

@@ -3,6 +3,7 @@
 
 import os
 import logging
+from pathlib import Path
 from typing import Optional, Sequence
 from datetime import datetime
 
@@ -45,6 +46,7 @@ def train_unet(
     output_channels: Sequence[str],  # Unet
     depth: int,  # Unet
     auto_padding: bool = False,
+    channel_fan_top: int,
     **kwargs,
 ):
     """
@@ -126,11 +128,16 @@ def train_unet(
         depth=depth, 
         n_in_channels=len(input_channels), 
         n_out_channels=len(output_channels), 
+        channel_fan_top=channel_fan_top,
         **kwargs,
     )
     
     network.print_network()
     
+    version_string = "version_" + datetime.now().strftime("%d-%m-%Y--%H-%M-%S"),
+    test_image_output = Path(output_path) / "test_images" / version_string
+    lightning_logs_path = Path(output_path) / "lightning_logs"
+
     unet_model = UnetModel(
         network=network,
         optimizer=optimizer,
@@ -142,16 +149,17 @@ def train_unet(
         lr=lr,
         input_dims=datamodule.dims,
         auto_padding=auto_padding,
+        test_image_output=test_image_output,
     )
     
     tb_logger = TensorBoardLogger(
-        save_dir=str(output_path) + "/lightning_logs",
-        version="version_" + datetime.now().strftime("%d-%m-%Y--%H-%M-%S"),
+        save_dir=lightning_logs_path,
+        version=version_string,
         name="",
     )
 
     ckpt_path = os.path.join(
-        str(output_path) + "/lightning_logs",
+        lightning_logs_path,
         tb_logger.version,
         "checkpoints",
     )
