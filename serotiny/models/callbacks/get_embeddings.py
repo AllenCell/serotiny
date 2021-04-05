@@ -20,19 +20,13 @@ class GetEmbeddings(Callback):
     ):
         """
         Args:
-            config: Config file used by Matheus in cvapipe_analysis
+            resample_n: How many times to sample from latent space and average
 
-            save_dir: Where to save plots
-            Default: csv_logs folder
+            x_label: x_label from datamodule
 
-            condition: A condition to give the decoder
-            Default None
+            c_label: c_label from datamodule
 
-            latent_walk_range: What range to do the latent walk
-            Default = [-2, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0]
-
-            cutoff_kld_per_dim: Cutoff to use for KLD per dim
-            Default = 0.5
+            id_fields: id_fields from datamodule
         """
         super().__init__()
 

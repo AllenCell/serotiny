@@ -23,6 +23,8 @@ class MLPVAELogging(Callback):  # pragma: no cover
         Args:
             resample_n: How many times to sample from
             the latent space before averaging results
+            values: What value to pass in as a condition to the decoder
+            conds_list: Which columns in the condition to set to a value
             save_dir: Where to save plots
             Default: csv_logs folder
         """
@@ -88,8 +90,6 @@ class MLPVAELogging(Callback):  # pragma: no cover
                     conds_list = [conds_list]
 
             for value in self.values:
-                print(self.datamodule.__module__)
-                print(conds_list)
                 make_plot_encoding(
                     self.save_dir,
                     pl_module,

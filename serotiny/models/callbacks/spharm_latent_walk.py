@@ -50,17 +50,18 @@ class SpharmLatentWalk(Callback):
         Args:
             config: Config file used by Matheus in cvapipe_analysis
 
-            save_dir: Where to save plots
-            Default: csv_logs folder
-
-            condition: A condition to give the decoder
-            Default None
+            spharm_coeffs_cols: List of column names of the spharm coeffs
+            Example: ["dna_spharm_L0M1",..]
 
             latent_walk_range: What range to do the latent walk
-            Default = [-2, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0]
+            Example = [-2, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0]
 
             cutoff_kld_per_dim: Cutoff to use for KLD per dim
-            Default = 0.5
+            Example = 0.5
+
+            plot_limits: Limits for plot
+
+            subfolder: Subfolder name to save gifs
         """
         super().__init__()
 

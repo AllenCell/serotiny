@@ -49,6 +49,8 @@ class GetClosestCellsToDims(Callback):
             id_col: "CellId"
 
             N_cells: 3
+
+            c_shape: shape of condition from datamodule
         """
         super().__init__()
 
