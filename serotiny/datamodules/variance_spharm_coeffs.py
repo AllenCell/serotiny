@@ -151,7 +151,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
 
         all_data = pd.read_csv(
             self.modified_source_save_dir
-            / f"variance_rotated_{self.x_label}_{self.c_label}.csv"
+            / f"variance_rotated_{self.x_label}_{self.c_label}_size_{self.num_rows}.csv"
         )
 
         if not self.subset:
