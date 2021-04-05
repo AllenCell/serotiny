@@ -71,7 +71,7 @@ def visualize_encoder_tabular(
         if kl_vs_rcl is None:
             kl_vs_rcl = {"condition": [], "KLD": [], "RCL": [], "ELBO": []}
         all_kl, all_lt = [], []
-        print(conds, "inside")
+
         # Split condition into tmp1 that contains the condition, and
         # tmp2 that contains the mask info of whether the condition
         # is there or not
@@ -406,4 +406,24 @@ def get_mesh_from_dataframe(row: pd.Series, prefix: str, lmax: int):
     # triangle mesh
     mesh, _ = shtools.get_reconstruction_from_coeffs(coeffs)
 
+    return mesh
+
+
+def get_mesh_from_series(row, alias, lmax):
+    coeffs = np.zeros((2, lmax, lmax), dtype=np.float32)
+    for l in range(lmax):
+        for m in range(l + 1):
+            try:
+                # Cosine SHE coefficients
+                coeffs[0, l, m] = row[
+                    [f for f in row.keys() if f"{alias}_shcoeffs_L{l}M{m}C" in f]
+                ]
+                # Sine SHE coefficients
+                coeffs[1, l, m] = row[
+                    [f for f in row.keys() if f"{alias}_shcoeffs_L{l}M{m}S" in f]
+                ]
+            # If a given (l,m) pair is not found, it is assumed to be zero
+            except:
+                pass
+    mesh, _ = shtools.get_reconstruction_from_coeffs(coeffs)
     return mesh
