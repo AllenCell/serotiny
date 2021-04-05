@@ -7,14 +7,31 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 from aicsshparam import shtools
+from aicscytoparam import cytoparam
 from cvapipe_analysis.tools.plotting import ShapeModePlotMaker
 from vtk.util.numpy_support import vtk_to_numpy as vtk2np
 import matplotlib.pyplot as plt
 from matplotlib import animation
+from serotiny.metrics.utils import get_mesh_from_series
 import vtk
 import operator
 from functools import reduce
 import math
+
+# Configure z for inference
+import matplotlib
+
+matplotlib.rc("xtick", labelsize=3)
+matplotlib.rc("ytick", labelsize=3)
+matplotlib.rcParams["xtick.major.size"] = 0.1
+matplotlib.rcParams["xtick.major.width"] = 0.1
+matplotlib.rcParams["xtick.minor.size"] = 0.1
+matplotlib.rcParams["xtick.minor.width"] = 0.1
+
+matplotlib.rcParams["ytick.major.size"] = 0.1
+matplotlib.rcParams["ytick.major.width"] = 0.1
+matplotlib.rcParams["ytick.minor.size"] = 0.1
+matplotlib.rcParams["ytick.minor.width"] = 0.1
 
 
 class SpharmLatentWalk(Callback):
@@ -23,6 +40,7 @@ class SpharmLatentWalk(Callback):
     def __init__(
         self,
         config: dict,
+        spharm_coeffs_cols: list,
         latent_walk_range: Optional[list] = None,
         cutoff_kld_per_dim: Optional[float] = None,
         plot_limits: Optional[list] = None,
@@ -51,15 +69,23 @@ class SpharmLatentWalk(Callback):
         self.latent_walk_range = latent_walk_range
         self.plot_limits = plot_limits
         self.subfolder = subfolder
+        self.dna_spharm_cols = spharm_coeffs_cols
 
-        dfg = pd.read_csv(
-            "/allen/aics/modeling/ritvik/projects/serotiny/variance_spharm_coeffs.csv"
-        )
-        self.dna_spharm_cols = [col for col in dfg.columns if "dna_shcoeffs" in col]
-        self.dna_spharm_cols = [f for f in self.dna_spharm_cols if "L" in f]
         if self.latent_walk_range is None:
             # self.latent_walk_range = [-2, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0]
-            self.latent_walk_range = [-0.5, -0.25, 0.1, 0, 0.1, 0.25, 0.5]
+            self.latent_walk_range = [
+                -2,
+                -1,
+                -0.5,
+                -0.25,
+                -0.1,
+                0,
+                0.1,
+                0.25,
+                0.5,
+                1,
+                2,
+            ]
 
         if self.cutoff_kld_per_dim is None:
             self.cutoff_kld_per_dim = 0.5
@@ -89,26 +115,6 @@ class SpharmLatentWalk(Callback):
 
         return batch_x, batch_y
 
-    @staticmethod
-    def get_mesh_from_series(row, alias, lmax):
-        coeffs = np.zeros((2, lmax, lmax), dtype=np.float32)
-        for l in range(lmax):
-            for m in range(l + 1):
-                try:
-                    # Cosine SHE coefficients
-                    coeffs[0, l, m] = row[
-                        [f for f in row.keys() if f"{alias}_shcoeffs_L{l}M{m}C" in f]
-                    ]
-                    # Sine SHE coefficients
-                    coeffs[1, l, m] = row[
-                        [f for f in row.keys() if f"{alias}_shcoeffs_L{l}M{m}S" in f]
-                    ]
-                # If a given (l,m) pair is not found, it is assumed to be zero
-                except:
-                    pass
-        mesh, _ = shtools.get_reconstruction_from_coeffs(coeffs)
-        return mesh
-
     def get_meshes(
         self,
         trainer: Trainer,
@@ -119,11 +125,18 @@ class SpharmLatentWalk(Callback):
         latent_dims: int,
         c_shape: int,
     ):
+        save_dir = self.config["project"]["local_staging"] / self.subfolder
         meshes = {}
         for rank, z_dim in enumerate(ranked_z_dim_list):
+            # Set subplots
+            fig, ax_array = plt.subplots(
+                3,
+                len(self.latent_walk_range),
+                squeeze=False,
+                figsize=(15, 7),
+            )
             meshes[rank] = {}
             for alias in self.config["pca"]["aliases"]:
-                print(rank, alias)
                 meshes[rank][alias] = []
                 for value_index, value in enumerate(self.latent_walk_range):
                     z_inf = torch.zeros(batch_size, latent_dims)
@@ -143,9 +156,20 @@ class SpharmLatentWalk(Callback):
                     test_spharm.columns = self.dna_spharm_cols
                     test_spharm_series = test_spharm.iloc[0]
 
-                    mesh = self.get_mesh_from_series(test_spharm_series, "dna", 32)
+                    mesh = get_mesh_from_series(test_spharm_series, "dna", 32)
+                    img, origin = cytoparam.voxelize_meshes([mesh])
                     meshes[rank][alias].append(mesh)
-                    print(32)
+                    for proj in [0, 1, 2]:
+                        ax_array[proj, value_index].set_title(f"{value}" r"$\sigma$")
+                        ax_array[proj, value_index].imshow(img.max(proj), cmap="gray")
+                    print(f"Done making mesg for dim {z_dim}")
+            [ax.axis("off") for ax in ax_array.flatten()]
+            # Save figure
+            ax_array.flatten()[0].get_figure().savefig(
+                save_dir / f"dim_{z_dim}_rank_{rank}.png"
+            )
+            # Close figure, otherwise clogs memory
+            plt.close(fig)
 
         return meshes
 
@@ -342,7 +366,6 @@ class SpharmLatentWalk(Callback):
                 projections = {}
                 projs = [[0, 1], [0, 2], [1, 2]]
                 for dim, proj in zip(["z", "y", "x"], projs):
-                    print(dim, projs)
                     projections[dim] = {}
                     for alias, mesh_list in mesh_dict.items():
                         print(dim, alias)
@@ -350,13 +373,12 @@ class SpharmLatentWalk(Callback):
                         for mesh in mesh_list:
                             coords = self.find_plane_mesh_intersection(mesh, proj)
                             projections[dim][alias].append(coords)
-                            print("done")
+                            print("done projecting single mesh")
                 # return contours
-                # print(shapemode)
                 # projections = plot_maker.get_2d_contours(mesh_dict)
-                print("made projection")
+                print(f"Done with all projections for shapemode {shapemode}")
                 for proj, contours in projections.items():
-                    print(proj)
+                    print(f"Beginning gif generation for proj {proj}")
                     self.animate_contours(
                         contours,
                         f"{shapemode}_{proj}",
@@ -364,8 +386,7 @@ class SpharmLatentWalk(Callback):
                         dir_path,
                         self.subfolder,
                     )
-                    print("animated")
-            print("cpombine")
+                print("Done gif generation for shapemode {shapemode}")
+            print("Combing all gifs into single plot")
             shapemodes = [str(i) for i in range(len(ranked_z_dim_list))]
             plot_maker.combine_and_save_animated_gifs(shapemodes)
-            print("end")
