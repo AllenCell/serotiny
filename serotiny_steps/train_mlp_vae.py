@@ -122,22 +122,19 @@ def train_mlp_vae(
         dm.prepare_data()
         dm.setup()
 
-    hidden_layers_tmp = hidden_layers.copy()
-    print(hidden_layers, hidden_layers_tmp)
     encoder = CBVAEEncoderMLP(
         x_dim=x_dim,
         c_dim=c_dim,
         hidden_layers=hidden_layers,
         latent_dims=latent_dims,
     )
-    print(hidden_layers, hidden_layers_tmp)
+
     decoder = CBVAEDecoderMLP(
         x_dim=x_dim,
         c_dim=c_dim,
-        hidden_layers=hidden_layers_tmp,
+        hidden_layers=hidden_layers,
         latent_dims=latent_dims,
     )
-    print(hidden_layers, hidden_layers_tmp)
     # encoder = CBVAEEncoderMLPResnet(
     #     x_dim=x_dim,
     #     c_dim=c_dim,
