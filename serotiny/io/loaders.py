@@ -119,13 +119,12 @@ class LoadSpharmCoeffs:
     Loader class, used to retrieve spharm coeffs from the dataframe,
     """
 
-    def __init__(self, x_label):
+    def __init__(self, x_label, spharm_cols):
         self.x_label = x_label
+        self.spharm_cols = spharm_cols
 
     def __call__(self, row):
-        spharm_cols = [col for col in row.keys() if self.x_label in col]
-        spharm_cols = [f for f in spharm_cols if "L" in f]
-        return torch.tensor(row[spharm_cols])
+        return torch.tensor(row[self.spharm_cols])
 
 
 class Load2DImage:
