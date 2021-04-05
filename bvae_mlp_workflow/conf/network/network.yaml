@@ -1,0 +1,3 @@
+# @package _group_
+latent_dims: 64
+beta: 1

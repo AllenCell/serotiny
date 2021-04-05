@@ -1,0 +1,13 @@
+defaults:
+  - cvapipe_analysis_config: matheus_config
+  - callbacks: callbacks
+  - data: data
+  - data/input: dna_coeffs
+  - data/dir: mem_align_no_skew
+  - data/set_zero: is_true
+  - data/condition: dna_pca
+  - network: network
+  - network/hidden_layers: 3
+  - network/architecture: baseline
+  - training: training
+  # - hydra/launcher: joblib

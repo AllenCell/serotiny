@@ -1,0 +1,9 @@
+# @package _group_
+num_epochs: 40
+batch_size: 128
+num_workers: 4
+gpu_id: "5"
+lr: 0.001
+scheduler: reduce_lr_plateau
+optimizer: "adam"
+

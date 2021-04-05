@@ -1,0 +1,6 @@
+  # @package _group_
+  # where to look for images if they happen to already be precomputed
+  # and where to store them if they do need to be calculated
+  datamodule: VarianceSpharmCoeffs
+  id_fields: ["CellId"]
+  modified_source_save_dir: /allen/aics/modeling/ritvik/projects/serotiny/bvae_mlp_workflow/
