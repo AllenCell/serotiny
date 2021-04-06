@@ -84,6 +84,8 @@ class UnetModel(pl.LightningModule):
         self.input_dims = input_dims
         self.test_image_output = test_image_output
 
+        print(f"this is the file we are running: {__file__}")
+
     def parse_batch(self, batch):
         # TODO: The values of x_label and y_label are used as keys in the batch dictionary.
         #       If they are the same column names, there may be conflict
