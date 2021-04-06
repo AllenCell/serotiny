@@ -220,6 +220,8 @@ class UnetModel(pl.LightningModule):
         x, y, ids = self.parse_batch(batch)
         y_hat, loss = self(x, y)
 
+        print(f"y_hat dimensions {y_hat.shape}")
+        print(f"saving images to {self.test_image_output}")
         if not self.test_image_output is None:
             for index, y_slice in enumerate(y_hat):
                 image_path = '-'.join(ids) + ".ome.tiff"
