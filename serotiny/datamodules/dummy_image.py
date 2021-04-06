@@ -42,6 +42,7 @@ class DummyImageDataset(Dataset):
 
     def __getitem__(self, idx):
         return {
+            'id': [idx, idx],
             self.x_label: torch.randn(self.input_dims),
             self.y_label: torch.randn(self.output_dims),
         }
