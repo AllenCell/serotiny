@@ -10,7 +10,7 @@ def test_unet_step():
             # output_path="/allen/aics/modeling/caleb/runs/image2image/variance_playground_3d_test/",
             datamodule="DummyImageDatamodule",
             # datamodule="ImageImage",
-            batch_size=4,
+            batch_size=2,
             num_gpus=[2],
             num_workers=4,
             id_fields=['CellId', 'CellIndex', 'FOVId'],
@@ -30,7 +30,7 @@ def test_unet_step():
             auto_padding=True,  # Unet-specific
             channel_fan_top=64,
             # kwargs for dummy image data module
-            length=1,
+            length=10,
             #input_dims=[572, 572, 60],
             #output_dims=[572, 572, 60],
             input_dims=[36, 38, 12],
