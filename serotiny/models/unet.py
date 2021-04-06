@@ -179,7 +179,7 @@ class UnetModel(pl.LightningModule):
     # NOTE: Had to remove optimizer_idx if using automatic backprop
     #def training_step(self, batch, batch_idx, optimizer_idx):
     def training_step(self, batch, batch_idx):
-        print(f'In training step (batch_idx = {batch_idx})')
+        print(f'In unet training step (batch_idx = {batch_idx})')
         x, y, ids = self.parse_batch(batch)
         y_hat, loss = self(x, y)
 
@@ -201,7 +201,7 @@ class UnetModel(pl.LightningModule):
         return {"loss": loss, "batch_idx": batch_idx}
 
     def validation_step(self, batch, batch_idx):
-        print(f'In validation step (batch_idx = {batch_idx})')
+        print(f'In unet validation step (batch_idx = {batch_idx})')
         x, y, ids = self.parse_batch(batch)
         y_hat, loss = self(x, y)
 
@@ -216,7 +216,7 @@ class UnetModel(pl.LightningModule):
         }
 
     def test_step(self, batch, batch_idx):
-        print(f'In test step (batch_idx = {batch_idx})')
+        print(f'In unet test step (batch_idx = {batch_idx})')
         x, y, ids = self.parse_batch(batch)
         y_hat, loss = self(x, y)
 
