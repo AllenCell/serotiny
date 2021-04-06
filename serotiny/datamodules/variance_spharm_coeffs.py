@@ -84,6 +84,8 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         x_dim: int,
         source_path: str,
         modified_source_save_dir: str,
+        align: str, 
+        skew: str,
         num_classes: Optional[int] = None,
         set_zero: Optional[bool] = False,
         subset: Optional[int] = None,
@@ -112,6 +114,8 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         self.modified_source_save_dir = modified_source_save_dir
 
         self.datasets = {}
+        self.align = align
+        self.skew = skew
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.x_dim = x_dim
@@ -151,7 +155,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
 
         all_data = pd.read_csv(
             self.modified_source_save_dir
-            / f"variance_rotated_{self.x_label}_{self.c_label}_size_{self.num_rows}.csv"
+            / f"variance_rotated_{self.x_label}_{self.c_label}_size_{self.num_rows}_align_{self.align}_skew_{self.skew}.csv"
         )
 
         if not self.subset:
@@ -189,7 +193,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         """
         my_file = (
             Path(self.modified_source_save_dir)
-            / f"variance_rotated_{self.x_label}_{self.c_label}_size_{self.num_rows}.csv"
+            / f"variance_rotated_{self.x_label}_{self.c_label}_size_{self.num_rows}_align_{self.align}_skew_{self.skew}.csv"
         )
         if my_file.is_file() and self.overwrite is False:
             pass
@@ -240,7 +244,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
 
             df.to_csv(
                 Path(self.modified_source_save_dir)
-                / f"variance_rotated_{self.x_label}_{self.c_label}_size_{self.num_rows}.csv"
+                / f"variance_rotated_{self.x_label}_{self.c_label}_size_{self.num_rows}_align_{self.align}_skew_{self.skew}.csv"
             )
 
     def train_dataloader(self):
