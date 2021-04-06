@@ -36,6 +36,7 @@ class GetClosestCellsToDims(Callback):
         id_col: str,
         N_cells: int,
         c_shape: int,
+        cutoff_kld_per_dim: Optional[float] = None,
     ):
         """
         Args:
@@ -60,6 +61,9 @@ class GetClosestCellsToDims(Callback):
         self.N_cells = N_cells
         self.c_shape = c_shape
         self.dna_spharm_cols = spharm_coeffs_cols
+        self.cutoff_kld_per_dim = cutoff_kld_per_dim
+        if self.cutoff_kld_per_dim is None:
+            self.cutoff_kld_per_dim = 0.5
 
     def to_device(
         self, batch_x: Sequence, batch_y: Sequence, device: Union[str, device]
@@ -125,6 +129,7 @@ class GetClosestCellsToDims(Callback):
     ):
         batch_size = trainer.test_dataloaders[0].batch_size
         latent_dims = pl_module.encoder.enc_layers[-1]
+
         for index, z_dim in enumerate(ranked_z_dim_list):
             # Set subplots
             fig, ax_array = plt.subplots(
@@ -142,6 +147,9 @@ class GetClosestCellsToDims(Callback):
 
                 z_inf = torch.zeros(batch_size, latent_dims)
                 walk_cols = [i for i in subset_sub_df.columns if "mu" in i]
+
+                this_cell_id = subset_sub_df.iloc[0]["CellId"]
+
                 for walk in walk_cols:
                     # walk_cols is mu_{dim}, so walk[3:]
                     z_inf[:, int(walk[3:])] = torch.from_numpy(
@@ -185,6 +193,12 @@ class GetClosestCellsToDims(Callback):
             dir_path = Path(trainer.logger[1].save_dir)
 
             stats = pd.read_csv(dir_path / "stats_per_dim_test.csv")
+
+            stats = (
+                stats.loc[stats["test_kld_per_dim"] > self.cutoff_kld_per_dim]
+                .sort_values(by=["test_kld_per_dim"])
+                .reset_index(drop=True)
+            )
 
             ranked_z_dim_list = [i for i in stats["dimension"][::-1]]
             mu_std_list = [i for i in stats["mu_std_per_dim"][::-1]]
