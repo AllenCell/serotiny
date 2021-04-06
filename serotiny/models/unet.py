@@ -220,13 +220,16 @@ class UnetModel(pl.LightningModule):
         x, y, ids = self.parse_batch(batch)
         y_hat, loss = self(x, y)
 
-        for index, y_slice in enumerate(y_hat):
-            output_path = Path(self.test_image_output) / '-'.join(ids)
-            with OmeTiffWriter(self.test_image_output) as tiff_writer:
-                tiff_writer.save(
-                    data=y_hat,
-                    channel_names=self.output_channels,
-                    dimension_order="STCZYX")
+        if not self.test_image_output is None:
+            for index, y_slice in enumerate(y_hat):
+                image_path = '-'.join(ids) + ".ome.tiff"
+                output_path = Path(self.test_image_output) / image_path
+                print(f"saving test file: {output_path}")
+                with OmeTiffWriter(output_path) as tiff_writer:
+                    tiff_writer.save(
+                        data=y_hat,
+                        channel_names=self.output_channels,
+                        dimension_order="STCZYX")
 
         return {
             "test_loss": loss,

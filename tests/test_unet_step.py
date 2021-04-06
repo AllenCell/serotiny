@@ -6,9 +6,10 @@ def test_unet_step():
     try:
         train_unet(
             data_dir="/allen/aics/modeling/VariancePlayground/manifests/",
-            output_path="/allen/aics/modeling/caleb/runs/image2image/variance_playground_3d_test/",
-            #datamodule="DummyImageDatamodule",
-            datamodule="ImageImage",
+            output_path="output",
+            # output_path="/allen/aics/modeling/caleb/runs/image2image/variance_playground_3d_test/",
+            datamodule="DummyImageDatamodule",
+            # datamodule="ImageImage",
             batch_size=4,
             num_gpus=[2],
             num_workers=4,
@@ -24,7 +25,8 @@ def test_unet_step():
             output_column="actk_rawseg",
             input_channels=['dna'],
             output_channels=['nucleus_segmentation'],
-            depth=3,  # Unet-specific
+            # depth=3,  # Unet-specific
+            depth=2,  # Unet-specific
             auto_padding=True,  # Unet-specific
             channel_fan_top=64,
             # kwargs for dummy image data module

@@ -45,7 +45,7 @@ def train_unet(
     input_channels: Sequence[str],  # Unet
     output_channels: Sequence[str],  # Unet
     depth: int,  # Unet
-    auto_padding: bool = False,
+    auto_padding: bool,
     channel_fan_top: int,
     **kwargs,
 ):
@@ -134,9 +134,11 @@ def train_unet(
     
     network.print_network()
     
-    version_string = "version_" + datetime.now().strftime("%d-%m-%Y--%H-%M-%S"),
+    version_string = "version_" + datetime.now().strftime("%d-%m-%Y--%H-%M-%S")
     test_image_output = Path(output_path) / "test_images" / version_string
     lightning_logs_path = Path(output_path) / "lightning_logs"
+
+    test_image_output.mkdir(parents=True, exist_ok=True)
 
     unet_model = UnetModel(
         network=network,
