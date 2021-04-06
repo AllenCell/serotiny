@@ -1,3 +1,5 @@
 # @package _group_
 path: "/allen/aics/assay-dev/MicroscopyOtherData/Viana/projects/cell_shape_variation/local_staging_beta/shapemode/manifest.csv"
 # path: "/allen/aics/modeling/ritvik/projects/serotiny/bvae_mlp_workflow/1000rows_subset.csv"
+align: "MEM"
+skew: "no"

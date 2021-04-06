@@ -17,7 +17,7 @@ def runme(cfg: DictConfig) -> None:
         modified_source_save_dir=cfg["data"]["modified_source_save_dir"],
         output_path=f"{os.getcwd()}/results/",
         datamodule=cfg["data"]["datamodule"],
-        batch_size=int(cfg["training"]["batch_size"]),
+        batch_size=int(cfg["training"]["batch_size"]["size"]),
         gpu_id=cfg["training"]["gpu_id"],
         num_workers=int(cfg["training"]["num_workers"]),
         num_epochs=int(cfg["training"]["num_epochs"]),
@@ -36,9 +36,13 @@ def runme(cfg: DictConfig) -> None:
         set_zero=cfg["data"]["set_zero"]["bool"],  # kwarg for spharm
         overwrite=False,  # kwarg for spharm
         id_fields=cfg["data"]["id_fields"],  # kwarg for spharm
-        values=list(cfg["callbacks"]['values']),
-        latent_walk_range = list(cfg["callbacks"]['latent_walk_range']),
-        n_cells = int(cfg["callbacks"]['n_cells']),  # No of closets cells to find per location
+        values=list(cfg["callbacks"]["values"]),
+        latent_walk_range=list(cfg["callbacks"]["latent_walk_range"]),
+        n_cells=int(
+            cfg["callbacks"]["n_cells"]
+        ),  # No of closets cells to find per location
+        align=cfg['data']['dir']['align'], # DNA/MEM
+        skew=cfg['data']['dir']['skew'], #yes/no
     )
 
     print("Done!")

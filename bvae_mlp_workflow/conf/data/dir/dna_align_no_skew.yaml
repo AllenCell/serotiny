@@ -1,2 +1,5 @@
 # @package _group_
-path: "/allen/aics/modeling/gui.pires/data/rotated_coeffs_full_manifest.csv"
+# path: "/allen/aics/modeling/gui.pires/data/rotated_coeffs_full_manifest.csv"
+path: "/allen/aics/modeling/ritvik/projects/serotiny/gui_dna_align_1000rows_subset.csv"
+align: "DNA"
+skew: "no"

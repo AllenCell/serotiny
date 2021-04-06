@@ -10,4 +10,5 @@ defaults:
   - network/hidden_layers: 3
   - network/architecture: baseline
   - training: training
-  # - hydra/launcher: joblib
+  - training/batch_size: 128
+  - hydra/launcher: joblib
