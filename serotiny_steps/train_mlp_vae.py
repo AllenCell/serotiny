@@ -53,6 +53,8 @@ def train_mlp_vae(
     cvapipe_analysis_config_path: str,
     latent_walk_range: list,
     n_cells: int,  # No of closets cells to find per location
+    align: str, # DNA/MEM
+    skew: str, #yes/no
     length: Optional[int] = None,  # For Gaussian
     corr: Optional[bool] = False,  # For Gaussian
     id_fields: Optional[list] = None,  # For Spharm
@@ -118,6 +120,8 @@ def train_mlp_vae(
             set_zero=set_zero,
             overwrite=overwrite,
             id_fields=id_fields,
+            align=align, 
+            skew=skew,
         )
         dm.prepare_data()
         dm.setup()
