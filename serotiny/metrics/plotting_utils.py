@@ -271,6 +271,9 @@ def make_plot_encoding(
         tmp_2 = kl_vs_rcl.loc[kl_vs_rcl["condition"] == str(conds_list[i])]
         tmp = tmp.sort_values(by="kl_divergence", ascending=False)
         tmp = tmp.reset_index(drop=True)
+        tmp["explained_variance"] = (
+            tmp["kl_divergence"] / tmp["kl_divergence"].sum()
+        ) * 100
         x = tmp.index.values
         y = tmp.iloc[:, 1].values
         sns.lineplot(
@@ -283,6 +286,20 @@ def make_plot_encoding(
         )
         bax.plot(x, y)
         ax3.scatter(tmp_2["RCL"].mean(), tmp_2["KLD"].mean(), label=str(i))
+
+        # Make plot for explained variance
+        fig_explained_var, ax_explained_var = plt.subplots(1, 1, figsize=(7, 5))
+        sns.lineplot(
+            ax=ax_explained_var,
+            data=tmp,
+            x=tmp.index,
+            y="explained_variance",
+            label=str(conds_list[i]),
+            legend="brief",
+        )
+        ax_explained_var.set_xlabel("Latent dimension")
+        ax_explained_var.set_ylabel("(KLD per dim/Total KLD) * 100")
+        ax_explained_var.set_title("Explained Variance")
 
     ax2.set_xlabel("Latent dimension")
     ax2.set_ylabel("KLD")
@@ -304,9 +321,12 @@ def make_plot_encoding(
         fig.savefig(path_save_fig, bbox_inches="tight")
         LOGGER.info(f"Saved: {path_save_fig}")
 
-    if save is True:
         path_save_fig = path_save_dir / Path(f"brokenaxes_KLD_per_dim_{value}.png")
         fig2.savefig(path_save_fig, bbox_inches="tight")
+        LOGGER.info(f"Saved: {path_save_fig}")
+
+        path_save_fig = path_save_dir / Path(f"explained_variance_{value}.png")
+        fig_explained_var.savefig(path_save_fig, bbox_inches="tight")
         LOGGER.info(f"Saved: {path_save_fig}")
 
 
