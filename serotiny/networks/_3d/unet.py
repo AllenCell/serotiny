@@ -14,8 +14,8 @@ class Unet(nn.Module):
         self,
         depth: int = 4,
         
-        n_in_channels: int = 1,
-        n_out_channels: int = 1,
+        num_input_channels: int = 1,
+        num_output_channels: int = 1,
         
         channel_fan_top: int = 64,        # Original paper = 64
         channel_fan: int = 2,             # Original paper = 2

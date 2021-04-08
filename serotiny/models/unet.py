@@ -33,12 +33,14 @@ class UnetModel(pl.LightningModule):
         network: nn.Module,
         optimizer: opt.Optimizer,
         loss: nn.Module,
+        lr: float,
+        input_dims: Sequence[int],
+
+        # additional parameters
         x_label: str,
         y_label: str,
         input_channels: Sequence[str],
         output_channels: Sequence[str],
-        lr: float,
-        input_dims: Sequence[int],
         auto_padding: bool = False,
         test_image_output = None,
     ):
@@ -85,7 +87,11 @@ class UnetModel(pl.LightningModule):
         self.output_channels = output_channels
 
         self.input_dims = input_dims
-        self.test_image_output = test_image_output
+
+        self.test_image_output = None
+        if not test_image_output is None:
+            self.test_image_output = Path(test_image_output)
+            self.test_image_output.mkdir(parents=True, exist_ok=True)
         
         if self.hparams.auto_padding:
             #print(f'self.network.depth = {self.network.depth}')
