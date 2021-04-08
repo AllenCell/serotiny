@@ -11,6 +11,7 @@ import fire
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
 from pytorch_lightning.callbacks import ModelCheckpoint, GPUStatsMonitor, EarlyStopping
+from pytorch_lightning.profiler import PyTorchProfiler
 
 #from serotiny.networks.vae import CBVAEDecoder, CBVAEEncoder
 #from serotiny.models import CBVAEModel
@@ -45,8 +46,8 @@ def train_unet(
     input_channels: Sequence[str],  # Unet
     output_channels: Sequence[str],  # Unet
     depth: int,  # Unet
-    auto_padding: bool,
-    channel_fan_top: int,
+    channel_fan_top: int,  # Unet
+    auto_padding: bool = False,  # Unet
     **kwargs,
 ):
     """
@@ -126,9 +127,9 @@ def train_unet(
     
     network = Unet(
         depth=depth, 
+        channel_fan_top=channel_fan_top, 
         n_in_channels=len(input_channels), 
         n_out_channels=len(output_channels), 
-        channel_fan_top=channel_fan_top,
         **kwargs,
     )
     
@@ -186,6 +187,8 @@ def train_unet(
         early_stopping,
     ]
     
+    profiler = PyTorchProfiler(profile_memory=True)
+    
     trainer = pl.Trainer(
         logger=[tb_logger],
         # accelerator="ddp",
@@ -196,9 +199,10 @@ def train_unet(
         checkpoint_callback=checkpoint_callback,
         callbacks=callbacks,
         benchmark=False,
-        profiler=False,
+        profiler=profiler,
         deterministic=True,
         #automatic_optimization=False,  # Set this to True (default) for automatic optimization
+        precision=16,
     )
     
     #import torch

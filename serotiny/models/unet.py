@@ -15,7 +15,7 @@ logger.propagate = False
 import torch
 import torch.optim as opt
 import torch.nn as nn
-import torch.nn.functional as F
+#import torch.nn.functional as F
 
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.parsing import get_init_args
@@ -83,7 +83,14 @@ class UnetModel(pl.LightningModule):
 
         self.input_dims = input_dims
         self.test_image_output = test_image_output
-
+        
+        if self.hparams.auto_padding:
+            #print(f'self.network.depth = {self.network.depth}')
+            #print(f'self.network.channel_fan = {self.network.channel_fan}')
+            #print(f'self.input_dims = {self.input_dims}')
+            
+            self.padding = self.get_unet_padding(list(self.input_dims), self.network.depth, self.network.channel_fan)
+            
         print(f"this is the file we are running: {__file__}")
 
     def parse_batch(self, batch):
@@ -147,7 +154,7 @@ class UnetModel(pl.LightningModule):
             padding_left = padding // 2
             padding_right = padding - padding_left
 
-            #print(f'input_size = {input_size}, new_input_size = {new_input_size}, padding = {padding_left, padding_right}')
+            print(f'input_size = {input_size}, new_input_size = {new_input_size}, padding = {padding_left, padding_right}')
 
             input_paddings.insert(0, padding_right)
             input_paddings.insert(0, padding_left)
@@ -164,13 +171,17 @@ class UnetModel(pl.LightningModule):
             #print(f'self.network.channel_fan = {self.network.channel_fan}')
             #print(f'self.input_dims = {self.input_dims}')
             
-            padding = self.get_unet_padding(list(self.input_dims), self.network.depth, self.network.channel_fan)
-            #print(f'padding = {padding}')
+            #padding = self.get_unet_padding(list(self.input_dims), self.network.depth, self.network.channel_fan)
+            #print(f'auto_padding = {padding}')
             
             # We need to pad both x and y, otherwise, they will have different sizes.
             # This assumes that x and y have the same sizes to begin with
-            x = F.pad(x, padding, mode="constant", value=0)
-            y = F.pad(y, padding, mode="constant", value=0)
+            #x = F.pad(x, self.padding, mode="constant", value=0)
+            #y = F.pad(y, self.padding, mode="constant", value=0)
+            
+            pad_mod = nn.ConstantPad3d(self.padding, value=0)
+            x = pad_mod(x)
+            y = pad_mod(y)
             
         # Forward passes
         y_hat = self.network(x)
@@ -199,7 +210,7 @@ class UnetModel(pl.LightningModule):
 
         # Default logger=False for training_step
         # set it to true to log train loss to all lggers
-        self.log("train loss", loss, logger=True)
+        self.log("train_loss", loss, logger=True)
         return {"loss": loss, "batch_idx": batch_idx}
 
     def validation_step(self, batch, batch_idx):
@@ -209,7 +220,7 @@ class UnetModel(pl.LightningModule):
 
         # Default logger=False for training_step
         # set it to true to log train loss to all lggers
-        self.log("validation loss", loss, logger=True)
+        self.log("validation_loss", loss, logger=True)
 
         return {
             "validation_loss": loss,
