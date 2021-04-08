@@ -182,8 +182,6 @@ def train_model(
         **kwargs
     )
     
-    print(f"created unet {unet_model}")
-
     tb_logger = TensorBoardLogger(
         save_dir=lightning_logs_path,
         version=version_string,
