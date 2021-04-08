@@ -161,8 +161,8 @@ def train_model(
     network = create_network(
         # depth=depth, 
         # channel_fan_top=channel_fan_top, 
-        num_input_channels=len(input_channels), 
-        num_output_channels=len(output_channels), 
+        # num_input_channels=len(input_channels), 
+        # num_output_channels=len(output_channels), 
         **kwargs,
     )
     
