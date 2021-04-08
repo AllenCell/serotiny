@@ -179,7 +179,6 @@ def train_model(
         optimizer=optimizer,
         loss=loss,
         lr=lr,
-        input_dims=datamodule.dims,
         **kwargs
     )
     
