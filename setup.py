@@ -110,6 +110,7 @@ setup(
             "split_data=serotiny_steps.split_data:main",
             "train_classifier=serotiny_steps.train_classifier:main",
             "train_vae=serotiny_steps.train_vae:main",
+            "train_model=serotiny_steps.train_model:main",
             "tune_model=serotiny_steps.tune_model:main",
         ],
     },
