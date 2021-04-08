@@ -69,7 +69,7 @@ def train_classifier(
         tes and val splits
 
     output_path: str,
-        Path to output diectory for saving trained model
+        Path to output directory for saving trained model
         and tensorboard logs
 
     datamodule: str,
