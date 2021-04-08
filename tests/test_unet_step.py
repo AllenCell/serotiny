@@ -16,13 +16,14 @@ def test_unet_step():
     
     try:
         train_unet(
-            data_dir="/allen/aics/modeling/VariancePlayground/manifests/",
-            output_path="output",
+            data_dir="data", # "/allen/aics/modeling/VariancePlayground/manifests/",
+            output_path="data/output",
             # output_path="/allen/aics/modeling/caleb/runs/image2image/variance_playground_3d_test/",
             datamodule="DummyImageDatamodule",
             # datamodule="ImageImage",
             batch_size=2,
-            num_gpus=[2],
+            num_gpus=[0],
+            # num_gpus=[2],
             num_workers=4,
             id_fields=['CellId', 'CellIndex', 'FOVId'],
             num_epochs=10,
