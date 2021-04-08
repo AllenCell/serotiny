@@ -112,7 +112,7 @@ class BaseDataModule(pl.LightningDataModule):
 
         filenames = listdir(self.data_dir)
         dataset_splits = [split for split in filenames if split.endswith(".csv")]
-        dataset_paths = [Path(self.data_dir + split) for split in dataset_splits]
+        dataset_paths = [Path(self.data_dir) / split for split in dataset_splits]
 
         for path in dataset_paths:
             if not path.exists():
