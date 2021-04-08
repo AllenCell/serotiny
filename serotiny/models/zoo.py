@@ -1,7 +1,9 @@
 from pathlib import Path
 import os
 
+from pytorch_lightning import Trainer
 import serotiny.models as models
+
 
 def _get_root(model_root=None):
     if model_root is not None:
@@ -42,7 +44,7 @@ def get_trainer_at_checkpoint(model_path, model_root=None):
     model_id = (model_id if ".ckpt" in model_id else model_id+".ckpt")
     model_path = (model_root / model_class) / model_id
 
-    trainer = Trainer(resume_from_checkpoint=model_path)
+    return Trainer(resume_from_checkpoint=model_path)
 
 
 def store_model(trainer, model_class, model_id, model_root=None):
