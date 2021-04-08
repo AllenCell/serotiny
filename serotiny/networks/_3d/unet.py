@@ -105,7 +105,7 @@ class Unet(nn.Module):
 
             # At the top layer
             if current_depth == depth:
-                n_in = n_in_channels
+                n_in = num_input_channels
                 n_out = channel_fan_top  # Similar to original paper and label-free, apply channel_fan_top only in the top layer
 
             else:
@@ -161,7 +161,7 @@ class Unet(nn.Module):
         # In original paper, kernel_size = 1
         self.conv_out = nn.Conv3d(
             self.channels_up[depth][1],
-            n_out_channels,
+            num_output_channels,
             
             kernel_size=kernel_size_finalconv,
             stride=stride_finalconv,
