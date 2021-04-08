@@ -157,7 +157,7 @@ class UnetModel(pl.LightningModule):
             padding_left = padding // 2
             padding_right = padding - padding_left
 
-            print(f'input_size = {input_size}, new_input_size = {new_input_size}, padding = {padding_left, padding_right}')
+            # print(f'input_size = {input_size}, new_input_size = {new_input_size}, padding = {padding_left, padding_right}')
 
             input_paddings.insert(0, padding_right)
             input_paddings.insert(0, padding_left)
@@ -236,15 +236,15 @@ class UnetModel(pl.LightningModule):
         x, y, ids = self.parse_batch(batch)
         y_hat, loss = self(x, y)
 
-        print(f"ids: {ids} - y_hat dimensions: {y_hat.shape}")
-        print(f"saving images to {self.test_image_output}")
+        # print(f"ids: {ids} - y_hat dimensions: {y_hat.shape}")
+        # print(f"saving images to {self.test_image_output}")
         if not self.test_image_output is None:
             test_images = y_hat.cpu().numpy().astype(np.float32)
             for id, y_slice in zip(ids, test_images):
-                print(f"id: {id}, y_slice.shape: {y_slice.shape}")
                 image_path = '-'.join(id) + ".ome.tiff"
                 output_path = Path(self.test_image_output) / image_path
-                print(f"saving test file: {output_path}")
+                # print(f"id: {id}, y_slice.shape: {y_slice.shape}")
+                # print(f"saving test file: {output_path}")
                 with OmeTiffWriter(output_path) as tiff_writer:
                     tiff_writer.save(
                         data=y_slice,
