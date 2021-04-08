@@ -43,6 +43,7 @@ class UnetModel(pl.LightningModule):
         output_channels: Sequence[str],
         auto_padding: bool = False,
         test_image_output = None,
+        **kwargs,
     ):
         """
         Instantiate a UnetModel.
