@@ -4,6 +4,7 @@ implemented as a Pytorch Lightning module
 """
 from typing import Sequence
 import inspect
+from pathlib import Path
 
 import logging
 
@@ -235,16 +236,34 @@ class UnetModel(pl.LightningModule):
 
         print(f"y_hat dimensions {y_hat.shape}")
         print(f"saving images to {self.test_image_output}")
+        print(f"ids = {ids}")
+        
+        # Convert each nested list from tensor to list
+        ids_lists_all = list(field.tolist() for field in ids.values())
+        print(f"ids_list_all = {ids_lists_all}")
+        
         if not self.test_image_output is None:
             for index, y_slice in enumerate(y_hat):
-                image_path = '-'.join(ids) + ".ome.tiff"
+                # Get the nth element from each list based on index
+                unique_id_list = [str(ids_list[index]) for ids_list in ids_lists_all]
+                image_path = '-'.join(unique_id_list) + ".ome.tiff"
+                print(f"image_path = {image_path}")
+                
                 output_path = Path(self.test_image_output) / image_path
                 print(f"saving test file: {output_path}")
-                with OmeTiffWriter(output_path) as tiff_writer:
-                    tiff_writer.save(
-                        data=y_hat,
-                        channel_names=self.output_channels,
-                        dimension_order="STCZYX")
+                
+                OmeTiffWriter.save(
+                    data=y_hat.cpu().numpy().astype((np.uint8)),
+                    output_path,
+                    dimension_order="CZYX",
+                    channel_names=self.output_channels,
+                )
+                
+                #with OmeTiffWriter(output_path) as tiff_writer:
+                #    tiff_writer.save(
+                #        data=y_hat,
+                #        channel_names=self.output_channels,
+                #        dimension_order="STCZYX")
 
         return {
             "test_loss": loss,

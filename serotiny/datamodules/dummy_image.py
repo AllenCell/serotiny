@@ -30,19 +30,26 @@ class DummyImageDataset(Dataset):
 
     # TODO: Should we include input_channels and output_channels so whatever is returned
     #       will include only the specific channels?
-    def __init__(self, x_label, y_label, length, input_dims, output_dims, *args, **kwargs):
+    def __init__(self, x_label, y_label, id_fields, length, input_dims, output_dims, *args, **kwargs):
         self.length = length
         self.input_dims = input_dims
         self.output_dims = output_dims
         self.x_label = x_label
         self.y_label = y_label
+        self.id_fields = id_fields
 
     def __len__(self):
         return self.length
 
     def __getitem__(self, idx):
+        
+        id_dict = {}
+        for field in self.id_fields:
+            id_dict[field] = idx
+            
         return {
-            'id': [idx, idx],
+            #'id': [idx, idx],
+            'id': id_dict,
             self.x_label: torch.randn(self.input_dims),
             self.y_label: torch.randn(self.output_dims),
         }
@@ -102,6 +109,7 @@ class DummyImageDatamodule(pl.LightningDataModule):
         y_label: str,
         input_channels: Sequence[Union[str, int]],
         output_channels: Sequence[Union[str, int]],
+        id_fields: Sequence[str],
         
         input_dims: list,
         output_dims: list,
@@ -114,11 +122,12 @@ class DummyImageDatamodule(pl.LightningDataModule):
         self.num_workers = num_workers
         self.x_label = x_label
         self.y_label = y_label
-        self.length = length
+        self.id_fields = id_fields
 
         self.num_input_channels = len(input_channels)
         self.num_output_channels = len(output_channels)
         
+        self.length = length
         self.input_dims = input_dims
         self.output_dims = output_dims
         
@@ -138,6 +147,7 @@ class DummyImageDatamodule(pl.LightningDataModule):
         self.dataset = DummyImageDataset(
             self.x_label, 
             self.y_label, 
+            self.id_fields, 
             self.length, 
             [self.num_input_channels] + self.input_dims, 
             [self.num_output_channels] + self.output_dims)
