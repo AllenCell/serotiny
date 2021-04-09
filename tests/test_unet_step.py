@@ -36,7 +36,6 @@ def test_unet_step():
             output_column="actk_rawseg",
             input_channels=['dna'],
             output_channels=['nucleus_segmentation'],
-            # depth=3,  # Unet-specific
             depth=2,  # Unet-specific
             channel_fan_top=64,  # Unet-specific
             auto_padding=True,  # Unet-specific
