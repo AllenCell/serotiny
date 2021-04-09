@@ -46,15 +46,11 @@ class DummyImageDataset(Dataset):
         
         id_dict = {}
         for field in self.id_fields:
-            id_dict[field] = idx
+            id_dict[field] = str(uuid())
             
         return {
-<<<<<<< HEAD
-            #'id': [idx, idx],
             'id': id_dict,
-=======
-            'id': [str(uuid()), str(uuid())],
->>>>>>> 039531702c1c8504434951d4964cc9dfac93e0d9
+            #'id': [str(uuid()), str(uuid())],
             self.x_label: torch.randn(self.input_dims),
             self.y_label: torch.randn(self.output_dims),
         }
