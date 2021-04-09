@@ -2,6 +2,9 @@
 General conditional beta variational autoencoder module,
 implemented as a Pytorch Lightning module
 """
+
+import numpy as np
+from pathlib import Path
 from typing import Sequence
 import inspect
 from pathlib import Path
@@ -155,7 +158,7 @@ class UnetModel(pl.LightningModule):
             padding_left = padding // 2
             padding_right = padding - padding_left
 
-            print(f'input_size = {input_size}, new_input_size = {new_input_size}, padding = {padding_left, padding_right}')
+            # print(f'input_size = {input_size}, new_input_size = {new_input_size}, padding = {padding_left, padding_right}')
 
             input_paddings.insert(0, padding_right)
             input_paddings.insert(0, padding_left)
@@ -242,6 +245,7 @@ class UnetModel(pl.LightningModule):
         ids_lists_all = list(field.tolist() for field in ids.values())
         print(f"ids_list_all = {ids_lists_all}")
         
+        '''
         if not self.test_image_output is None:
             for index, y_slice in enumerate(y_hat):
                 # Get the nth element from each list based on index
@@ -258,12 +262,25 @@ class UnetModel(pl.LightningModule):
                     dimension_order="CZYX",
                     channel_names=self.output_channels,
                 )
+        '''
+        
+        # print(f"ids: {ids} - y_hat dimensions: {y_hat.shape}")
+        # print(f"saving images to {self.test_image_output}")
+        if not self.test_image_output is None:
+            test_images = y_hat.cpu().numpy().astype(np.float32)
+            for id, y_slice in zip(ids, test_images):
+                unique_id_list = [str(ids_list[index]) for ids_list in ids_lists_all]
+                image_path = '-'.join(unique_id_list) + ".ome.tiff"
+                print(f"image_path = {image_path}")
                 
-                #with OmeTiffWriter(output_path) as tiff_writer:
-                #    tiff_writer.save(
-                #        data=y_hat,
-                #        channel_names=self.output_channels,
-                #        dimension_order="STCZYX")
+                output_path = Path(self.test_image_output) / image_path
+                # print(f"id: {id}, y_slice.shape: {y_slice.shape}")
+                # print(f"saving test file: {output_path}")
+                with OmeTiffWriter(output_path) as tiff_writer:
+                    tiff_writer.save(
+                        data=y_slice,
+                        channel_names=self.output_channels,
+                        dimension_order="STCZYX")
 
         return {
             "test_loss": loss,

@@ -1,3 +1,4 @@
+from uuid import uuid4 as uuid
 from typing import Sequence, Union
 
 import multiprocessing as mp
@@ -48,8 +49,12 @@ class DummyImageDataset(Dataset):
             id_dict[field] = idx
             
         return {
+<<<<<<< HEAD
             #'id': [idx, idx],
             'id': id_dict,
+=======
+            'id': [str(uuid()), str(uuid())],
+>>>>>>> 039531702c1c8504434951d4964cc9dfac93e0d9
             self.x_label: torch.randn(self.input_dims),
             self.y_label: torch.randn(self.output_dims),
         }
