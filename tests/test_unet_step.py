@@ -81,42 +81,6 @@ def test_unet_step():
             loss=loss_params,
             datamodule=datamodule_params,
         )
-
-
-        #     data_dir="data", # "/allen/aics/modeling/VariancePlayground/manifests/",
-        #     output_path="data/output",
-        #     # output_path="/allen/aics/modeling/caleb/runs/image2image/variance_playground_3d_test/",
-        #     # datamodule="DummyImageDatamodule",
-        #     datamodule=datamodule_params,
-        #     # datamodule="ImageImage",
-        #     batch_size=2,
-        #     id_fields=['CellId', 'CellIndex', 'FOVId'],
-        #     num_gpus=[0],
-        #     # num_gpus=[2],
-        #     num_workers=4,
-        #     num_epochs=1,
-        #     lr=1e-3,
-        #     optimizer="Adam",
-        #     scheduler="Adam",
-        #     loss="BatchMSELoss",
-        #     test=True,
-        #     x_label="x_label",
-        #     y_label="y_label",
-        #     input_column="actk_rawseg",
-        #     output_column="actk_rawseg",
-        #     input_channels=['dna'],
-        #     output_channels=['nucleus_segmentation'],
-        #     depth=2,  # Unet-specific
-        #     channel_fan_top=64,  # Unet-specific
-        #     auto_padding=True,  # Unet-specific
-            
-        #     # kwargs for dummy image data module
-        #     length=10,
-        #     #input_dims=[572, 572, 60],
-        #     #output_dims=[572, 572, 60],
-        #     input_dims=[36, 38, 12],
-        #     output_dims=[36, 38, 12],
-        # )
         
     except Exception as e:
         pytest.fail(f"`train_unet` failed to run.")
