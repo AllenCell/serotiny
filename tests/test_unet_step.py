@@ -26,7 +26,7 @@ def test_unet_step():
             num_gpus=[0],
             # num_gpus=[2],
             num_workers=4,
-            num_epochs=10,
+            num_epochs=1,
             lr=1e-3,
             optimizer="Adam",
             scheduler="Adam",
@@ -38,7 +38,6 @@ def test_unet_step():
             output_column="actk_rawseg",
             input_channels=['dna'],
             output_channels=['nucleus_segmentation'],
-            # depth=3,  # Unet-specific
             depth=2,  # Unet-specific
             channel_fan_top=64,  # Unet-specific
             auto_padding=True,  # Unet-specific

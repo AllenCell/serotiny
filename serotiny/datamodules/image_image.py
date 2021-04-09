@@ -115,8 +115,18 @@ class ImageImage(BaseDataModule):
         self.x_label = x_label
         self.y_label = y_label
         
+        """
+        Example:
+        
+        ids = {'CellId': tensor([290104, 282904, 308256, 296999, 300839, 303729, 293187], device='cuda:2'), 
+               'CellIndex': tensor([13, 13,  6, 19,  9, 19,  1], device='cuda:2'), 
+               'FOVId': tensor([1967, 1691, 2590, 2190, 2335, 2422, 2064], device='cuda:2')
+              }
+        """
+        
         self.loaders = {
             # Use callable class objects here because lambdas aren't picklable
+            
             "id": LoadColumns(self.id_fields),
             self.x_label: Load3DImage(
                 self.input_column,

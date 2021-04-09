@@ -7,6 +7,7 @@ import numpy as np
 from pathlib import Path
 from typing import Sequence
 import inspect
+from pathlib import Path
 
 import logging
 
@@ -243,12 +244,28 @@ class UnetModel(pl.LightningModule):
         x, y, ids = self.parse_batch(batch)
         y_hat, loss = self(x, y)
 
+        #print(f"y_hat dimensions {y_hat.shape}")
+        #print(f"saving images to {self.test_image_output}")
+        #print(f"ids = {ids}")
+        
+        # Convert each nested list from tensor to list
+        try:
+            ids_lists_all = list(field.tolist() for field in ids.values())  # Real datamodule returns ids as a tensor list
+        except:
+            ids_lists_all = list(field for field in ids.values())  # Dummy datamodule returns ids as a regular list
+            
+        #print(f"ids_list_all = {ids_lists_all}")
+        
         # print(f"ids: {ids} - y_hat dimensions: {y_hat.shape}")
         # print(f"saving images to {self.test_image_output}")
         if not self.test_image_output is None:
-            test_images = y_hat.cpu().numpy().astype(np.float32)
-            for id, y_slice in zip(ids, test_images):
-                image_path = '-'.join(id) + ".ome.tiff"
+            test_images = y_hat.cpu().numpy().astype(np.float32)  # TODO: Maybe change this to uint16? Caleb
+            #for id, y_slice in zip(ids, test_images):
+            for index, y_slice in enumerate(test_images):
+                unique_id_list = [str(ids_list[index]) for ids_list in ids_lists_all]
+                image_path = '-'.join(unique_id_list) + ".ome.tiff"
+                print(f"image_path = {image_path}")
+                
                 output_path = Path(self.test_image_output) / image_path
                 # print(f"id: {id}, y_slice.shape: {y_slice.shape}")
                 # print(f"saving test file: {output_path}")
@@ -256,7 +273,7 @@ class UnetModel(pl.LightningModule):
                     tiff_writer.save(
                         data=y_slice,
                         channel_names=self.output_channels,
-                        dimension_order="STCZYX")
+                        dimension_order="STCZYX")  # TODO: Maybe change this to CZYX since we don't have S and T? Caleb
 
         return {
             "test_loss": loss,
