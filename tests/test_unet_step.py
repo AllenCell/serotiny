@@ -21,14 +21,8 @@ def test_unet_step():
             # output_path="/allen/aics/modeling/caleb/runs/image2image/variance_playground_3d_test/",
             datamodule="DummyImageDatamodule",
             # datamodule="ImageImage",
-<<<<<<< HEAD
-            batch_size=7,
-            num_gpus=[2],
-=======
             batch_size=2,
-            num_gpus=[0],
-            # num_gpus=[2],
->>>>>>> 039531702c1c8504434951d4964cc9dfac93e0d9
+            num_gpus=[2],
             num_workers=4,
             id_fields=['CellId', 'CellIndex', 'FOVId'],
             num_epochs=1,
