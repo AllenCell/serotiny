@@ -42,9 +42,10 @@ class UnetModel(pl.LightningModule):
         y_label: str,
         input_channels: Sequence[str],
         output_channels: Sequence[str],
-        auto_padding: bool = False,
-        test_image_output = None,
-        **kwargs,
+        auto_padding: bool,
+        output_path: str,
+        version_string: str,
+        test_image_output: bool,
     ):
         """
         Instantiate a UnetModel.
@@ -90,9 +91,8 @@ class UnetModel(pl.LightningModule):
 
         self.input_dims = input_dims
 
-        self.test_image_output = None
-        if not test_image_output is None:
-            self.test_image_output = Path(test_image_output)
+        if test_image_output:
+            self.test_image_output = Path(output_path) / "test_images" / version_string
             self.test_image_output.mkdir(parents=True, exist_ok=True)
         
         if self.hparams.auto_padding:
@@ -258,7 +258,7 @@ class UnetModel(pl.LightningModule):
         
         # print(f"ids: {ids} - y_hat dimensions: {y_hat.shape}")
         # print(f"saving images to {self.test_image_output}")
-        if not self.test_image_output is None:
+        if self.hparams.test_image_output:
             test_images = y_hat.cpu().numpy().astype(np.float32)  # TODO: Maybe change this to uint16? Caleb
             #for id, y_slice in zip(ids, test_images):
             for index, y_slice in enumerate(test_images):

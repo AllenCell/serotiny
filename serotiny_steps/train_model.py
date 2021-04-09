@@ -4,7 +4,7 @@
 import os
 import logging
 from pathlib import Path
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Any, Dict
 from datetime import datetime
 
 import fire
@@ -38,30 +38,11 @@ def module_get(module, key):
     return module.__dict__[key]
 
 def train_model(
-    data_dir: str,
-    output_path: str,
-    datamodule: str,
-    network: str,
-    model: str,
-    id_fields: Sequence[str],
-    batch_size: int,
-    num_gpus: int,
-    num_workers: int,
-    num_epochs: int,
-    lr: float,
-    optimizer: str,
-    loss: str,  # Unet
-    test: bool,
-    # x_label: str,
-    # y_label: str,  # Unet
-    # input_column: str,
-    # output_column: str,
-    # input_channels: Sequence[str],  # Unet
-    # output_channels: Sequence[str],  # Unet
-    # depth: int,  # Unet
-    # channel_fan_top: int,  # Unet
-    # auto_padding: bool = False,  # Unet
-    **kwargs,
+    datamodule: Dict[str, Any],
+    network: Dict[str, Any],
+    loss: Dict[str, Any],
+    model: Dict[str, Any],
+    training: Dict[str, Any],
 ):
     """
     Instantiate and train a bVAE.
@@ -105,82 +86,37 @@ def train_model(
 
     """
 
-    print(f"all kwargs: {kwargs}")
-
-    datamodule_key = datamodule
+    datamodule_key = training['datamodule']
     create_datamodule = module_get(datamodules, datamodule_key)
-
-    # if datamodule not in datamodules.__dict__:
-    #     raise KeyError(
-    #         f"Chosen datamodule {datamodule} not available.\n"
-    #         f"Available datamodules:\n{datamodules.__all__}"
-    #     )
-
-    # Load data module
-    datamodule = create_datamodule(
-        batch_size=batch_size,
-        num_workers=num_workers,
-        id_fields=id_fields,
-        data_dir=data_dir,
-        # x_label=x_label,
-        # y_label=y_label,
-        # input_column=input_column,
-        # output_column=output_column,
-        # input_channels=input_channels,
-        # output_channels=output_channels,
-        **kwargs,
-    )
+    datamodule = create_datamodule(**datamodule)
     datamodule.setup()
     
     print(f'datamodule.dims = {datamodule.dims}')
 
-    # if loss not in losses.__dict__:
-    #     raise KeyError(
-    #         f"Chosen reconstruction criterion {crit_recon} not"
-    #         f"available.\n Available losses:\n"
-    #         f"{losses.__all__}"
-    #     )
-
-    # loss = losses.__dict__[loss]()
-
-    loss_key = loss
+    loss_key = training['loss']
     create_loss = module_get(losses, loss_key)
-    loss = create_loss()
+    loss = create_loss(**loss)
 
-    # if network not in networks.__dict__:
-    #     raise KeyError(
-    #         f"Chosen network {network} not available.\n"
-    #         f"Available networks:\n"
-    #         f"{networks.__all__}"
-    #     )
-
-    # create_network = networks.__dict__[network]
-    
-    network_key = network
+    network_key = training['network']
     create_network = module_get(networks, network_key)
-    network = create_network(
-        # depth=depth, 
-        # channel_fan_top=channel_fan_top, 
-        # num_input_channels=len(input_channels), 
-        # num_output_channels=len(output_channels), 
-        **kwargs,
-    )
-    
+    network = create_network(**network)
     network.print_network()
     
     version_string = "version_" + datetime.now().strftime("%d-%m-%Y--%H-%M-%S")
-    test_image_output = Path(output_path) / "test_images" / version_string
+    output_path = training['output_path']
     lightning_logs_path = Path(output_path) / "lightning_logs"
 
-    model_key = model
+    model_key = training['model']
     create_model = module_get(models, model_key)
-    model = create_model(
-        network=network,
-        optimizer=optimizer,
+    model_params = dict(
+        model,
         loss=loss,
-        lr=lr,
-        **kwargs
-    )
+        network=network,
+        input_dims=datamodule.dims,
+        output_path=output_path,
+        version_string=version_string,
+    )    
+    model = create_model(**model_params)
     
     tb_logger = TensorBoardLogger(
         save_dir=lightning_logs_path,
@@ -204,6 +140,7 @@ def train_model(
         verbose=True,
     )
 
+    # TODO: make early_stopping optional
     early_stopping = EarlyStopping("validation_loss")
 
     callbacks = [
@@ -212,21 +149,25 @@ def train_model(
         early_stopping,
     ]
     
+    # TODO: option to create profiler
     profiler = PyTorchProfiler(profile_memory=True)
     
     trainer = pl.Trainer(
         logger=[tb_logger],
         # accelerator="ddp",
         # replace_sampler_ddp=False,
-        gpus=num_gpus,
-        max_epochs=num_epochs,
+        gpus=training['num_gpus'],
+        max_epochs=training['num_epochs'],
         progress_bar_refresh_rate=5,
         checkpoint_callback=checkpoint_callback,
         callbacks=callbacks,
         benchmark=False,
+        # TODO: make profiling optional
         profiler=profiler,
         deterministic=True,
+        # TODO: provide ability to specify optimizer
         #automatic_optimization=False,  # Set this to True (default) for automatic optimization
+        # TODO: provide an option for precision?
         precision=16,
     )
     
@@ -236,7 +177,7 @@ def train_model(
     trainer.fit(model, datamodule)
 
     # test the model
-    if test is True:
+    if training.get('test'):
         trainer.test(datamodule=datamodule)
 
     return checkpoint_callback.best_model_path

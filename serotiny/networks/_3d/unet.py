@@ -14,8 +14,8 @@ class Unet(nn.Module):
         self,
         depth: int = 4,
         
-        input_channels=None,
-        output_channels=None,
+        num_input_channels: int = 1,
+        num_output_channels: int = 1,
         
         channel_fan_top: int = 64,        # Original paper = 64
         channel_fan: int = 2,             # Original paper = 2
@@ -42,7 +42,6 @@ class Unet(nn.Module):
         padding_finalconv: int = 1,       # Original paper = no mention, label-free = 1
         
         # dimensions: tuple, # =(176, 104, 52),
-        **kwargs
     ):
 
         """
@@ -78,8 +77,8 @@ class Unet(nn.Module):
         self.channel_fan_top = channel_fan_top
         self.channel_fan = channel_fan
 
-        self.input_channels = input_channels
-        self.output_channels = output_channels
+        self.num_input_channels = num_input_channels
+        self.num_output_channels = num_output_channels
 
         """
         An example of n_in and n_out for a network of depth = 4:
@@ -108,7 +107,7 @@ class Unet(nn.Module):
 
             # At the top layer
             if current_depth == depth:
-                n_in = len(self.input_channels)
+                n_in = self.num_input_channels
                 n_out = channel_fan_top  # Similar to original paper and label-free, apply channel_fan_top only in the top layer
 
             else:
@@ -164,7 +163,7 @@ class Unet(nn.Module):
         # In original paper, kernel_size = 1
         self.conv_out = nn.Conv3d(
             self.channels_up[depth][1],
-            len(self.output_channels),
+            self.num_output_channels,
             
             kernel_size=kernel_size_finalconv,
             stride=stride_finalconv,
