@@ -12,7 +12,7 @@ from cvapipe_analysis.tools.plotting import ShapeModePlotMaker
 from vtk.util.numpy_support import vtk_to_numpy as vtk2np
 import matplotlib.pyplot as plt
 from matplotlib import animation
-from serotiny.metrics.utils import get_mesh_from_series
+from serotiny.utils.metric_utils import get_mesh_from_series
 import vtk
 import operator
 from functools import reduce
@@ -45,6 +45,7 @@ class SpharmLatentWalk(Callback):
         cutoff_kld_per_dim: Optional[float] = None,
         plot_limits: Optional[list] = None,
         subfolder: Optional[str] = None,
+        ignore_mesh_and_contour_plots: Optional[bool] = None,
     ):
         """
         Args:
@@ -105,6 +106,7 @@ class SpharmLatentWalk(Callback):
 
         self.config["pca"]["plot"]["limits"] = self.plot_limits
         self.plot_maker = None
+        self.ignore_mesh_and_contour_plots = ignore_mesh_and_contour_plots
 
     def to_device(
         self, batch_x: Sequence, batch_y: Sequence, device: Union[str, device]
@@ -362,32 +364,32 @@ class SpharmLatentWalk(Callback):
                 latent_dims,
                 c_shape,
             )
-
-            for shapemode, mesh_dict in meshes.items():
-                projections = {}
-                projs = [[0, 1], [0, 2], [1, 2]]
-                for dim, proj in zip(["z", "y", "x"], projs):
-                    projections[dim] = {}
-                    for alias, mesh_list in mesh_dict.items():
-                        print(dim, alias)
-                        projections[dim][alias] = []
-                        for mesh in mesh_list:
-                            coords = self.find_plane_mesh_intersection(mesh, proj)
-                            projections[dim][alias].append(coords)
-                            print("done projecting single mesh")
-                # return contours
-                # projections = plot_maker.get_2d_contours(mesh_dict)
-                print(f"Done with all projections for shapemode {shapemode}")
-                for proj, contours in projections.items():
-                    print(f"Beginning gif generation for proj {proj}")
-                    self.animate_contours(
-                        contours,
-                        f"{shapemode}_{proj}",
-                        self.config,
-                        dir_path,
-                        self.subfolder,
-                    )
-                print("Done gif generation for shapemode {shapemode}")
-            print("Combing all gifs into single plot")
-            shapemodes = [str(i) for i in range(len(ranked_z_dim_list))]
-            plot_maker.combine_and_save_animated_gifs(shapemodes)
+            if not self.ignore_mesh_and_contour_plots:
+                for shapemode, mesh_dict in meshes.items():
+                    projections = {}
+                    projs = [[0, 1], [0, 2], [1, 2]]
+                    for dim, proj in zip(["z", "y", "x"], projs):
+                        projections[dim] = {}
+                        for alias, mesh_list in mesh_dict.items():
+                            print(dim, alias)
+                            projections[dim][alias] = []
+                            for mesh in mesh_list:
+                                coords = self.find_plane_mesh_intersection(mesh, proj)
+                                projections[dim][alias].append(coords)
+                                print("done projecting single mesh")
+                    # return contours
+                    # projections = plot_maker.get_2d_contours(mesh_dict)
+                    print(f"Done with all projections for shapemode {shapemode}")
+                    for proj, contours in projections.items():
+                        print(f"Beginning gif generation for proj {proj}")
+                        self.animate_contours(
+                            contours,
+                            f"{shapemode}_{proj}",
+                            self.config,
+                            dir_path,
+                            self.subfolder,
+                        )
+                    print("Done gif generation for shapemode {shapemode}")
+                print("Combing all gifs into single plot")
+                shapemodes = [str(i) for i in range(len(ranked_z_dim_list))]
+                plot_maker.combine_and_save_animated_gifs(shapemodes)

@@ -2,12 +2,12 @@ import torch
 import numpy as np
 import pandas as pd
 from aicsshparam import shtools
-from ..loss_formulations import calculate_elbo
+from serotiny.loss_formulations import calculate_elbo
 import torchvision
-from ..models.utils import index_to_onehot
-from .inception import InceptionV3
-from .calculate_fid import get_activations
-from .calculate_fid import calculate_fid
+from serotiny.utils.model_utils import index_to_onehot
+from serotiny.metrics.inception import InceptionV3
+from serotiny.metrics.calculate_fid import get_activations
+from serotiny.metrics.calculate_fid import calculate_fid
 
 
 def visualize_encoder_tabular(

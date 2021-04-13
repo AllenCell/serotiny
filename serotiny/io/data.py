@@ -1,7 +1,7 @@
 import warnings
 import multiprocessing as mp
 from itertools import chain, combinations
-from typing import Union
+from typing import Sequence, Union
 
 import numpy as np
 import pandas as pd
@@ -11,7 +11,31 @@ import torch
 from sklearn.preprocessing import OneHotEncoder
 from torch.utils.data import DataLoader, WeightedRandomSampler
 from .dataframe_dataset import DataframeDataset
+from pathlib import Path
 
+from actk.utils import dataset_utils
+
+
+def load_csv(dataset: Union[str, Path, pd.DataFrame], required: Sequence[str]):
+    """
+    Read dataframe from either a path or an existing pd.DataFrame, checking
+    the fields given by `required` are present
+    """
+
+    # Handle dataset provided as string or path
+    if isinstance(dataset, (str, Path)):
+        dataset = Path(dataset).expanduser().resolve(strict=True)
+
+        # Read dataset
+        dataset = pd.read_csv(dataset)
+
+    # Check the dataset for the required columns
+    dataset_utils.check_required_fields(
+        dataset=dataset,
+        required_fields=required,
+    )
+
+    return dataset
 
 def powerset(iterable):
     """
@@ -22,6 +46,43 @@ def powerset(iterable):
     return list(
         chain.from_iterable(combinations(elements, r) for r in range(len(elements) + 1))
     )
+
+
+def subset_channels(
+    channel_subset: Sequence[Union[int, str]], channels: Sequence[Union[int, str]]
+):
+    """
+    Subset channels given a list of both
+
+    Parameters
+    -----------
+    channel_subset: Sequence[Union[int, str]]
+        List of subset channels
+
+    channels: Sequence[Union[int, str]]
+        List of all channels
+
+    Returns:
+    channel_indexes:
+        Indexes of subset channels in original channel list
+
+    num_channels:
+        New length of channels
+    """
+    if channel_subset is not None:
+        try:
+            channel_indexes = [
+                channels.index(channel_name) for channel_name in channel_subset
+            ]
+            num_channels = len(channel_indexes)
+        except ValueError:
+            raise Exception(
+                (
+                    f"channel indexes {channel_subset} "
+                    f"do not match channel names {channels}"
+                )
+            )
+    return channel_indexes, num_channels
 
 
 def download_quilt_data(

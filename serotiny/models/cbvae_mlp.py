@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Optional
 
 from ..loss_formulations import calculate_elbo
-from .utils import log_metrics
+from serotiny.utils.model_utils import log_metrics
 
 AVAILABLE_OPTIMIZERS = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}
 AVAILABLE_SCHEDULERS = {"reduce_lr_plateau": torch.optim.lr_scheduler.ReduceLROnPlateau}

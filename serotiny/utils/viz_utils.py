@@ -5,8 +5,8 @@ import pandas as pd
 import seaborn as sns
 import torch
 import math
-from .utils import compute_generative_metric_tabular
-from .utils import visualize_encoder_tabular
+from .metric_utils import compute_generative_metric_tabular
+from .metric_utils import visualize_encoder_tabular
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
 from brokenaxes import brokenaxes

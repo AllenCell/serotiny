@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 from aicsshparam import shtools
 from cvapipe_analysis.steps.pca_path_cells.utils import scan_pc_for_cells
-from serotiny.metrics.utils import get_mesh_from_series
+from serotiny.utils.metric_utils import get_mesh_from_series
 from aicscytoparam import cytoparam
 import matplotlib.pyplot as plt
 import matplotlib

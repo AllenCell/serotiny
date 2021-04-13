@@ -5,9 +5,8 @@ from typing import Sequence, Callable, Union
 
 import pytorch_lightning as pl
 from torchvision import transforms
-from ..csv import load_csv
 from ..io import load_data_loader
-from .utils import subset_channels
+from ..io.data import subset_channels, load_csv
 
 
 class BaseDataModule(pl.LightningDataModule):

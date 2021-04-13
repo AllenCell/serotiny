@@ -7,7 +7,7 @@ import pandas as pd
 
 import fire
 
-from serotiny.csv import load_csv
+from serotiny.io.data import load_csv
 
 ###############################################################################
 

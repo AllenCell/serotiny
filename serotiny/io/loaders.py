@@ -6,7 +6,7 @@ import torch
 import numpy as np
 
 from .image import tiff_loader, png_loader
-from serotiny.models.utils import index_to_onehot
+from serotiny.utils.model_utils import index_to_onehot
 
 __all__ = ["LoadColumns", "LoadClass", "Load2DImage", "Load3DImage"]
 

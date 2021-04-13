@@ -13,7 +13,6 @@ import yaml
 from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
 from pytorch_lightning.callbacks import ModelCheckpoint, GPUStatsMonitor, EarlyStopping
 
-from serotiny.progress_bar import GlobalProgressBar
 from serotiny.networks.vae import CBVAEEncoderMLP, CBVAEDecoderMLP
 from serotiny.networks.vae import CBVAEEncoderMLPResnet, CBVAEDecoderMLPResnet
 from serotiny.models import CBVAEMLPModel
@@ -24,6 +23,7 @@ from serotiny.models.callbacks import (
     SpharmLatentWalk,
     GetEmbeddings,
     GetClosestCellsToDims,
+    GlobalProgressBar,
 )
 
 log = logging.getLogger(__name__)
@@ -53,8 +53,8 @@ def train_mlp_vae(
     cvapipe_analysis_config_path: str,
     latent_walk_range: list,
     n_cells: int,  # No of closets cells to find per location
-    align: str, # DNA/MEM
-    skew: str, #yes/no
+    align: str,  # DNA/MEM
+    skew: str,  # yes/no
     length: Optional[int] = None,  # For Gaussian
     corr: Optional[bool] = False,  # For Gaussian
     id_fields: Optional[list] = None,  # For Spharm
@@ -120,7 +120,7 @@ def train_mlp_vae(
             set_zero=set_zero,
             overwrite=overwrite,
             id_fields=id_fields,
-            align=align, 
+            align=align,
             skew=skew,
         )
         dm.prepare_data()
@@ -211,11 +211,12 @@ def train_mlp_vae(
             config=config,
             spharm_coeffs_cols=dm.spharm_cols,
             latent_walk_range=latent_walk_range,
+            ignore_mesh_and_contour_plots=True,
         )
         callbacks = [
             GPUStatsMonitor(),
             GlobalProgressBar(),
-            EarlyStopping("val_loss", patience=10),
+            EarlyStopping("val_loss", patience=15),
             mlp_vae_logging,
             get_embeddings,
             get_closest_cells_to_dims,

@@ -5,7 +5,7 @@ from torch import device, Tensor
 from pytorch_lightning import Callback, LightningModule, Trainer
 from pathlib import Path
 import pandas as pd
-from ...metrics.plotting_utils import make_plot_encoding
+from serotiny.utils.viz_utils import make_plot_encoding
 
 
 class MLPVAELogging(Callback):  # pragma: no cover
