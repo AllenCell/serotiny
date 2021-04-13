@@ -9,6 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
 from torchvision import transforms
+
 from ..io import png_loader
 from ..io import download_quilt_data
 from ..io import load_data_loader

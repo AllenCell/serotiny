@@ -16,6 +16,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 from ..io.dataframe_dataset import DataframeDataset
 from ..io.loaders import infer_extension_loader, LoadColumns
+import serotiny.data.loaders as loaders
 
 def _unnest_list(l):
     res = []

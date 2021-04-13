@@ -93,7 +93,7 @@ class LoadPCA:
     Loader class, used to retrieve PCA from the dataframe,
     also set to 0 if we dont want any pca values
     """
-
+    
     def __init__(self, x_label, get_inds=False, set_zero=False):
         self.x_label = x_label  # DNA_PC1...
         self.get_inds = get_inds
@@ -166,7 +166,6 @@ class Load3DImage:
             mask_thresh=0,
             transform=self.transform,
         )
-
 
 def infer_extension_loader(extension, chosen_col="true_paths"):
     if extension == ".png":

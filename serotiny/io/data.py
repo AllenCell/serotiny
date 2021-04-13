@@ -11,6 +11,7 @@ import torch
 from sklearn.preprocessing import OneHotEncoder
 from torch.utils.data import DataLoader, WeightedRandomSampler
 from .dataframe_dataset import DataframeDataset
+
 from pathlib import Path
 
 from actk.utils import dataset_utils
@@ -85,6 +86,7 @@ def subset_channels(
     return channel_indexes, num_channels
 
 
+
 def download_quilt_data(
     package: str,
     bucket: str,
@@ -123,6 +125,7 @@ def download_quilt_data(
 def load_data_loader(
     dataset: pd.DataFrame,
     loaders: dict,
+    transform: Union[list, torch.nn.Module],
     batch_size: int,
     num_workers: int,
     shuffle: bool,
@@ -165,7 +168,8 @@ def load_data_loader(
     """
 
     # Load a dataframe from the dataset, using the provided row processing fns
-    dataframe = DataframeDataset(dataset, loaders=loaders)
+
+    dataframe = DataframeDataset(dataset, loaders=loaders, transform=transform)
 
     # Configure WeightedRandomSampler to handle class imbalances
     sampler = None
