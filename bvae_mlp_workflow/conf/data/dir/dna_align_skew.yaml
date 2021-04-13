@@ -1,0 +1,5 @@
+# @package _group_
+# path: "/allen/aics/modeling/gui.pires/data/rotated_coeffs_full_manifest.csv"
+path: "/allen/aics/modeling/bvae_analysis/data/aligned_shcoeffs/C:0_skew/aligned_manifest_remove_zeros.csv"
+align: "DNA"
+skew: "yes"

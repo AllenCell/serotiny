@@ -2,6 +2,7 @@ import os
 from omegaconf import DictConfig, OmegaConf
 import hydra
 from serotiny_steps.train_mlp_vae import train_mlp_vae
+from hydra.core.hydra_config import HydraConfig
 
 
 @hydra.main(config_path="conf", config_name="config")
@@ -10,7 +11,6 @@ def runme(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
     print("Working directory : {}".format(os.getcwd()))
     print(f"{os.getcwd()}/results/")
-    print(cfg["network"]["hidden_layers"])
 
     train_mlp_vae(
         source_path=cfg["data"]["dir"]["path"],
@@ -41,8 +41,8 @@ def runme(cfg: DictConfig) -> None:
         n_cells=int(
             cfg["callbacks"]["n_cells"]
         ),  # No of closets cells to find per location
-        align=cfg['data']['dir']['align'], # DNA/MEM
-        skew=cfg['data']['dir']['skew'], #yes/no
+        align=cfg["data"]["dir"]["align"],  # DNA/MEM
+        skew=cfg["data"]["dir"]["skew"],  # yes/no
     )
 
     print("Done!")
