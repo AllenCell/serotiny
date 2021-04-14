@@ -6,6 +6,7 @@ from typing import Sequence
 import inspect
 
 import logging
+
 logger = logging.getLogger("lightning")
 logger.propagate = False
 

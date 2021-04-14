@@ -1,11 +1,11 @@
-from typing import Optional, Sequence, Tuple, Union
+from typing import Optional
 
 import torch
-from torch import device, Tensor
 from pytorch_lightning import Callback, LightningModule, Trainer
 from pathlib import Path
 import pandas as pd
 from serotiny.utils.viz_utils import make_plot_encoding
+from serotiny.utils.model_utils import to_device
 
 
 class MLPVAELogging(Callback):  # pragma: no cover
@@ -38,16 +38,6 @@ class MLPVAELogging(Callback):  # pragma: no cover
         if self.datamodule.__module__ == "serotiny.datamodules.gaussian":
             self.values = [0]
 
-    def to_device(
-        self, batch_x: Sequence, batch_y: Sequence, device: Union[str, device]
-    ) -> Tuple[Tensor, Tensor]:
-
-        # last input is for online eval
-        batch_x = batch_x.to(device)
-        batch_y = batch_y.to(device)
-
-        return batch_x, batch_y
-
     def on_test_epoch_end(self, trainer: Trainer, pl_module: LightningModule):
 
         with torch.no_grad():
@@ -58,7 +48,7 @@ class MLPVAELogging(Callback):  # pragma: no cover
             x = test_iter[x_label].float()
             c = test_iter[c_label].float()
 
-            x, c = self.to_device(x, c, pl_module.device)
+            x, c = to_device(x, c, pl_module.device)
 
             dir_path = Path(trainer.logger[1].save_dir)
             stats = pd.read_csv(dir_path / "stats_all.csv")

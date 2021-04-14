@@ -4,12 +4,159 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as opt
-
+from typing import Sequence, Tuple, Union
+from torch import device, Tensor
 import pytorch_lightning as pl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from pytorch_lightning import LightningModule, Trainer
+from cvapipe_analysis.steps.pca_path_cells.utils import scan_pc_for_cells
+
+
+def to_device(
+    batch_x: Sequence, batch_y: Sequence, device: Union[str, device]
+) -> Tuple[Tensor, Tensor]:
+
+    # last input is for online eval
+    batch_x = batch_x.to(device)
+    batch_y = batch_y.to(device)
+
+    return batch_x, batch_y
+
+
+def compute_embeddings(pl_module: LightningModule, input_x, cond_c, resample_n):
+
+    # Make empty list
+    my_recon_list, my_z_means_list, my_log_var_list = [], [], []
+    input_x, cond_c = to_device(input_x, cond_c, pl_module.device)
+    # Run resample_n times for resampling
+    for resample in range(resample_n):
+        recon_batch, z_means, log_var, _, _, _, _, _ = pl_module(
+            input_x.clone().float(), cond_c.clone().float()
+        )
+        my_recon_list.append(recon_batch)
+        my_z_means_list.append(z_means)
+        my_log_var_list.append(log_var)
+
+    # Average over the N resamples
+    recon_batch = torch.mean(torch.stack(my_recon_list), dim=0)
+    z_means = torch.mean(torch.stack(my_z_means_list), dim=0)
+    log_var = torch.mean(torch.stack(my_log_var_list), dim=0)
+
+    return recon_batch, z_means, log_var
+
+
+def get_all_embeddings(
+    trainer: Trainer,
+    pl_module: LightningModule,
+    resample_n: int,
+    x_label: str,
+    c_label: str,
+    id_fields: list,
+):
+
+    all_z_means = []
+    cell_ids = []
+    split = []
+    for step, x in enumerate(trainer.train_dataloader):
+        input_x = x[x_label]
+        cond_c = x[c_label]
+        cell_id = x["id"][id_fields[0]]
+
+        recon_batch, z_means, log_var = compute_embeddings(
+            pl_module, input_x, cond_c, resample_n
+        )
+        all_z_means.append(z_means)
+        cell_ids.append(cell_id)
+        split.append(["train"] * z_means.shape[0])
+
+    for step, x in enumerate(trainer.val_dataloaders[0]):
+        input_x = x[x_label]
+        cond_c = x[c_label]
+        cell_id = x["id"][id_fields[0]]
+
+        recon_batch, z_means, log_var = compute_embeddings(
+            pl_module, input_x, cond_c, resample_n
+        )
+        all_z_means.append(z_means)
+        cell_ids.append(cell_id)
+        split.append(["val"] * z_means.shape[0])
+
+    for step, x in enumerate(trainer.test_dataloaders[0]):
+        input_x = x[x_label]
+        cond_c = x[c_label]
+        cell_id = x["id"][id_fields[0]]
+
+        recon_batch, z_means, log_var = compute_embeddings(
+            pl_module, input_x, cond_c, resample_n
+        )
+        all_z_means.append(z_means)
+        cell_ids.append(cell_id)
+        split.append(["test"] * z_means.shape[0])
+
+    all_z_means = torch.cat(all_z_means, dim=0)
+    cell_ids = torch.cat(cell_ids, dim=0)
+    split = [item for sublist in split for item in sublist]
+    all_z_means = all_z_means.detach().cpu().numpy()
+
+    df1 = pd.DataFrame(
+        all_z_means, columns=[f"mu_{i}" for i in range(all_z_means.shape[1])]
+    )
+    df2 = pd.DataFrame(cell_ids, columns=["CellId"])
+    df3 = pd.DataFrame(split, columns=["split"])
+    frames = [df1, df2, df3]
+    result = pd.concat(frames, axis=1)
+
+    return result
+
+
+def get_closest_cells(
+    ranked_z_dim_list,
+    mu_std_list,
+    all_embeddings,
+    dir_path,
+    path_in_stdv,
+    metric,
+    id_col,
+    N_cells,
+):
+    embeddings_most_important_dims = all_embeddings[
+        [f"mu_{i}" for i in ranked_z_dim_list]
+    ]
+
+    dist_cols = embeddings_most_important_dims.columns
+
+    df_list = []
+    dims = []
+    for index, dim in enumerate(ranked_z_dim_list):
+        mu_std = mu_std_list[index]
+        df_cells = scan_pc_for_cells(
+            all_embeddings,
+            pc=index + 1,  # This function assumes first index is 1
+            path=np.array(path_in_stdv) * mu_std,
+            dist_cols=dist_cols,
+            metric=metric,
+            id_col=id_col,
+            N_cells=N_cells,
+        )
+        dims.append([dim] * df_cells.shape[0])
+        df_list.append(df_cells)
+    tmp = pd.concat(df_list)
+    tmp = tmp.reset_index(drop=True)
+    dims = [item for sublist in dims for item in sublist]
+    df2 = pd.DataFrame(dims, columns=["ranked_dim"])
+    result = pd.concat([tmp, df2], axis=1)
+
+    path = dir_path / "closest_real_cells_to_top_dims.csv"
+
+    if path.exists():
+        result.to_csv(path, mode="a", header=False, index=False)
+    else:
+        result.to_csv(path, header="column_names", index=False)
+
+    return result
 
 
 def acc_prec_recall(n_classes):
@@ -304,7 +451,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
                 dataframe2["test_kld_per_dim"].append(summed_kld[k].item())
                 dataframe2["mu_std_per_dim"].append(dim_var[k].item())
                 dataframe2["explained_variance"].append(
-                    (summed_kld[k].item() / summed_summed_kld) * 100
+                    (summed_kld[k].item() / summed_summed_kld.item()) * 100
                 )
 
         stats_per_dim = pd.DataFrame(dataframe2)

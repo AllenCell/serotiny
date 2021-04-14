@@ -5,6 +5,7 @@ import numpy as np
 from torch.utils.data import Dataset
 from torch.utils.data.dataloader import default_collate as collate
 
+
 class DataframeDataset(Dataset):
     """
     Class to wrap a pandas DataFrame in a pytorch Dataset. In practice, at AICS
@@ -40,9 +41,15 @@ class DataframeDataset(Dataset):
             split_names = self.dataframe[split_col].unique().tolist()
             assert set(split_names).issubset({"train", "validation", "test"})
 
-            self.train_split = self.dataframe.loc[self.dataframe[split_col] == "train"].index.tolist()
-            self.val_split = self.dataframe.loc[self.dataframe[split_col] == "validation"].index.tolist()
-            self.test_split = self.dataframe.loc[self.dataframe[split_col] == "test"].index.tolist()
+            self.train_split = self.dataframe.loc[
+                self.dataframe[split_col] == "train"
+            ].index.tolist()
+            self.val_split = self.dataframe.loc[
+                self.dataframe[split_col] == "validation"
+            ].index.tolist()
+            self.test_split = self.dataframe.loc[
+                self.dataframe[split_col] == "test"
+            ].index.tolist()
 
     def __len__(self):
         return len(self.dataframe)

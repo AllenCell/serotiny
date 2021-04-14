@@ -1,7 +1,6 @@
 import torch
 import numpy as np
 import pandas as pd
-from aicsshparam import shtools
 from serotiny.loss_formulations import calculate_elbo
 import torchvision
 from serotiny.utils.model_utils import index_to_onehot
@@ -329,101 +328,3 @@ def compute_generative_metric(
         grid2 = torchvision.utils.make_grid(gen_images, nrow=5)
 
     return fid, grid.cpu(), grid2.cpu()
-
-
-def get_shcoeff_matrix_from_dataframe(row: pd.Series, prefix: str, lmax: int):
-
-    """
-    Reshape spherical harmonics expansion (SHE) coefficients
-    into a coefficients matrix of shape 2 x lmax x lmax, where
-    lmax is the degree of the expansion.
-    Parameters
-    --------------------
-    row: pd.Series
-        Series that contains the SHE coefficients.
-    prefix: str
-        String to identify the keys of the series that contain
-        the SHE coefficients.
-    lmax: int
-        Degree of the expansion
-    Returns
-    -------
-        coeffs: np.array
-            Array of shape 2 x lmax x lmax that contains the
-            SHE coefficients.
-    """
-
-    # Empty matrix to store the SHE coefficients
-    coeffs = np.zeros((2, lmax, lmax), dtype=np.float32)
-
-    for l in range(lmax):
-        for m in range(l + 1):
-            try:
-                # Cosine SHE coefficients
-                coeffs[0, l, m] = row[
-                    [f for f in row.keys() if f"{prefix}{l}M{m}C" in f]
-                ]
-                # Sine SHE coefficients
-                coeffs[1, l, m] = row[
-                    [f for f in row.keys() if f"{prefix}{l}M{m}S" in f]
-                ]
-            # If a given (l,m) pair is not found, it is
-            # assumed to be zero
-            except:
-                pass
-
-    # Error if no coefficients were found.
-    if not np.abs(coeffs).sum():
-        raise Exception(f"No coefficients found. Please check prefix: {prefix}")
-
-    return coeffs
-
-
-def get_mesh_from_dataframe(row: pd.Series, prefix: str, lmax: int):
-
-    """
-    Reconstruct the 3D triangle mesh corresponding to SHE
-    coefficients stored in a pandas Series format.
-    Parameters
-    --------------------
-    row: pd.Series
-        Series that contains the SHE coefficients.
-    prefix: str
-        String to identify the keys of the series that contain
-        the SHE coefficients.
-    lmax: int
-        Degree of the expansion
-    Returns
-    -------
-        mesh: vtk.vtkPolyData
-            Triangle mesh.
-    """
-
-    # Reshape SHE coefficients
-    coeffs = get_shcoeff_matrix_from_dataframe(row=row, prefix=prefix, lmax=lmax)
-
-    # Use aicsshparam to convert SHE coefficients into
-    # triangle mesh
-    mesh, _ = shtools.get_reconstruction_from_coeffs(coeffs)
-
-    return mesh
-
-
-def get_mesh_from_series(row, alias, lmax):
-    coeffs = np.zeros((2, lmax, lmax), dtype=np.float32)
-    for l in range(lmax):
-        for m in range(l + 1):
-            try:
-                # Cosine SHE coefficients
-                coeffs[0, l, m] = row[
-                    [f for f in row.keys() if f"{alias}_shcoeffs_L{l}M{m}C" in f]
-                ]
-                # Sine SHE coefficients
-                coeffs[1, l, m] = row[
-                    [f for f in row.keys() if f"{alias}_shcoeffs_L{l}M{m}S" in f]
-                ]
-            # If a given (l,m) pair is not found, it is assumed to be zero
-            except:
-                pass
-    mesh, _ = shtools.get_reconstruction_from_coeffs(coeffs)
-    return mesh
