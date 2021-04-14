@@ -11,6 +11,8 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
+from scipy.stats import multivariate_normal
+
 
 def acc_prec_recall(n_classes):
     """
@@ -426,3 +428,72 @@ def find_lr_scheduler(scheduler_name):
             f"options are {available_schedulers}"
         )
     return scheduler_class
+
+def q_batch(z, mus, logvars):
+    """
+    Compute a batch contribution to marginal q, where marginal q is
+
+    q(z) = 1/N sum(q(z | x_n)).
+
+    This function computes *unnormalized* contributions to that sum
+
+    """
+    numerator = (z - mus)**2 / (logvars.exp())
+    numerator = -0.5 * numerator.sum(axis=1)
+    numerator = torch.exp(numerator)
+
+    # equivalent to product of all sigma-squares
+    denominator = torch.sum(logsigmas, axis=1).exp()
+    denominator *= math.pow(2 * math.pi, mus.shape[1])
+    denominator = torch.sqrt(denominator)
+
+    return (numerator / denominator).sum()
+
+def marginal_kl(model, dataloader, prior_mean, prior_logvar, n_samples,
+                x_label, c_label, verbose=True):
+
+    prior = multivariate_normal(mean=prior_mean,
+                                cov=np.exp(prior_logvar))
+
+    dataset_size = len(dataloader.dataset)
+
+    with torch.no_grad():
+        total_marginal_kl = 0
+        if verbose:
+            sample_iter = trange(n_samples, desc="all samples"):
+        else:
+            sample_iter = range(n_samples)
+
+        for i in sample_iter:
+            sample_ix = random.randint(0, dataset_size)
+            sample = dataloader.dataset[sample_ix]
+
+            _, z_s, _, _, _, _, _, _ = model.forward(
+                sample[x_label].float().unsqueeze(0),
+                sample[c_label].float().unsqueeze(0)
+            )
+
+            total_q = 0
+            log_p_z_s = prior.logpdf(z_s)
+
+            if verbose:
+                batch_iter = tqdm(iter(dataloader), total=len(dataloader),
+                                  leave=False, desc=f"sample {i}")
+            else:
+                batch_iter = dataloader
+
+            for batch in batch_iter:
+                _, mu, logvar, _, _, _, _, _ = model.forward(
+                    batch[x_label].float(),
+                    batch[c_label].float()
+                )
+
+                total_q += q_batch(
+                    z_s.double(),
+                    mu.double(),
+                    logvar.double()
+                )
+
+            total_marginal_kl += torch.log(total_q / dataset_size) - log_p_z_s
+
+        return total_marginal_kl / n_samples
