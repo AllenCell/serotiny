@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from pytorch_lightning import LightningModule, Trainer
+from pytorch_lightning import LightningModule
 from cvapipe_analysis.steps.pca_path_cells.utils import scan_pc_for_cells
 
 
@@ -49,7 +49,9 @@ def compute_embeddings(pl_module: LightningModule, input_x, cond_c, resample_n):
 
 
 def get_all_embeddings(
-    trainer: Trainer,
+    train_dataloader,
+    val_dataloader,
+    test_dataloader,
     pl_module: LightningModule,
     resample_n: int,
     x_label: str,
@@ -60,7 +62,7 @@ def get_all_embeddings(
     all_z_means = []
     cell_ids = []
     split = []
-    for step, x in enumerate(trainer.train_dataloader):
+    for step, x in enumerate(train_dataloader):
         input_x = x[x_label]
         cond_c = x[c_label]
         cell_id = x["id"][id_fields[0]]
@@ -72,7 +74,7 @@ def get_all_embeddings(
         cell_ids.append(cell_id)
         split.append(["train"] * z_means.shape[0])
 
-    for step, x in enumerate(trainer.val_dataloaders[0]):
+    for step, x in enumerate(val_dataloader):
         input_x = x[x_label]
         cond_c = x[c_label]
         cell_id = x["id"][id_fields[0]]
@@ -84,7 +86,7 @@ def get_all_embeddings(
         cell_ids.append(cell_id)
         split.append(["val"] * z_means.shape[0])
 
-    for step, x in enumerate(trainer.test_dataloaders[0]):
+    for step, x in enumerate(test_dataloader):
         input_x = x[x_label]
         cond_c = x[c_label]
         cell_id = x["id"][id_fields[0]]
@@ -132,6 +134,8 @@ def get_closest_cells(
     dims = []
     for index, dim in enumerate(ranked_z_dim_list):
         mu_std = mu_std_list[index]
+        print(ranked_z_dim_list)
+        print(mu_std)
         df_cells = scan_pc_for_cells(
             all_embeddings,
             pc=index + 1,  # This function assumes first index is 1
@@ -141,6 +145,7 @@ def get_closest_cells(
             id_col=id_col,
             N_cells=N_cells,
         )
+        print(df_cells)
         dims.append([dim] * df_cells.shape[0])
         df_list.append(df_cells)
     tmp = pd.concat(df_list)

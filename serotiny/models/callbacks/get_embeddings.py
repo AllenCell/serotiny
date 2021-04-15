@@ -37,7 +37,9 @@ class GetEmbeddings(Callback):
             dir_path = Path(trainer.logger[1].save_dir)
 
             result = get_all_embeddings(
-                trainer,
+                trainer.train_dataloader,
+                trainer.val_dataloaders[0],
+                trainer.test_dataloaders[0],
                 pl_module,
                 self.resample_n,
                 self.x_label,

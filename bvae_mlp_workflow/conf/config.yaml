@@ -5,7 +5,7 @@ defaults:
   - data/input: dna_coeffs
   - data/dir: mem_align_no_skew
   # - data/dir: dna_align_skew
-  - data/set_zero: is_false
+  - data/set_zero: is_true
   - data/condition: dna_pca
   - network: network
   - network/hidden_layers: 1
@@ -13,10 +13,13 @@ defaults:
   - training: training
   - training/batch_size: 128
   - hydra/launcher: joblib
+  # - hydra/job_logging: colorlog
+  # - hydra/hydra_logging: colorlog
+
 
 hydra:
   run:
-    dir: outputs/${hydra.job.override_dirname}
+    dir: output_tmp_test/${hydra.job.override_dirname}
   sweep:
-    dir: multirun/
+    dir: multirun_apr_14/
     subdir: ${hydra.job.override_dirname}

@@ -18,10 +18,43 @@ from .mesh_utils import get_mesh_from_series
 LOGGER = logging.getLogger(__name__)
 
 
+def make_embedding_pairplots(
+    input_df: pd.DataFrame,
+    all_embeddings: pd.DataFrame,
+    hues: list,
+    ranked_z_dim_list: list,
+    save_dir,
+):
+    stats_mu = all_embeddings.loc[all_embeddings["split"] == "test"]
+    # hues = ['DNA_PC1', 'DNA_PC2']
+    for hue in hues:
+        ranked_cols = [f"mu_{j}" for j in ranked_z_dim_list[:8]]
+        stats_top = stats_mu[[i for i in ranked_cols]]
+        stats_top = stats_top.reset_index(drop=True)
+
+        ranked_cols.append("CellId")
+        stats_top_with_cellid = stats_mu[
+            [i for i in stats_mu.columns if i in ranked_cols]
+        ]
+        stats_top_with_cellid = stats_top_with_cellid.reset_index(drop=True)
+
+        stats_top_with_cellid_merged = input_df[[hue, "CellId"]].merge(
+            stats_top_with_cellid, on=["CellId"]
+        )
+        stats_top_with_cellid_merged = stats_top_with_cellid_merged.drop(
+            columns="CellId"
+        )
+
+        sns.set_context('talk')
+        g = sns.pairplot(stats_top_with_cellid_merged, hue=hue, corner=True)
+        g.savefig(save_dir / f"pairplot_test_embeddings_hue_{hue}.png")
+
+
 def decode_latent_walk_closest_cells(
     trainer: Trainer,
     pl_module: LightningModule,
     closest_cells_df: pd.DataFrame,
+    all_embeddings: pd.DataFrame,
     ranked_z_dim_list: list,
     mu_std_list: list,
     dir_path,
@@ -46,16 +79,19 @@ def decode_latent_walk_closest_cells(
         for loc_index, location in enumerate(subset_df["location"].unique()):
             subset_sub_df = subset_df.loc[subset_df["location"] == location]
             subset_sub_df = subset_sub_df.reset_index(drop=True)
+            this_cell_embedding = all_embeddings.loc[
+                all_embeddings["CellId"] == subset_sub_df["CellId"].item()
+            ]
 
             z_inf = torch.zeros(batch_size, latent_dims)
-            walk_cols = [i for i in subset_sub_df.columns if "mu" in i]
+            walk_cols = [i for i in this_cell_embedding.columns if "mu" in i]
 
             this_cell_id = subset_sub_df.iloc[0]["CellId"]
 
             for walk in walk_cols:
                 # walk_cols is mu_{dim}, so walk[3:]
                 z_inf[:, int(walk[3:])] = torch.from_numpy(
-                    np.array(subset_sub_df.iloc[0][walk])
+                    np.array(this_cell_embedding.iloc[0][walk])
                 )
             z_inf = z_inf.cuda(device=0)
             z_inf = z_inf.float()
@@ -77,7 +113,7 @@ def decode_latent_walk_closest_cells(
 
             for proj in [0, 1, 2]:
                 ax_array[proj, loc_index].set_title(
-                    f"{path_in_stdv[loc_index]}" r"$\sigma$"
+                    f"{path_in_stdv[loc_index]} $\sigma$  \n ID {this_cell_id}"
                 )
                 ax_array[proj, loc_index].imshow(img.max(proj), cmap="gray")
 

@@ -260,7 +260,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
             shuffle=False,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
-            weights_col="ClassWeights",
+            weights_col=None,  # or ClassWeights
         )
 
         return train_dataloader
@@ -278,7 +278,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
             shuffle=False,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
-            weights_col="ClassWeights",
+            weights_col=None,  # or ClassWeights
         )
 
         return val_dataloader
@@ -296,7 +296,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
             shuffle=False,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
-            weights_col="ClassWeights",
+            weights_col=None,  # or ClassWeights
         )
 
         return test_dataloader

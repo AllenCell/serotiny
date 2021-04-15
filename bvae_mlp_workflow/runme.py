@@ -3,19 +3,28 @@ from omegaconf import DictConfig, OmegaConf
 import hydra
 from serotiny_steps.train_mlp_vae import train_mlp_vae
 from hydra.core.hydra_config import HydraConfig
+from hydra.utils import get_original_cwd, to_absolute_path
 
 
 @hydra.main(config_path="conf", config_name="config")
 def runme(cfg: DictConfig) -> None:
 
+    # This is hard coded
+    zoo_root_path = "/allen/aics/modeling/zoo/bvae_mlp"
     print(OmegaConf.to_yaml(cfg))
     print("Working directory : {}".format(os.getcwd()))
     print(f"{os.getcwd()}/results/")
+    override_path = os.path.relpath(os.getcwd(), get_original_cwd())
+    checkpoint_path = zoo_root_path + "_" + override_path
+    checkpoint_path = f"{os.getcwd()}/results/checkpoints/"
+    # checkpoint_path = "/allen/aics/modeling/zoo/bvae_mlp/"
+    print(checkpoint_path)
 
     train_mlp_vae(
         source_path=cfg["data"]["dir"]["path"],
         modified_source_save_dir=cfg["data"]["modified_source_save_dir"],
         output_path=f"{os.getcwd()}/results/",
+        checkpoint_path=checkpoint_path,  # Save all checkpoints in a zoo folder
         datamodule=cfg["data"]["datamodule"],
         batch_size=int(cfg["training"]["batch_size"]["size"]),
         gpu_id=cfg["training"]["gpu_id"],
@@ -43,6 +52,7 @@ def runme(cfg: DictConfig) -> None:
         ),  # No of closets cells to find per location
         align=cfg["data"]["dir"]["align"],  # DNA/MEM
         skew=cfg["data"]["dir"]["skew"],  # yes/no
+        hues=list(cfg["callbacks"]["hues"]),
     )
 
     print("Done!")

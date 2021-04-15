@@ -98,6 +98,7 @@ class GetClosestCellsToDims(Callback):
                 trainer,
                 pl_module,
                 result,
+                all_embeddings,
                 ranked_z_dim_list,
                 mu_std_list,
                 dir_path,

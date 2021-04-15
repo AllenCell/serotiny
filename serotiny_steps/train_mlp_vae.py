@@ -22,6 +22,7 @@ from serotiny.models.callbacks import (
     GetEmbeddings,
     GetClosestCellsToDims,
     GlobalProgressBar,
+    EmbeddingScatterPlots,
 )
 
 log = logging.getLogger(__name__)
@@ -60,6 +61,7 @@ def train_mlp_vae(
     set_zero: Optional[bool] = False,  # For Spharm
     overwrite: Optional[bool] = False,  # For Spharm
     values: Optional[list] = None,  # For Spharm
+    hues: Optional[list] = None,  # For spharm
 ):
     """
     Instantiate and train a bVAE.
@@ -199,12 +201,15 @@ def train_mlp_vae(
             latent_walk_range=latent_walk_range,
             ignore_mesh_and_contour_plots=True,
         )
+
+        embedding_scatterplots = EmbeddingScatterPlots(input_df=dm.dfg, hues=hues)
         callbacks = [
             GPUStatsMonitor(),
             GlobalProgressBar(),
             EarlyStopping("val_loss", patience=15),
             mlp_vae_logging,
             get_embeddings,
+            embedding_scatterplots,
             get_closest_cells_to_dims,
             spharm_latent_walk,
         ]
