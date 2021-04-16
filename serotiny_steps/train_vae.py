@@ -16,7 +16,7 @@ from serotiny.models import CBVAEModel
 
 import serotiny.datamodules as datamodules
 import serotiny.losses as losses
-from serotiny.progress_bar import GlobalProgressBar
+from serotiny.models.callbacks.progress_bar import GlobalProgressBar
 from serotiny.model.zoo import store_model
 
 log = logging.getLogger(__name__)

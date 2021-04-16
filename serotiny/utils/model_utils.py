@@ -4,11 +4,164 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as opt
-
+from typing import Sequence, Tuple, Union
+from torch import device, Tensor
 import pytorch_lightning as pl
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
+from pytorch_lightning import LightningModule
+from cvapipe_analysis.steps.pca_path_cells.utils import scan_pc_for_cells
+
+
+def to_device(
+    batch_x: Sequence, batch_y: Sequence, device: Union[str, device]
+) -> Tuple[Tensor, Tensor]:
+
+    # last input is for online eval
+    batch_x = batch_x.to(device)
+    batch_y = batch_y.to(device)
+
+    return batch_x, batch_y
+
+
+def compute_embeddings(pl_module: LightningModule, input_x, cond_c, resample_n):
+
+    # Make empty list
+    my_recon_list, my_z_means_list, my_log_var_list = [], [], []
+    input_x, cond_c = to_device(input_x, cond_c, pl_module.device)
+    # Run resample_n times for resampling
+    for resample in range(resample_n):
+        recon_batch, z_means, log_var, _, _, _, _, _ = pl_module(
+            input_x.clone().float(), cond_c.clone().float()
+        )
+        my_recon_list.append(recon_batch)
+        my_z_means_list.append(z_means)
+        my_log_var_list.append(log_var)
+
+    # Average over the N resamples
+    recon_batch = torch.mean(torch.stack(my_recon_list), dim=0)
+    z_means = torch.mean(torch.stack(my_z_means_list), dim=0)
+    log_var = torch.mean(torch.stack(my_log_var_list), dim=0)
+
+    return recon_batch, z_means, log_var
+
+
+def get_all_embeddings(
+    train_dataloader,
+    val_dataloader,
+    test_dataloader,
+    pl_module: LightningModule,
+    resample_n: int,
+    x_label: str,
+    c_label: str,
+    id_fields: list,
+):
+
+    all_z_means = []
+    cell_ids = []
+    split = []
+    for step, x in enumerate(train_dataloader):
+        input_x = x[x_label]
+        cond_c = x[c_label]
+        cell_id = x["id"][id_fields[0]]
+
+        recon_batch, z_means, log_var = compute_embeddings(
+            pl_module, input_x, cond_c, resample_n
+        )
+        all_z_means.append(z_means)
+        cell_ids.append(cell_id)
+        split.append(["train"] * z_means.shape[0])
+
+    for step, x in enumerate(val_dataloader):
+        input_x = x[x_label]
+        cond_c = x[c_label]
+        cell_id = x["id"][id_fields[0]]
+
+        recon_batch, z_means, log_var = compute_embeddings(
+            pl_module, input_x, cond_c, resample_n
+        )
+        all_z_means.append(z_means)
+        cell_ids.append(cell_id)
+        split.append(["val"] * z_means.shape[0])
+
+    for step, x in enumerate(test_dataloader):
+        input_x = x[x_label]
+        cond_c = x[c_label]
+        cell_id = x["id"][id_fields[0]]
+
+        recon_batch, z_means, log_var = compute_embeddings(
+            pl_module, input_x, cond_c, resample_n
+        )
+        all_z_means.append(z_means)
+        cell_ids.append(cell_id)
+        split.append(["test"] * z_means.shape[0])
+
+    all_z_means = torch.cat(all_z_means, dim=0)
+    cell_ids = torch.cat(cell_ids, dim=0)
+    split = [item for sublist in split for item in sublist]
+    all_z_means = all_z_means.detach().cpu().numpy()
+
+    df1 = pd.DataFrame(
+        all_z_means, columns=[f"mu_{i}" for i in range(all_z_means.shape[1])]
+    )
+    df2 = pd.DataFrame(cell_ids, columns=["CellId"])
+    df3 = pd.DataFrame(split, columns=["split"])
+    frames = [df1, df2, df3]
+    result = pd.concat(frames, axis=1)
+
+    return result
+
+
+def get_closest_cells(
+    ranked_z_dim_list,
+    mu_std_list,
+    all_embeddings,
+    dir_path,
+    path_in_stdv,
+    metric,
+    id_col,
+    N_cells,
+):
+    embeddings_most_important_dims = all_embeddings[
+        [f"mu_{i}" for i in ranked_z_dim_list]
+    ]
+
+    dist_cols = embeddings_most_important_dims.columns
+
+    df_list = []
+    dims = []
+    for index, dim in enumerate(ranked_z_dim_list):
+        mu_std = mu_std_list[index]
+        print(ranked_z_dim_list)
+        print(mu_std)
+        df_cells = scan_pc_for_cells(
+            all_embeddings,
+            pc=index + 1,  # This function assumes first index is 1
+            path=np.array(path_in_stdv) * mu_std,
+            dist_cols=dist_cols,
+            metric=metric,
+            id_col=id_col,
+            N_cells=N_cells,
+        )
+        print(df_cells)
+        dims.append([dim] * df_cells.shape[0])
+        df_list.append(df_cells)
+    tmp = pd.concat(df_list)
+    tmp = tmp.reset_index(drop=True)
+    dims = [item for sublist in dims for item in sublist]
+    df2 = pd.DataFrame(dims, columns=["ranked_dim"])
+    result = pd.concat([tmp, df2], axis=1)
+
+    path = dir_path / "closest_real_cells_to_top_dims.csv"
+
+    if path.exists():
+        result.to_csv(path, mode="a", header=False, index=False)
+    else:
+        result.to_csv(path, header="column_names", index=False)
+
+    return result
 
 
 def acc_prec_recall(n_classes):
@@ -186,12 +339,14 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
         f"{prefix}_kld": [],
     }
 
-    batch_rcl, batch_kld = (
+    batch_rcl, batch_kld, batch_mu = (
+        torch.empty([0]),
         torch.empty([0]),
         torch.empty([0]),
     )
 
     batch_length = 0
+    num_data_points = 0
     loss, rcl_loss, kld_loss = 0, 0, 0
 
     total_x = torch.stack([x["input"] for x in outputs])
@@ -205,6 +360,8 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
     for output in outputs:
         rcl_per_element = output["rcl_per_elem"]
         kld_per_element = output["kld_per_elem"]
+        mu_per_elem = output["mu_per_elem"]
+
         loss += output[f"{prefix}_loss"].item()
         rcl_loss += output["recon_loss"].item()
         kld_loss += output["kld_loss"].item()
@@ -224,6 +381,16 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
                 ],
                 0,
             )
+            batch_mu = torch.cat(
+                [
+                    batch_mu.type_as(mu_per_elem),
+                    torch.sum(mu_per_elem[this_cond_positions], dim=0).view(1, -1),
+                ],
+                0,
+            )
+
+            this_batch_size = rcl_per_element.shape[0]
+            num_data_points += this_batch_size
             batch_length += 1
 
             this_cond_rcl = torch.sum(rcl_per_element[this_cond_positions])
@@ -232,12 +399,19 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
             rcl_per_condition_loss[jj] += this_cond_rcl.item()
             kld_per_condition_loss[jj] += this_cond_kld.item()
 
-    loss = loss / num_batches
-    rcl_loss = rcl_loss / num_batches
-    kld_loss = kld_loss / num_batches
-    rcl_per_condition_loss = rcl_per_condition_loss / num_batches
-    kld_per_condition_loss = kld_per_condition_loss / num_batches
+    # loss = loss / num_batches
+    # rcl_loss = rcl_loss / num_batches
+    # kld_loss = kld_loss / num_batches
+    # rcl_per_condition_loss = rcl_per_condition_loss / num_batches
+    # kld_per_condition_loss = kld_per_condition_loss / num_batches
 
+    loss = loss / num_data_points
+    rcl_loss = rcl_loss / num_data_points
+    kld_loss = kld_loss / num_data_points
+    rcl_per_condition_loss = rcl_per_condition_loss / num_data_points
+    kld_per_condition_loss = kld_per_condition_loss / num_data_points
+
+    # Save metrics averaged across all batches and dimension per condition
     for j in range(len(torch.unique(output["cond_labels"]))):
         dataframe["epoch"].append(current_epoch)
         dataframe["condition"].append(j)
@@ -263,26 +437,37 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
         stats.to_csv(path, header="column_names", index=False)
 
     if prefix == "test":
+
+        # Save test KLD and variance of mu per dimension, condition
+        # This is averaged across batch
         dataframe2 = {
-            "epoch": [],
             "dimension": [],
             "test_kld_per_dim": [],
             "condition": [],
+            "mu_std_per_dim": [],
+            "explained_variance": [],
         }
 
         for j in range(len(torch.unique(output["cond_labels"]))):
-            # this_cond_rcl = test_batch_rcl[j::X_train.shape[2] + 1, :]
 
             this_cond_kld = batch_kld[j :: len(torch.unique(output["cond_labels"])), :]
+            this_cond_mu = batch_mu[j :: len(torch.unique(output["cond_labels"])), :]
 
-            # summed_rcl = torch.sum(this_cond_rcl, dim=0) / batch_num_test
             summed_kld = torch.sum(this_cond_kld, dim=0) / batch_length
+            dim_var = torch.std(this_cond_mu, dim=0)
+
+            summed_summed_kld = torch.sum(summed_kld)
 
             for k in range(len(summed_kld)):
-                dataframe2["epoch"].append(current_epoch)
                 dataframe2["dimension"].append(k)
-                dataframe2["condition"].append(j)
+                dataframe2["condition"].append(
+                    torch.unique(output["cond_labels"])[j].item()
+                )
                 dataframe2["test_kld_per_dim"].append(summed_kld[k].item())
+                dataframe2["mu_std_per_dim"].append(dim_var[k].item())
+                dataframe2["explained_variance"].append(
+                    (summed_kld[k].item() / summed_summed_kld.item()) * 100
+                )
 
         stats_per_dim = pd.DataFrame(dataframe2)
 
@@ -291,6 +476,65 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
             stats_per_dim.to_csv(path2, mode="a", header=False, index=False)
         else:
             stats_per_dim.to_csv(path2, header="column_names", index=False)
+
+        # Get ranked Z dim list
+        stats_per_dim_ranked = (
+            stats_per_dim.loc[stats_per_dim["test_kld_per_dim"] > 0.5]
+            .sort_values(by=["test_kld_per_dim"])
+            .reset_index(drop=True)
+        )
+
+        ranked_z_dim_list = [i for i in stats_per_dim_ranked["dimension"][::-1]]
+
+        # Save mu per element, dimension and conditon
+        # Not averaged across batch
+        dataframe3 = {
+            "dimension": [],
+            "mu": [],
+            "element": [],
+            "condition": [],
+        }
+
+        for j in range(len(torch.unique(output["cond_labels"]))):
+
+            this_cond_mu = batch_mu[j :: len(torch.unique(output["cond_labels"])), :]
+
+            for element in range(this_cond_mu.shape[0]):
+                for dimension in range(this_cond_mu.shape[1]):
+                    dataframe3["dimension"].append(dimension)
+                    dataframe3["element"].append(element)
+                    dataframe3["condition"].append(
+                        torch.unique(output["cond_labels"])[j].item()
+                    )
+                    dataframe3["mu"].append(this_cond_mu[element, dimension].item())
+
+        mu_per_elem_and_dim = pd.DataFrame(dataframe3)
+
+        path3 = dir_path / f"mu_per_elem_and_dim_{prefix}.csv"
+        if path3.exists():
+            mu_per_elem_and_dim.to_csv(path3, mode="a", header=False, index=False)
+        else:
+            mu_per_elem_and_dim.to_csv(path3, header="column_names", index=False)
+
+        # Make correlation plot between top 20 latent dims
+        mu_per_elem_and_dim = mu_per_elem_and_dim[["dimension", "mu", "element"]]
+        table = pd.pivot_table(
+            mu_per_elem_and_dim, values="mu", index=["element"], columns=["dimension"]
+        )
+        mu_corrs = table[ranked_z_dim_list[:20]].corr()
+
+        plt.figure(figsize=(8, 8))
+        sns.heatmap(
+            mu_corrs.abs(),
+            cmap="Blues",
+            vmin=0,
+            vmax=1,
+            xticklabels=True,
+            yticklabels=True,
+            square=True,
+            cbar_kws={"shrink": 0.82},
+        )
+        plt.savefig(dir_path / "latent_dim_corrs.png", dpi=300, bbox_inches="tight")
 
         path_all = dir_path / "stats_all.csv"
         all_stats = pd.DataFrame()
@@ -304,6 +548,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
             all_stats.to_csv(path_all, header="column_names", index=False)
 
     return outputs
+
 
 def find_optimizer(optimizer_name):
     """

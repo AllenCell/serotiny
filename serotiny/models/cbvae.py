@@ -6,6 +6,7 @@ from typing import Sequence
 import inspect
 
 import logging
+
 logger = logging.getLogger("lightning")
 logger.propagate = False
 
@@ -17,8 +18,8 @@ import torch.nn.functional as F
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.parsing import get_init_args
 
-from ..losses import KLDLoss
-from .utils import index_to_onehot, find_optimizer
+from serotiny.losses import KLDLoss
+from serotiny.utils.model_utils import index_to_onehot, find_optimizer
 
 
 def reparameterize(mu, log_var, add_noise=True):

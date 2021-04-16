@@ -1,14 +1,21 @@
-from typing import Optional, Sequence, Tuple, Union
+from typing import Optional
 
 import torch
-from torch import device, Tensor
 from pytorch_lightning import Callback, LightningModule, Trainer
 from pathlib import Path
 import pandas as pd
-from aicscytoparam import cytoparam
-from ...metrics.utils import get_mesh_from_dataframe
+from cvapipe_analysis.tools.plotting import ShapeModePlotMaker
+
+
+from serotiny.utils.mesh_utils import (
+    get_meshes,
+    find_plane_mesh_intersection,
+    animate_contours,
+)
+
+
+# Configure z for inference
 import matplotlib
-import matplotlib.pyplot as plt
 
 matplotlib.rc("xtick", labelsize=3)
 matplotlib.rc("ytick", labelsize=3)
@@ -28,124 +35,92 @@ class SpharmLatentWalk(Callback):
 
     def __init__(
         self,
-        save_dir: Optional[str] = None,
-        condition: Optional[list] = None,
+        config: dict,
+        spharm_coeffs_cols: list,
         latent_walk_range: Optional[list] = None,
         cutoff_kld_per_dim: Optional[float] = None,
+        plot_limits: Optional[list] = None,
+        subfolder: Optional[str] = None,
+        ignore_mesh_and_contour_plots: Optional[bool] = None,
     ):
         """
         Args:
-            save_dir: Where to save plots
-            Default: csv_logs folder
+            config: Config file used by Matheus in cvapipe_analysis
 
-            condition: A condition to give the decoder
-            Default None
+            spharm_coeffs_cols: List of column names of the spharm coeffs
+            Example: ["dna_spharm_L0M1",..]
 
             latent_walk_range: What range to do the latent walk
-            Default = [-5, -2.5, 0, 2.5, 5]
+            Example = [-2, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0]
 
             cutoff_kld_per_dim: Cutoff to use for KLD per dim
-            Default = 0.5
+            Example = 0.5
+
+            plot_limits: Limits for plot
+
+            subfolder: Subfolder name to save gifs
         """
         super().__init__()
 
-        self.save_dir = save_dir
-        self.condition = condition
+        self.config = config
         self.cutoff_kld_per_dim = cutoff_kld_per_dim
         self.latent_walk_range = latent_walk_range
-        dfg = pd.read_csv(
-            "/allen/aics/modeling/ritvik/projects/serotiny/variance_spharm_coeffs.csv"
-        )
-        self.dna_spharm_cols = [col for col in dfg.columns if "dna_shcoeffs" in col]
+        self.plot_limits = plot_limits
+        self.subfolder = subfolder
+        self.dna_spharm_cols = spharm_coeffs_cols
+
         if self.latent_walk_range is None:
-            self.latent_walk_range = [-5, -2.5, 0, 2.5, 5]
+            # self.latent_walk_range = [-2, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, 2.0]
+            self.latent_walk_range = [
+                -2,
+                -1,
+                -0.5,
+                -0.25,
+                -0.1,
+                0,
+                0.1,
+                0.25,
+                0.5,
+                1,
+                2,
+            ]
 
         if self.cutoff_kld_per_dim is None:
             self.cutoff_kld_per_dim = 0.5
 
-    def to_device(
-        self, batch_x: Sequence, batch_y: Sequence, device: Union[str, device]
-    ) -> Tuple[Tensor, Tensor]:
+        if self.plot_limits is None:
+            self.plot_limits = [-150, 150, -80, 80]
 
-        # last input is for online eval
-        batch_x = batch_x.to(device)
-        batch_y = batch_y.to(device)
+        if self.subfolder is None:
+            self.subfolder = "gifs"
 
-        return batch_x, batch_y
+        self.config["pca"]["aliases"] = ["NUC"]
 
-    def make_plots(
-        self,
-        trainer: Trainer,
-        pl_module: LightningModule,
-        ranked_z_dim_list: list,
-        batch_size: int,
-        latent_dims: int,
-        c_shape: int,
-    ):
+        self.config["pca"][
+            "map_points"
+        ] = self.latent_walk_range  # This is map points in std dev units
 
-        for rank, z_dim in enumerate(ranked_z_dim_list):
-            # Set subplots
-            fig, ax_array = plt.subplots(
-                3,
-                len(self.latent_walk_range),
-                squeeze=False,
-                figsize=(30, 30),
-            )
-            count = 0
-            for value_index, value in enumerate(self.latent_walk_range):
-                z_inf = torch.zeros(batch_size, latent_dims)
-                z_inf[:, z_dim] = value
-                z_inf = z_inf.cuda(device=0)
-                z_inf = z_inf.float()
-                decoder = pl_module.decoder
-
-                y_test = torch.zeros(batch_size, c_shape)
-                if self.condition:
-                    y_test[:, 0] = self.condition
-
-                z_inf, y_test = self.to_device(z_inf, y_test, pl_module.device)
-                x_hat = decoder(z_inf, y_test)
-
-                test_spharm = x_hat[0, :]
-                test_spharm = test_spharm.detach().cpu().numpy()
-                test_spharm = pd.DataFrame(test_spharm).T
-                test_spharm.columns = self.dna_spharm_cols
-                test_spharm_series = test_spharm.iloc[0]
-
-                mesh = get_mesh_from_dataframe(test_spharm_series, "dna_shcoeffs_L", 32)
-                img, origin = cytoparam.voxelize_meshes([mesh])
-
-                for proj in [0, 1, 2]:
-
-                    ax_array[proj, value_index].set_title(
-                        f"value_{value}_project_{proj}"
-                    )
-                    ax_array[proj, value_index].imshow(img.max(proj), cmap="gray")
-                    count += 1
-
-            [ax.axis("off") for ax in ax_array.flatten()]
-            # Save figure
-            ax_array.flatten()[0].get_figure().savefig(
-                self.save_dir / Path(f"./z_dim_{z_dim}_rank_{rank}"),
-                dpi=200,
-            )
-
-            # Close figure, otherwise clogs memory
-            plt.close(fig)
+        self.config["pca"]["plot"]["limits"] = self.plot_limits
+        self.plot_maker = None
+        self.ignore_mesh_and_contour_plots = ignore_mesh_and_contour_plots
 
     def on_test_epoch_end(self, trainer: Trainer, pl_module: LightningModule):
 
         with torch.no_grad():
             dir_path = Path(trainer.logger[1].save_dir)
+
+            self.config["project"][
+                "local_staging"
+            ] = dir_path  # This is where plots get saved
+
+            subdir = dir_path / self.subfolder
+            subdir.mkdir(parents=True, exist_ok=True)
+
+            plot_maker = ShapeModePlotMaker(
+                config=self.config, subfolder=self.subfolder
+            )
+
             stats = pd.read_csv(dir_path / "stats_per_dim_test.csv")
-
-            if not self.save_dir:
-                self.save_dir = dir_path
-
-            if self.condition:
-                stats = stats.loc[stats["condition"] == self.condition].reset_index(
-                    drop=True
-                )
 
             stats = (
                 stats.loc[stats["test_kld_per_dim"] > self.cutoff_kld_per_dim]
@@ -154,9 +129,12 @@ class SpharmLatentWalk(Callback):
             )
 
             ranked_z_dim_list = [i for i in stats["dimension"][::-1]]
+            mu_variance_list = [i for i in stats["mu_std_per_dim"][::-1]]
 
-            if len(ranked_z_dim_list) > 10:
-                ranked_z_dim_list = ranked_z_dim_list[:10]
+            num_shapemodes = 8
+            if len(ranked_z_dim_list) > num_shapemodes:
+                ranked_z_dim_list = ranked_z_dim_list[:num_shapemodes]
+                mu_variance_list = mu_variance_list[:num_shapemodes]
 
             batch_size = trainer.test_dataloaders[0].batch_size
             latent_dims = pl_module.encoder.enc_layers[-1]
@@ -167,6 +145,45 @@ class SpharmLatentWalk(Callback):
             c = test_iter[c_label]
             c_shape = c.shape[-1]
 
-            self.make_plots(
-                trainer, pl_module, ranked_z_dim_list, batch_size, latent_dims, c_shape
+            meshes = get_meshes(
+                pl_module,
+                ranked_z_dim_list,
+                mu_variance_list,
+                batch_size,
+                latent_dims,
+                c_shape,
+                self.subfolder,
+                self.latent_walk_range,
+                self.config,
+                self.dna_spharm_cols,
             )
+
+            if not self.ignore_mesh_and_contour_plots:
+                for shapemode, mesh_dict in meshes.items():
+                    projections = {}
+                    projs = [[0, 1], [0, 2], [1, 2]]
+                    for dim, proj in zip(["z", "y", "x"], projs):
+                        projections[dim] = {}
+                        for alias, mesh_list in mesh_dict.items():
+                            print(dim, alias)
+                            projections[dim][alias] = []
+                            for mesh in mesh_list:
+                                coords = find_plane_mesh_intersection(mesh, proj)
+                                projections[dim][alias].append(coords)
+                                print("done projecting single mesh")
+                    # return contours
+                    # projections = plot_maker.get_2d_contours(mesh_dict)
+                    print(f"Done with all projections for shapemode {shapemode}")
+                    for proj, contours in projections.items():
+                        print(f"Beginning gif generation for proj {proj}")
+                        animate_contours(
+                            contours,
+                            f"{shapemode}_{proj}",
+                            self.config,
+                            dir_path,
+                            self.subfolder,
+                        )
+                    print("Done gif generation for shapemode {shapemode}")
+                print("Combing all gifs into single plot")
+                shapemodes = [str(i) for i in range(len(ranked_z_dim_list))]
+                plot_maker.combine_and_save_animated_gifs(shapemodes)

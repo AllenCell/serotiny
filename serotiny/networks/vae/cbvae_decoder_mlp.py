@@ -10,24 +10,31 @@ class CBVAEDecoderMLP(nn.Module):
         self,
         x_dim=295,
         c_dim=25,
-        dec_layers=[512, 512, 256, 256, 256, 256, 256, 295],
+        hidden_layers=[256, 256, 256, 256, 256],
+        latent_dims=64,
     ):
         # super(Enc, self).__init__()
         super().__init__()
 
         self.xdim = x_dim
         self.cdim = c_dim
-        self.dec_layers = dec_layers
+        self.hidden_layers = hidden_layers
+        self.latent_dims = latent_dims
+
+        self.dec_layers = self.hidden_layers.copy()
+
+        self.dec_layers.insert(0, self.latent_dims)
+        self.dec_layers.append(self.xdim)
 
         # decoder part
         decoder_layers = []
         # decoder_net = nn.Sequential()
-        for j, (i, k) in enumerate(zip(dec_layers[0::1], dec_layers[1::1])):
+        for j, (i, k) in enumerate(zip(self.dec_layers[0::1], self.dec_layers[1::1])):
             if j == 0:
                 decoder_layers.append(nn.Linear(i + self.cdim, k))
                 decoder_layers.append(nn.BatchNorm1d(k))
                 decoder_layers.append(nn.ReLU())
-            elif j == len(dec_layers) - 2:
+            elif j == len(self.dec_layers) - 2:
                 decoder_layers.append(nn.Linear(i, k))
             else:
                 decoder_layers.append(nn.Linear(i, k))

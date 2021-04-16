@@ -16,7 +16,7 @@ import torch.optim as opt
 
 import pytorch_lightning as pl
 
-from .utils import (
+from serotiny.utils.model_utils import (
     acc_prec_recall,
     add_pr_curve_tensorboard,
     find_optimizer,

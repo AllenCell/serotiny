@@ -116,7 +116,7 @@ class ClassMSELoss(nn.Module):
     def forward(self, input, target):
 
         if input.shape[1] > 1:
-            target_onehot = utils.index_to_onehot(target, input.shape[1]).float()
+            target_onehot = serotiny.utils.model_utils.index_to_onehot(target, input.shape[1]).float()
         else:
             target_onehot = target.float()
 
@@ -158,7 +158,7 @@ class ClassMSELossV2(nn.Module):
     def forward(self, input, target):
 
         if input.shape[1] > 1:
-            target_onehot = utils.index_to_onehot(target, input.shape[1]).float()
+            target_onehot = serotiny.utils.model_utils.index_to_onehot(target, input.shape[1]).float()
         else:
             target_onehot = target.float()
 

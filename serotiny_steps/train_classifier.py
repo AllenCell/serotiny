@@ -14,7 +14,7 @@ from pl_bolts.callbacks import PrintTableMetricsCallback
 from ray.tune.integration.pytorch_lightning import TuneReportCallback
 from ray import tune
 
-from serotiny.progress_bar import GlobalProgressBar
+from serotiny.models.callbacks.progress_bar import GlobalProgressBar
 from serotiny.models.classification import ClassificationModel
 
 import serotiny.datamodules as datamodules

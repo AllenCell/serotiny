@@ -4,7 +4,7 @@
 import logging
 import fire
 
-from serotiny.data.csv import load_csv
+from serotiny.io.data import load_csv
 
 ###############################################################################
 

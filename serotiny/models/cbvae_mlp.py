@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Optional
 
 from ..loss_formulations import calculate_elbo
-from .utils import log_metrics
+from serotiny.utils.model_utils import log_metrics
 
 AVAILABLE_OPTIMIZERS = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}
 AVAILABLE_SCHEDULERS = {"reduce_lr_plateau": torch.optim.lr_scheduler.ReduceLROnPlateau}
@@ -70,6 +70,8 @@ class CBVAEMLPModel(pl.LightningModule):
         # train autoencoder
         #####################
 
+        batch_size = x.shape[0]
+
         mu, logsigma, z = self.encoder(x, x_cond)
         if z_inference is not None:
             x_hat = self.decoder(z_inference, x_cond)
@@ -84,9 +86,9 @@ class CBVAEMLPModel(pl.LightningModule):
             x_hat,
             mu,
             logsigma,
-            loss,
-            recon_loss,
-            kld_loss,
+            loss / batch_size,
+            recon_loss / batch_size,
+            kld_loss / batch_size,
             kld_per_element,
             rcl_per_element,
         )
@@ -95,7 +97,7 @@ class CBVAEMLPModel(pl.LightningModule):
         x, x_cond, x_cond_inds = self.parse_batch(batch)
         # kld_elem is batch * num_latent_dims
         # rcl_elem is batch * Y shape of input
-        x_hat, _, _, loss, recon_loss, kld_loss, kld_elem, rcl_elem = self(x, x_cond)
+        x_hat, mu, _, loss, recon_loss, kld_loss, kld_elem, rcl_elem = self(x, x_cond)
 
         # Default logger=False for training_step
         # set it to true to log train loss to all lggers
@@ -115,6 +117,7 @@ class CBVAEMLPModel(pl.LightningModule):
             "kld_per_elem": kld_elem,
             "rcl_per_elem": rcl_elem,
             "batch_idx": batch_idx,
+            "mu_per_elem": mu,
         }
 
     def training_epoch_end(self, outputs):
@@ -123,7 +126,7 @@ class CBVAEMLPModel(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         x, x_cond, x_cond_inds = self.parse_batch(batch)
-        x_hat, _, _, loss, recon_loss, kld_loss, kld_elem, rcl_elem = self(x, x_cond)
+        x_hat, mu, _, loss, recon_loss, kld_loss, kld_elem, rcl_elem = self(x, x_cond)
 
         # Default logger=False for training_step
         # set it to true to log train loss to all lggers
@@ -143,6 +146,7 @@ class CBVAEMLPModel(pl.LightningModule):
             "rcl_per_elem": rcl_elem,
             "batch_idx": batch_idx,
             "batch": batch,
+            "mu_per_elem": mu,
         }
 
     def validation_epoch_end(self, outputs):
@@ -151,7 +155,7 @@ class CBVAEMLPModel(pl.LightningModule):
 
     def test_step(self, batch, batch_idx):
         x, x_cond, x_cond_inds = self.parse_batch(batch)
-        x_hat, _, _, loss, recon_loss, kld_loss, kld_elem, rcl_elem = self(x, x_cond)
+        x_hat, mu, _, loss, recon_loss, kld_loss, kld_elem, rcl_elem = self(x, x_cond)
 
         # Default logger=False for training_step
         # set it to true to log train loss to all lggers
@@ -170,6 +174,7 @@ class CBVAEMLPModel(pl.LightningModule):
             "kld_per_elem": kld_elem,
             "rcl_per_elem": rcl_elem,
             "batch_idx": batch_idx,
+            "mu_per_elem": mu,
         }
 
     def test_epoch_end(self, outputs):
