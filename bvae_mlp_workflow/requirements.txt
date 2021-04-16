@@ -1,2 +1,0 @@
-hydra-core>=1.0.5
-omegaconf>=2.0.6
