@@ -1,0 +1,4 @@
+# @package _group_
+path: "/allen/aics/modeling/bvae_analysis/data/aligned_shcoeffs/C:0_noskew/manifest_aligned.csv"
+align: "DNA"
+skew: "yes"

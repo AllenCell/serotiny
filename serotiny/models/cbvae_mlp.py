@@ -70,6 +70,8 @@ class CBVAEMLPModel(pl.LightningModule):
         # train autoencoder
         #####################
 
+        batch_size = x.shape[0]
+
         mu, logsigma, z = self.encoder(x, x_cond)
         if z_inference is not None:
             x_hat = self.decoder(z_inference, x_cond)
@@ -84,9 +86,9 @@ class CBVAEMLPModel(pl.LightningModule):
             x_hat,
             mu,
             logsigma,
-            loss,
-            recon_loss,
-            kld_loss,
+            loss / batch_size,
+            recon_loss / batch_size,
+            kld_loss / batch_size,
             kld_per_element,
             rcl_per_element,
         )

@@ -1,5 +1,5 @@
 # @package _group_
-num_epochs: 60
+num_epochs: 1
 num_workers: 4
 gpu_id: "7"
 lr: 0.001

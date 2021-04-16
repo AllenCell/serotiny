@@ -346,6 +346,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
     )
 
     batch_length = 0
+    num_data_points = 0
     loss, rcl_loss, kld_loss = 0, 0, 0
 
     total_x = torch.stack([x["input"] for x in outputs])
@@ -387,6 +388,9 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
                 ],
                 0,
             )
+
+            this_batch_size = rcl_per_element.shape[0]
+            num_data_points += this_batch_size
             batch_length += 1
 
             this_cond_rcl = torch.sum(rcl_per_element[this_cond_positions])
@@ -395,11 +399,17 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
             rcl_per_condition_loss[jj] += this_cond_rcl.item()
             kld_per_condition_loss[jj] += this_cond_kld.item()
 
-    loss = loss / num_batches
-    rcl_loss = rcl_loss / num_batches
-    kld_loss = kld_loss / num_batches
-    rcl_per_condition_loss = rcl_per_condition_loss / num_batches
-    kld_per_condition_loss = kld_per_condition_loss / num_batches
+    # loss = loss / num_batches
+    # rcl_loss = rcl_loss / num_batches
+    # kld_loss = kld_loss / num_batches
+    # rcl_per_condition_loss = rcl_per_condition_loss / num_batches
+    # kld_per_condition_loss = kld_per_condition_loss / num_batches
+
+    loss = loss / num_data_points
+    rcl_loss = rcl_loss / num_data_points
+    kld_loss = kld_loss / num_data_points
+    rcl_per_condition_loss = rcl_per_condition_loss / num_data_points
+    kld_per_condition_loss = kld_per_condition_loss / num_data_points
 
     # Save metrics averaged across all batches and dimension per condition
     for j in range(len(torch.unique(output["cond_labels"]))):

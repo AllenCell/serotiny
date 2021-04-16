@@ -19,7 +19,7 @@ defaults:
 
 hydra:
   run:
-    dir: output_tmp_test/${hydra.job.override_dirname}
+    dir: output_apr_16/${hydra.job.override_dirname}
   sweep:
     dir: multirun_apr_14/
     subdir: ${hydra.job.override_dirname}
