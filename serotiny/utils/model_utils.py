@@ -350,12 +350,18 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
         torch.empty([0]),
     )
 
+    all_rcl, all_kld, all_mu = (
+        torch.empty([0]),
+        torch.empty([0]),
+        torch.empty([0]),
+    )
+
     batch_length = 0
     num_data_points = 0
     loss, rcl_loss, kld_loss = 0, 0, 0
 
     total_x = torch.stack([x["input"] for x in outputs])
-    num_batches = len(total_x)
+    # num_batches = len(total_x)
 
     rcl_per_condition_loss, kld_per_condition_loss = (
         torch.zeros(total_x.size()[-1] + 1),
@@ -392,6 +398,24 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
                     torch.sum(mu_per_elem[this_cond_positions], dim=0).view(1, -1),
                 ],
                 0,
+            )
+
+            all_rcl = torch.cat(
+                [
+                    all_rcl.type_as(rcl_per_element),
+                    rcl_per_element[this_cond_positions],
+                ],
+                0,
+            )
+            all_kld = torch.cat(
+                [
+                    all_kld.type_as(kld_per_element),
+                    kld_per_element[this_cond_positions],
+                ],
+                0,
+            )
+            all_mu = torch.cat(
+                [all_mu.type_as(mu_per_elem), mu_per_elem[this_cond_positions]], 0
             )
 
             this_batch_size = rcl_per_element.shape[0]
@@ -445,6 +469,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
 
         # Save test KLD and variance of mu per dimension, condition
         # This is averaged across batch
+
         dataframe2 = {
             "dimension": [],
             "test_kld_per_dim": [],
@@ -455,11 +480,24 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
 
         for j in range(len(torch.unique(output["cond_labels"]))):
 
-            this_cond_kld = batch_kld[j :: len(torch.unique(output["cond_labels"])), :]
-            this_cond_mu = batch_mu[j :: len(torch.unique(output["cond_labels"])), :]
+            # this_cond_per_batch_kld = batch_kld[
+            #     j :: len(torch.unique(output["cond_labels"])), :
+            # ]
+            # this_cond_per_batch_mu = batch_mu[
+            #     j :: len(torch.unique(output["cond_labels"])), :
+            # ]
 
-            summed_kld = torch.sum(this_cond_kld, dim=0) / batch_length
-            dim_var = torch.std(this_cond_mu, dim=0)
+            this_cond_per_element_kld = all_kld[
+                j :: len(torch.unique(output["cond_labels"])), :
+            ]
+            this_cond_per_element_mu = all_mu[
+                j :: len(torch.unique(output["cond_labels"])), :
+            ]
+
+            # summed_kld = torch.sum(this_cond_per_batch_kld, dim=0) / batch_length
+            # dim_var = torch.std(this_cond_per_batch_mu, dim=0)
+            summed_kld = torch.sum(this_cond_per_element_kld, dim=0) / num_data_points
+            dim_std = torch.std(this_cond_per_element_mu, dim=0)
 
             summed_summed_kld = torch.sum(summed_kld)
 
@@ -469,7 +507,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
                     torch.unique(output["cond_labels"])[j].item()
                 )
                 dataframe2["test_kld_per_dim"].append(summed_kld[k].item())
-                dataframe2["mu_std_per_dim"].append(dim_var[k].item())
+                dataframe2["mu_std_per_dim"].append(dim_std[k].item())
                 dataframe2["explained_variance"].append(
                     (summed_kld[k].item() / summed_summed_kld.item()) * 100
                 )
@@ -484,7 +522,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
 
         # Get ranked Z dim list
         stats_per_dim_ranked = (
-            stats_per_dim.loc[stats_per_dim["test_kld_per_dim"] > 0.5]
+            stats_per_dim.loc[stats_per_dim["test_kld_per_dim"] > 0.05]
             .sort_values(by=["test_kld_per_dim"])
             .reset_index(drop=True)
         )
@@ -502,16 +540,21 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
 
         for j in range(len(torch.unique(output["cond_labels"]))):
 
-            this_cond_mu = batch_mu[j :: len(torch.unique(output["cond_labels"])), :]
+            # this_cond_mu = batch_mu[j :: len(torch.unique(output["cond_labels"])), :]
+            this_cond_per_element_mu = all_mu[
+                j :: len(torch.unique(output["cond_labels"])), :
+            ]
 
-            for element in range(this_cond_mu.shape[0]):
-                for dimension in range(this_cond_mu.shape[1]):
+            for element in range(this_cond_per_element_mu.shape[0]):
+                for dimension in range(this_cond_per_element_mu.shape[1]):
                     dataframe3["dimension"].append(dimension)
                     dataframe3["element"].append(element)
                     dataframe3["condition"].append(
                         torch.unique(output["cond_labels"])[j].item()
                     )
-                    dataframe3["mu"].append(this_cond_mu[element, dimension].item())
+                    dataframe3["mu"].append(
+                        this_cond_per_element_mu[element, dimension].item()
+                    )
 
         mu_per_elem_and_dim = pd.DataFrame(dataframe3)
 
@@ -529,6 +572,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
         mu_corrs = table[ranked_z_dim_list[:20]].corr()
 
         plt.figure(figsize=(8, 8))
+        sns.set_context('talk')
         sns.heatmap(
             mu_corrs.abs(),
             cmap="Blues",
@@ -675,9 +719,7 @@ def marginal_kl(
                     batch[c_label].float(),
                     model.device,
                 )
-                _, mu, logvar, _, _, _, _, _ = model.forward(
-                    this_x, this_c
-                )
+                _, mu, logvar, _, _, _, _, _ = model.forward(this_x, this_c)
 
                 total_q += q_batch(z_s.double(), mu.double(), logvar.double())
 

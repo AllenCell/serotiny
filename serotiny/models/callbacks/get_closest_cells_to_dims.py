@@ -58,7 +58,7 @@ class GetClosestCellsToDims(Callback):
         self.dna_spharm_cols = spharm_coeffs_cols
         self.cutoff_kld_per_dim = cutoff_kld_per_dim
         if self.cutoff_kld_per_dim is None:
-            self.cutoff_kld_per_dim = 0.5
+            self.cutoff_kld_per_dim = 0
 
     def on_test_epoch_end(self, trainer: Trainer, pl_module: LightningModule):
 

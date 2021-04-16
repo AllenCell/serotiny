@@ -37,7 +37,7 @@ def get_meshes(
             figsize=(15, 7),
         )
         meshes[rank] = {}
-        for alias in config["pca"]["aliases"]:
+        for alias in config["shapespace"]["aliases"]:
             meshes[rank][alias] = []
             for value_index, value in enumerate(latent_walk_range):
                 z_inf = torch.zeros(batch_size, latent_dims)

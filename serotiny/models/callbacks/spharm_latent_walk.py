@@ -86,7 +86,7 @@ class SpharmLatentWalk(Callback):
             ]
 
         if self.cutoff_kld_per_dim is None:
-            self.cutoff_kld_per_dim = 0.5
+            self.cutoff_kld_per_dim = 0
 
         if self.plot_limits is None:
             self.plot_limits = [-150, 150, -80, 80]
@@ -94,13 +94,13 @@ class SpharmLatentWalk(Callback):
         if self.subfolder is None:
             self.subfolder = "gifs"
 
-        self.config["pca"]["aliases"] = ["NUC"]
+        self.config["shapespace"]["aliases"] = ["NUC"]
 
-        self.config["pca"][
+        self.config["shapespace"][
             "map_points"
         ] = self.latent_walk_range  # This is map points in std dev units
 
-        self.config["pca"]["plot"]["limits"] = self.plot_limits
+        self.config["shapespace"]["plot"]["limits"] = self.plot_limits
         self.plot_maker = None
         self.ignore_mesh_and_contour_plots = ignore_mesh_and_contour_plots
 
@@ -116,9 +116,10 @@ class SpharmLatentWalk(Callback):
             subdir = dir_path / self.subfolder
             subdir.mkdir(parents=True, exist_ok=True)
 
-            plot_maker = ShapeModePlotMaker(
-                config=self.config, subfolder=self.subfolder
-            )
+            from cvapipe_analysis.tools import controller
+
+            control = controller.Controller(self.config)
+            plot_maker = ShapeModePlotMaker(control, subfolder=self.subfolder)
 
             stats = pd.read_csv(dir_path / "stats_per_dim_test.csv")
 

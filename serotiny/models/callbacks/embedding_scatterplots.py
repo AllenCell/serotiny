@@ -27,7 +27,7 @@ class EmbeddingScatterPlots(Callback):
         self.input_df = input_df
         self.cutoff_kld_per_dim = cutoff_kld_per_dim
         if self.cutoff_kld_per_dim is None:
-            self.cutoff_kld_per_dim = 0.5
+            self.cutoff_kld_per_dim = 0
 
     def on_test_epoch_end(self, trainer: Trainer, pl_module: LightningModule):
 
