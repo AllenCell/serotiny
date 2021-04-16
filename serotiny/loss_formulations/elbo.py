@@ -21,7 +21,5 @@ def calculate_elbo(x, reconstructed_x, mean, log_var, beta, mask=False):
     rcl_per_element = loss_per_element(reconstructed_x, x)
     kld = -0.5 * torch.sum(1 + log_var - mean.pow(2) - log_var.exp())
     kld_per_element = -0.5 * (1 + log_var - mean.pow(2) - log_var.exp())
-    print(rcl)
-    print(rcl_per_element)
 
     return rcl + beta * kld, rcl, kld, rcl_per_element, kld_per_element
