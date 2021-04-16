@@ -7,19 +7,20 @@ class KLDLoss(nn.Module):
     def __init__(self, reduction=None, mode="isotropic"):
         super(KLDLoss, self).__init__()
         self.reduction = reduction
+        self.mode = mode
 
         if mode not in ["isotropic", "diagonal"]:
             raise NotImplementedError(f"KLD mode '{mode}' not implemented")
 
-    def forward(self, mu, logvar, prior_mu=none, prior_logvar=None):
+    def forward(self, mu, logvar, prior_mu=None, prior_logvar=None):
 
-        if mode == "isotropic":
+        if self.mode == "isotropic":
             kld = -0.5 * (1 + logvar - mu.pow(2) - logvar.exp())
-        elif mode == "diagonal":
+        elif self.mode == "diagonal":
             mu_diff = prior_mu - mu
 
-            trace = (logvar/prior_logvar).sum(axis=1)
-            mahalanobis = (mu_diff**2)/prior_logvar
+            trace = (logvar / prior_logvar).sum(axis=1)
+            mahalanobis = (mu_diff**2) / prior_logvar
             log_det_ratio = prior_logvar.sum() - logvar.sum(axis=1)
 
             kld = trace + mahalanobis - mu.shape[1] + log_det_ratio

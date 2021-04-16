@@ -13,6 +13,11 @@ import pandas as pd
 import seaborn as sns
 from pytorch_lightning import LightningModule
 from cvapipe_analysis.steps.pca_path_cells.utils import scan_pc_for_cells
+from tqdm import trange
+from tqdm import tqdm
+import math
+import random
+from scipy.stats import multivariate_normal
 
 
 def to_device(
@@ -162,8 +167,6 @@ def get_closest_cells(
         result.to_csv(path, header="column_names", index=False)
 
     return result
-
-from scipy.stats import multivariate_normal
 
 
 def acc_prec_recall(n_classes):
@@ -591,6 +594,7 @@ def find_lr_scheduler(scheduler_name):
         )
     return scheduler_class
 
+
 def q_batch(z, mus, logvars):
     """
     Compute a batch contribution to marginal q, where marginal q is
@@ -600,61 +604,82 @@ def q_batch(z, mus, logvars):
     This function computes *unnormalized* contributions to that sum
 
     """
-    numerator = (z - mus)**2 / (logvars.exp())
+    numerator = (z - mus) ** 2 / (logvars.exp())
     numerator = -0.5 * numerator.sum(axis=1)
     numerator = torch.exp(numerator)
 
     # equivalent to product of all sigma-squares
-    denominator = torch.sum(logsigmas, axis=1).exp()
+    denominator = torch.sum(logvars, axis=1).exp()
     denominator *= math.pow(2 * math.pi, mus.shape[1])
     denominator = torch.sqrt(denominator)
 
     return (numerator / denominator).sum()
 
-def marginal_kl(model, dataloader, prior_mean, prior_logvar, n_samples,
-                x_label, c_label, verbose=True):
 
-    prior = multivariate_normal(mean=prior_mean,
-                                cov=np.exp(prior_logvar))
+def marginal_kl(
+    model,
+    dataloader,
+    prior_mean,
+    prior_logvar,
+    n_samples,
+    x_label,
+    c_label,
+    verbose=True,
+):
+
+    prior = multivariate_normal(mean=prior_mean, cov=np.exp(prior_logvar))
 
     dataset_size = len(dataloader.dataset)
 
     with torch.no_grad():
         total_marginal_kl = 0
         if verbose:
-            sample_iter = trange(n_samples, desc="all samples"):
+            sample_iter = trange(n_samples, desc="all samples")
         else:
             sample_iter = range(n_samples)
 
         for i in sample_iter:
             sample_ix = random.randint(0, dataset_size)
-            sample = dataloader.dataset[sample_ix]
+
+            # import ipdb
+            # ipdb.set_trace()
+            sample = dataloader.dataset.datasets[sample_ix]
+
+            this_x, this_c = to_device(
+                sample[x_label].float().unsqueeze(0),
+                sample[c_label].float().unsqueeze(0),
+                model.device,
+            )
 
             _, z_s, _, _, _, _, _, _ = model.forward(
-                sample[x_label].float().unsqueeze(0),
-                sample[c_label].float().unsqueeze(0)
+                this_x,
+                this_c,
             )
 
             total_q = 0
-            log_p_z_s = prior.logpdf(z_s)
+            log_p_z_s = prior.logpdf(z_s.cpu().numpy())
 
             if verbose:
-                batch_iter = tqdm(iter(dataloader), total=len(dataloader),
-                                  leave=False, desc=f"sample {i}")
+                batch_iter = tqdm(
+                    iter(dataloader),
+                    total=len(dataloader),
+                    leave=False,
+                    desc=f"sample {i}",
+                )
             else:
                 batch_iter = dataloader
 
             for batch in batch_iter:
-                _, mu, logvar, _, _, _, _, _ = model.forward(
+                this_x, this_c = to_device(
                     batch[x_label].float(),
-                    batch[c_label].float()
+                    batch[c_label].float(),
+                    model.device,
+                )
+                _, mu, logvar, _, _, _, _, _ = model.forward(
+                    this_x, this_c
                 )
 
-                total_q += q_batch(
-                    z_s.double(),
-                    mu.double(),
-                    logvar.double()
-                )
+                total_q += q_batch(z_s.double(), mu.double(), logvar.double())
 
             total_marginal_kl += torch.log(total_q / dataset_size) - log_p_z_s
 

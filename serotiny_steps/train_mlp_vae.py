@@ -23,6 +23,7 @@ from serotiny.models.callbacks import (
     GetClosestCellsToDims,
     GlobalProgressBar,
     EmbeddingScatterPlots,
+    MarginalKL,
 )
 
 log = logging.getLogger(__name__)
@@ -176,6 +177,12 @@ def train_mlp_vae(
         ]
     elif datamodule == "VarianceSpharmCoeffs":
 
+        marginal_kl = MarginalKL(
+            n_samples=5,
+            x_label=dm.x_label,
+            c_label=dm.c_label,
+            embedding_dim=latent_dims,
+        )
         mlp_vae_logging = MLPVAELogging(datamodule=dm, values=values)
 
         get_embeddings = GetEmbeddings(
@@ -207,6 +214,7 @@ def train_mlp_vae(
             GPUStatsMonitor(),
             GlobalProgressBar(),
             EarlyStopping("val_loss", patience=15),
+            marginal_kl,
             mlp_vae_logging,
             get_embeddings,
             embedding_scatterplots,

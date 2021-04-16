@@ -1,19 +1,14 @@
-from typing import Optional, Sequence, Tuple, Union
+from typing import Optional
 from pathlib import Path
 
-import random
-import math
-from scipy.stats import multivariate_normal
-
 import json
-import pandas as pd
 import numpy as np
 import torch
 from pytorch_lightning import Callback, LightningModule, Trainer
-from tqdm import trange, tqdm
 
 from serotiny.losses import KLDLoss
-from serotiny.utils.model_utils import q_batch, marginal_kl
+from serotiny.utils.model_utils import marginal_kl
+from serotiny.utils.model_utils import to_device
 
 
 class MarginalKL(Callback):
@@ -29,53 +24,73 @@ class MarginalKL(Callback):
         x_label: str,
         c_label: str,
         embedding_dim: int,
-        prior_mean: Optional[np.array],
-        prior_logvar: Optional[np.array],
-        mode: str = "isotropic"
-        save_dir: Union[Path, str],
+        mode: str = "isotropic",
         verbose: bool = True,
+        prior_mean: Optional[np.array] = None,
+        prior_logvar: Optional[np.array] = None,
     ):
-        """
-        """
+        """"""
         super().__init__()
 
         self.n_samples = n_samples
-        self.save_dir = save_dir
         self.embedding_dim = embedding_dim
         self.prior_mean = prior_mean
         self.prior_logvar = prior_logvar
         self.mode = mode
+        self.x_label = x_label
+        self.c_label = c_label
 
-        self.kl_div = KLDLoss(mode=mode)
+        self.kl_div = KLDLoss(mode=mode, reduction="sum")
 
     def on_test_epoch_end(self, trainer: Trainer, pl_module: LightningModule):
 
-        if prior_mean is None:
-            prior_mean = np.zeros(self.embedding_dim)
-        if prior_var is None:
-            prior_logvar = np.zeros(self.embedding_dim)
+        save_dir = Path(trainer.logger[1].save_dir)
 
-        marginal_kl = marginal_kl(pl_module, trainer.train_dataloader, prior_mean,
-                                  prior_logvar, self.n_samples, self.x_label,
-                                  self.c_label)
+        if self.prior_mean is None:
+            self.prior_mean = np.zeros(self.embedding_dim)
+        if self.prior_logvar is None:
+            self.prior_logvar = np.zeros(self.embedding_dim)
+
+        marginal_kl_result = marginal_kl(
+            pl_module,
+            trainer.train_dataloader,
+            self.prior_mean,
+            self.prior_logvar,
+            self.n_samples,
+            self.x_label,
+            self.c_label,
+        )
 
         with torch.no_grad():
+            train_dataloader = trainer.train_dataloader
             total_kld = 0
-            for batch in dataloader:
-                _, mu, logvar, _, _, _, _, _ = model.forward(
+            for batch in train_dataloader:
+                this_x, this_c = to_device(
                     batch[self.x_label].float(),
-                    batch[self.c_label].float()
+                    batch[self.c_label].float(),
+                    pl_module.device,
+                )
+                _, mu, logvar, _, _, _, _, _ = pl_module(this_x, this_c)
+
+                total_kld += self.kl_div(
+                    mu,
+                    logvar,
+                    prior_mu=self.prior_mean,
+                    prior_logvar=self.prior_logvar,
                 )
 
-                total_kld += self.kl_div(mu, logvar, prior_mu=self.prior_mean,
-                                         prior_logvar=self.prior_logvar)
-
+        dataset_size = len(train_dataloader.dataset)
         avg_kld = total_kld / dataset_size
-
+        # import ipdb
+        # ipdb.set_trace()
         with open(save_dir / "elbo_terms.json", "w") as f:
-            json.dump({
-                "avg_kld": avg_kld,
-                "marginal_kld": marginal_kld,
-                "index-code mutual-information": avg_kld - marginal_kld,
-                "logN": np.log(dataset_size)
-            }, f)
+            json.dump(
+                {
+                    "avg_kld": avg_kld.item(),
+                    "marginal_kld": marginal_kl_result.item(),
+                    "index-code mutual-information": avg_kld.item()
+                    - marginal_kl_result.item(),
+                    "logN": np.log(dataset_size),
+                },
+                f,
+            )

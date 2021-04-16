@@ -59,9 +59,11 @@ class CBVAEMLPModel(pl.LightningModule):
 
         self.prior_mode = prior_mode
         self.embedding_dim = self.encoder.enc_layers[-1]
+        self.prior_mean = None
+        self.prior_logvar = None
 
         if prior_mode not in ["isotropic", "anisotropic"]:
-            raise NotImplementedError(f"KLD mode '{mode}' not implemented")
+            raise NotImplementedError(f"KLD mode '{prior_mode}' not implemented")
 
         if prior_mode == "anisotropic":
             self.prior_mean = torch.zeros(self.embedding_dim)
@@ -71,7 +73,6 @@ class CBVAEMLPModel(pl.LightningModule):
                 self.prior_logvar = torch.tensor(prior_logvar)
                 if learn_prior_logvar:
                     self.prior_logvar = nn.Parameter(self.prior_logvar)
-
 
     def parse_batch(self, batch):
         x = batch[self.hparams.x_label].float()
@@ -99,8 +100,15 @@ class CBVAEMLPModel(pl.LightningModule):
             x_hat = self.decoder(z, x_cond)
 
         loss, recon_loss, kld_loss, rcl_per_element, kld_per_element = calculate_elbo(
-            x, x_hat, mu, logsigma, self.beta, mask=self.mask, mode=self.prior_mode,
-            prior_mu=self.prior_mean, prior_logvar=self.prior_logvar
+            x,
+            x_hat,
+            mu,
+            logsigma,
+            self.beta,
+            mask=self.mask,
+            mode=self.prior_mode,
+            prior_mu=self.prior_mean,
+            prior_logvar=self.prior_logvar,
         )
 
         return (
