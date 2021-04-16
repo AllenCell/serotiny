@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 import logging
 from typing import Optional
-from datetime import datetime
 
 import fire
 import pytorch_lightning as pl
@@ -14,8 +12,8 @@ from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
 from pytorch_lightning.callbacks import ModelCheckpoint, GPUStatsMonitor, EarlyStopping
 
 from serotiny.networks.vae import CBVAEEncoderMLP, CBVAEDecoderMLP
-from serotiny.networks.vae import CBVAEEncoderMLPResnet, CBVAEDecoderMLPResnet
 from serotiny.models import CBVAEMLPModel
+import os
 
 import serotiny.datamodules as datamodules
 from serotiny.models.callbacks import (
@@ -24,6 +22,7 @@ from serotiny.models.callbacks import (
     GetEmbeddings,
     GetClosestCellsToDims,
     GlobalProgressBar,
+    EmbeddingScatterPlots,
 )
 
 log = logging.getLogger(__name__)
@@ -34,6 +33,7 @@ def train_mlp_vae(
     source_path: str,
     modified_source_save_dir: str,
     output_path: str,
+    checkpoint_path: str,
     datamodule: str,
     batch_size: int,
     gpu_id: str,
@@ -61,6 +61,7 @@ def train_mlp_vae(
     set_zero: Optional[bool] = False,  # For Spharm
     overwrite: Optional[bool] = False,  # For Spharm
     values: Optional[list] = None,  # For Spharm
+    hues: Optional[list] = None,  # For spharm
 ):
     """
     Instantiate and train a bVAE.
@@ -69,7 +70,6 @@ def train_mlp_vae(
     ----------
 
     """
-    import os
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
     os.environ["CUDA_VISIBLE_DEVICES"] = gpu_id
@@ -139,17 +139,6 @@ def train_mlp_vae(
         hidden_layers=hidden_layers,
         latent_dims=latent_dims,
     )
-    # encoder = CBVAEEncoderMLPResnet(
-    #     x_dim=x_dim,
-    #     c_dim=c_dim,
-    #     enc_layers=enc_layers,
-    # )
-
-    # decoder = CBVAEDecoderMLPResnet(
-    #     x_dim=x_dim,
-    #     c_dim=c_dim,
-    #     dec_layers=dec_layers,
-    # )
 
     vae = CBVAEMLPModel(
         encoder=encoder,
@@ -167,12 +156,11 @@ def train_mlp_vae(
     csv_logger = CSVLogger(
         save_dir=str(output_path) + "/csv_logs",
     )
-
-    ckpt_path = str(output_path) + "/checkpoints"
-
+    print(checkpoint_path)
     # Initialize model checkpoint
     checkpoint_callback = ModelCheckpoint(
-        dirpath=ckpt_path,
+        dirpath=checkpoint_path,
+        filename="{epoch}-{val_loss:.2f}",
         # if save_top_k = 1, all files in this local staging dir
         # will be deleted when a checkpoint is saved
         # save_top_k=1,
@@ -213,12 +201,15 @@ def train_mlp_vae(
             latent_walk_range=latent_walk_range,
             ignore_mesh_and_contour_plots=True,
         )
+
+        embedding_scatterplots = EmbeddingScatterPlots(input_df=dm.dfg, hues=hues)
         callbacks = [
             GPUStatsMonitor(),
             GlobalProgressBar(),
             EarlyStopping("val_loss", patience=15),
             mlp_vae_logging,
             get_embeddings,
+            embedding_scatterplots,
             get_closest_cells_to_dims,
             spharm_latent_walk,
         ]

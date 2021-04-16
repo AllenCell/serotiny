@@ -3,8 +3,6 @@ from typing import Union, Sequence, Optional
 import numpy as np
 import torch
 
-from imageio import imwrite
-
 import aicsimageio
 import aicsimageio.transforms as transforms
 from aicsimageio.writers import OmeTiffWriter
@@ -88,10 +86,10 @@ def infer_dims(img):
     dims = dict(zip(img.dims, img.shape))
 
     if "S" in dims:
-        if (dims["S"] > 1):
+        if dims["S"] > 1:
             raise ValueError("Expected image with no S dimensions")
     if "T" in dims:
-        if (dims["T"] > 1):
+        if dims["T"] > 1:
             raise ValueError("Expected image with no T dimensions")
 
     if (dims["X"] < 1) or (dims["Y"] < 1):
@@ -155,7 +153,7 @@ def tiff_loader(
             f"\tselect_channels:: {select_channels}"
         )
 
-    loaded_channels = select_channels+list(channel_masks.values())
+    loaded_channels = select_channels + list(channel_masks.values())
     loaded_channels_idx = [channel_names.index(channel) for channel in loaded_channels]
 
     dims = infer_dims(aicsimg)
@@ -199,11 +197,8 @@ def tiff_writer(
         raise ValueError(f"Unexpected image shape {img.shape}")
 
     with OmeTiffWriter(path) as writer:
-        writer.save(
-            img,
-            dimension_order=dims,
-            channel_names=channels
-        )
+        writer.save(img, dimension_order=dims, channel_names=channels)
+
 
 def project_2d(
     path_3d,
@@ -242,9 +237,7 @@ def project_2d(
     aicsimageio.use_dask(False)
 
     # load the 3d image
-    image_3d = tiff_loader(
-        path_3d, select_channels=channels, channel_masks=masks
-    )
+    image_3d = tiff_loader(path_3d, select_channels=channels, channel_masks=masks)
 
     # find the argument based on the axis
     if axis in TRANSFORM_AXIS_MAP:

@@ -10,8 +10,120 @@ from .metric_utils import visualize_encoder_tabular
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import numpy as np
 from brokenaxes import brokenaxes
+from aicscytoparam import cytoparam
+from pytorch_lightning import LightningModule, Trainer
+from .model_utils import to_device
+from .mesh_utils import get_mesh_from_series
 
 LOGGER = logging.getLogger(__name__)
+
+
+def make_embedding_pairplots(
+    input_df: pd.DataFrame,
+    all_embeddings: pd.DataFrame,
+    hues: list,
+    ranked_z_dim_list: list,
+    save_dir,
+):
+    stats_mu = all_embeddings.loc[all_embeddings["split"] == "test"]
+    # hues = ['DNA_PC1', 'DNA_PC2']
+    for hue in hues:
+        ranked_cols = [f"mu_{j}" for j in ranked_z_dim_list[:8]]
+        stats_top = stats_mu[[i for i in ranked_cols]]
+        stats_top = stats_top.reset_index(drop=True)
+
+        ranked_cols.append("CellId")
+        stats_top_with_cellid = stats_mu[
+            [i for i in stats_mu.columns if i in ranked_cols]
+        ]
+        stats_top_with_cellid = stats_top_with_cellid.reset_index(drop=True)
+
+        stats_top_with_cellid_merged = input_df[[hue, "CellId"]].merge(
+            stats_top_with_cellid, on=["CellId"]
+        )
+        stats_top_with_cellid_merged = stats_top_with_cellid_merged.drop(
+            columns="CellId"
+        )
+
+        sns.set_context('talk')
+        g = sns.pairplot(stats_top_with_cellid_merged, hue=hue, corner=True)
+        g.savefig(save_dir / f"pairplot_test_embeddings_hue_{hue}.png")
+
+
+def decode_latent_walk_closest_cells(
+    trainer: Trainer,
+    pl_module: LightningModule,
+    closest_cells_df: pd.DataFrame,
+    all_embeddings: pd.DataFrame,
+    ranked_z_dim_list: list,
+    mu_std_list: list,
+    dir_path,
+    path_in_stdv,
+    c_shape,
+    dna_spharm_cols,
+):
+    batch_size = trainer.test_dataloaders[0].batch_size
+    latent_dims = pl_module.encoder.enc_layers[-1]
+
+    for index, z_dim in enumerate(ranked_z_dim_list):
+        # Set subplots
+        fig, ax_array = plt.subplots(
+            3,
+            len(path_in_stdv),
+            squeeze=False,
+            figsize=(15, 7),
+        )
+        subset_df = closest_cells_df.loc[closest_cells_df["ranked_dim"] == z_dim]
+        mu_std = mu_std_list[index]
+
+        for loc_index, location in enumerate(subset_df["location"].unique()):
+            subset_sub_df = subset_df.loc[subset_df["location"] == location]
+            subset_sub_df = subset_sub_df.reset_index(drop=True)
+            this_cell_embedding = all_embeddings.loc[
+                all_embeddings["CellId"] == subset_sub_df["CellId"].item()
+            ]
+
+            z_inf = torch.zeros(batch_size, latent_dims)
+            walk_cols = [i for i in this_cell_embedding.columns if "mu" in i]
+
+            this_cell_id = subset_sub_df.iloc[0]["CellId"]
+
+            for walk in walk_cols:
+                # walk_cols is mu_{dim}, so walk[3:]
+                z_inf[:, int(walk[3:])] = torch.from_numpy(
+                    np.array(this_cell_embedding.iloc[0][walk])
+                )
+            z_inf = z_inf.cuda(device=0)
+            z_inf = z_inf.float()
+            decoder = pl_module.decoder
+
+            y_test = torch.zeros(batch_size, c_shape)
+
+            z_inf, y_test = to_device(z_inf, y_test, pl_module.device)
+            x_hat = decoder(z_inf, y_test)
+
+            test_spharm = x_hat[0, :]
+            test_spharm = test_spharm.detach().cpu().numpy()
+            test_spharm = pd.DataFrame(test_spharm).T
+            test_spharm.columns = dna_spharm_cols
+            test_spharm_series = test_spharm.iloc[0]
+
+            mesh = get_mesh_from_series(test_spharm_series, "dna", 32)
+            img, origin = cytoparam.voxelize_meshes([mesh])
+
+            for proj in [0, 1, 2]:
+                ax_array[proj, loc_index].set_title(
+                    f"{path_in_stdv[loc_index]} $\sigma$  \n ID {this_cell_id}"
+                )
+                ax_array[proj, loc_index].imshow(img.max(proj), cmap="gray")
+
+        [ax.axis("off") for ax in ax_array.flatten()]
+        # Save figure
+        ax_array.flatten()[0].get_figure().savefig(
+            dir_path / f"dim_{z_dim}_rank_{index}_closest_real_cell.png"
+        )
+        # Close figure, otherwise clogs memory
+        plt.close(fig)
 
 
 def make_plot_fid(

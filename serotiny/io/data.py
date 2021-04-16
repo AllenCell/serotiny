@@ -38,6 +38,7 @@ def load_csv(dataset: Union[str, Path, pd.DataFrame], required: Sequence[str]):
 
     return dataset
 
+
 def powerset(iterable):
     """
     Generate all combinations of the elements of `iterable`, for all possible
@@ -84,7 +85,6 @@ def subset_channels(
                 )
             )
     return channel_indexes, num_channels
-
 
 
 def download_quilt_data(
@@ -169,7 +169,7 @@ def load_data_loader(
 
     # Load a dataframe from the dataset, using the provided row processing fns
 
-    dataframe = DataframeDataset(dataset, loaders=loaders, transform=transform)
+    dataframe = DataframeDataset(dataset, loaders=loaders)
 
     # Configure WeightedRandomSampler to handle class imbalances
     sampler = None

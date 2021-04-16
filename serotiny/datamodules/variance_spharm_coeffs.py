@@ -84,7 +84,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         x_dim: int,
         source_path: str,
         modified_source_save_dir: str,
-        align: str, 
+        align: str,
         skew: str,
         num_classes: Optional[int] = None,
         set_zero: Optional[bool] = False,
@@ -126,6 +126,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         self.stratify_column = self.c_label
 
         dfg = pd.read_csv(self.source_path)
+        self.dfg = dfg
         self.num_rows = dfg.shape[0]
         self.spharm_cols = [col for col in dfg.columns if self.x_label in col]
         self.spharm_cols = [f for f in self.spharm_cols if "L" in f]
@@ -198,7 +199,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         if my_file.is_file() and self.overwrite is False:
             pass
         else:
-            df = pd.read_csv(self.source_path)
+            df = self.dfg
 
             train_inds, test_inds = train_test_split(
                 df.index,
@@ -255,10 +256,11 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         train_dataloader = load_data_loader(
             train_dataset,
             self.loaders,
+            transform=None,
             shuffle=False,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
-            weights_col="ClassWeights",
+            weights_col=None,  # or ClassWeights
         )
 
         return train_dataloader
@@ -272,10 +274,11 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         val_dataloader = load_data_loader(
             val_dataset,
             self.loaders,
+            transform=None,
             shuffle=False,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
-            weights_col="ClassWeights",
+            weights_col=None,  # or ClassWeights
         )
 
         return val_dataloader
@@ -289,10 +292,11 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         test_dataloader = load_data_loader(
             test_dataset,
             self.loaders,
+            transform=None,
             shuffle=False,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
-            weights_col="ClassWeights",
+            weights_col=None,  # or ClassWeights
         )
 
         return test_dataloader
