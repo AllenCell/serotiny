@@ -7,6 +7,13 @@ from serotiny.utils.model_utils import index_to_onehot
 from serotiny.metrics.inception import InceptionV3
 from serotiny.metrics.calculate_fid import get_activations
 from serotiny.metrics.calculate_fid import calculate_fid
+from sklearn.decomposition import PCA
+
+
+def get_singular_values(df, cols, n_principal_components=None):
+    df = df[cols]
+    pca = PCA(n_principal_components).fit(df)
+    return pca.singular_values_
 
 
 def visualize_encoder_tabular(

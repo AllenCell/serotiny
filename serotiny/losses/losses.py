@@ -16,11 +16,11 @@ class KLDLoss(nn.Module):
 
         if self.mode == "isotropic":
             kld = -0.5 * (1 + logvar - mu.pow(2) - logvar.exp())
-        elif self.mode == "diagonal":
+        elif self.mode == "anisotropic":
             mu_diff = prior_mu - mu
 
             trace = (logvar / prior_logvar).sum(axis=1)
-            mahalanobis = (mu_diff**2) / prior_logvar
+            mahalanobis = (mu_diff ** 2) / prior_logvar
             log_det_ratio = prior_logvar.sum() - logvar.sum(axis=1)
 
             kld = trace + mahalanobis - mu.shape[1] + log_det_ratio
@@ -130,7 +130,9 @@ class ClassMSELoss(nn.Module):
     def forward(self, input, target):
 
         if input.shape[1] > 1:
-            target_onehot = serotiny.utils.model_utils.index_to_onehot(target, input.shape[1]).float()
+            target_onehot = serotiny.utils.model_utils.index_to_onehot(
+                target, input.shape[1]
+            ).float()
         else:
             target_onehot = target.float()
 
@@ -172,7 +174,9 @@ class ClassMSELossV2(nn.Module):
     def forward(self, input, target):
 
         if input.shape[1] > 1:
-            target_onehot = serotiny.utils.model_utils.index_to_onehot(target, input.shape[1]).float()
+            target_onehot = serotiny.utils.model_utils.index_to_onehot(
+                target, input.shape[1]
+            ).float()
         else:
             target_onehot = target.float()
 

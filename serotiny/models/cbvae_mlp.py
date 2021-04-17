@@ -60,7 +60,7 @@ class CBVAEMLPModel(pl.LightningModule):
         self.prior_mode = prior_mode
         self.embedding_dim = self.encoder.enc_layers[-1]
         self.prior_mean = None
-        self.prior_logvar = None
+        self.prior_logvar = prior_logvar
 
         if prior_mode not in ["isotropic", "anisotropic"]:
             raise NotImplementedError(f"KLD mode '{prior_mode}' not implemented")
@@ -107,7 +107,7 @@ class CBVAEMLPModel(pl.LightningModule):
             self.beta,
             mask=self.mask,
             mode=self.prior_mode,
-            prior_mu=self.prior_mean,
+            prior_mu=self.prior_mean.type_as(mu),
             prior_logvar=self.prior_logvar,
         )
 

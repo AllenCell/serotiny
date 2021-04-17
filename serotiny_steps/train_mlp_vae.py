@@ -13,6 +13,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint, GPUStatsMonitor, EarlyS
 
 from serotiny.networks.vae import CBVAEEncoderMLP, CBVAEDecoderMLP
 from serotiny.models import CBVAEMLPModel
+from serotiny.utils.metric_utils import get_singular_values
 import os
 
 import serotiny.datamodules as datamodules
@@ -56,6 +57,9 @@ def train_mlp_vae(
     n_cells: int,  # No of closets cells to find per location
     align: str,  # DNA/MEM
     skew: str,  # yes/no
+    prior_mode: str,  # "isotropic', 'anisotropic'
+    learn_prior_logvar: bool,  # Default None
+    init_logvar_pca: bool,
     length: Optional[int] = None,  # For Gaussian
     corr: Optional[bool] = False,  # For Gaussian
     id_fields: Optional[list] = None,  # For Spharm
@@ -141,6 +145,14 @@ def train_mlp_vae(
         latent_dims=latent_dims,
     )
 
+    if init_logvar_pca:
+        singular_values = np.sqrt(
+            get_singular_values(dm.dfg, dm.spharm_cols, latent_dims)
+            / (dm.dfg.shape[0] - 1)
+        )
+    else:
+        singular_values = None
+
     vae = CBVAEMLPModel(
         encoder=encoder,
         decoder=decoder,
@@ -149,9 +161,11 @@ def train_mlp_vae(
         x_label=x_label,
         c_label=c_label,
         c_label_ind=c_label_ind,
+        prior_mode=prior_mode,
+        learn_prior_logvar=learn_prior_logvar,
+        prior_logvar=singular_values,
     )
 
-    print(output_path)
     tb_logger = TensorBoardLogger(save_dir=str(output_path))
 
     csv_logger = CSVLogger(

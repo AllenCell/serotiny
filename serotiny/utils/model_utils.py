@@ -572,7 +572,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
         mu_corrs = table[ranked_z_dim_list[:20]].corr()
 
         plt.figure(figsize=(8, 8))
-        sns.set_context('talk')
+        sns.set_context("talk")
         sns.heatmap(
             mu_corrs.abs(),
             cmap="Blues",
