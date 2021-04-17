@@ -35,12 +35,12 @@ def calculate_elbo(
     elif mode == "anisotropic":
         mu_diff = prior_mu - mean
 
-        trace = (log_var / prior_logvar).sum(axis=1)
-        mahalanobis = ((mu_diff ** 2) / prior_logvar).sum(axis=1)
-        log_det_ratio = prior_logvar.sum() - log_var.sum(axis=1)
-        # import ipdb
-        # ipdb.set_trace()
-        kld_per_element = trace + mahalanobis - mean.shape[1] + log_det_ratio
+        kld_per_element = 0.5 * (
+            (prior_logvar - log_var) +
+            (log_var - prior_logvar).exp() +
+            (mu_diff.pow(2) / prior_logvar.exp()) +
+            -1
+        )
     else:
         raise NotImplementedError(f"KLD mode '{mode}' not implemented")
 
