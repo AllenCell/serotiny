@@ -135,6 +135,10 @@ def visualize_encoder_tabular(
             mask,
         )
 
+        elbo_loss_total = elbo_loss_total / X_test.shape[0]
+        rcl_per_lt_temp_total = rcl_per_lt_temp_total / X_test.shape[0]
+        kl_per_lt_temp_total = kl_per_lt_temp_total / X_test.shape[0]
+
         # Save info to dataframe
         # if conds = [0,1,2] for a 2D Gaussian (X_test.size()[-1]),
         # then num_conds = 0, so
