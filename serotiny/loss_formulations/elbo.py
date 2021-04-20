@@ -1,6 +1,19 @@
 import torch
 
 
+def diagonal_gaussian_kl(mu1, mu2, logvar1, logvar2):
+    mu_diff = mu2 - mu1
+
+    kld_per_element = 0.5 * (
+        (logvar2 - logvar1) +
+        (logvar1 - logvar2).exp() +
+        (mu_diff.pow(2) / logvar2.exp()) +
+        -1
+    )
+
+    return kld_per_element
+
+
 def calculate_elbo(
     x,
     reconstructed_x,
@@ -33,14 +46,8 @@ def calculate_elbo(
     if mode == "isotropic":
         kld_per_element = -0.5 * (1 + log_var - mean.pow(2) - log_var.exp())
     elif mode == "anisotropic":
-        mu_diff = prior_mu - mean
+        kld_per_element = diagonal_gaussian_kl(mean, prior_mu, log_var, prior_logvar)
 
-        kld_per_element = 0.5 * (
-            (prior_logvar - log_var) +
-            (log_var - prior_logvar).exp() +
-            (mu_diff.pow(2) / prior_logvar.exp()) +
-            -1
-        )
     else:
         raise NotImplementedError(f"KLD mode '{mode}' not implemented")
 
