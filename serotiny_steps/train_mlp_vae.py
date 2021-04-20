@@ -1,33 +1,42 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os
 import logging
 from typing import Optional
-from datetime import datetime
 
 import fire
 import pytorch_lightning as pl
+import numpy as np
+import yaml
 from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
-from pytorch_lightning.callbacks import ModelCheckpoint, GPUStatsMonitor
+from pytorch_lightning.callbacks import ModelCheckpoint, GPUStatsMonitor, EarlyStopping
 
-from serotiny.progress_bar import GlobalProgressBar
 from serotiny.networks.vae import CBVAEEncoderMLP, CBVAEDecoderMLP
 from serotiny.models import CBVAEMLPModel
+import os
 
 import serotiny.datamodules as datamodules
-from serotiny.models.callbacks import MLPVAELogging, SpharmLatentWalk
+from serotiny.models.callbacks import (
+    MLPVAELogging,
+    SpharmLatentWalk,
+    GetEmbeddings,
+    GetClosestCellsToDims,
+    GlobalProgressBar,
+    EmbeddingScatterPlots,
+)
 
 log = logging.getLogger(__name__)
 pl.seed_everything(42)
 
 
 def train_mlp_vae(
-    data_dir: str,
+    source_path: str,
+    modified_source_save_dir: str,
     output_path: str,
+    checkpoint_path: str,
     datamodule: str,
     batch_size: int,
-    num_gpus: int,
+    gpu_id: str,
     num_workers: int,
     num_epochs: int,
     lr: float,
@@ -38,15 +47,21 @@ def train_mlp_vae(
     c_label_ind: str,
     x_dim: int,
     c_dim: int,
-    enc_layers: list,
-    dec_layers: list,
+    latent_dims: int,
+    hidden_layers: list,
     beta: float,
+    cvapipe_analysis_config_path: str,
+    latent_walk_range: list,
+    n_cells: int,  # No of closets cells to find per location
+    align: str,  # DNA/MEM
+    skew: str,  # yes/no
     length: Optional[int] = None,  # For Gaussian
     corr: Optional[bool] = False,  # For Gaussian
     id_fields: Optional[list] = None,  # For Spharm
     set_zero: Optional[bool] = False,  # For Spharm
     overwrite: Optional[bool] = False,  # For Spharm
     values: Optional[list] = None,  # For Spharm
+    hues: Optional[list] = None,  # For spharm
 ):
     """
     Instantiate and train a bVAE.
@@ -55,6 +70,10 @@ def train_mlp_vae(
     ----------
 
     """
+
+    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
+    os.environ["CUDA_VISIBLE_DEVICES"] = gpu_id
+
     if datamodule not in datamodules.__dict__:
         raise KeyError(
             f"Chosen datamodule {datamodule} not available.\n"
@@ -66,7 +85,7 @@ def train_mlp_vae(
         dm = datamodules.__dict__[datamodule](
             batch_size=batch_size,
             num_workers=num_workers,
-            data_dir=data_dir,
+            data_dir=modified_source_save_dir,
             x_label=x_label,
             c_label=c_label,
             c_label_ind=c_label_ind,
@@ -79,7 +98,7 @@ def train_mlp_vae(
         dm_no_shuffle = datamodules.__dict__[datamodule](
             batch_size=batch_size,
             num_workers=num_workers,
-            data_dir=data_dir,
+            data_dir=modified_source_save_dir,
             x_label=x_label,
             c_label=c_label,
             c_label_ind=c_label_ind,
@@ -92,7 +111,8 @@ def train_mlp_vae(
         dm = datamodules.__dict__[datamodule](
             batch_size=batch_size,
             num_workers=num_workers,
-            data_dir=data_dir,
+            source_path=source_path,
+            modified_source_save_dir=modified_source_save_dir,
             x_label=x_label,
             c_label=c_label,
             c_label_ind=c_label_ind,
@@ -100,6 +120,8 @@ def train_mlp_vae(
             set_zero=set_zero,
             overwrite=overwrite,
             id_fields=id_fields,
+            align=align,
+            skew=skew,
         )
         dm.prepare_data()
         dm.setup()
@@ -107,13 +129,15 @@ def train_mlp_vae(
     encoder = CBVAEEncoderMLP(
         x_dim=x_dim,
         c_dim=c_dim,
-        enc_layers=enc_layers,
+        hidden_layers=hidden_layers,
+        latent_dims=latent_dims,
     )
 
     decoder = CBVAEDecoderMLP(
         x_dim=x_dim,
         c_dim=c_dim,
-        dec_layers=dec_layers,
+        hidden_layers=hidden_layers,
+        latent_dims=latent_dims,
     )
 
     vae = CBVAEMLPModel(
@@ -126,27 +150,17 @@ def train_mlp_vae(
         c_label_ind=c_label_ind,
     )
 
-    tb_logger = TensorBoardLogger(
-        save_dir=str(output_path) + "/lightning_logs",
-        version="version_" + datetime.now().strftime("%d-%m-%Y--%H-%M-%S"),
-        name="",
-    )
+    print(output_path)
+    tb_logger = TensorBoardLogger(save_dir=str(output_path))
 
     csv_logger = CSVLogger(
-        save_dir=str(output_path) + "/lightning_logs" + "/csv_logs",
-        version="version_" + datetime.now().strftime("%d-%m-%Y--%H-%M-%S"),
-        name="",
+        save_dir=str(output_path) + "/csv_logs",
     )
-
-    ckpt_path = os.path.join(
-        str(output_path) + "/lightning_logs",
-        tb_logger.version,
-        "checkpoints",
-    )
-
+    print(checkpoint_path)
     # Initialize model checkpoint
     checkpoint_callback = ModelCheckpoint(
-        dirpath=ckpt_path,
+        dirpath=checkpoint_path,
+        filename="{epoch}-{val_loss:.2f}",
         # if save_top_k = 1, all files in this local staging dir
         # will be deleted when a checkpoint is saved
         # save_top_k=1,
@@ -161,18 +175,50 @@ def train_mlp_vae(
             MLPVAELogging(datamodule=dm_no_shuffle),
         ]
     elif datamodule == "VarianceSpharmCoeffs":
+
+        mlp_vae_logging = MLPVAELogging(datamodule=dm, values=values)
+
+        get_embeddings = GetEmbeddings(
+            resample_n=2, x_label=dm.x_label, c_label=dm.c_label, id_fields=dm.id_fields
+        )
+
+        get_closest_cells_to_dims = GetClosestCellsToDims(
+            np.array(latent_walk_range),
+            spharm_coeffs_cols=dm.spharm_cols,
+            metric="euclidean",
+            id_col="CellId",
+            N_cells=n_cells,
+            c_shape=c_dim,
+        )
+        config = yaml.load(
+            open(cvapipe_analysis_config_path, "r"),
+            Loader=yaml.FullLoader,
+        )
+
+        spharm_latent_walk = SpharmLatentWalk(
+            config=config,
+            spharm_coeffs_cols=dm.spharm_cols,
+            latent_walk_range=latent_walk_range,
+            ignore_mesh_and_contour_plots=True,
+        )
+
+        embedding_scatterplots = EmbeddingScatterPlots(input_df=dm.dfg, hues=hues)
         callbacks = [
             GPUStatsMonitor(),
             GlobalProgressBar(),
-            MLPVAELogging(datamodule=dm, values=values),
-            SpharmLatentWalk(),
+            EarlyStopping("val_loss", patience=15),
+            mlp_vae_logging,
+            get_embeddings,
+            embedding_scatterplots,
+            get_closest_cells_to_dims,
+            spharm_latent_walk,
         ]
 
     trainer = pl.Trainer(
         logger=[tb_logger, csv_logger],
         accelerator="ddp",
         replace_sampler_ddp=False,
-        gpus=num_gpus,
+        gpus=1,
         max_epochs=num_epochs,
         progress_bar_refresh_rate=5,
         checkpoint_callback=checkpoint_callback,

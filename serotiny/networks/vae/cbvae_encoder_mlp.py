@@ -10,26 +10,32 @@ class CBVAEEncoderMLP(nn.Module):
         self,
         x_dim=295,
         c_dim=25,
-        enc_layers=[295, 256, 256, 256, 256, 256, 512, 512],
+        hidden_layers=[256, 256, 256, 256],
+        latent_dims=64,
     ):
         # super(Enc, self).__init__()
         super().__init__()
 
         self.xdim = x_dim
         self.cdim = c_dim
-        self.enc_layers = enc_layers
+        self.hidden_layers = hidden_layers
+        self.latent_dims = latent_dims
+
+        self.enc_layers = self.hidden_layers.copy()
+        self.enc_layers.insert(0, self.xdim)
+        self.enc_layers.append(self.latent_dims)
         # encoder part
 
         encoder_layers = []
         # encoder_net = nn.Sequential()
-        for j, (i, k) in enumerate(zip(enc_layers[0::1], enc_layers[1::1])):
+        for j, (i, k) in enumerate(zip(self.enc_layers[0::1], self.enc_layers[1::1])):
             if j == 0:
                 encoder_layers.append(nn.Linear(i + self.cdim, k))
                 encoder_layers.append(nn.BatchNorm1d(k))
                 encoder_layers.append(nn.ReLU())
-            elif j == len(enc_layers) - 2:
-                self.fc1 = nn.Linear(enc_layers[-2], enc_layers[-1])
-                self.fc2 = nn.Linear(enc_layers[-2], enc_layers[-1])
+            elif j == len(self.enc_layers) - 2:
+                self.fc1 = nn.Linear(self.enc_layers[-2], self.enc_layers[-1])
+                self.fc2 = nn.Linear(self.enc_layers[-2], self.enc_layers[-1])
             else:
                 encoder_layers.append(nn.Linear(i, k))
                 encoder_layers.append(nn.BatchNorm1d(k))

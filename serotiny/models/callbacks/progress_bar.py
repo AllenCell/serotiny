@@ -41,7 +41,7 @@ class GlobalProgressBar(ProgressBarBase):
     def on_init_end(self, trainer):
         self.main_progress_bar = tqdm(
             desc="Total Epochs",
-            initial=trainer.current_epoch,
+            initial=trainer.current_epoch - 1,
             total=trainer.max_epochs,
             position=(2 * self.process_position),
             disable=False,
@@ -54,5 +54,5 @@ class GlobalProgressBar(ProgressBarBase):
     def on_train_end(self, trainer, pl_module):
         self.main_progress_bar.close()
 
-    def on_epoch_end(self, trainer, pl_module):
+    def on_validation_epoch_end(self, trainer, pl_module):
         self.main_progress_bar.update(1)

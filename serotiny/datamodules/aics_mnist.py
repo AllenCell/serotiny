@@ -9,10 +9,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
 from torchvision import transforms
-from ..image import png_loader
-from ..data import download_quilt_data
-from ..data import load_data_loader
-from ..data.loaders import Load2DImage, LoadClass, LoadColumns
+
+from ..io import png_loader
+from ..io import download_quilt_data
+from ..io import load_data_loader
+from ..io.loaders import Load2DImage, LoadClass, LoadColumns
 from .base_datamodule import BaseDataModule
 
 

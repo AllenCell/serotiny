@@ -1,8 +1,8 @@
 from typing import Sequence, Union, Callable
 from torchvision import transforms
-from ...image import png_loader
-from ...data import load_data_loader
-from ...data.loaders import Load2DImage, LoadClass, LoadColumns
+from ...io.image import png_loader
+from ...io import load_data_loader
+from ...io.loaders import Load2DImage, LoadClass, LoadColumns
 from ..constants import DatasetFields
 from ..base_datamodule import BaseDataModule
 

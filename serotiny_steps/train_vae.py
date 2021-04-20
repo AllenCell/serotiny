@@ -16,7 +16,8 @@ from serotiny.models import CBVAEModel
 
 import serotiny.datamodules as datamodules
 import serotiny.losses as losses
-from serotiny.progress_bar import GlobalProgressBar
+from serotiny.models.callbacks.progress_bar import GlobalProgressBar
+from serotiny.model.zoo import store_model
 
 log = logging.getLogger(__name__)
 pl.seed_everything(42)
@@ -58,8 +59,8 @@ def train_vae(
     ----------
     data_dir: str
         Path to dataset, read by the datamodule
-    output_path: str
-        Path to store model and logs
+    checkpoints_path: str
+        Path to store model checkpoints and logs
     datamodule: str,
         String specifying which datamodule to use
     batch_size: int
@@ -232,7 +233,11 @@ def train_vae(
     if test is True:
         trainer.test(datamodule=datamodule)
 
-    return checkpoint_callback.best_model_path
+    trainer = pl.Trainer(resume_from_checkpoint=checkpoint_callback.best_model_path)
+
+    # store best model to zoo
+    store_model(trainer, "CBVAEModel", tb_logger.version)
+
 
 
 if __name__ == "__main__":

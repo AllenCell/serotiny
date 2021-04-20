@@ -10,7 +10,7 @@ import fire
 
 from aics_dask_utils import DistributedHandler
 
-from serotiny.csv import load_csv
+from serotiny.io.data import load_csv
 from serotiny.image import change_resolution
 
 ###############################################################################

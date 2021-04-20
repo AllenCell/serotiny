@@ -1,11 +1,11 @@
-from typing import Optional, Sequence, Tuple, Union
+from typing import Optional
 
 import torch
-from torch import device, Tensor
 from pytorch_lightning import Callback, LightningModule, Trainer
 from pathlib import Path
 import pandas as pd
-from ...metrics.plotting_utils import make_plot_encoding
+from serotiny.utils.viz_utils import make_plot_encoding
+from serotiny.utils.model_utils import to_device
 
 
 class MLPVAELogging(Callback):  # pragma: no cover
@@ -15,7 +15,7 @@ class MLPVAELogging(Callback):  # pragma: no cover
         self,
         datamodule,
         resample_n: int = 10,
-        values: list = [-1, 1],
+        values: list = [-1, 0, 1],
         conds_list: Optional[list] = None,
         save_dir: Optional[str] = None,
     ):
@@ -23,6 +23,8 @@ class MLPVAELogging(Callback):  # pragma: no cover
         Args:
             resample_n: How many times to sample from
             the latent space before averaging results
+            values: What value to pass in as a condition to the decoder
+            conds_list: Which columns in the condition to set to a value
             save_dir: Where to save plots
             Default: csv_logs folder
         """
@@ -33,16 +35,8 @@ class MLPVAELogging(Callback):  # pragma: no cover
         self.datamodule = datamodule
         self.conds_list = conds_list
         self.values = values
-
-    def to_device(
-        self, batch_x: Sequence, batch_y: Sequence, device: Union[str, device]
-    ) -> Tuple[Tensor, Tensor]:
-
-        # last input is for online eval
-        batch_x = batch_x.to(device)
-        batch_y = batch_y.to(device)
-
-        return batch_x, batch_y
+        if self.datamodule.__module__ == "serotiny.datamodules.gaussian":
+            self.values = [0]
 
     def on_test_epoch_end(self, trainer: Trainer, pl_module: LightningModule):
 
@@ -54,7 +48,7 @@ class MLPVAELogging(Callback):  # pragma: no cover
             x = test_iter[x_label].float()
             c = test_iter[c_label].float()
 
-            x, c = self.to_device(x, c, pl_module.device)
+            x, c = to_device(x, c, pl_module.device)
 
             dir_path = Path(trainer.logger[1].save_dir)
             stats = pd.read_csv(dir_path / "stats_all.csv")
@@ -83,6 +77,7 @@ class MLPVAELogging(Callback):  # pragma: no cover
                     conds_list = []
                     for i in range(num_classes):
                         conds_list.append(i)
+                    conds_list = [conds_list]
 
             for value in self.values:
                 make_plot_encoding(

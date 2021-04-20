@@ -5,8 +5,8 @@ import numpy as np
 from sklearn.preprocessing import LabelEncoder
 
 from typing import Optional
-from ..data import load_data_loader
-from ..data.loaders import (
+from ..io import load_data_loader
+from ..io.loaders import (
     LoadSpharmCoeffs,
     LoadOneHotClass,
     LoadColumns,
@@ -82,8 +82,11 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         c_label_ind: str,
         id_fields: list,
         x_dim: int,
+        source_path: str,
+        modified_source_save_dir: str,
+        align: str,
+        skew: str,
         num_classes: Optional[int] = None,
-        data_dir: Optional[str] = None,
         set_zero: Optional[bool] = False,
         subset: Optional[int] = None,
         overwrite: Optional[bool] = False,
@@ -107,11 +110,12 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         if not self.num_classes:
             self.num_classes = 25
 
-        self.data_dir = data_dir
-        if not self.data_dir:
-            self.data_dir = "/allen/aics/modeling/ritvik/projects/serotiny/"
+        self.source_path = source_path
+        self.modified_source_save_dir = modified_source_save_dir
 
         self.datasets = {}
+        self.align = align
+        self.skew = skew
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.x_dim = x_dim
@@ -121,31 +125,38 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         self.overwrite = overwrite
         self.stratify_column = self.c_label
 
+        dfg = pd.read_csv(self.source_path)
+        self.dfg = dfg
+        self.num_rows = dfg.shape[0]
+        self.spharm_cols = [col for col in dfg.columns if self.x_label in col]
+        self.spharm_cols = [f for f in self.spharm_cols if "L" in f]
+
         self.loaders = {
             # Use callable class objects here because lambdas aren't picklable
             "id": LoadColumns(self.id_fields),
             self.c_label: LoadOneHotClass(
                 self.num_classes, self.c_encoded_label, self.set_zero
             ),
-            self.x_label: LoadSpharmCoeffs(self.x_label),
+            self.x_label: LoadSpharmCoeffs(self.x_label, self.spharm_cols),
             self.c_label_ind: LoadIntClass(
                 self.num_classes, self.c_encoded_label, self.set_zero
             ),
         }
 
         if self.c_label in ["DNA_PC", "MEM_PC", "DNA_MEM_PC"]:
-            self.loaders[self.c_label] = LoadPCA(self.c_label)
-            self.loaders[self.c_label_ind] = LoadPCA(self.c_label, set_zero=True)
+            self.loaders[self.c_label] = LoadPCA(self.c_label, set_zero=self.set_zero)
+            self.loaders[self.c_label_ind] = LoadPCA(self.c_label, get_inds=True)
             self.stratify_column = "structure_name"
 
     def setup(self, stage=None):
         """
         Setup train, val and test dataframes. Get image dimensions
         """
-        self.data_dir = Path(self.data_dir)
+        self.modified_source_save_dir = Path(self.modified_source_save_dir)
 
         all_data = pd.read_csv(
-            self.data_dir / f"variance_{self.x_label}_{self.c_label}.csv"
+            self.modified_source_save_dir
+            / f"variance_rotated_{self.x_label}_{self.c_label}_size_{self.num_rows}_align_{self.align}_skew_{self.skew}.csv"
         )
 
         if not self.subset:
@@ -181,17 +192,19 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         """
         Prepare dataset
         """
-        my_file = Path(self.data_dir) / f"variance_{self.x_label}_{self.c_label}.csv"
+        my_file = (
+            Path(self.modified_source_save_dir)
+            / f"variance_rotated_{self.x_label}_{self.c_label}_size_{self.num_rows}_align_{self.align}_skew_{self.skew}.csv"
+        )
         if my_file.is_file() and self.overwrite is False:
             pass
         else:
-            df = pd.read_csv(
-                "/allen/aics/assay-dev/MicroscopyOtherData/Viana/projects/cell_shape_variation/local_staging_beta/shapemode/manifest.csv"
-            )
+            df = self.dfg
+
             train_inds, test_inds = train_test_split(
                 df.index,
-                test_size=30557,
-                train_size=173180,
+                test_size=self.num_rows - int(0.85 * self.num_rows),
+                train_size=int(0.85 * self.num_rows),
                 stratify=df[self.stratify_column],
                 random_state=42,
             )
@@ -201,7 +214,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
 
             train_inds, val_inds = train_test_split(
                 dfs["train"].index,
-                test_size=30557,
+                test_size=self.num_rows - int(0.85 * self.num_rows),
                 stratify=dfs["train"][self.stratify_column],
                 random_state=42,
             )
@@ -231,7 +244,8 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
                 df[self.c_encoded_label] = df[self.c_label + "_encoded"]
 
             df.to_csv(
-                Path(self.data_dir) / f"variance_{self.x_label}_{self.c_label}.csv"
+                Path(self.modified_source_save_dir)
+                / f"variance_rotated_{self.x_label}_{self.c_label}_size_{self.num_rows}_align_{self.align}_skew_{self.skew}.csv"
             )
 
     def train_dataloader(self):
@@ -246,7 +260,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
             shuffle=False,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
-            weights_col="ClassWeights",
+            weights_col=None,  # or ClassWeights
         )
 
         return train_dataloader
@@ -264,7 +278,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
             shuffle=False,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
-            weights_col="ClassWeights",
+            weights_col=None,  # or ClassWeights
         )
 
         return val_dataloader
@@ -282,7 +296,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
             shuffle=False,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
-            weights_col="ClassWeights",
+            weights_col=None,  # or ClassWeights
         )
 
         return test_dataloader
