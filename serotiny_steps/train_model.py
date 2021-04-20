@@ -22,7 +22,7 @@ import serotiny.datamodules as datamodules
 import serotiny.losses as losses
 import serotiny.networks as networks
 import serotiny.models as models
-from serotiny.progress_bar import GlobalProgressBar
+from serotiny.models.callbacks.progress_bar import GlobalProgressBar
 
 log = logging.getLogger(__name__)
 pl.seed_everything(42)
