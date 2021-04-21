@@ -15,39 +15,60 @@ from pytorch_lightning import LightningModule, Trainer
 from .model_utils import to_device
 from .mesh_utils import get_mesh_from_series
 
+from sklearn.decomposition import PCA
+
 LOGGER = logging.getLogger(__name__)
 
 
 def make_embedding_pairplots(
-    input_df: pd.DataFrame,
     all_embeddings: pd.DataFrame,
-    hues: list,
+    fitted_pca: PCA,
+    n_components: int,
     ranked_z_dim_list: list,
+    model,
     save_dir,
+    cond_size,
 ):
-    stats_mu = all_embeddings.loc[all_embeddings["split"] == "test"]
-    # hues = ['DNA_PC1', 'DNA_PC2']
-    for hue in hues:
-        ranked_cols = [f"mu_{j}" for j in ranked_z_dim_list[:8]]
-        stats_top = stats_mu[[i for i in ranked_cols]]
-        stats_top = stats_top.reset_index(drop=True)
 
-        ranked_cols.append("CellId")
-        stats_top_with_cellid = stats_mu[
-            [i for i in stats_mu.columns if i in ranked_cols]
-        ]
-        stats_top_with_cellid = stats_top_with_cellid.reset_index(drop=True)
+    pca_std = np.sqrt(fitted_pca.explained_variance_)
 
-        stats_top_with_cellid_merged = input_df[[hue, "CellId"]].merge(
-            stats_top_with_cellid, on=["CellId"]
+    ranked_ixs = ranked_z_dim_list[:n_components]
+    ranked_cols = [f"mu_{j}" for j in ranked_z_dim_list[:n_components]]
+
+    mus = (
+        all_embeddings
+        [ranked_cols]
+    )
+
+    walk_points = [-2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2]
+    for pc in range(n_components):
+        walk_std = np.zeros_like(pca_std)
+        walk_std[pc] = pca_std[pc]
+
+        spharm_walk = fitted_pca.inverse_transform(
+            [n * walk_std for n in walk_points]
         )
-        stats_top_with_cellid_merged = stats_top_with_cellid_merged.drop(
-            columns="CellId"
-        )
+
+        with torch.no_grad():
+            _, latent_walk, _, _, _, _, _, _ = model(
+                torch.tensor(spharm_walk).float(),
+                torch.zeros((len(spharm_walk), cond_size))
+            )
 
         sns.set_context('talk')
-        g = sns.pairplot(stats_top_with_cellid_merged, hue=hue, corner=True)
-        g.savefig(save_dir / f"pairplot_test_embeddings_hue_{hue}.png")
+        g = sns.pairplot(mus, corner=True, plot_kws=dict(s=5, alpha=0.2, color="grey"))
+        for row_ix, ax_row in enumerate(g.axes[1:]):
+            row_ix += 1
+            for col_ix in range(row_ix):
+                ax = g.axes[row_ix][col_ix]
+                x_ix = ranked_ixs[col_ix]
+                y_ix = ranked_ixs[row_ix]
+                ax.plot(latent_walk[:,x_ix], latent_walk[:,y_ix])
+                sc = ax.scatter(latent_walk[:,x_ix], latent_walk[:,y_ix], c=walk_points)
+
+        cax = g.fig.add_axes([0.85, 0.85, 0.01, 0.1])
+        g.fig.colorbar(sc, cax=cax)
+        g.savefig(save_dir / f"pairplot_embeddings_PC_{pc}.png")
 
 
 def decode_latent_walk_closest_cells(
@@ -277,10 +298,13 @@ def make_plot_encoding(
     fig, (ax1, ax, ax2, ax3) = plt.subplots(1, 4, figsize=(7 * 4, 5))
 
     # Also make a brokenaxes plot of Subplot 3
-    fig2 = plt.figure(figsize=(12, 10))
-    bax = brokenaxes(
-        xlims=((0, latent_dims - 50), (latent_dims - 4, latent_dims)), hspace=0.15
-    )
+    if latent_dims > 54:
+        fig2 = plt.figure(figsize=(12, 10))
+        bax = brokenaxes(
+            xlims=((0, latent_dims - 50), (latent_dims - 4, latent_dims)), hspace=0.15
+        )
+    else:
+        fig2, bax = plt.subplots(1, 1, figsize=(12, 10))
 
     if "total_train_losses" in stats_all.columns:
         sns.lineplot(ax=ax1, data=stats_all, x="epoch", y="total_train_losses")

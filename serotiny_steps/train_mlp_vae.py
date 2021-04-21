@@ -1,20 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import logging
 from typing import Optional
 
 import fire
+import yaml
+
 import pytorch_lightning as pl
 import numpy as np
-import yaml
 from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
 from pytorch_lightning.callbacks import ModelCheckpoint, GPUStatsMonitor, EarlyStopping
+from sklearn.decomposition import PCA
 
 from serotiny.networks.vae import CBVAEEncoderMLP, CBVAEDecoderMLP
 from serotiny.models import CBVAEMLPModel
 from serotiny.utils.metric_utils import get_singular_values
-import os
+
 
 import serotiny.datamodules as datamodules
 from serotiny.models.callbacks import (
@@ -25,6 +28,7 @@ from serotiny.models.callbacks import (
     GlobalProgressBar,
     EmbeddingScatterPlots,
     MarginalKL,
+    EmpiricalKL
 )
 
 log = logging.getLogger(__name__)
@@ -145,13 +149,14 @@ def train_mlp_vae(
         latent_dims=latent_dims,
     )
 
+    fitted_pca = PCA().fit(dm.datasets["train"][dm.spharm_cols])
+
     if init_logvar_pca:
-        singular_values = np.sqrt(
-            get_singular_values(dm.dfg, dm.spharm_cols, latent_dims)
-            / (dm.dfg.shape[0] - 1)
-        )
+        prior_logvar = fitted_pca.singular_values_ ** 2
+        prior_logvar = prior_logvar / prior_logvar.sum()
+        prior_logvar = np.log(prior_logvar)
     else:
-        singular_values = None
+        prior_logvar = None
 
     vae = CBVAEMLPModel(
         encoder=encoder,
@@ -197,10 +202,17 @@ def train_mlp_vae(
             c_label=dm.c_label,
             embedding_dim=latent_dims,
         )
+
+        empirical_kl = EmpiricalKL(
+            x_label=dm.x_label,
+            c_label=dm.c_label,
+            embedding_dim=latent_dims,
+        )
+
         mlp_vae_logging = MLPVAELogging(datamodule=dm, values=values)
 
         get_embeddings = GetEmbeddings(
-            resample_n=2, x_label=dm.x_label, c_label=dm.c_label, id_fields=dm.id_fields
+            x_label=dm.x_label, c_label=dm.c_label, id_fields=dm.id_fields
         )
 
         get_closest_cells_to_dims = GetClosestCellsToDims(
@@ -223,7 +235,11 @@ def train_mlp_vae(
             ignore_mesh_and_contour_plots=True,
         )
 
-        embedding_scatterplots = EmbeddingScatterPlots(input_df=dm.dfg, hues=hues)
+        embedding_scatterplots = EmbeddingScatterPlots(
+            fitted_pca=fitted_pca,
+            n_components=len(hues),
+            c_dim=c_dim
+        )
         callbacks = [
             GPUStatsMonitor(),
             GlobalProgressBar(),
@@ -238,9 +254,10 @@ def train_mlp_vae(
 
     trainer = pl.Trainer(
         logger=[tb_logger, csv_logger],
-        accelerator="ddp",
-        replace_sampler_ddp=False,
-        gpus=1,
+        #accelerator="ddp",
+        #replace_sampler_ddp=False,
+        #gpus=1,
+        gpus=None,
         max_epochs=num_epochs,
         progress_bar_refresh_rate=5,
         checkpoint_callback=checkpoint_callback,
