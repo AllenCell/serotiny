@@ -9,7 +9,6 @@ class GetEmbeddings(Callback):
 
     def __init__(
         self,
-        resample_n: int,
         x_label: str,
         c_label: str,
         id_fields: list,
@@ -26,7 +25,6 @@ class GetEmbeddings(Callback):
         """
         super().__init__()
 
-        self.resample_n = resample_n
         self.x_label = x_label
         self.c_label = c_label
         self.id_fields = id_fields
@@ -41,7 +39,6 @@ class GetEmbeddings(Callback):
                 trainer.val_dataloaders[0],
                 trainer.test_dataloaders[0],
                 pl_module,
-                self.resample_n,
                 self.x_label,
                 self.c_label,
                 self.id_fields,

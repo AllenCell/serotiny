@@ -30,86 +30,45 @@ def to_device(
 
     return batch_x, batch_y
 
-
-def compute_embeddings(pl_module: LightningModule, input_x, cond_c, resample_n):
-
-    # Make empty list
-    my_recon_list, my_z_means_list, my_log_var_list = [], [], []
-    input_x, cond_c = to_device(input_x, cond_c, pl_module.device)
-    # Run resample_n times for resampling
-    for resample in range(resample_n):
-        recon_batch, z_means, log_var, _, _, _, _, _ = pl_module(
-            input_x.clone().float(), cond_c.clone().float()
-        )
-        my_recon_list.append(recon_batch)
-        my_z_means_list.append(z_means)
-        my_log_var_list.append(log_var)
-
-    # Average over the N resamples
-    recon_batch = torch.mean(torch.stack(my_recon_list), dim=0)
-    z_means = torch.mean(torch.stack(my_z_means_list), dim=0)
-    log_var = torch.mean(torch.stack(my_log_var_list), dim=0)
-
-    return recon_batch, z_means, log_var
-
-
 def get_all_embeddings(
     train_dataloader,
     val_dataloader,
     test_dataloader,
     pl_module: LightningModule,
-    resample_n: int,
     x_label: str,
     c_label: str,
     id_fields: list,
 ):
 
-    all_z_means = []
+    all_embeddings = []
     cell_ids = []
     split = []
-    for step, x in enumerate(train_dataloader):
-        input_x = x[x_label]
-        cond_c = x[c_label]
-        cell_id = x["id"][id_fields[0]]
 
-        recon_batch, z_means, log_var = compute_embeddings(
-            pl_module, input_x, cond_c, resample_n
-        )
-        all_z_means.append(z_means)
-        cell_ids.append(cell_id)
-        split.append(["train"] * z_means.shape[0])
+    zip_iter = zip(["train", "val", "test"],
+                   [train_dataloader, val_dataloader, test_dataloader])
 
-    for step, x in enumerate(val_dataloader):
-        input_x = x[x_label]
-        cond_c = x[c_label]
-        cell_id = x["id"][id_fields[0]]
+    with torch.no_grad():
+        for split_name, dataloader in zip_iter:
+            for batch in dataloader:
+                input_x = batch[x_label]
+                cond_c = batch[c_label]
+                cell_id = batch["id"][id_fields[0]]
 
-        recon_batch, z_means, log_var = compute_embeddings(
-            pl_module, input_x, cond_c, resample_n
-        )
-        all_z_means.append(z_means)
-        cell_ids.append(cell_id)
-        split.append(["val"] * z_means.shape[0])
+                _, mus, _, _, _, _, _, _ = pl_module(
+                    input_x.float(), cond_c.float()
+                )
+                all_embeddings.append(mus)
 
-    for step, x in enumerate(test_dataloader):
-        input_x = x[x_label]
-        cond_c = x[c_label]
-        cell_id = x["id"][id_fields[0]]
+                cell_ids.append(cell_id)
+                split.append([split_name] * mus.shape[0])
 
-        recon_batch, z_means, log_var = compute_embeddings(
-            pl_module, input_x, cond_c, resample_n
-        )
-        all_z_means.append(z_means)
-        cell_ids.append(cell_id)
-        split.append(["test"] * z_means.shape[0])
-
-    all_z_means = torch.cat(all_z_means, dim=0)
+    all_embeddings = torch.cat(all_embeddings, dim=0)
     cell_ids = torch.cat(cell_ids, dim=0)
     split = [item for sublist in split for item in sublist]
-    all_z_means = all_z_means.detach().cpu().numpy()
+    all_embeddings = all_embeddings.cpu().numpy()
 
     df1 = pd.DataFrame(
-        all_z_means, columns=[f"mu_{i}" for i in range(all_z_means.shape[1])]
+        all_embeddings, columns=[f"mu_{i}" for i in range(all_embeddings.shape[1])]
     )
     df2 = pd.DataFrame(cell_ids, columns=["CellId"])
     df3 = pd.DataFrame(split, columns=["split"])
