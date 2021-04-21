@@ -13,7 +13,7 @@ from serotiny.loss_formulations.elbo import diagonal_gaussian_kl
 def batch_update_stats(mu, var, z_batch, n_samples):
     batch_size = len(z_batch)
 
-    old_weight = (n_samples/(n_samples + batch_size)
+    old_weight = n_samples/(n_samples + batch_size)
     new_weight = 1 - old_weight
     weight_prod = old_weight * new_weight
 
@@ -46,8 +46,6 @@ class EmpiricalKL(Callback):
         self.embedding_dim = embedding_dim
         self.x_label = x_label
         self.c_label = c_label
-
-        self.kl_div = KLDLoss(mode=mode, reduction="sum")
 
     def on_test_epoch_end(self, trainer: Trainer, pl_module: LightningModule):
 
@@ -86,9 +84,9 @@ class EmpiricalKL(Callback):
                 )
 
         symmetric_kl = 0.5 * (
-            diagonal_gaussian_kl(train_mu, train_var.log(), test_mu, test_var.log()) +
-            diagonal_gaussian_kl(test_mu, test_var.log(), train_mu, train_var.log())
-        ).sum(axis=1).mean()
+            diagonal_gaussian_kl(train_mu, train_var.log(), test_mu, test_var.log()).sum() +
+            diagonal_gaussian_kl(test_mu, test_var.log(), train_mu, train_var.log()).sum()
+        )
 
         with open(save_dir / "train_test_empirical_kl.json", "w") as f:
             json.dump(
