@@ -107,7 +107,7 @@ class CBVAEMLPModel(pl.LightningModule):
             self.beta,
             mask=self.mask,
             mode=self.prior_mode,
-            prior_mu=self.prior_mean.type_as(mu),
+            prior_mu=(None if self.prior_mean is None else self.prior_mean.type_as(mu)),
             prior_logvar=self.prior_logvar,
         )
 

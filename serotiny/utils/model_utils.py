@@ -98,8 +98,6 @@ def get_closest_cells(
     dims = []
     for index, dim in enumerate(ranked_z_dim_list):
         mu_std = mu_std_list[index]
-        print(ranked_z_dim_list)
-        print(mu_std)
         df_cells = scan_pc_for_cells(
             all_embeddings,
             pc=index + 1,  # This function assumes first index is 1
@@ -109,9 +107,9 @@ def get_closest_cells(
             id_col=id_col,
             N_cells=N_cells,
         )
-        print(df_cells)
         dims.append([dim] * df_cells.shape[0])
         df_list.append(df_cells)
+
     tmp = pd.concat(df_list)
     tmp = tmp.reset_index(drop=True)
     dims = [item for sublist in dims for item in sublist]
@@ -434,6 +432,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
             "test_kld_per_dim": [],
             "condition": [],
             "mu_std_per_dim": [],
+            "mu_mean_per_dim": [],
             "explained_variance": [],
         }
 
@@ -457,6 +456,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
             # dim_var = torch.std(this_cond_per_batch_mu, dim=0)
             summed_kld = torch.sum(this_cond_per_element_kld, dim=0) / num_data_points
             dim_std = torch.std(this_cond_per_element_mu, dim=0)
+            dim_mean = torch.mean(this_cond_per_element_mu, dim=0)
 
             summed_summed_kld = torch.sum(summed_kld)
 
@@ -467,6 +467,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
                 )
                 dataframe2["test_kld_per_dim"].append(summed_kld[k].item())
                 dataframe2["mu_std_per_dim"].append(dim_std[k].item())
+                dataframe2["mu_mean_per_dim"].append(dim_mean[k].item())
                 dataframe2["explained_variance"].append(
                     (summed_kld[k].item() / summed_summed_kld.item()) * 100
                 )

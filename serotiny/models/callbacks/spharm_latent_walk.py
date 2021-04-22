@@ -131,6 +131,7 @@ class SpharmLatentWalk(Callback):
 
             ranked_z_dim_list = [i for i in stats["dimension"][::-1]]
             mu_variance_list = [i for i in stats["mu_std_per_dim"][::-1]]
+            mu_mean_list = [i for i in stats["mu_mean_per_dim"][::-1]]
 
             num_shapemodes = 8
             if len(ranked_z_dim_list) > num_shapemodes:
@@ -150,6 +151,7 @@ class SpharmLatentWalk(Callback):
                 pl_module,
                 ranked_z_dim_list,
                 mu_variance_list,
+                mu_mean_list,
                 batch_size,
                 latent_dims,
                 c_shape,
