@@ -8,10 +8,17 @@ from typing import Optional
 import fire
 import yaml
 
+import torch
+import torch.nn.functional as F
 import pytorch_lightning as pl
 import numpy as np
 from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
-from pytorch_lightning.callbacks import ModelCheckpoint, GPUStatsMonitor, EarlyStopping
+from pytorch_lightning.callbacks import (
+    ModelCheckpoint,
+    GPUStatsMonitor,
+    EarlyStopping,
+    ProgressBar
+)
 from sklearn.decomposition import PCA
 
 from serotiny.networks.vae import CBVAEEncoderMLP, CBVAEDecoderMLP
@@ -25,7 +32,7 @@ from serotiny.models.callbacks import (
     SpharmLatentWalk,
     GetEmbeddings,
     GetClosestCellsToDims,
-    GlobalProgressBar,
+    #GlobalProgressBar,
     EmbeddingScatterPlots,
     MarginalKL,
     EmpiricalKL
@@ -117,6 +124,7 @@ def train_mlp_vae(
             corr=corr,
         )
     else:
+        log.info("Instantiating datamodule")
         dm = datamodules.__dict__[datamodule](
             batch_size=batch_size,
             num_workers=num_workers,
@@ -135,6 +143,7 @@ def train_mlp_vae(
         dm.prepare_data()
         dm.setup()
 
+    log.info("Instantiating encoder")
     encoder = CBVAEEncoderMLP(
         x_dim=x_dim,
         c_dim=c_dim,
@@ -142,6 +151,7 @@ def train_mlp_vae(
         latent_dims=latent_dims,
     )
 
+    log.info("Instantiating decoder")
     decoder = CBVAEDecoderMLP(
         x_dim=x_dim,
         c_dim=c_dim,
@@ -149,15 +159,21 @@ def train_mlp_vae(
         latent_dims=latent_dims,
     )
 
-    fitted_pca = PCA().fit(dm.datasets["train"][dm.spharm_cols])
+    log.info("Fitting PCA")
+    fitted_pca = PCA(n_components=latent_dims).fit(dm.datasets["train"][dm.spharm_cols])
 
     if init_logvar_pca:
-        prior_logvar = fitted_pca.singular_values_ ** 2
+        prior_logvar = fitted_pca.singular_values_[:latent_dims] ** 2
         prior_logvar = prior_logvar / prior_logvar.sum()
-        prior_logvar = np.log(prior_logvar)
+        prior_logvar = F.log_softmax(torch.tensor(prior_logvar))
+        log.info(f"Initializing prior_logvar to {prior_logvar.tolist()}")
     else:
         prior_logvar = None
 
+    if learn_prior_logvar:
+        log.info("Learning prior_logvar")
+
+    log.info("Instantiating VAE")
     vae = CBVAEMLPModel(
         encoder=encoder,
         decoder=decoder,
@@ -168,7 +184,7 @@ def train_mlp_vae(
         c_label_ind=c_label_ind,
         prior_mode=prior_mode,
         learn_prior_logvar=learn_prior_logvar,
-        prior_logvar=singular_values,
+        prior_logvar=prior_logvar,
     )
 
     tb_logger = TensorBoardLogger(save_dir=str(output_path))
@@ -191,13 +207,13 @@ def train_mlp_vae(
     if datamodule == "GaussianDataModule":
         callbacks = [
             GPUStatsMonitor(),
-            GlobalProgressBar(),
+            #GlobalProgressBar(),
             MLPVAELogging(datamodule=dm_no_shuffle),
         ]
     elif datamodule == "VarianceSpharmCoeffs":
 
         marginal_kl = MarginalKL(
-            n_samples=5,
+            n_samples=20,
             x_label=dm.x_label,
             c_label=dm.c_label,
             embedding_dim=latent_dims,
@@ -241,10 +257,11 @@ def train_mlp_vae(
             c_dim=c_dim
         )
         callbacks = [
-            GPUStatsMonitor(),
-            GlobalProgressBar(),
+            #GPUStatsMonitor(),
+            ProgressBar(),
             EarlyStopping("val_loss", patience=15),
             marginal_kl,
+            empirical_kl,
             mlp_vae_logging,
             get_embeddings,
             embedding_scatterplots,
@@ -264,6 +281,7 @@ def train_mlp_vae(
         callbacks=callbacks,
     )
 
+    log.info("Calling trainer.fit")
     trainer.fit(vae, dm)
 
     # test the model
