@@ -257,7 +257,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
             train_dataset,
             self.loaders,
             transform=None,
-            shuffle=False,
+            shuffle=True,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
             weights_col=None,  # or ClassWeights
@@ -275,7 +275,7 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
             val_dataset,
             self.loaders,
             transform=None,
-            shuffle=False,
+            shuffle=True,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
             weights_col=None,  # or ClassWeights
