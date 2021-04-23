@@ -139,6 +139,7 @@ def train_mlp_vae(
             id_fields=id_fields,
             align=align,
             skew=skew,
+            dl_pin_memory=False,
         )
         dm.prepare_data()
         dm.setup()
