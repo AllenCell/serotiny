@@ -130,6 +130,8 @@ def load_data_loader(
     num_workers: int,
     shuffle: bool,
     weights_col: str,
+    pin_memory: bool = True,
+    drop_last: bool = False,
 ):
     """
     Load a pytorch DataLoader from the provided dataset.
@@ -183,8 +185,8 @@ def load_data_loader(
         batch_size=batch_size,
         shuffle=shuffle,
         sampler=sampler,
-        pin_memory=True,
-        drop_last=True,
+        pin_memory=pin_memory,
+        drop_last=drop_last,
         num_workers=num_workers,
         multiprocessing_context=mp.get_context("fork"),
     )
