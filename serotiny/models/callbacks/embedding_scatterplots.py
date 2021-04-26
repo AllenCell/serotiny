@@ -1,12 +1,11 @@
 import torch
-from typing import Optional
+from typing import Optional, List
 from pytorch_lightning import Callback, LightningModule, Trainer
 from pathlib import Path
 import pandas as pd
 from sklearn.decomposition import PCA
 
-from serotiny.utils.viz_utils import make_embedding_pairplots
-
+from serotiny.utils.viz_utils import make_embedding_pairplots, make_pca_pairplots
 
 class EmbeddingScatterPlots(Callback):
     """"""
@@ -14,6 +13,7 @@ class EmbeddingScatterPlots(Callback):
     def __init__(
         self,
         fitted_pca: PCA,
+        pca_df: pd.DataFrame,
         n_components: int,
         c_dim: int,
         cutoff_kld_per_dim: Optional[float] = None,
@@ -27,6 +27,7 @@ class EmbeddingScatterPlots(Callback):
         self.fitted_pca = fitted_pca
         self.n_components = n_components
         self.c_dim = c_dim
+        self.pca_df = pca_df
 
         self.cutoff_kld_per_dim = cutoff_kld_per_dim
         if self.cutoff_kld_per_dim is None:
@@ -58,6 +59,17 @@ class EmbeddingScatterPlots(Callback):
             make_embedding_pairplots(
                 all_embeddings.loc[all_embeddings.split == "test"],
                 self.fitted_pca,
+                self.n_components,
+                ranked_z_dim_list=ranked_z_dim_list,
+                model=pl_module,
+                save_dir=dir_path,
+                cond_size=self.c_dim
+            )
+
+            make_pca_pairplots(
+                all_embeddings.loc[all_embeddings.split == "test"],
+                self.fitted_pca,
+                self.pca_df,
                 self.n_components,
                 ranked_z_dim_list=ranked_z_dim_list,
                 model=pl_module,

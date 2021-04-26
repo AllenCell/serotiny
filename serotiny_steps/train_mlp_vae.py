@@ -11,6 +11,7 @@ import yaml
 import torch
 import torch.nn.functional as F
 import pytorch_lightning as pl
+import pandas as pd
 import numpy as np
 from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
 from pytorch_lightning.callbacks import (
@@ -161,7 +162,9 @@ def train_mlp_vae(
     )
 
     log.info("Fitting PCA")
-    fitted_pca = PCA(n_components=latent_dims).fit(dm.datasets["train"][dm.spharm_cols])
+    fitted_pca = PCA().fit(dm.dfg[dm.spharm_cols])
+    pca_df = pd.DataFrame(fitted_pca.transform(dm.dfg[dm.spharm_cols]))
+    pca_df["CellId"] = dm.dfg["CellId"]
 
     if init_logvar_pca:
         prior_logvar = fitted_pca.singular_values_[:latent_dims] ** 2

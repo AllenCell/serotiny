@@ -6,6 +6,7 @@ from .progress_bar import GlobalProgressBar
 from .embedding_scatterplots import EmbeddingScatterPlots
 from .marginal_kl import MarginalKL
 from .train_test_empirical_kl import EmpiricalKL
+from .pca_embedding_correlation import PCALatentCorrelation
 
 __all__ = [
     "MLPVAELogging",
@@ -15,5 +16,6 @@ __all__ = [
     "GlobalProgressBar",
     "EmbeddingScatterPlots",
     "MarginalKL",
-    "EmpiricalKL"
+    "EmpiricalKL",
+    "PCALatentCorrelation"
 ]

@@ -63,12 +63,60 @@ def make_embedding_pairplots(
                 ax = g.axes[row_ix][col_ix]
                 x_ix = ranked_ixs[col_ix]
                 y_ix = ranked_ixs[row_ix]
-                ax.plot(latent_walk[:,x_ix], latent_walk[:,y_ix])
-                sc = ax.scatter(latent_walk[:,x_ix], latent_walk[:,y_ix], c=walk_points)
+                ax.plot(latent_walk[:, x_ix], latent_walk[:,y_ix])
+                sc = ax.scatter(latent_walk[:, x_ix], latent_walk[:, y_ix], c=walk_points)
 
         cax = g.fig.add_axes([0.85, 0.85, 0.01, 0.1])
         g.fig.colorbar(sc, cax=cax)
         g.savefig(save_dir / f"pairplot_embeddings_PC_{pc}.png")
+
+
+def make_pca_pairplots(
+    all_embeddings: pd.DataFrame,
+    fitted_pca: PCA,
+    all_pcs: pd.DataFrame,
+    n_components: int,
+    ranked_z_dim_list: list,
+    model,
+    save_dir,
+    cond_size,
+):
+
+    ranked_ixs = ranked_z_dim_list[:n_components]
+    ranked_cols = [f"mu_{j}" for j in ranked_z_dim_list[:n_components]]
+    walk_points = [-2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2]
+    mus = all_embeddings[[col for col in all_embeddings.columns
+                          if "mu_" in col]].values
+    walk_mu = mus.mean(axis=0)
+    walk_std = mus.std(axis=0)
+
+    for dim in ranked_ixs:
+        latent_walk = torch.stack(
+            [torch.tensor(walk_mu + walk_std[dim] * n) for n in walk_points]
+        ).float()
+
+        with torch.no_grad():
+            spharm_walk = model.decoder(latent_walk,
+                                        torch.zeros((len(latent_walk), cond_size)))
+
+        pca_walk = fitted_pca.transform(spharm_walk)
+
+        sns.set_context('talk')
+        g = sns.pairplot(all_pcs[all_pcs.columns[:n_components]],
+                         corner=True, plot_kws=dict(s=5, alpha=0.2, color="grey"))
+
+        for row_ix, ax_row in enumerate(g.axes[1:]):
+            row_ix += 1
+            for col_ix in range(row_ix):
+                ax = g.axes[row_ix][col_ix]
+                x_ix = ranked_ixs[col_ix]
+                y_ix = ranked_ixs[row_ix]
+                ax.plot(pca_walk[:, x_ix], pca_walk[:, y_ix])
+                sc = ax.scatter(pca_walk[:, x_ix], pca_walk[:, y_ix], c=walk_points)
+
+        cax = g.fig.add_axes([0.85, 0.85, 0.01, 0.1])
+        g.fig.colorbar(sc, cax=cax)
+        g.savefig(save_dir / f"pairplot_embeddings_latent_{dim}.png")
 
 
 def decode_latent_walk_closest_cells(
