@@ -30,6 +30,31 @@ def to_device(
 
     return batch_x, batch_y
 
+
+def get_ranked_dims(
+    dir_path,
+    cutoff_kld_per_dim,
+    max_num_shapemodes,
+):
+    stats = pd.read_csv(dir_path / "stats_per_dim_test.csv")
+
+    stats = (
+        stats.loc[stats["test_kld_per_dim"] > cutoff_kld_per_dim]
+        .sort_values(by=["test_kld_per_dim"])
+        .reset_index(drop=True)
+    )
+
+    ranked_z_dim_list = [i for i in stats["dimension"][::-1]]
+    mu_std_list = [i for i in stats["mu_std_per_dim"][::-1]]
+    mu_mean_list = [i for i in stats["mu_mean_per_dim"][::-1]]
+
+    if len(ranked_z_dim_list) > max_num_shapemodes:
+        ranked_z_dim_list = ranked_z_dim_list[:max_num_shapemodes]
+        mu_std_list = mu_std_list[:max_num_shapemodes]
+
+    return ranked_z_dim_list, mu_std_list, mu_mean_list
+
+
 def get_all_embeddings(
     train_dataloader,
     val_dataloader,
@@ -44,8 +69,9 @@ def get_all_embeddings(
     cell_ids = []
     split = []
 
-    zip_iter = zip(["train", "val", "test"],
-                   [train_dataloader, val_dataloader, test_dataloader])
+    zip_iter = zip(
+        ["train", "val", "test"], [train_dataloader, val_dataloader, test_dataloader]
+    )
 
     with torch.no_grad():
         for split_name, dataloader in zip_iter:
@@ -54,9 +80,7 @@ def get_all_embeddings(
                 cond_c = batch[c_label]
                 cell_id = batch["id"][id_fields[0]]
 
-                _, mus, _, _, _, _, _, _ = pl_module(
-                    input_x.float(), cond_c.float()
-                )
+                _, mus, _, _, _, _, _, _ = pl_module(input_x.float(), cond_c.float())
                 all_embeddings.append(mus)
 
                 cell_ids.append(cell_id)
@@ -76,6 +100,80 @@ def get_all_embeddings(
     result = pd.concat(frames, axis=1)
 
     return result
+
+
+def find_outliers(
+    ranked_z_dim_list: list,
+    test_embeddings: pd.DataFrame,
+    bins: list,
+):
+    for dim in ranked_z_dim_list:
+        mu_array = np.array(test_embeddings[[f"mu_{dim}"]]).astype(np.float32)
+        mu_array -= mu_array.mean()
+        mu_array /= mu_array.std()
+
+        binw = 0.5 * np.diff(bins).mean()
+        bin_edges = np.unique([(b - binw, b + binw) for b in bins])
+
+        inds = np.digitize(mu_array, bin_edges)
+        # Find outliers per dim and add to embeddings
+        left_outliers = np.where(inds.flatten() == 0)
+        right_outliers = np.where(inds.flatten() == len(bin_edges))
+        outlier_col = np.zeros(test_embeddings.shape[0], dtype="object")
+
+        if left_outliers[0].size > 0:
+            outlier_col[left_outliers[0]] = "Left Outlier"
+            inds[left_outliers[0]] = 0  # Map left outlier to bin 1
+        if right_outliers[0].size > 0:
+            outlier_col[right_outliers[0]] = "Right Outlier"
+            inds[right_outliers[0]] = (
+                len(bin_edges) - 1
+            )  # Map right outlier to last bin
+
+        outlier_col[np.where(outlier_col == 0)] = False
+        test_embeddings[f"outliers_mu_{dim}"] = outlier_col
+
+    return test_embeddings
+
+
+def get_bins_for_each_cell(
+    ranked_z_dim_list: list,
+    test_embeddings: pd.DataFrame,
+    bins: list,
+):
+
+    for dim in ranked_z_dim_list:
+        mu_array = np.array(test_embeddings[[f"mu_{dim}"]]).astype(np.float32)
+        mu_array -= mu_array.mean()
+        mu_array /= mu_array.std()
+
+        binw = 0.5 * np.diff(bins).mean()
+        bin_edges = np.unique([(b - binw, b + binw) for b in bins])
+        bin_edges[0] = -np.inf
+        bin_edges[-1] = np.inf
+
+        inds = np.digitize(mu_array, bin_edges)
+
+        # Add bins per dim to embeddings
+        bin_values = []
+        for i in inds:
+            bin_values.append((bin_edges[i - 1].item(), bin_edges[i].item()))
+        test_embeddings[f"bins_mu_{dim}"] = bin_values
+
+    bin_embeddings = test_embeddings[[i for i in test_embeddings.columns if "bin" in i]]
+
+    ranked_z_dim_bin_counts = []
+    for dim in ranked_z_dim_list:
+        bin_counts = bin_embeddings.pivot_table(
+            index=[f"bins_mu_{dim}"], aggfunc="size"
+        )
+        bin_counts = bin_counts.to_frame(f"bin_count_mu_{dim}")
+
+        ranked_z_dim_bin_counts.append(bin_counts)
+
+    all_dim_bin_counts = pd.concat(ranked_z_dim_bin_counts, axis=1)
+
+    return test_embeddings, all_dim_bin_counts
 
 
 def get_closest_cells(
@@ -646,8 +744,9 @@ def marginal_kl(
             sample_ix = random.randint(0, dataset_size)
 
             # import ipdb
+
             # ipdb.set_trace()
-            sample = dataloader.dataset.datasets[sample_ix]
+            sample = dataloader.dataset[sample_ix]
 
             this_x, this_c = to_device(
                 sample[x_label].float().unsqueeze(0),
