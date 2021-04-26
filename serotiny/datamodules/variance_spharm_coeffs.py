@@ -90,7 +90,6 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         set_zero: Optional[bool] = False,
         subset: Optional[int] = None,
         overwrite: Optional[bool] = False,
-        dl_pin_memory: bool = True,
         **kwargs,
     ):
 
@@ -125,8 +124,6 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
         self.subset = subset
         self.overwrite = overwrite
         self.stratify_column = self.c_label
-
-        self.dl_pin_memory = dl_pin_memory
 
         dfg = pd.read_csv(self.source_path)
         self.dfg = dfg
@@ -264,8 +261,6 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
             batch_size=self.batch_size,
             num_workers=self.num_workers,
             weights_col=None,  # or ClassWeights
-            pin_memory=self.dl_pin_memory,
-            drop_last=False,
         )
 
         return train_dataloader
@@ -284,8 +279,6 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
             batch_size=self.batch_size,
             num_workers=self.num_workers,
             weights_col=None,  # or ClassWeights
-            pin_memory=self.dl_pin_memory,
-            drop_last=False,
         )
 
         return val_dataloader
@@ -304,8 +297,6 @@ class VarianceSpharmCoeffs(pl.LightningDataModule):
             batch_size=self.batch_size,
             num_workers=self.num_workers,
             weights_col=None,  # or ClassWeights
-            pin_memory=self.dl_pin_memory,
-            drop_last=False,
         )
 
         return test_dataloader

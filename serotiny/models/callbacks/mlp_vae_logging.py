@@ -17,7 +17,6 @@ class MLPVAELogging(Callback):  # pragma: no cover
         resample_n: int = 10,
         values: list = [-1, 0, 1],
         conds_list: Optional[list] = None,
-        save_dir: Optional[str] = None,
     ):
         """
         Args:
@@ -30,7 +29,6 @@ class MLPVAELogging(Callback):  # pragma: no cover
         """
         super().__init__()
 
-        self.save_dir = save_dir
         self.resample_n = resample_n
         self.datamodule = datamodule
         self.conds_list = conds_list
@@ -41,6 +39,11 @@ class MLPVAELogging(Callback):  # pragma: no cover
     def on_test_epoch_end(self, trainer: Trainer, pl_module: LightningModule):
 
         with torch.no_grad():
+
+            dir_path = Path(trainer.logger[1].save_dir)
+            subdir = dir_path / "encoding_test"
+            subdir.mkdir(parents=True, exist_ok=True)
+
             test_dataloader = self.datamodule.test_dataloader()
             test_iter = next(iter(test_dataloader))
             x_label, c_label = self.datamodule.x_label, self.datamodule.c_label
@@ -50,14 +53,10 @@ class MLPVAELogging(Callback):  # pragma: no cover
 
             x, c = to_device(x, c, pl_module.device)
 
-            dir_path = Path(trainer.logger[1].save_dir)
             stats = pd.read_csv(dir_path / "stats_all.csv")
 
             enc_layers = pl_module.encoder.enc_layers
             dec_layers = pl_module.decoder.dec_layers
-
-            if not self.save_dir:
-                self.save_dir = dir_path
 
             if not self.conds_list:
                 if self.datamodule.__module__ == "serotiny.datamodules.gaussian":
@@ -81,7 +80,7 @@ class MLPVAELogging(Callback):  # pragma: no cover
 
             for value in self.values:
                 make_plot_encoding(
-                    self.save_dir,
+                    subdir,
                     pl_module,
                     dec_layers,
                     enc_layers,

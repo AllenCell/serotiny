@@ -20,6 +20,33 @@ from sklearn.decomposition import PCA
 LOGGER = logging.getLogger(__name__)
 
 
+def plot_bin_count_table(
+    bin_counts: pd.DataFrame,
+    save_dir,
+):
+
+    # sns.set_context('talk')
+    fig, ax = plt.subplots()
+
+    # hide axes
+    fig.patch.set_visible(False)
+    ax.axis("off")
+    ax.axis("tight")
+
+    table = ax.table(
+        cellText=bin_counts.values,
+        colLabels=bin_counts.columns,
+        rowLabels=bin_counts.index,
+        colWidths=[0.2] * bin_counts.shape[1],
+        loc="center",
+    )
+    table.auto_set_font_size(False)
+    table.set_fontsize(13)
+    table.scale(2, 2)
+
+    fig.savefig(save_dir / "bin_counts.png", bbox_inches="tight")
+
+
 def make_embedding_pairplots(
     all_embeddings: pd.DataFrame,
     fitted_pca: PCA,
@@ -35,27 +62,22 @@ def make_embedding_pairplots(
     ranked_ixs = ranked_z_dim_list[:n_components]
     ranked_cols = [f"mu_{j}" for j in ranked_z_dim_list[:n_components]]
 
-    mus = (
-        all_embeddings
-        [ranked_cols]
-    )
+    mus = all_embeddings[ranked_cols]
 
     walk_points = [-2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2]
     for pc in range(n_components):
         walk_std = np.zeros_like(pca_std)
         walk_std[pc] = pca_std[pc]
 
-        spharm_walk = fitted_pca.inverse_transform(
-            [n * walk_std for n in walk_points]
-        )
+        spharm_walk = fitted_pca.inverse_transform([n * walk_std for n in walk_points])
 
         with torch.no_grad():
             _, latent_walk, _, _, _, _, _, _ = model(
                 torch.tensor(spharm_walk).float(),
-                torch.zeros((len(spharm_walk), cond_size))
+                torch.zeros((len(spharm_walk), cond_size)),
             )
 
-        sns.set_context('talk')
+        sns.set_context("talk")
         g = sns.pairplot(mus, corner=True, plot_kws=dict(s=5, alpha=0.2, color="grey"))
         for row_ix, ax_row in enumerate(g.axes[1:]):
             row_ix += 1
@@ -63,12 +85,14 @@ def make_embedding_pairplots(
                 ax = g.axes[row_ix][col_ix]
                 x_ix = ranked_ixs[col_ix]
                 y_ix = ranked_ixs[row_ix]
-                ax.plot(latent_walk[:,x_ix], latent_walk[:,y_ix])
-                sc = ax.scatter(latent_walk[:,x_ix], latent_walk[:,y_ix], c=walk_points)
+                ax.plot(latent_walk[:, x_ix], latent_walk[:, y_ix])
+                sc = ax.scatter(
+                    latent_walk[:, x_ix], latent_walk[:, y_ix], c=walk_points
+                )
 
         cax = g.fig.add_axes([0.85, 0.85, 0.01, 0.1])
         g.fig.colorbar(sc, cax=cax)
-        g.savefig(save_dir / f"pairplot_embeddings_PC_{pc}.png")
+        g.savefig(save_dir / f"pairplot_embeddings_PC_{pc + 1}.png")
 
 
 def decode_latent_walk_closest_cells(
@@ -133,15 +157,24 @@ def decode_latent_walk_closest_cells(
             img, origin = cytoparam.voxelize_meshes([mesh])
 
             for proj in [0, 1, 2]:
+                plt.style.use("dark_background")
                 ax_array[proj, loc_index].set_title(
-                    f"{path_in_stdv[loc_index]} $\sigma$  \n ID {this_cell_id}"
+                    f"{path_in_stdv[loc_index]} $\sigma$  \n ID {this_cell_id}", fontsize=14
                 )
                 ax_array[proj, loc_index].imshow(img.max(proj), cmap="gray")
 
-        [ax.axis("off") for ax in ax_array.flatten()]
+                ax_array[proj, loc_index].set_xlim([0, 140])
+                ax_array[proj, loc_index].set_ylim([0, 120])
+                for tick in ax_array[proj, loc_index].xaxis.get_major_ticks():
+                    tick.label.set_fontsize(5)
+                for tick in ax_array[proj, loc_index].yaxis.get_major_ticks():
+                    tick.label.set_fontsize(5)
+                plt.style.use("default")
+
+        # [ax.axis("off") for ax in ax_array.flatten()]
         # Save figure
         ax_array.flatten()[0].get_figure().savefig(
-            dir_path / f"dim_{z_dim}_rank_{index}_closest_real_cell.png"
+            dir_path / f"dim_{z_dim}_rank_{index + 1}_closest_real_cell.png"
         )
         # Close figure, otherwise clogs memory
         plt.close(fig)

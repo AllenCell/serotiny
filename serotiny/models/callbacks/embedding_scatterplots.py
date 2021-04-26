@@ -6,6 +6,7 @@ import pandas as pd
 from sklearn.decomposition import PCA
 
 from serotiny.utils.viz_utils import make_embedding_pairplots
+from serotiny.utils.model_utils import get_ranked_dims
 
 
 class EmbeddingScatterPlots(Callback):
@@ -37,23 +38,14 @@ class EmbeddingScatterPlots(Callback):
         with torch.no_grad():
             dir_path = Path(trainer.logger[1].save_dir)
 
-            stats = pd.read_csv(dir_path / "stats_per_dim_test.csv")
-
-            stats = (
-                stats.loc[stats["test_kld_per_dim"] > self.cutoff_kld_per_dim]
-                .sort_values(by=["test_kld_per_dim"])
-                .reset_index(drop=True)
+            ranked_z_dim_list, mu_std_list, _ = get_ranked_dims(
+                dir_path, self.cutoff_kld_per_dim, max_num_shapemodes=8
             )
 
-            ranked_z_dim_list = [i for i in stats["dimension"][::-1]]
-            mu_std_list = [i for i in stats["mu_std_per_dim"][::-1]]
+            subdir = dir_path / "embeddings"
+            subdir.mkdir(parents=True, exist_ok=True)
 
-            num_shapemodes = 8
-            if len(ranked_z_dim_list) > num_shapemodes:
-                ranked_z_dim_list = ranked_z_dim_list[:num_shapemodes]
-                mu_std_list = mu_std_list[:num_shapemodes]
-
-            all_embeddings = pd.read_csv(dir_path / "embeddings_all.csv")
+            all_embeddings = pd.read_csv(subdir / "embeddings_all.csv")
 
             make_embedding_pairplots(
                 all_embeddings.loc[all_embeddings.split == "test"],
@@ -61,6 +53,6 @@ class EmbeddingScatterPlots(Callback):
                 self.n_components,
                 ranked_z_dim_list=ranked_z_dim_list,
                 model=pl_module,
-                save_dir=dir_path,
-                cond_size=self.c_dim
+                save_dir=subdir,
+                cond_size=self.c_dim,
             )
