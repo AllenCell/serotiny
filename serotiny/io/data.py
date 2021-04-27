@@ -129,7 +129,7 @@ def load_data_loader(
     batch_size: int,
     num_workers: int,
     shuffle: bool,
-    weights_col: str,
+    weights_col=None,
 ):
     """
     Load a pytorch DataLoader from the provided dataset.

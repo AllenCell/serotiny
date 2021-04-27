@@ -159,7 +159,7 @@ class Load3DImage:
 
     def __call__(self, row):
         return tiff_loader(
-            path_str=row[self.chosen_col],
+            row[self.chosen_col],
             select_channels=self.select_channels,
             output_dtype=np.float32,
             channel_masks=None,
