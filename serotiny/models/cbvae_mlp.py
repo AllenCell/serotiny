@@ -68,11 +68,13 @@ class CBVAEMLPModel(pl.LightningModule):
         if prior_mode == "anisotropic":
             self.prior_mean = torch.zeros(self.embedding_dim)
             if prior_logvar is None:
-                self.prior_logvar = nn.Parameter(torch.zeros(self.embedding_dim))
+                self.prior_logvar = torch.zeros(self.embedding_dim)
             else:
                 self.prior_logvar = torch.tensor(prior_logvar)
-                if learn_prior_logvar:
-                    self.prior_logvar = nn.Parameter(self.prior_logvar)
+            # if learn_prior_logvar:
+            self.prior_logvar = nn.Parameter(
+                self.prior_logvar, requires_grad=learn_prior_logvar
+            )
 
     def parse_batch(self, batch):
         x = batch[self.hparams.x_label].float()
