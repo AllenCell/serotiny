@@ -18,7 +18,7 @@ from pytorch_lightning.callbacks import (
     ModelCheckpoint,
     GPUStatsMonitor,
     EarlyStopping,
-    ProgressBar
+    ProgressBar,
 )
 from sklearn.decomposition import PCA
 
@@ -33,10 +33,10 @@ from serotiny.models.callbacks import (
     SpharmLatentWalk,
     GetEmbeddings,
     GetClosestCellsToDims,
-    #GlobalProgressBar,
+    # GlobalProgressBar,
     EmbeddingScatterPlots,
     MarginalKL,
-    EmpiricalKL
+    EmpiricalKL,
 )
 
 log = logging.getLogger(__name__)
@@ -124,6 +124,8 @@ def train_mlp_vae(
             length=length,
             corr=corr,
         )
+
+        prior_logvar = None
     else:
         log.info("Instantiating datamodule")
         dm = datamodules.__dict__[datamodule](
@@ -145,6 +147,22 @@ def train_mlp_vae(
         dm.prepare_data()
         dm.setup()
 
+        log.info("Fitting PCA")
+        fitted_pca = PCA().fit(dm.dfg[dm.spharm_cols])
+        pca_df = pd.DataFrame(fitted_pca.transform(dm.dfg[dm.spharm_cols]))
+        pca_df["CellId"] = dm.dfg["CellId"]
+
+        if init_logvar_pca:
+            prior_logvar = fitted_pca.singular_values_[:latent_dims] ** 2
+            prior_logvar = prior_logvar / prior_logvar.sum()
+            prior_logvar = F.log_softmax(torch.tensor(prior_logvar))
+            log.info(f"Initializing prior_logvar to {prior_logvar.tolist()}")
+        else:
+            prior_logvar = None
+
+    if learn_prior_logvar:
+        log.info("Learning prior_logvar")
+
     log.info("Instantiating encoder")
     encoder = CBVAEEncoderMLP(
         x_dim=x_dim,
@@ -160,22 +178,6 @@ def train_mlp_vae(
         hidden_layers=hidden_layers,
         latent_dims=latent_dims,
     )
-
-    log.info("Fitting PCA")
-    fitted_pca = PCA().fit(dm.dfg[dm.spharm_cols])
-    pca_df = pd.DataFrame(fitted_pca.transform(dm.dfg[dm.spharm_cols]))
-    pca_df["CellId"] = dm.dfg["CellId"]
-
-    if init_logvar_pca:
-        prior_logvar = fitted_pca.singular_values_[:latent_dims] ** 2
-        prior_logvar = prior_logvar / prior_logvar.sum()
-        prior_logvar = F.log_softmax(torch.tensor(prior_logvar))
-        log.info(f"Initializing prior_logvar to {prior_logvar.tolist()}")
-    else:
-        prior_logvar = None
-
-    if learn_prior_logvar:
-        log.info("Learning prior_logvar")
 
     log.info("Instantiating VAE")
     vae = CBVAEMLPModel(
@@ -211,7 +213,7 @@ def train_mlp_vae(
     if datamodule == "GaussianDataModule":
         callbacks = [
             GPUStatsMonitor(),
-            #GlobalProgressBar(),
+            # GlobalProgressBar(),
             MLPVAELogging(datamodule=dm_no_shuffle),
         ]
     elif datamodule == "VarianceSpharmCoeffs":
@@ -258,10 +260,11 @@ def train_mlp_vae(
         embedding_scatterplots = EmbeddingScatterPlots(
             fitted_pca=fitted_pca,
             n_components=len(hues),
-            c_dim=c_dim
+            c_dim=c_dim,
+            pca_df=pca_df,
         )
         callbacks = [
-            #GPUStatsMonitor(),
+            # GPUStatsMonitor(),
             ProgressBar(),
             EarlyStopping("val_loss", patience=15),
             marginal_kl,
@@ -275,9 +278,9 @@ def train_mlp_vae(
 
     trainer = pl.Trainer(
         logger=[tb_logger, csv_logger],
-        #accelerator="ddp",
-        #replace_sampler_ddp=False,
-        #gpus=1,
+        # accelerator="ddp",
+        # replace_sampler_ddp=False,
+        # gpus=1,
         gpus=None,
         max_epochs=num_epochs,
         progress_bar_refresh_rate=5,

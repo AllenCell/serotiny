@@ -66,6 +66,6 @@ class EmbeddingScatterPlots(Callback):
                 self.n_components,
                 ranked_z_dim_list=ranked_z_dim_list,
                 model=pl_module,
-                save_dir=dir_path,
+                save_dir=subdir,
                 cond_size=self.c_dim
             )

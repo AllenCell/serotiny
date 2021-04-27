@@ -72,8 +72,6 @@ class GetEmbeddings(Callback):
                 self.id_fields,
             )
 
-            print("done")
-
             path = subdir / "embeddings_all.csv"
 
             if path.exists():

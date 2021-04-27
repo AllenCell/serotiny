@@ -2,7 +2,7 @@ from typing import Optional
 import pytorch_lightning as pl
 import torch
 from torch.utils.data import DataLoader, Dataset
-from torch.distributions import MultivariateNormal
+from torch.distributions import MultivariateNormal, Multinomial
 import numpy as np
 import multiprocessing as mp
 
@@ -17,6 +17,7 @@ class GaussianDataset(Dataset):
         x_dim,
         shuffle=True,
         corr=False,
+        binomial=False,
     ):
         """
         Args:
@@ -36,6 +37,7 @@ class GaussianDataset(Dataset):
         self.corr = corr
         self.shuffle = shuffle
         self.x_dim = x_dim
+        self.binomial = binomial
 
         Batches_X, Batches_C, Batches_conds = (
             torch.empty([0]),
@@ -44,10 +46,13 @@ class GaussianDataset(Dataset):
         )
         for j, i in enumerate(range(self.length)):
             if self.corr is False:
-                m = MultivariateNormal(
-                    torch.zeros(x_dim),
-                    torch.eye(x_dim),
-                )
+                if self.binomial:
+                    m = Multinomial(20, torch.tensor([1.0] * self.x_dim))
+                else:
+                    m = MultivariateNormal(
+                        torch.zeros(x_dim),
+                        torch.eye(x_dim),
+                    )
             else:
                 if j == 0:
                     corr_matrix = self.random_corr_mat(D=x_dim)
@@ -136,6 +141,7 @@ def make_dataloader(
     num_workers,
     shuffle,
     corr,
+    binomial,
 ):
     """
     Instantiate gaussian dataset and return dataloader
@@ -148,11 +154,12 @@ def make_dataloader(
         x_dim,
         shuffle=shuffle,
         corr=corr,
+        binomial=binomial,
     )
     return DataLoader(
         dataset,
         batch_size=batch_size,
-        pin_memory=True,
+        pin_memory=False,
         drop_last=True,
         num_workers=num_workers,
         multiprocessing_context=mp.get_context("fork"),
@@ -199,6 +206,7 @@ class GaussianDataModule(pl.LightningDataModule):
         length: int,
         shuffle: Optional[bool] = False,
         corr: Optional[bool] = False,
+        binomial: Optional[bool] = False,
         **kwargs
     ):
 
@@ -221,6 +229,7 @@ class GaussianDataModule(pl.LightningDataModule):
             num_workers,
             shuffle,
             corr,
+            binomial,
         )
 
     def train_dataloader(self):

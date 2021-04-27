@@ -415,7 +415,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
     num_data_points = 0
     loss, rcl_loss, kld_loss = 0, 0, 0
 
-    total_x = torch.stack([x["input"] for x in outputs])
+    total_x = torch.cat([x["input"] for x in outputs])
     # num_batches = len(total_x)
 
     rcl_per_condition_loss, kld_per_condition_loss = (
@@ -746,7 +746,7 @@ def marginal_kl(
             # import ipdb
 
             # ipdb.set_trace()
-            sample = dataloader.dataset[sample_ix]
+            sample = dataloader.dataset.datasets[sample_ix]
 
             this_x, this_c = to_device(
                 sample[x_label].float().unsqueeze(0),

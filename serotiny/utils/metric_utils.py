@@ -160,6 +160,10 @@ def visualize_encoder_tabular(
             )
 
             # Save all_kl and all_lt, useful for sorting later
+            rcl_per_lt_temp = rcl_per_lt_temp / X_test.shape[0]
+            kl_per_lt_temp = kl_per_lt_temp / X_test.shape[0]
+            elbo_loss = elbo_loss / X_test.shape[0]
+
             all_kl = np.append(all_kl, kl_per_lt_temp.item())
             all_lt.append(ii)
             kl_per_lt["condition"].append(str(conds))
