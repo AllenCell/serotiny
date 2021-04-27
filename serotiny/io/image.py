@@ -101,6 +101,70 @@ def infer_dims(img):
     return "CZYX"
 
 
+def tiff_loader_CZYX(
+    path_str,
+    select_channels=None,
+    output_dtype=np.float32,
+    channel_masks=None,
+    mask_thresh=0,
+    transform=None,
+):
+    """
+    Load TIFF image from path given by `path_str`.
+    ---
+    Parameters:
+      path_str: str -> path of the image to load
+      select_channels: list -> channels to be retrieved from the image
+      output_dtype: numpy dtype TODO: explain
+      channel_masks: TODO: explain
+      mask_thresh: float -> TODO: explain this
+      transform: callable (optional) -> transform to apply before returning
+    Returns:
+      torch.Tensor
+    """
+    aicsimg = aicsimageio.AICSImage(path_str)
+    channel_names = aicsimg.get_channel_names()
+    data = aicsimg.get_image_data("CZYX", S=0, T=0)
+
+    mask_keys = channel_masks.keys() if channel_masks else {}
+    
+    if select_channels is None:
+        select_channels = channel_names
+
+    if (not set(select_channels).issubset(channel_names)) or (
+        not set(mask_keys).issubset(channel_names)
+    ):
+        raise KeyError(
+            "Some elements of `select_channels` or `channel_masks` "
+            "are not present in `channel_names`:\n"
+            f"\tchannel_names: {channel_names}\n"
+            f"\tchannel_masks: {channel_masks}\n"
+            f"\tselect_channels:: {select_channels}"
+        )
+
+    channel_map = {
+        channel_name: index for index, channel_name in enumerate(channel_names)
+    }
+
+    if channel_masks is not None:
+        for channel, mask in channel_masks.items():
+            channel_index = channel_map[channel]
+            mask_index = channel_map[mask]
+            mask = data[mask_index] > mask_thresh
+            data[channel_index][~mask] = 0
+
+    if select_channels:
+        channel_indexes = [channel_map[channel] for channel in select_channels]
+        data = data[channel_indexes, ...]
+
+    data = data.astype(output_dtype)
+    if transform:
+        data = transform(data)
+
+    return data
+
+
+
 def tiff_loader(
     path,
     select_channels=None,
