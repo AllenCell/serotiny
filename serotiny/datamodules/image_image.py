@@ -148,7 +148,7 @@ class ImageImage(BaseDataModule):
         """
         return self.transform(
             tiff_loader(
-                path_str=dataset[self.input_column].iloc[0],
+                dataset[self.input_column].iloc[0],
                 select_channels=self.input_channels,
                 output_dtype=np.float32,
             )
