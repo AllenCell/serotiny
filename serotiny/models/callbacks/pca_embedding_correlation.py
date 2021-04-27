@@ -23,7 +23,7 @@ class PCALatentCorrelation(Callback):
         corr = corr[[col for col in corr.columns if col not in self.pca_df.columns]]
         corr = corr.loc[self.pca_df.columns]
 
-        f, ax = plt.subplots(figsize=(60, 20))
+        f, ax = plt.subplots(figsize=(80, 30))
         sns.set_context("talk")
         g = sns.heatmap(corr.T, cmap="vlag", square=True, ax=ax, xticklabels=True, yticklabels=True)
         f.savefig(dir_path / "correlation_embeddings_PC.png")
