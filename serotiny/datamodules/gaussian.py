@@ -51,8 +51,8 @@ class GaussianDataset(Dataset):
             all_x_dims = []
             for dims in range(self.x_dim):
                 N = int(self.length / 2)
-                mu, sigma = -1, 0.5
-                mu2, sigma2 = 1, 0.5
+                mu, sigma = -50, 10
+                mu2, sigma2 = 50, 5
                 X1 = np.random.normal(mu, sigma, N)
                 X2 = np.random.normal(mu2, sigma2, self.length - N)
                 X_concat = np.concatenate([X1, X2])

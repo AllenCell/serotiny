@@ -94,12 +94,22 @@ class CBVAEMLPModel(pl.LightningModule):
         #####################
 
         batch_size = x.shape[0]
-
+        import ipdb
+        ipdb.set_trace()
         mu, logsigma, z = self.encoder(x, x_cond)
         if z_inference is not None:
             x_hat = self.decoder(z_inference, x_cond)
         else:
             x_hat = self.decoder(z, x_cond)
+
+        # import matplotlib.pyplot as plt
+
+        # fig, (ax, ax1) = plt.subplots(1, 2, figsize=(20, 5))
+        # ax.scatter(x[:, 0].cpu().detach().numpy(), x[:, 1].cpu().detach().numpy())
+        # ax1.scatter(
+        #     x_hat[:, 0].cpu().detach().numpy(), x_hat[:, 1].cpu().detach().numpy()
+        # )
+        # fig.savefig("testing.png")
 
         loss, recon_loss, kld_loss, rcl_per_element, kld_per_element = calculate_elbo(
             x,
