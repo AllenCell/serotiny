@@ -18,6 +18,7 @@ class GaussianDataset(Dataset):
         shuffle=True,
         corr=False,
         binomial=False,
+        bimodal=False,
     ):
         """
         Args:
@@ -38,30 +39,53 @@ class GaussianDataset(Dataset):
         self.shuffle = shuffle
         self.x_dim = x_dim
         self.binomial = binomial
+        self.bimodal = bimodal
 
         Batches_X, Batches_C, Batches_conds = (
             torch.empty([0]),
             torch.empty([0]),
             torch.empty([0]),
         )
+
+        if self.bimodal:
+            all_x_dims = []
+            for dims in range(self.x_dim):
+                N = int(self.length / 2)
+                mu, sigma = -1, 0.5
+                mu2, sigma2 = 1, 0.5
+                X1 = np.random.normal(mu, sigma, N)
+                X2 = np.random.normal(mu2, sigma2, self.length - N)
+                X_concat = np.concatenate([X1, X2])
+                all_x_dims.append(X_concat)
+            all_x = np.stack(all_x_dims)
+            all_x = np.swapaxes(all_x, 0, 1)
+            np.random.shuffle(all_x)
+            all_x = torch.tensor(all_x)
+        # import ipdb
+
+        # ipdb.set_trace()
+
         for j, i in enumerate(range(self.length)):
             if self.corr is False:
                 if self.binomial:
                     m = Multinomial(20, torch.tensor([1.0] * self.x_dim))
+                    X = m.sample((self.BATCH_SIZE,))
+                elif self.bimodal:
+                    X = all_x[j].view([1, -1])
                 else:
                     m = MultivariateNormal(
                         torch.zeros(x_dim),
                         torch.eye(x_dim),
                     )
+                    X = m.sample((self.BATCH_SIZE,))
             else:
                 if j == 0:
                     corr_matrix = self.random_corr_mat(D=x_dim)
                     corr_matrix = torch.from_numpy(corr_matrix)
                 m = MultivariateNormal(torch.zeros(x_dim).float(), corr_matrix.float())
 
-            X = m.sample((self.BATCH_SIZE,))
-
             C = X.clone()
+
             count = 0
             if self.shuffle is True:
                 while count == 0:
@@ -142,6 +166,7 @@ def make_dataloader(
     shuffle,
     corr,
     binomial,
+    bimodal,
 ):
     """
     Instantiate gaussian dataset and return dataloader
@@ -155,6 +180,7 @@ def make_dataloader(
         shuffle=shuffle,
         corr=corr,
         binomial=binomial,
+        bimodal=bimodal,
     )
     return DataLoader(
         dataset,
@@ -207,6 +233,7 @@ class GaussianDataModule(pl.LightningDataModule):
         shuffle: Optional[bool] = False,
         corr: Optional[bool] = False,
         binomial: Optional[bool] = False,
+        bimodal: Optional[bool] = False,
         **kwargs
     ):
 
@@ -230,6 +257,7 @@ class GaussianDataModule(pl.LightningDataModule):
             shuffle,
             corr,
             binomial,
+            bimodal,
         )
 
     def train_dataloader(self):
