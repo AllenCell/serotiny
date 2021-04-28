@@ -94,7 +94,6 @@ class CBVAEMLPModel(pl.LightningModule):
         #####################
 
         batch_size = x.shape[0]
-
         mu, logsigma, z = self.encoder(x, x_cond)
         if z_inference is not None:
             x_hat = self.decoder(z_inference, x_cond)

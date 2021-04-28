@@ -144,8 +144,9 @@ def make_pca_pairplots(
         ).float()
 
         with torch.no_grad():
-            spharm_walk = model.decoder(latent_walk,
-                                        torch.zeros((len(latent_walk), cond_size)))
+            spharm_walk = model.decoder(
+                latent_walk, torch.zeros((len(latent_walk), cond_size))
+            )
 
         pca_walk = fitted_pca.transform(spharm_walk)
         pca_walk = (pca_walk - pca_mean)/pca_std
@@ -197,6 +198,8 @@ def decode_latent_walk_closest_cells(
             figsize=(15, 7),
         )
         subset_df = closest_cells_df.loc[closest_cells_df["ranked_dim"] == z_dim]
+        subset_df = subset_df.drop_duplicates()
+        print(subset_df)
         mu_std = mu_std_list[index]
 
         for loc_index, location in enumerate(subset_df["location"].unique()):
@@ -237,7 +240,8 @@ def decode_latent_walk_closest_cells(
             for proj in [0, 1, 2]:
                 plt.style.use("dark_background")
                 ax_array[proj, loc_index].set_title(
-                    f"{path_in_stdv[loc_index]} $\sigma$  \n ID {this_cell_id}", fontsize=14
+                    f"{path_in_stdv[loc_index]} $\sigma$  \n ID {this_cell_id}",
+                    fontsize=14,
                 )
                 ax_array[proj, loc_index].imshow(img.max(proj), cmap="gray")
 

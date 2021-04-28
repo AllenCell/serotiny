@@ -214,11 +214,12 @@ def get_closest_cells(
     df2 = pd.DataFrame(dims, columns=["ranked_dim"])
     result = pd.concat([tmp, df2], axis=1)
 
+    # import ipdb
+    # ipdb.set_trace()
+
     path = dir_path / "closest_real_cells_to_top_dims.csv"
 
     if path.exists():
-        result.to_csv(path, mode="a", header=False, index=False)
-    else:
         result.to_csv(path, header="column_names", index=False)
 
     return result

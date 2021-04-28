@@ -75,8 +75,6 @@ class GetEmbeddings(Callback):
             path = subdir / "embeddings_all.csv"
 
             if path.exists():
-                result.to_csv(path, mode="a", header=False, index=False)
-            else:
                 result.to_csv(path, header="column_names", index=False)
 
             ranked_z_dim_list, mu_std_list, _ = get_ranked_dims(
