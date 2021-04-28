@@ -18,7 +18,7 @@ from pytorch_lightning.callbacks import (
     ModelCheckpoint,
     GPUStatsMonitor,
     EarlyStopping,
-    ProgressBar,
+    # ProgressBar,
 )
 from sklearn.decomposition import PCA
 
@@ -33,10 +33,11 @@ from serotiny.models.callbacks import (
     SpharmLatentWalk,
     GetEmbeddings,
     GetClosestCellsToDims,
-    # GlobalProgressBar,
+    GlobalProgressBar,
     EmbeddingScatterPlots,
     MarginalKL,
     EmpiricalKL,
+    PCAWalks,
 )
 
 log = logging.getLogger(__name__)
@@ -254,7 +255,12 @@ def train_mlp_vae(
             config=config,
             spharm_coeffs_cols=dm.spharm_cols,
             latent_walk_range=latent_walk_range,
-            ignore_mesh_and_contour_plots=True,
+            ignore_mesh_and_contour_plots=False,
+        )
+
+        pca_walks = PCAWalks(
+            df=dm.dfg,
+            config=config,
         )
 
         embedding_scatterplots = EmbeddingScatterPlots(
@@ -265,7 +271,7 @@ def train_mlp_vae(
         )
         callbacks = [
             # GPUStatsMonitor(),
-            ProgressBar(),
+            GlobalProgressBar(),
             EarlyStopping("val_loss", patience=15),
             marginal_kl,
             empirical_kl,
@@ -274,6 +280,7 @@ def train_mlp_vae(
             embedding_scatterplots,
             get_closest_cells_to_dims,
             spharm_latent_walk,
+            pca_walks,
         ]
 
     trainer = pl.Trainer(
