@@ -155,7 +155,7 @@ def make_pca_pairplots(
         g = sns.pairplot(all_pcs[all_pcs.columns[:n_components]],
                          corner=True,
                          kind="hist",
-                         plot_kws=dict(bins=100, color="red",
+                         plot_kws=dict(bins=100, cmap="Reds",
                                        binrange=((-3, 3), (-3, 3))))
 
         for row_ix, ax_row in enumerate(g.axes[1:]):
