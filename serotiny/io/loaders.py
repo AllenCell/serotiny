@@ -100,11 +100,8 @@ class LoadPCA:
         self.set_zero = set_zero
 
     def __call__(self, row):
-        pca_cols = [
-            col
-            for col in row.keys()
-            if self.x_label in col and len(col) == len(self.x_label) + 1
-        ]
+        pca_cols = [col for col in row.keys() if self.x_label in col]
+        pca_cols = pca_cols[:8]
         pca = torch.tensor(row[pca_cols]).float()
         if self.set_zero:
             pca[pca != 0] = 0

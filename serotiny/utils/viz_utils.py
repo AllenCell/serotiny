@@ -110,8 +110,7 @@ def make_pca_pairplots(
     ranked_ixs = ranked_z_dim_list[:n_components]
     ranked_cols = [f"mu_{j}" for j in ranked_z_dim_list[:n_components]]
     walk_points = [-2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2]
-    mus = all_embeddings[[col for col in all_embeddings.columns
-                          if "mu_" in col]].values
+    mus = all_embeddings[[col for col in all_embeddings.columns if "mu_" in col]].values
     walk_mu = mus.mean(axis=0)
     walk_std = mus.std(axis=0)
 
@@ -121,14 +120,18 @@ def make_pca_pairplots(
         ).float()
 
         with torch.no_grad():
-            spharm_walk = model.decoder(latent_walk,
-                                        torch.zeros((len(latent_walk), cond_size)))
+            spharm_walk = model.decoder(
+                latent_walk, torch.zeros((len(latent_walk), cond_size))
+            )
 
         pca_walk = fitted_pca.transform(spharm_walk)
 
-        sns.set_context('talk')
-        g = sns.pairplot(all_pcs[all_pcs.columns[:n_components]],
-                         corner=True, plot_kws=dict(s=5, alpha=0.2, color="grey"))
+        sns.set_context("talk")
+        g = sns.pairplot(
+            all_pcs[all_pcs.columns[:n_components]],
+            corner=True,
+            plot_kws=dict(s=5, alpha=0.2, color="grey"),
+        )
 
         for row_ix, ax_row in enumerate(g.axes[1:]):
             row_ix += 1
@@ -168,6 +171,8 @@ def decode_latent_walk_closest_cells(
             figsize=(15, 7),
         )
         subset_df = closest_cells_df.loc[closest_cells_df["ranked_dim"] == z_dim]
+        subset_df = subset_df.drop_duplicates()
+        print(subset_df)
         mu_std = mu_std_list[index]
 
         for loc_index, location in enumerate(subset_df["location"].unique()):
@@ -208,7 +213,8 @@ def decode_latent_walk_closest_cells(
             for proj in [0, 1, 2]:
                 plt.style.use("dark_background")
                 ax_array[proj, loc_index].set_title(
-                    f"{path_in_stdv[loc_index]} $\sigma$  \n ID {this_cell_id}", fontsize=14
+                    f"{path_in_stdv[loc_index]} $\sigma$  \n ID {this_cell_id}",
+                    fontsize=14,
                 )
                 ax_array[proj, loc_index].imshow(img.max(proj), cmap="gray")
 
