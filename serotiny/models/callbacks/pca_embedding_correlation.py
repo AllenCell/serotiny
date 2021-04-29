@@ -14,7 +14,7 @@ class PCALatentCorrelation(Callback):
         dir_path = Path(trainer.logger[1].save_dir)
 
         df = pd.concat([
-            pd.read_csv(dir_path / "embeddins/embeddings_all.csv")
+            pd.read_csv(dir_path / "embeddings/embeddings_all.csv")
                 .set_index("CellId")
                 .sort_index(),
             self.pca_df
