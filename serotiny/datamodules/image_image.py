@@ -7,7 +7,7 @@ from torchvision import transforms
 import torchio.transforms as tiotransforms
 from aicsimageprocessing.resize import resize_to
 
-from ..io.image import tiff_loader_CZYX
+from ..io.image import tiff_loader
 from ..io.data import load_data_loader
 from ..io.loaders import Load3DImage, LoadClass, LoadColumns
 from .constants import DatasetFields
@@ -147,7 +147,7 @@ class ImageImage(BaseDataModule):
         Load a single 3D image given a path
         """
         return self.transform(
-            tiff_loader_CZYX(
+            tiff_loader(
                 dataset[self.input_column].iloc[0],
                 select_channels=self.input_channels,
                 output_dtype=np.float32,
@@ -176,7 +176,7 @@ class ImageImage(BaseDataModule):
             train_dataset,
             train_loaders,
             transform=self.train_transform,
-            shuffle=False,
+            shuffle=True,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
         )
