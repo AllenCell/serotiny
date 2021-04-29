@@ -17,9 +17,9 @@ class UpResidualLayer(nn.Module):
         activation: str = "relu",
         output_padding: int = 0,
         ch_cond_list: Optional[Sequence[int]] = None,
-        activation_last: Optional[str] = None
+        activation_last: Optional[str] = None,
     ):
-       """
+        """
         Basic layer used in the CBVAE model (extracted from pytorch_integrated_cell).
 
         This network is composed of two main paths + some number of conditional paths

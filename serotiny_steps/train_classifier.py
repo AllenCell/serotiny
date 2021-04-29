@@ -56,7 +56,7 @@ def train_classifier(
     classes: list,
     dimensionality: int,
     precision: int,
-    **datamodule_kwargs
+    **datamodule_kwargs,
 ):
     """
     Initialize dataloaders and model
@@ -133,14 +133,18 @@ def train_classifier(
     elif dimensionality == 3:
         import serotiny.networks.classification._3d as available_nets
     elif dimensionality == 1:
-        raise NotImplementedError("No networks for 1-dimensional inputs available (yet)")
+        raise NotImplementedError(
+            "No networks for 1-dimensional inputs available (yet)"
+        )
     else:
         raise ValueError("Parameter `dimensionality` should be 1, 2 or 3")
 
     if model not in available_nets.__dict__:
-        raise KeyError(f"Chosen network {model} not available.\n"
-                       f"Available networks, for the selected dimensionality "
-                       f"({dimensionality}):\n{available_nets.__all__}")
+        raise KeyError(
+            f"Chosen network {model} not available.\n"
+            f"Available networks, for the selected dimensionality "
+            f"({dimensionality}):\n{available_nets.__all__}"
+        )
 
     network_class = available_nets.__dict__[model]
 
@@ -151,7 +155,7 @@ def train_classifier(
         data_dir=datasets_path,
         x_label=x_label,
         y_label=y_label,
-        **datamodule_kwargs
+        **datamodule_kwargs,
     )
     datamodule.setup()
 
