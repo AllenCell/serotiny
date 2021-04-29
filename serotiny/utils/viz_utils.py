@@ -64,6 +64,9 @@ def make_embedding_pairplots(
 
     mus = all_embeddings[[col for col in all_embeddings.columns
                           if col not in ("CellId", "split")]]
+
+    # mus = all_embeddings[[col for col in all_embeddings.columns]]
+
     mus_mean = mus.values.mean(axis=0)
     mus_std = mus.values.std(axis=0)
     mus = (mus - mus_mean)/mus_std
@@ -89,7 +92,6 @@ def make_embedding_pairplots(
         #                 #plot_kws=dict(s=5, alpha=0.2, color="grey"))
 
         latent_walk = (latent_walk - mus_mean)/mus_std
-
         g = sns.PairGrid(mus, corner=True, diag_sharey=True)
         g.map_lower(sns.histplot, cmap="Reds", binrange=((-3, 3),(-3, 3)), bins=100)
         g.map_diag(sns.histplot, binrange=(-3, 3))
@@ -199,7 +201,6 @@ def decode_latent_walk_closest_cells(
         )
         subset_df = closest_cells_df.loc[closest_cells_df["ranked_dim"] == z_dim]
         subset_df = subset_df.drop_duplicates()
-        print(subset_df)
         mu_std = mu_std_list[index]
 
         for loc_index, location in enumerate(subset_df["location"].unique()):

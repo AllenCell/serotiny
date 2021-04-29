@@ -79,8 +79,6 @@ class SpharmLatentWalk(Callback):
         if self.subfolder is None:
             self.subfolder = "latent_walks"
 
-        self.config["shapespace"]["aliases"] = ["NUC"]
-
         self.config["shapespace"][
             "map_points"
         ] = self.latent_walk_range  # This is map points in std dev units
@@ -97,6 +95,8 @@ class SpharmLatentWalk(Callback):
             self.config["project"][
                 "local_staging"
             ] = dir_path  # This is where plots get saved
+
+            print(self.config["shapespace"])
 
             subdir = dir_path / self.subfolder
             subdir.mkdir(parents=True, exist_ok=True)
@@ -131,6 +131,8 @@ class SpharmLatentWalk(Callback):
                 self.dna_spharm_cols,
             )
 
+            print(self.config["shapespace"])
+
             if not self.ignore_mesh_and_contour_plots:
                 for shapemode, mesh_dict in meshes.items():
                     projections = {}
@@ -148,12 +150,15 @@ class SpharmLatentWalk(Callback):
                                 print("done projecting single mesh")
                     # return contours
                     # projections = plot_maker.get_2d_contours(mesh_dict)
+
                     print(f"Done with all projections for shapemode {shapemode}")
+                    # import ipdb
+                    # ipdb.set_trace()
                     for proj, contours in projections.items():
                         print(f"Beginning gif generation for proj {proj}")
                         plot_maker.animate_contours(
                             contours,
-                            f"NUC_PC{shapemode + 1}_{proj}",
+                            f"dna_PC{shapemode + 1}_{proj}",
                             # self.config,
                             # dir_path,
                             # self.subfolder,

@@ -65,6 +65,7 @@ class MLPVAELogging(Callback):  # pragma: no cover
                     conds_list = []
                     for i in range(x.shape[-1] + 1):
                         conds_list.append([j for j in range(i)])
+                    conds_list = [conds_list[-1]]
 
                 elif (
                     self.datamodule.__module__

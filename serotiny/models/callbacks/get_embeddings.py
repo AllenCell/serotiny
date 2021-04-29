@@ -74,8 +74,7 @@ class GetEmbeddings(Callback):
 
             path = subdir / "embeddings_all.csv"
 
-            if path.exists():
-                result.to_csv(path, header="column_names", index=False)
+            result.to_csv(path, index=False)
 
             ranked_z_dim_list, mu_std_list, _ = get_ranked_dims(
                 dir_path, self.cutoff_kld_per_dim, max_num_shapemodes=8
@@ -94,12 +93,10 @@ class GetEmbeddings(Callback):
 
             path2 = subdir / "embeddings_test_with_bins_outliers.csv"
 
-            result_with_bins_and_outliers.to_csv(
-                path2, header="column_names", index=False
-            )
+            result_with_bins_and_outliers.to_csv(path2, index=False)
 
             path3 = subdir / "all_dim_bin_counts.csv"
 
-            all_dim_bin_counts.to_csv(path3, header="column_names", index=False)
+            all_dim_bin_counts.to_csv(path3, index=False)
 
             plot_bin_count_table(all_dim_bin_counts, subdir)

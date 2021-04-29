@@ -38,6 +38,7 @@ from serotiny.models.callbacks import (
     MarginalKL,
     EmpiricalKL,
     PCAWalks,
+    PCALatentCorrelation,
 )
 
 log = logging.getLogger(__name__)
@@ -269,6 +270,8 @@ def train_mlp_vae(
             c_dim=c_dim,
             pca_df=pca_df,
         )
+
+        # pca_latent_corr = PCALatentCorrelation(pca_df=pca_df)
         callbacks = [
             # GPUStatsMonitor(),
             GlobalProgressBar(),
@@ -281,6 +284,7 @@ def train_mlp_vae(
             get_closest_cells_to_dims,
             spharm_latent_walk,
             pca_walks,
+            # pca_latent_corr,
         ]
 
     trainer = pl.Trainer(

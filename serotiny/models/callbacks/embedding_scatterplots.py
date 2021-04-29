@@ -43,7 +43,6 @@ class EmbeddingScatterPlots(Callback):
             ranked_z_dim_list, mu_std_list, _ = get_ranked_dims(
                 dir_path, self.cutoff_kld_per_dim, max_num_shapemodes=8
             )
-
             subdir = dir_path / "embeddings"
             subdir.mkdir(parents=True, exist_ok=True)
 

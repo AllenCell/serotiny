@@ -19,6 +19,7 @@ class GaussianDataset(Dataset):
         corr=False,
         binomial=False,
         bimodal=False,
+        projection=False,
     ):
         """
         Args:
@@ -40,6 +41,8 @@ class GaussianDataset(Dataset):
         self.x_dim = x_dim
         self.binomial = binomial
         self.bimodal = bimodal
+        self.projection = projection
+        self.projection_dim = 20
 
         Batches_X, Batches_C, Batches_conds = (
             torch.empty([0]),
@@ -64,6 +67,18 @@ class GaussianDataset(Dataset):
         # import ipdb
 
         # ipdb.set_trace()
+        if self.projection:
+            P = torch.zeros([self.projection_dim, self.projection_dim])
+            col = 0
+            for row in range(P.size()[0]):
+                # col = torch.randint(0,self.model_kwargs['x_dim'],(1,)).item()
+                # P[row][col] = torch.randn(1).item()
+                P[row][col] = 1 + torch.randn(1).item() / 100
+                # P[row][col] = 1
+                if col != self.x_dim - 1:
+                    col += 1
+                else:
+                    col = 0
 
         for j, i in enumerate(range(self.length)):
             if self.corr is False:
@@ -72,6 +87,31 @@ class GaussianDataset(Dataset):
                     X = m.sample((self.BATCH_SIZE,))
                 elif self.bimodal:
                     X = all_x[j].view([1, -1])
+                elif self.projection:
+                    m = MultivariateNormal(
+                        torch.zeros(self.x_dim),
+                        torch.eye(self.x_dim),
+                    )
+                    X = None
+                    X = m.sample((self.BATCH_SIZE,))
+
+                    X = torch.cat(
+                        [
+                            X,
+                            torch.zeros(
+                                (
+                                    self.BATCH_SIZE,
+                                    self.projection_dim - self.x_dim,
+                                )
+                            ),
+                        ],
+                        1,
+                    )
+                    # X = torch.mm(P, X.t())
+                    X = torch.mm(P, torch.square(X.t())) + torch.mm(P, X.t())
+                    # torch.mm(P, torch.square(X.t()))
+                    X = X.t()
+                    x_dim = self.projection_dim
                 else:
                     m = MultivariateNormal(
                         torch.zeros(x_dim),
@@ -167,6 +207,7 @@ def make_dataloader(
     corr,
     binomial,
     bimodal,
+    projection,
 ):
     """
     Instantiate gaussian dataset and return dataloader
@@ -181,6 +222,7 @@ def make_dataloader(
         corr=corr,
         binomial=binomial,
         bimodal=bimodal,
+        projection=projection,
     )
     return DataLoader(
         dataset,
@@ -234,6 +276,7 @@ class GaussianDataModule(pl.LightningDataModule):
         corr: Optional[bool] = False,
         binomial: Optional[bool] = False,
         bimodal: Optional[bool] = False,
+        projection: Optional[bool] = False,
         **kwargs
     ):
 
@@ -258,6 +301,7 @@ class GaussianDataModule(pl.LightningDataModule):
             corr,
             binomial,
             bimodal,
+            projection,
         )
 
     def train_dataloader(self):
