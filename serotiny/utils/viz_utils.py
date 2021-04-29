@@ -50,6 +50,7 @@ def plot_bin_count_table(
 def make_embedding_pairplots(
     all_embeddings: pd.DataFrame,
     fitted_pca: PCA,
+    pca_df: pd.DataFrame,
     n_components: int,
     ranked_z_dim_list: list,
     model,
@@ -57,15 +58,17 @@ def make_embedding_pairplots(
     cond_size,
 ):
 
-    pca_std = np.sqrt(fitted_pca.explained_variance_)
+    pca_df = pca_df.loc[pca_df.CellId.isin(all_embeddings.CellId)]
+    pca_df = pca_df[[col for col in pca_df.columns if col != "CellId"]]
+
+    walk_mean = pca_df.values.mean(axis=0)
+    pca_std = pca_df.values.std(axis=0)
 
     ranked_ixs = ranked_z_dim_list[:n_components]
     ranked_cols = [f"mu_{j}" for j in ranked_z_dim_list[:n_components]]
 
     mus = all_embeddings[[col for col in all_embeddings.columns
                           if col not in ("CellId", "split")]]
-
-    # mus = all_embeddings[[col for col in all_embeddings.columns]]
 
     mus_mean = mus.values.mean(axis=0)
     mus_std = mus.values.std(axis=0)
@@ -77,7 +80,8 @@ def make_embedding_pairplots(
         walk_std = np.zeros_like(pca_std)
         walk_std[pc] = pca_std[pc]
 
-        spharm_walk = fitted_pca.inverse_transform([n * walk_std for n in walk_points])
+        spharm_walk = fitted_pca.inverse_transform([walk_mean + (n * walk_std)
+                                                    for n in walk_points])
 
         with torch.no_grad():
             _, latent_walk, _, _, _, _, _, _ = model(
@@ -86,14 +90,12 @@ def make_embedding_pairplots(
             )
 
         sns.set_context("talk")
-        #g = sns.pairplot(mus, corner=True,
-        #                 kind="hist",
-        #                 plot_kws=dict(bins=100, color="grey"))
-        #                 #plot_kws=dict(s=5, alpha=0.2, color="grey"))
+                         #plot_kws=dict(s=5, alpha=0.2, color="grey"))
 
         latent_walk = (latent_walk - mus_mean)/mus_std
         g = sns.PairGrid(mus, corner=True, diag_sharey=True)
-        g.map_lower(sns.histplot, cmap="Reds", binrange=((-3, 3),(-3, 3)), bins=100)
+        g.map_lower(sns.histplot, cmap="Reds", binrange=((-3, 3),(-3, 3)),
+                    bins=100, stat="density")
         g.map_diag(sns.histplot, binrange=(-3, 3))
 
         for row_ix, ax_row in enumerate(g.axes[1:]):
@@ -118,31 +120,36 @@ def make_embedding_pairplots(
 def make_pca_pairplots(
     all_embeddings: pd.DataFrame,
     fitted_pca: PCA,
-    all_pcs: pd.DataFrame,
+    pca_df: pd.DataFrame,
     n_components: int,
     ranked_z_dim_list: list,
     model,
     save_dir,
     cond_size,
 ):
+    pca_df = pca_df.loc[pca_df.CellId.isin(all_embeddings.CellId)]
+    pca_df = pca_df[[col for col in pca_df.columns if col != "CellId"]]
 
     ranked_ixs = ranked_z_dim_list[:n_components]
-    ranked_cols = [f"mu_{j}" for j in ranked_z_dim_list[:n_components]]
     walk_points = [-2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2]
     mus = all_embeddings[[col for col in all_embeddings.columns
                           if "mu_" in col]].values
 
     walk_mu = mus.mean(axis=0)
-    walk_std = mus.std(axis=0)
+    mu_std = mus.std(axis=0)
 
-    all_pcs = all_pcs[[col for col in all_pcs.columns if col != "CellId"]]
-    pca_mean = all_pcs.values.mean(axis=0)
-    pca_std = all_pcs.values.std(axis=0)
-    all_pcs = (all_pcs - pca_mean)/pca_std
+    pca_df = pca_df[[col for col in pca_df.columns if col != "CellId"]]
+    pca_mean = pca_df.values.mean(axis=0)
+    pca_std = pca_df.values.std(axis=0)
+    pca_df = (pca_df - pca_mean)/pca_std
 
     for dim in ranked_ixs:
+        walk_std = np.zeros_like(mu_std)
+        walk_std[dim] = mu_std[dim]
+
         latent_walk = torch.stack(
-            [torch.tensor(walk_mu + walk_std[dim] * n) for n in walk_points]
+            [torch.tensor(walk_mu + (walk_std * n))
+             for n in walk_points]
         ).float()
 
         with torch.no_grad():
@@ -154,11 +161,11 @@ def make_pca_pairplots(
         pca_walk = (pca_walk - pca_mean)/pca_std
 
         sns.set_context('talk')
-        g = sns.pairplot(all_pcs[all_pcs.columns[:n_components]],
-                         corner=True,
-                         kind="hist",
-                         plot_kws=dict(bins=100, cmap="Reds",
-                                       binrange=((-3, 3), (-3, 3))))
+
+        g = sns.PairGrid(pca_df[range(n_components)], corner=True, diag_sharey=True)
+        g.map_lower(sns.histplot, cmap="Reds", binrange=((-3, 3),(-3, 3)),
+                    bins=100, stat="density")
+        g.map_diag(sns.histplot, binrange=(-3, 3))
 
         for row_ix, ax_row in enumerate(g.axes[1:]):
             row_ix += 1
@@ -166,8 +173,8 @@ def make_pca_pairplots(
                 ax = g.axes[row_ix][col_ix]
                 ax.set_xlim(-3, 3)
                 ax.set_ylim(-3, 3)
-                x_ix = ranked_ixs[col_ix]
-                y_ix = ranked_ixs[row_ix]
+                x_ix = col_ix
+                y_ix = row_ix
                 ax.plot(pca_walk[:, x_ix], pca_walk[:, y_ix])
                 sc = ax.scatter(pca_walk[:, x_ix], pca_walk[:, y_ix], c=walk_points)
 

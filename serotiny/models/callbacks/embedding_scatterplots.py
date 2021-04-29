@@ -51,6 +51,7 @@ class EmbeddingScatterPlots(Callback):
             make_embedding_pairplots(
                 all_embeddings.loc[all_embeddings.split == "test"],
                 self.fitted_pca,
+                self.pca_df,
                 self.n_components,
                 ranked_z_dim_list=ranked_z_dim_list,
                 model=pl_module,
