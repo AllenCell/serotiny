@@ -10,7 +10,7 @@ from pytorch_lightning import Callback, LightningModule, Trainer
 from serotiny.utils.model_utils import get_ranked_dims
 
 class PCALatentCorrelation(Callback):
-    def __init__(self, pca_df, n_pcs=20):
+    def __init__(self, pca_df, n_pcs=60):
         self.pca_df = pca_df.set_index("CellId").sort_index()
         self.n_pcs = n_pcs
 
@@ -41,12 +41,12 @@ class PCALatentCorrelation(Callback):
 
             corr.to_csv(dir_path / "correlations_pc_embeddings.csv")
 
-        f, ax = plt.subplots(1, 1, figsize=(10, 30))
-        cbar_ax = f.add_axes([1, 0.1, 0.05, 0.8])
+        f, ax = plt.subplots(1, 1, figsize=(10, 10))
+        cbar_ax = f.add_axes([1, 0.35, 0.04, 0.3])
         sns.set_context("talk")
         g = sns.heatmap(corr.T, cmap="vlag", square=True, ax=ax, cbar_ax=cbar_ax,
                         xticklabels=True, yticklabels=True)
-        ax.set_xticklabels(ax.get_xmajorticklabels(), fontsize = 16)
-        ax.set_yticklabels(ax.get_ymajorticklabels(), fontsize = 16)
+        ax.set_xticklabels(ax.get_xmajorticklabels(), fontsize = 13)
+        ax.set_yticklabels(ax.get_ymajorticklabels(), fontsize = 13)
         plt.tight_layout()
         f.savefig(dir_path / "correlation_embeddings_PC.png")
