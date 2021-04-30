@@ -4,17 +4,31 @@ import torch.nn as nn
 
 
 class KLDLoss(nn.Module):
-    # computes kl loss against a reference isotropic gaussian distribution
-    def __init__(self, reduction):
+    def __init__(self, reduction=None, mode="isotropic"):
         super(KLDLoss, self).__init__()
         self.reduction = reduction
+        self.mode = mode
 
-    def forward(self, mu, logvar):
+        if mode not in ["isotropic", "diagonal"]:
+            raise NotImplementedError(f"KLD mode '{mode}' not implemented")
 
-        kld = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+    def forward(self, mu, logvar, prior_mu=None, prior_logvar=None):
 
-        if self.reduction == "sum":
+        if self.mode == "isotropic":
+            kld = -0.5 * (1 + logvar - mu.pow(2) - logvar.exp())
+        elif self.mode == "anisotropic":
+            mu_diff = prior_mu - mu
+
+            trace = (logvar / prior_logvar).sum(axis=1)
+            mahalanobis = (mu_diff ** 2) / prior_logvar
+            log_det_ratio = prior_logvar.sum() - logvar.sum(axis=1)
+
+            kld = trace + mahalanobis - mu.shape[1] + log_det_ratio
+
+        if self.reduction is None:
             pass
+        elif self.reduction == "sum":
+            kld = kld.sum()
         elif self.reduction == "batch":  # sum then divide over batch size
             kld = kld / mu.shape[0]
         elif self.reduction == "mean":  # divide over all elements
@@ -116,7 +130,9 @@ class ClassMSELoss(nn.Module):
     def forward(self, input, target):
 
         if input.shape[1] > 1:
-            target_onehot = serotiny.utils.model_utils.index_to_onehot(target, input.shape[1]).float()
+            target_onehot = serotiny.utils.model_utils.index_to_onehot(
+                target, input.shape[1]
+            ).float()
         else:
             target_onehot = target.float()
 
@@ -158,7 +174,9 @@ class ClassMSELossV2(nn.Module):
     def forward(self, input, target):
 
         if input.shape[1] > 1:
-            target_onehot = serotiny.utils.model_utils.index_to_onehot(target, input.shape[1]).float()
+            target_onehot = serotiny.utils.model_utils.index_to_onehot(
+                target, input.shape[1]
+            ).float()
         else:
             target_onehot = target.float()
 

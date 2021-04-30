@@ -7,6 +7,7 @@ import pandas as pd
 import matplotlib
 from serotiny.utils.model_utils import get_closest_cells
 from serotiny.utils.viz_utils import decode_latent_walk_closest_cells
+from serotiny.utils.model_utils import get_ranked_dims
 
 matplotlib.rc("xtick", labelsize=3)
 matplotlib.rc("ytick", labelsize=3)
@@ -58,36 +59,27 @@ class GetClosestCellsToDims(Callback):
         self.dna_spharm_cols = spharm_coeffs_cols
         self.cutoff_kld_per_dim = cutoff_kld_per_dim
         if self.cutoff_kld_per_dim is None:
-            self.cutoff_kld_per_dim = 0.5
+            self.cutoff_kld_per_dim = 0
 
     def on_test_epoch_end(self, trainer: Trainer, pl_module: LightningModule):
 
         with torch.no_grad():
             dir_path = Path(trainer.logger[1].save_dir)
 
-            stats = pd.read_csv(dir_path / "stats_per_dim_test.csv")
+            subdir = dir_path / "closest_cells"
+            subdir.mkdir(parents=True, exist_ok=True)
 
-            stats = (
-                stats.loc[stats["test_kld_per_dim"] > self.cutoff_kld_per_dim]
-                .sort_values(by=["test_kld_per_dim"])
-                .reset_index(drop=True)
+            ranked_z_dim_list, mu_std_list, _ = get_ranked_dims(
+                dir_path, self.cutoff_kld_per_dim, max_num_shapemodes=8
             )
 
-            ranked_z_dim_list = [i for i in stats["dimension"][::-1]]
-            mu_std_list = [i for i in stats["mu_std_per_dim"][::-1]]
-
-            num_shapemodes = 8
-            if len(ranked_z_dim_list) > num_shapemodes:
-                ranked_z_dim_list = ranked_z_dim_list[:num_shapemodes]
-                mu_std_list = mu_std_list[:num_shapemodes]
-
-            all_embeddings = pd.read_csv(dir_path / "embeddings_all.csv")
+            all_embeddings = pd.read_csv(dir_path / "embeddings/embeddings_all.csv")
 
             result = get_closest_cells(
                 ranked_z_dim_list,
                 mu_std_list,
                 all_embeddings,
-                dir_path,
+                subdir,
                 self.path_in_stdv,
                 self.metric,
                 self.id_col,
@@ -101,7 +93,7 @@ class GetClosestCellsToDims(Callback):
                 all_embeddings,
                 ranked_z_dim_list,
                 mu_std_list,
-                dir_path,
+                subdir,
                 self.path_in_stdv,
                 self.c_shape,
                 self.dna_spharm_cols,

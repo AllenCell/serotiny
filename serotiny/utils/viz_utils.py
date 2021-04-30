@@ -15,39 +15,172 @@ from pytorch_lightning import LightningModule, Trainer
 from .model_utils import to_device
 from .mesh_utils import get_mesh_from_series
 
+from sklearn.decomposition import PCA
+
 LOGGER = logging.getLogger(__name__)
 
 
-def make_embedding_pairplots(
-    input_df: pd.DataFrame,
-    all_embeddings: pd.DataFrame,
-    hues: list,
-    ranked_z_dim_list: list,
+def plot_bin_count_table(
+    bin_counts: pd.DataFrame,
     save_dir,
 ):
-    stats_mu = all_embeddings.loc[all_embeddings["split"] == "test"]
-    # hues = ['DNA_PC1', 'DNA_PC2']
-    for hue in hues:
-        ranked_cols = [f"mu_{j}" for j in ranked_z_dim_list[:8]]
-        stats_top = stats_mu[[i for i in ranked_cols]]
-        stats_top = stats_top.reset_index(drop=True)
 
-        ranked_cols.append("CellId")
-        stats_top_with_cellid = stats_mu[
-            [i for i in stats_mu.columns if i in ranked_cols]
-        ]
-        stats_top_with_cellid = stats_top_with_cellid.reset_index(drop=True)
+    # sns.set_context('talk')
+    fig, ax = plt.subplots()
 
-        stats_top_with_cellid_merged = input_df[[hue, "CellId"]].merge(
-            stats_top_with_cellid, on=["CellId"]
-        )
-        stats_top_with_cellid_merged = stats_top_with_cellid_merged.drop(
-            columns="CellId"
-        )
+    # hide axes
+    fig.patch.set_visible(False)
+    ax.axis("off")
+    ax.axis("tight")
+
+    table = ax.table(
+        cellText=bin_counts.values,
+        colLabels=bin_counts.columns,
+        rowLabels=bin_counts.index,
+        colWidths=[0.2] * bin_counts.shape[1],
+        loc="center",
+    )
+    table.auto_set_font_size(False)
+    table.set_fontsize(13)
+    table.scale(2, 2)
+
+    fig.savefig(save_dir / "bin_counts.png", bbox_inches="tight")
+
+
+def make_embedding_pairplots(
+    all_embeddings: pd.DataFrame,
+    fitted_pca: PCA,
+    pca_df: pd.DataFrame,
+    n_components: int,
+    ranked_z_dim_list: list,
+    model,
+    save_dir,
+    cond_size,
+):
+
+    pca_df = pca_df.loc[pca_df.CellId.isin(all_embeddings.CellId)]
+    pca_df = pca_df[[col for col in pca_df.columns if col != "CellId"]]
+
+    walk_mean = pca_df.values.mean(axis=0)
+    pca_std = pca_df.values.std(axis=0)
+
+    ranked_ixs = ranked_z_dim_list[:n_components]
+    ranked_cols = [f"mu_{j}" for j in ranked_z_dim_list[:n_components]]
+
+    mus = all_embeddings[[col for col in all_embeddings.columns
+                          if col not in ("CellId", "split")]]
+
+    mus_mean = mus.values.mean(axis=0)
+    mus_std = mus.values.std(axis=0)
+    mus = (mus - mus_mean)/mus_std
+    mus = mus[ranked_cols]
+
+    walk_points = [-2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2]
+    for pc in range(n_components):
+        walk_std = np.zeros_like(pca_std)
+        walk_std[pc] = pca_std[pc]
+
+        spharm_walk = fitted_pca.inverse_transform([walk_mean + (n * walk_std)
+                                                    for n in walk_points])
+
+        with torch.no_grad():
+            _, latent_walk, _, _, _, _, _, _ = model(
+                torch.tensor(spharm_walk).float(),
+                torch.zeros((len(spharm_walk), cond_size)),
+            )
+
+        sns.set_context("talk")
+                         #plot_kws=dict(s=5, alpha=0.2, color="grey"))
+
+        latent_walk = (latent_walk - mus_mean)/mus_std
+        g = sns.PairGrid(mus, corner=True, diag_sharey=True)
+        g.map_lower(sns.histplot, cmap="Reds", binrange=((-3, 3),(-3, 3)),
+                    bins=100, stat="density")
+        g.map_diag(sns.histplot, binrange=(-3, 3))
+
+        for row_ix, ax_row in enumerate(g.axes[1:]):
+            row_ix += 1
+            for col_ix in range(row_ix):
+                ax = g.axes[row_ix][col_ix]
+                ax.set_xlim(-3, 3)
+                ax.set_ylim(-3, 3)
+                x_ix = ranked_ixs[col_ix]
+                y_ix = ranked_ixs[row_ix]
+
+                ax.plot(latent_walk[:, x_ix], latent_walk[:, y_ix])
+                sc = ax.scatter(
+                    latent_walk[:, x_ix], latent_walk[:, y_ix], c=walk_points
+                )
+
+        cax = g.fig.add_axes([0.85, 0.85, 0.01, 0.1])
+        g.fig.colorbar(sc, cax=cax)
+        g.savefig(save_dir / f"pairplot_embeddings_PC_{pc + 1}.png")
+
+
+def make_pca_pairplots(
+    all_embeddings: pd.DataFrame,
+    fitted_pca: PCA,
+    pca_df: pd.DataFrame,
+    n_components: int,
+    ranked_z_dim_list: list,
+    model,
+    save_dir,
+    cond_size,
+):
+    pca_df = pca_df.loc[pca_df.CellId.isin(all_embeddings.CellId)]
+    pca_df = pca_df[[col for col in pca_df.columns if col != "CellId"]]
+
+    ranked_ixs = ranked_z_dim_list[:n_components]
+    walk_points = [-2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2]
+    mus = all_embeddings[[col for col in all_embeddings.columns
+                          if "mu_" in col]].values
+
+    walk_mu = mus.mean(axis=0)
+    mu_std = mus.std(axis=0)
+
+    pca_df = pca_df[[col for col in pca_df.columns if col != "CellId"]]
+    pca_mean = pca_df.values.mean(axis=0)
+    pca_std = pca_df.values.std(axis=0)
+    pca_df = (pca_df - pca_mean)/pca_std
+
+    for dim in ranked_ixs:
+        walk_std = np.zeros_like(mu_std)
+        walk_std[dim] = mu_std[dim]
+
+        latent_walk = torch.stack(
+            [torch.tensor(walk_mu + (walk_std * n))
+             for n in walk_points]
+        ).float()
+
+        with torch.no_grad():
+            spharm_walk = model.decoder(
+                latent_walk, torch.zeros((len(latent_walk), cond_size))
+            )
+
+        pca_walk = fitted_pca.transform(spharm_walk)
+        pca_walk = (pca_walk - pca_mean)/pca_std
 
         sns.set_context('talk')
-        g = sns.pairplot(stats_top_with_cellid_merged, hue=hue, corner=True)
-        g.savefig(save_dir / f"pairplot_test_embeddings_hue_{hue}.png")
+
+        g = sns.PairGrid(pca_df[range(n_components)], corner=True, diag_sharey=True)
+        g.map_lower(sns.histplot, cmap="Reds", binrange=((-3, 3),(-3, 3)),
+                    bins=100, stat="density")
+        g.map_diag(sns.histplot, binrange=(-3, 3))
+
+        for row_ix, ax_row in enumerate(g.axes[1:]):
+            row_ix += 1
+            for col_ix in range(row_ix):
+                ax = g.axes[row_ix][col_ix]
+                ax.set_xlim(-3, 3)
+                ax.set_ylim(-3, 3)
+                x_ix = col_ix
+                y_ix = row_ix
+                ax.plot(pca_walk[:, x_ix], pca_walk[:, y_ix])
+                sc = ax.scatter(pca_walk[:, x_ix], pca_walk[:, y_ix], c=walk_points)
+
+        cax = g.fig.add_axes([0.85, 0.85, 0.01, 0.1])
+        g.fig.colorbar(sc, cax=cax)
+        g.savefig(save_dir / f"pairplot_embeddings_latent_{dim}.png")
 
 
 def decode_latent_walk_closest_cells(
@@ -74,6 +207,7 @@ def decode_latent_walk_closest_cells(
             figsize=(15, 7),
         )
         subset_df = closest_cells_df.loc[closest_cells_df["ranked_dim"] == z_dim]
+        subset_df = subset_df.drop_duplicates()
         mu_std = mu_std_list[index]
 
         for loc_index, location in enumerate(subset_df["location"].unique()):
@@ -112,15 +246,25 @@ def decode_latent_walk_closest_cells(
             img, origin = cytoparam.voxelize_meshes([mesh])
 
             for proj in [0, 1, 2]:
+                plt.style.use("dark_background")
                 ax_array[proj, loc_index].set_title(
-                    f"{path_in_stdv[loc_index]} $\sigma$  \n ID {this_cell_id}"
+                    f"{path_in_stdv[loc_index]} $\sigma$  \n ID {this_cell_id}",
+                    fontsize=14,
                 )
                 ax_array[proj, loc_index].imshow(img.max(proj), cmap="gray")
 
-        [ax.axis("off") for ax in ax_array.flatten()]
+                ax_array[proj, loc_index].set_xlim([0, 140])
+                ax_array[proj, loc_index].set_ylim([0, 120])
+                for tick in ax_array[proj, loc_index].xaxis.get_major_ticks():
+                    tick.label.set_fontsize(5)
+                for tick in ax_array[proj, loc_index].yaxis.get_major_ticks():
+                    tick.label.set_fontsize(5)
+                plt.style.use("default")
+
+        # [ax.axis("off") for ax in ax_array.flatten()]
         # Save figure
         ax_array.flatten()[0].get_figure().savefig(
-            dir_path / f"dim_{z_dim}_rank_{index}_closest_real_cell.png"
+            dir_path / f"dim_{z_dim}_rank_{index + 1}_closest_real_cell.png"
         )
         # Close figure, otherwise clogs memory
         plt.close(fig)
@@ -277,10 +421,13 @@ def make_plot_encoding(
     fig, (ax1, ax, ax2, ax3) = plt.subplots(1, 4, figsize=(7 * 4, 5))
 
     # Also make a brokenaxes plot of Subplot 3
-    fig2 = plt.figure(figsize=(12, 10))
-    bax = brokenaxes(
-        xlims=((0, latent_dims - 50), (latent_dims - 4, latent_dims)), hspace=0.15
-    )
+    if latent_dims > 54:
+        fig2 = plt.figure(figsize=(12, 10))
+        bax = brokenaxes(
+            xlims=((0, latent_dims - 50), (latent_dims - 4, latent_dims)), hspace=0.15
+        )
+    else:
+        fig2, bax = plt.subplots(1, 1, figsize=(12, 10))
 
     if "total_train_losses" in stats_all.columns:
         sns.lineplot(ax=ax1, data=stats_all, x="epoch", y="total_train_losses")

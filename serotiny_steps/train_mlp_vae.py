@@ -1,19 +1,31 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os
 import logging
 from typing import Optional
 
 import fire
-import pytorch_lightning as pl
-import numpy as np
 import yaml
+
+import torch
+import torch.nn.functional as F
+import pytorch_lightning as pl
+import pandas as pd
+import numpy as np
 from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
-from pytorch_lightning.callbacks import ModelCheckpoint, GPUStatsMonitor, EarlyStopping
+from pytorch_lightning.callbacks import (
+    ModelCheckpoint,
+    GPUStatsMonitor,
+    EarlyStopping,
+    # ProgressBar,
+)
+from sklearn.decomposition import PCA
 
 from serotiny.networks.vae import CBVAEEncoderMLP, CBVAEDecoderMLP
 from serotiny.models import CBVAEMLPModel
-import os
+from serotiny.utils.metric_utils import get_singular_values
+
 
 import serotiny.datamodules as datamodules
 from serotiny.models.callbacks import (
@@ -23,6 +35,10 @@ from serotiny.models.callbacks import (
     GetClosestCellsToDims,
     GlobalProgressBar,
     EmbeddingScatterPlots,
+    MarginalKL,
+    EmpiricalKL,
+    PCAWalks,
+    PCALatentCorrelation,
 )
 
 log = logging.getLogger(__name__)
@@ -55,6 +71,9 @@ def train_mlp_vae(
     n_cells: int,  # No of closets cells to find per location
     align: str,  # DNA/MEM
     skew: str,  # yes/no
+    prior_mode: str,  # "isotropic', 'anisotropic'
+    learn_prior_logvar: bool,  # Default None
+    init_logvar_pca: bool,
     length: Optional[int] = None,  # For Gaussian
     corr: Optional[bool] = False,  # For Gaussian
     id_fields: Optional[list] = None,  # For Spharm
@@ -107,7 +126,10 @@ def train_mlp_vae(
             length=length,
             corr=corr,
         )
+
+        prior_logvar = None
     else:
+        log.info("Instantiating datamodule")
         dm = datamodules.__dict__[datamodule](
             batch_size=batch_size,
             num_workers=num_workers,
@@ -122,10 +144,28 @@ def train_mlp_vae(
             id_fields=id_fields,
             align=align,
             skew=skew,
+            dl_pin_memory=False,
         )
         dm.prepare_data()
         dm.setup()
 
+        log.info("Fitting PCA")
+        fitted_pca = PCA().fit(dm.dfg[dm.spharm_cols])
+        pca_df = pd.DataFrame(fitted_pca.transform(dm.dfg[dm.spharm_cols]))
+        pca_df["CellId"] = dm.dfg["CellId"]
+
+        if init_logvar_pca:
+            prior_logvar = fitted_pca.singular_values_[:latent_dims] ** 2
+            prior_logvar = prior_logvar / prior_logvar.sum()
+            prior_logvar = F.log_softmax(torch.tensor(prior_logvar))
+            log.info(f"Initializing prior_logvar to {prior_logvar.tolist()}")
+        else:
+            prior_logvar = None
+
+    if learn_prior_logvar:
+        log.info("Learning prior_logvar")
+
+    log.info("Instantiating encoder")
     encoder = CBVAEEncoderMLP(
         x_dim=x_dim,
         c_dim=c_dim,
@@ -133,6 +173,7 @@ def train_mlp_vae(
         latent_dims=latent_dims,
     )
 
+    log.info("Instantiating decoder")
     decoder = CBVAEDecoderMLP(
         x_dim=x_dim,
         c_dim=c_dim,
@@ -140,6 +181,7 @@ def train_mlp_vae(
         latent_dims=latent_dims,
     )
 
+    log.info("Instantiating VAE")
     vae = CBVAEMLPModel(
         encoder=encoder,
         decoder=decoder,
@@ -148,9 +190,11 @@ def train_mlp_vae(
         x_label=x_label,
         c_label=c_label,
         c_label_ind=c_label_ind,
+        prior_mode=prior_mode,
+        learn_prior_logvar=learn_prior_logvar,
+        prior_logvar=prior_logvar,
     )
 
-    print(output_path)
     tb_logger = TensorBoardLogger(save_dir=str(output_path))
 
     csv_logger = CSVLogger(
@@ -171,15 +215,28 @@ def train_mlp_vae(
     if datamodule == "GaussianDataModule":
         callbacks = [
             GPUStatsMonitor(),
-            GlobalProgressBar(),
+            # GlobalProgressBar(),
             MLPVAELogging(datamodule=dm_no_shuffle),
         ]
     elif datamodule == "VarianceSpharmCoeffs":
 
+        marginal_kl = MarginalKL(
+            n_samples=20,
+            x_label=dm.x_label,
+            c_label=dm.c_label,
+            embedding_dim=latent_dims,
+        )
+
+        empirical_kl = EmpiricalKL(
+            x_label=dm.x_label,
+            c_label=dm.c_label,
+            embedding_dim=latent_dims,
+        )
+
         mlp_vae_logging = MLPVAELogging(datamodule=dm, values=values)
 
         get_embeddings = GetEmbeddings(
-            resample_n=2, x_label=dm.x_label, c_label=dm.c_label, id_fields=dm.id_fields
+            x_label=dm.x_label, c_label=dm.c_label, id_fields=dm.id_fields
         )
 
         get_closest_cells_to_dims = GetClosestCellsToDims(
@@ -199,32 +256,50 @@ def train_mlp_vae(
             config=config,
             spharm_coeffs_cols=dm.spharm_cols,
             latent_walk_range=latent_walk_range,
-            ignore_mesh_and_contour_plots=True,
+            ignore_mesh_and_contour_plots=False,
         )
 
-        embedding_scatterplots = EmbeddingScatterPlots(input_df=dm.dfg, hues=hues)
+        pca_walks = PCAWalks(
+            df=dm.dfg,
+            config=config,
+        )
+
+        embedding_scatterplots = EmbeddingScatterPlots(
+            fitted_pca=fitted_pca,
+            n_components=len(hues),
+            c_dim=c_dim,
+            pca_df=pca_df,
+        )
+
+        # pca_latent_corr = PCALatentCorrelation(pca_df=pca_df)
         callbacks = [
-            GPUStatsMonitor(),
+            # GPUStatsMonitor(),
             GlobalProgressBar(),
             EarlyStopping("val_loss", patience=15),
+            marginal_kl,
+            empirical_kl,
             mlp_vae_logging,
             get_embeddings,
             embedding_scatterplots,
             get_closest_cells_to_dims,
             spharm_latent_walk,
+            pca_walks,
+            # pca_latent_corr,
         ]
 
     trainer = pl.Trainer(
         logger=[tb_logger, csv_logger],
-        accelerator="ddp",
-        replace_sampler_ddp=False,
-        gpus=1,
+        # accelerator="ddp",
+        # replace_sampler_ddp=False,
+        # gpus=1,
+        gpus=None,
         max_epochs=num_epochs,
         progress_bar_refresh_rate=5,
         checkpoint_callback=checkpoint_callback,
         callbacks=callbacks,
     )
 
+    log.info("Calling trainer.fit")
     trainer.fit(vae, dm)
 
     # test the model

@@ -7,6 +7,13 @@ from serotiny.utils.model_utils import index_to_onehot
 from serotiny.metrics.inception import InceptionV3
 from serotiny.metrics.calculate_fid import get_activations
 from serotiny.metrics.calculate_fid import calculate_fid
+from sklearn.decomposition import PCA
+
+
+def get_singular_values(df, cols, n_principal_components=None):
+    df = df[cols]
+    pca = PCA(n_principal_components).fit(df)
+    return pca.singular_values_
 
 
 def visualize_encoder_tabular(
@@ -128,6 +135,10 @@ def visualize_encoder_tabular(
             mask,
         )
 
+        elbo_loss_total = elbo_loss_total / X_test.shape[0]
+        rcl_per_lt_temp_total = rcl_per_lt_temp_total / X_test.shape[0]
+        kl_per_lt_temp_total = kl_per_lt_temp_total / X_test.shape[0]
+
         # Save info to dataframe
         # if conds = [0,1,2] for a 2D Gaussian (X_test.size()[-1]),
         # then num_conds = 0, so
@@ -149,6 +160,10 @@ def visualize_encoder_tabular(
             )
 
             # Save all_kl and all_lt, useful for sorting later
+            rcl_per_lt_temp = rcl_per_lt_temp / X_test.shape[0]
+            kl_per_lt_temp = kl_per_lt_temp / X_test.shape[0]
+            elbo_loss = elbo_loss / X_test.shape[0]
+
             all_kl = np.append(all_kl, kl_per_lt_temp.item())
             all_lt.append(ii)
             kl_per_lt["condition"].append(str(conds))

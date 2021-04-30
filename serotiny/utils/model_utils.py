@@ -13,6 +13,11 @@ import pandas as pd
 import seaborn as sns
 from pytorch_lightning import LightningModule
 from cvapipe_analysis.steps.pca_path_cells.utils import scan_pc_for_cells
+from tqdm import trange
+from tqdm import tqdm
+import math
+import random
+from scipy.stats import multivariate_normal
 
 
 def to_device(
@@ -26,26 +31,28 @@ def to_device(
     return batch_x, batch_y
 
 
-def compute_embeddings(pl_module: LightningModule, input_x, cond_c, resample_n):
+def get_ranked_dims(
+    dir_path,
+    cutoff_kld_per_dim,
+    max_num_shapemodes,
+):
+    stats = pd.read_csv(dir_path / "stats_per_dim_test.csv")
 
-    # Make empty list
-    my_recon_list, my_z_means_list, my_log_var_list = [], [], []
-    input_x, cond_c = to_device(input_x, cond_c, pl_module.device)
-    # Run resample_n times for resampling
-    for resample in range(resample_n):
-        recon_batch, z_means, log_var, _, _, _, _, _ = pl_module(
-            input_x.clone().float(), cond_c.clone().float()
-        )
-        my_recon_list.append(recon_batch)
-        my_z_means_list.append(z_means)
-        my_log_var_list.append(log_var)
+    stats = (
+        stats.loc[stats["test_kld_per_dim"] > cutoff_kld_per_dim]
+        .sort_values(by=["test_kld_per_dim"])
+        .reset_index(drop=True)
+    )
 
-    # Average over the N resamples
-    recon_batch = torch.mean(torch.stack(my_recon_list), dim=0)
-    z_means = torch.mean(torch.stack(my_z_means_list), dim=0)
-    log_var = torch.mean(torch.stack(my_log_var_list), dim=0)
+    ranked_z_dim_list = [i for i in stats["dimension"][::-1]]
+    mu_std_list = [i for i in stats["mu_std_per_dim"][::-1]]
+    mu_mean_list = [i for i in stats["mu_mean_per_dim"][::-1]]
 
-    return recon_batch, z_means, log_var
+    if len(ranked_z_dim_list) > max_num_shapemodes:
+        ranked_z_dim_list = ranked_z_dim_list[:max_num_shapemodes]
+        mu_std_list = mu_std_list[:max_num_shapemodes]
+
+    return ranked_z_dim_list, mu_std_list, mu_mean_list
 
 
 def get_all_embeddings(
@@ -53,58 +60,39 @@ def get_all_embeddings(
     val_dataloader,
     test_dataloader,
     pl_module: LightningModule,
-    resample_n: int,
     x_label: str,
     c_label: str,
     id_fields: list,
 ):
 
-    all_z_means = []
+    all_embeddings = []
     cell_ids = []
     split = []
-    for step, x in enumerate(train_dataloader):
-        input_x = x[x_label]
-        cond_c = x[c_label]
-        cell_id = x["id"][id_fields[0]]
 
-        recon_batch, z_means, log_var = compute_embeddings(
-            pl_module, input_x, cond_c, resample_n
-        )
-        all_z_means.append(z_means)
-        cell_ids.append(cell_id)
-        split.append(["train"] * z_means.shape[0])
+    zip_iter = zip(
+        ["train", "val", "test"], [train_dataloader, val_dataloader, test_dataloader]
+    )
 
-    for step, x in enumerate(val_dataloader):
-        input_x = x[x_label]
-        cond_c = x[c_label]
-        cell_id = x["id"][id_fields[0]]
+    with torch.no_grad():
+        for split_name, dataloader in zip_iter:
+            for batch in dataloader:
+                input_x = batch[x_label]
+                cond_c = batch[c_label]
+                cell_id = batch["id"][id_fields[0]]
 
-        recon_batch, z_means, log_var = compute_embeddings(
-            pl_module, input_x, cond_c, resample_n
-        )
-        all_z_means.append(z_means)
-        cell_ids.append(cell_id)
-        split.append(["val"] * z_means.shape[0])
+                _, mus, _, _, _, _, _, _ = pl_module(input_x.float(), cond_c.float())
+                all_embeddings.append(mus)
 
-    for step, x in enumerate(test_dataloader):
-        input_x = x[x_label]
-        cond_c = x[c_label]
-        cell_id = x["id"][id_fields[0]]
+                cell_ids.append(cell_id)
+                split.append([split_name] * mus.shape[0])
 
-        recon_batch, z_means, log_var = compute_embeddings(
-            pl_module, input_x, cond_c, resample_n
-        )
-        all_z_means.append(z_means)
-        cell_ids.append(cell_id)
-        split.append(["test"] * z_means.shape[0])
-
-    all_z_means = torch.cat(all_z_means, dim=0)
+    all_embeddings = torch.cat(all_embeddings, dim=0)
     cell_ids = torch.cat(cell_ids, dim=0)
     split = [item for sublist in split for item in sublist]
-    all_z_means = all_z_means.detach().cpu().numpy()
+    all_embeddings = all_embeddings.cpu().numpy()
 
     df1 = pd.DataFrame(
-        all_z_means, columns=[f"mu_{i}" for i in range(all_z_means.shape[1])]
+        all_embeddings, columns=[f"mu_{i}" for i in range(all_embeddings.shape[1])]
     )
     df2 = pd.DataFrame(cell_ids, columns=["CellId"])
     df3 = pd.DataFrame(split, columns=["split"])
@@ -112,6 +100,80 @@ def get_all_embeddings(
     result = pd.concat(frames, axis=1)
 
     return result
+
+
+def find_outliers(
+    ranked_z_dim_list: list,
+    test_embeddings: pd.DataFrame,
+    bins: list,
+):
+    for dim in ranked_z_dim_list:
+        mu_array = np.array(test_embeddings[[f"mu_{dim}"]]).astype(np.float32)
+        mu_array -= mu_array.mean()
+        mu_array /= mu_array.std()
+
+        binw = 0.5 * np.diff(bins).mean()
+        bin_edges = np.unique([(b - binw, b + binw) for b in bins])
+
+        inds = np.digitize(mu_array, bin_edges)
+        # Find outliers per dim and add to embeddings
+        left_outliers = np.where(inds.flatten() == 0)
+        right_outliers = np.where(inds.flatten() == len(bin_edges))
+        outlier_col = np.zeros(test_embeddings.shape[0], dtype="object")
+
+        if left_outliers[0].size > 0:
+            outlier_col[left_outliers[0]] = "Left Outlier"
+            inds[left_outliers[0]] = 0  # Map left outlier to bin 1
+        if right_outliers[0].size > 0:
+            outlier_col[right_outliers[0]] = "Right Outlier"
+            inds[right_outliers[0]] = (
+                len(bin_edges) - 1
+            )  # Map right outlier to last bin
+
+        outlier_col[np.where(outlier_col == 0)] = False
+        test_embeddings[f"outliers_mu_{dim}"] = outlier_col
+
+    return test_embeddings
+
+
+def get_bins_for_each_cell(
+    ranked_z_dim_list: list,
+    test_embeddings: pd.DataFrame,
+    bins: list,
+):
+
+    for dim in ranked_z_dim_list:
+        mu_array = np.array(test_embeddings[[f"mu_{dim}"]]).astype(np.float32)
+        mu_array -= mu_array.mean()
+        mu_array /= mu_array.std()
+
+        binw = 0.5 * np.diff(bins).mean()
+        bin_edges = np.unique([(b - binw, b + binw) for b in bins])
+        bin_edges[0] = -np.inf
+        bin_edges[-1] = np.inf
+
+        inds = np.digitize(mu_array, bin_edges)
+
+        # Add bins per dim to embeddings
+        bin_values = []
+        for i in inds:
+            bin_values.append((bin_edges[i - 1].item(), bin_edges[i].item()))
+        test_embeddings[f"bins_mu_{dim}"] = bin_values
+
+    bin_embeddings = test_embeddings[[i for i in test_embeddings.columns if "bin" in i]]
+
+    ranked_z_dim_bin_counts = []
+    for dim in ranked_z_dim_list:
+        bin_counts = bin_embeddings.pivot_table(
+            index=[f"bins_mu_{dim}"], aggfunc="size"
+        )
+        bin_counts = bin_counts.to_frame(f"bin_count_mu_{dim}")
+
+        ranked_z_dim_bin_counts.append(bin_counts)
+
+    all_dim_bin_counts = pd.concat(ranked_z_dim_bin_counts, axis=1)
+
+    return test_embeddings, all_dim_bin_counts
 
 
 def get_closest_cells(
@@ -134,8 +196,6 @@ def get_closest_cells(
     dims = []
     for index, dim in enumerate(ranked_z_dim_list):
         mu_std = mu_std_list[index]
-        print(ranked_z_dim_list)
-        print(mu_std)
         df_cells = scan_pc_for_cells(
             all_embeddings,
             pc=index + 1,  # This function assumes first index is 1
@@ -145,20 +205,21 @@ def get_closest_cells(
             id_col=id_col,
             N_cells=N_cells,
         )
-        print(df_cells)
         dims.append([dim] * df_cells.shape[0])
         df_list.append(df_cells)
+
     tmp = pd.concat(df_list)
     tmp = tmp.reset_index(drop=True)
     dims = [item for sublist in dims for item in sublist]
     df2 = pd.DataFrame(dims, columns=["ranked_dim"])
     result = pd.concat([tmp, df2], axis=1)
 
+    # import ipdb
+    # ipdb.set_trace()
+
     path = dir_path / "closest_real_cells_to_top_dims.csv"
 
     if path.exists():
-        result.to_csv(path, mode="a", header=False, index=False)
-    else:
         result.to_csv(path, header="column_names", index=False)
 
     return result
@@ -345,12 +406,18 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
         torch.empty([0]),
     )
 
+    all_rcl, all_kld, all_mu = (
+        torch.empty([0]),
+        torch.empty([0]),
+        torch.empty([0]),
+    )
+
     batch_length = 0
     num_data_points = 0
     loss, rcl_loss, kld_loss = 0, 0, 0
 
-    total_x = torch.stack([x["input"] for x in outputs])
-    num_batches = len(total_x)
+    total_x = torch.cat([x["input"] for x in outputs])
+    # num_batches = len(total_x)
 
     rcl_per_condition_loss, kld_per_condition_loss = (
         torch.zeros(total_x.size()[-1] + 1),
@@ -387,6 +454,24 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
                     torch.sum(mu_per_elem[this_cond_positions], dim=0).view(1, -1),
                 ],
                 0,
+            )
+
+            all_rcl = torch.cat(
+                [
+                    all_rcl.type_as(rcl_per_element),
+                    rcl_per_element[this_cond_positions],
+                ],
+                0,
+            )
+            all_kld = torch.cat(
+                [
+                    all_kld.type_as(kld_per_element),
+                    kld_per_element[this_cond_positions],
+                ],
+                0,
+            )
+            all_mu = torch.cat(
+                [all_mu.type_as(mu_per_elem), mu_per_elem[this_cond_positions]], 0
             )
 
             this_batch_size = rcl_per_element.shape[0]
@@ -440,21 +525,37 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
 
         # Save test KLD and variance of mu per dimension, condition
         # This is averaged across batch
+
         dataframe2 = {
             "dimension": [],
             "test_kld_per_dim": [],
             "condition": [],
             "mu_std_per_dim": [],
+            "mu_mean_per_dim": [],
             "explained_variance": [],
         }
 
         for j in range(len(torch.unique(output["cond_labels"]))):
 
-            this_cond_kld = batch_kld[j :: len(torch.unique(output["cond_labels"])), :]
-            this_cond_mu = batch_mu[j :: len(torch.unique(output["cond_labels"])), :]
+            # this_cond_per_batch_kld = batch_kld[
+            #     j :: len(torch.unique(output["cond_labels"])), :
+            # ]
+            # this_cond_per_batch_mu = batch_mu[
+            #     j :: len(torch.unique(output["cond_labels"])), :
+            # ]
 
-            summed_kld = torch.sum(this_cond_kld, dim=0) / batch_length
-            dim_var = torch.std(this_cond_mu, dim=0)
+            this_cond_per_element_kld = all_kld[
+                j :: len(torch.unique(output["cond_labels"])), :
+            ]
+            this_cond_per_element_mu = all_mu[
+                j :: len(torch.unique(output["cond_labels"])), :
+            ]
+
+            # summed_kld = torch.sum(this_cond_per_batch_kld, dim=0) / batch_length
+            # dim_var = torch.std(this_cond_per_batch_mu, dim=0)
+            summed_kld = torch.sum(this_cond_per_element_kld, dim=0) / num_data_points
+            dim_std = torch.std(this_cond_per_element_mu, dim=0)
+            dim_mean = torch.mean(this_cond_per_element_mu, dim=0)
 
             summed_summed_kld = torch.sum(summed_kld)
 
@@ -464,7 +565,8 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
                     torch.unique(output["cond_labels"])[j].item()
                 )
                 dataframe2["test_kld_per_dim"].append(summed_kld[k].item())
-                dataframe2["mu_std_per_dim"].append(dim_var[k].item())
+                dataframe2["mu_std_per_dim"].append(dim_std[k].item())
+                dataframe2["mu_mean_per_dim"].append(dim_mean[k].item())
                 dataframe2["explained_variance"].append(
                     (summed_kld[k].item() / summed_summed_kld.item()) * 100
                 )
@@ -479,7 +581,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
 
         # Get ranked Z dim list
         stats_per_dim_ranked = (
-            stats_per_dim.loc[stats_per_dim["test_kld_per_dim"] > 0.5]
+            stats_per_dim.loc[stats_per_dim["test_kld_per_dim"] > 0.05]
             .sort_values(by=["test_kld_per_dim"])
             .reset_index(drop=True)
         )
@@ -497,16 +599,21 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
 
         for j in range(len(torch.unique(output["cond_labels"]))):
 
-            this_cond_mu = batch_mu[j :: len(torch.unique(output["cond_labels"])), :]
+            # this_cond_mu = batch_mu[j :: len(torch.unique(output["cond_labels"])), :]
+            this_cond_per_element_mu = all_mu[
+                j :: len(torch.unique(output["cond_labels"])), :
+            ]
 
-            for element in range(this_cond_mu.shape[0]):
-                for dimension in range(this_cond_mu.shape[1]):
+            for element in range(this_cond_per_element_mu.shape[0]):
+                for dimension in range(this_cond_per_element_mu.shape[1]):
                     dataframe3["dimension"].append(dimension)
                     dataframe3["element"].append(element)
                     dataframe3["condition"].append(
                         torch.unique(output["cond_labels"])[j].item()
                     )
-                    dataframe3["mu"].append(this_cond_mu[element, dimension].item())
+                    dataframe3["mu"].append(
+                        this_cond_per_element_mu[element, dimension].item()
+                    )
 
         mu_per_elem_and_dim = pd.DataFrame(dataframe3)
 
@@ -524,6 +631,7 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
         mu_corrs = table[ranked_z_dim_list[:20]].corr()
 
         plt.figure(figsize=(8, 8))
+        sns.set_context("talk")
         sns.heatmap(
             mu_corrs.abs(),
             cmap="Blues",
@@ -588,3 +696,93 @@ def find_lr_scheduler(scheduler_name):
             f"options are {available_schedulers}"
         )
     return scheduler_class
+
+
+def q_batch(z, mus, logvars):
+    """
+    Compute a batch contribution to marginal q, where marginal q is
+
+    q(z) = 1/N sum(q(z | x_n)).
+
+    This function computes *unnormalized* contributions to that sum
+
+    """
+    numerator = (z - mus) ** 2 / (logvars.exp())
+    numerator = -0.5 * numerator.sum(axis=1)
+    numerator = torch.exp(numerator)
+
+    # equivalent to product of all sigma-squares
+    denominator = torch.sum(logvars, axis=1).exp()
+    denominator *= math.pow(2 * math.pi, mus.shape[1])
+    denominator = torch.sqrt(denominator)
+
+    return (numerator / denominator).sum()
+
+
+def marginal_kl(
+    model,
+    dataloader,
+    prior_mean,
+    prior_logvar,
+    n_samples,
+    x_label,
+    c_label,
+    verbose=True,
+):
+
+    prior = multivariate_normal(mean=prior_mean, cov=np.exp(prior_logvar))
+
+    dataset_size = len(dataloader.dataset)
+
+    with torch.no_grad():
+        total_marginal_kl = 0
+        if verbose:
+            sample_iter = trange(n_samples, desc="all samples")
+        else:
+            sample_iter = range(n_samples)
+
+        for i in sample_iter:
+            sample_ix = random.randint(0, dataset_size)
+
+            # import ipdb
+
+            # ipdb.set_trace()
+            sample = dataloader.dataset.datasets[sample_ix]
+
+            this_x, this_c = to_device(
+                sample[x_label].float().unsqueeze(0),
+                sample[c_label].float().unsqueeze(0),
+                model.device,
+            )
+
+            _, z_s, _, _, _, _, _, _ = model.forward(
+                this_x,
+                this_c,
+            )
+
+            total_q = 0
+            log_p_z_s = prior.logpdf(z_s.cpu().numpy())
+
+            if verbose:
+                batch_iter = tqdm(
+                    iter(dataloader),
+                    total=len(dataloader),
+                    leave=False,
+                    desc=f"sample {i}",
+                )
+            else:
+                batch_iter = dataloader
+
+            for batch in batch_iter:
+                this_x, this_c = to_device(
+                    batch[x_label].float(),
+                    batch[c_label].float(),
+                    model.device,
+                )
+                _, mu, logvar, _, _, _, _, _ = model.forward(this_x, this_c)
+
+                total_q += q_batch(z_s.double(), mu.double(), logvar.double())
+
+            total_marginal_kl += torch.log(total_q / dataset_size) - log_p_z_s
+
+        return total_marginal_kl / n_samples

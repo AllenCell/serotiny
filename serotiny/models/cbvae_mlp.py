@@ -5,6 +5,7 @@ implemented as a Pytorch Lightning module
 # import inspect
 
 import torch
+import torch.nn as nn
 import pytorch_lightning as pl
 
 # from pytorch_lightning.utilities.parsing import get_init_args
@@ -31,6 +32,9 @@ class CBVAEMLPModel(pl.LightningModule):
         c_label="structure",
         c_label_ind: Optional[str] = None,
         mask: Optional[bool] = True,
+        prior_mode="isotropic",
+        prior_logvar=None,
+        learn_prior_logvar=False,
     ):
         super().__init__()
 
@@ -53,6 +57,25 @@ class CBVAEMLPModel(pl.LightningModule):
         self.c_label_ind = c_label_ind
         self.c_label = c_label
 
+        self.prior_mode = prior_mode
+        self.embedding_dim = self.encoder.enc_layers[-1]
+        self.prior_mean = None
+        self.prior_logvar = prior_logvar
+
+        if prior_mode not in ["isotropic", "anisotropic"]:
+            raise NotImplementedError(f"KLD mode '{prior_mode}' not implemented")
+
+        if prior_mode == "anisotropic":
+            self.prior_mean = torch.zeros(self.embedding_dim)
+            if prior_logvar is None:
+                self.prior_logvar = torch.zeros(self.embedding_dim)
+            else:
+                self.prior_logvar = torch.tensor(prior_logvar)
+            # if learn_prior_logvar:
+            self.prior_logvar = nn.Parameter(
+                self.prior_logvar, requires_grad=learn_prior_logvar
+            )
+
     def parse_batch(self, batch):
         x = batch[self.hparams.x_label].float()
         x_cond = batch[self.hparams.c_label]
@@ -71,7 +94,6 @@ class CBVAEMLPModel(pl.LightningModule):
         #####################
 
         batch_size = x.shape[0]
-
         mu, logsigma, z = self.encoder(x, x_cond)
         if z_inference is not None:
             x_hat = self.decoder(z_inference, x_cond)
@@ -79,7 +101,15 @@ class CBVAEMLPModel(pl.LightningModule):
             x_hat = self.decoder(z, x_cond)
 
         loss, recon_loss, kld_loss, rcl_per_element, kld_per_element = calculate_elbo(
-            x, x_hat, mu, logsigma, self.beta, mask=self.mask
+            x,
+            x_hat,
+            mu,
+            logsigma,
+            self.beta,
+            mask=self.mask,
+            mode=self.prior_mode,
+            prior_mu=(None if self.prior_mean is None else self.prior_mean.type_as(mu)),
+            prior_logvar=self.prior_logvar,
         )
 
         return (

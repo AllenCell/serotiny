@@ -13,11 +13,15 @@ from .model_utils import to_device
 import pandas as pd
 import numpy as np
 
+# Configure z for inference
+import matplotlib
+
 
 def get_meshes(
     pl_module: LightningModule,
     ranked_z_dim_list: list,
     mu_variance_list: list,
+    mu_mean_list: list,
     batch_size: int,
     latent_dims: int,
     c_shape: int,
@@ -26,6 +30,19 @@ def get_meshes(
     config: dict,
     dna_spharm_cols,
 ):
+
+    matplotlib.rc("xtick", labelsize=3)
+    matplotlib.rc("ytick", labelsize=3)
+    matplotlib.rcParams["xtick.major.size"] = 0.1
+    matplotlib.rcParams["xtick.major.width"] = 0.1
+    matplotlib.rcParams["xtick.minor.size"] = 0.1
+    matplotlib.rcParams["xtick.minor.width"] = 0.1
+
+    matplotlib.rcParams["ytick.major.size"] = 0.1
+    matplotlib.rcParams["ytick.major.width"] = 0.1
+    matplotlib.rcParams["ytick.minor.size"] = 0.1
+    matplotlib.rcParams["ytick.minor.width"] = 0.1
+
     save_dir = config["project"]["local_staging"] / subfolder
     meshes = {}
     for rank, z_dim in enumerate(ranked_z_dim_list):
@@ -34,13 +51,15 @@ def get_meshes(
             3,
             len(latent_walk_range),
             squeeze=False,
-            figsize=(15, 7),
+            figsize=(15, 5),
         )
         meshes[rank] = {}
-        for alias in config["pca"]["aliases"]:
+        for alias in config["shapespace"]["aliases"]:
             meshes[rank][alias] = []
             for value_index, value in enumerate(latent_walk_range):
-                z_inf = torch.zeros(batch_size, latent_dims)
+                z_inf = torch.zeros(batch_size, latent_dims) + torch.tensor(
+                    mu_mean_list
+                )
                 z_inf[:, z_dim] = value * mu_variance_list[rank]
                 z_inf = z_inf.cuda(device=0)
                 z_inf = z_inf.float()
@@ -59,15 +78,26 @@ def get_meshes(
 
                 mesh = get_mesh_from_series(test_spharm_series, "dna", 32)
                 img, origin = cytoparam.voxelize_meshes([mesh])
+                print(origin)
                 meshes[rank][alias].append(mesh)
                 for proj in [0, 1, 2]:
-                    ax_array[proj, value_index].set_title(f"{value}" r"$\sigma$")
+                    plt.style.use("dark_background")
                     ax_array[proj, value_index].imshow(img.max(proj), cmap="gray")
+                    ax_array[proj, value_index].set_title(
+                        f"{value}" r"$\sigma$", fontsize=14
+                    )
+                    ax_array[proj, value_index].set_xlim([0, 140])
+                    ax_array[proj, value_index].set_ylim([0, 120])
+                    for tick in ax_array[proj, value_index].xaxis.get_major_ticks():
+                        tick.label.set_fontsize(5)
+                    for tick in ax_array[proj, value_index].yaxis.get_major_ticks():
+                        tick.label.set_fontsize(5)
+                    plt.style.use("default")
                 print(f"Done making mesh for dim {z_dim}")
-        [ax.axis("off") for ax in ax_array.flatten()]
+        # [ax.axis("off") for ax in ax_array.flatten()]
         # Save figure
         ax_array.flatten()[0].get_figure().savefig(
-            save_dir / f"dim_{z_dim}_rank_{rank}.png"
+            save_dir / f"dim_{z_dim}_rank_{rank + 1}.png"
         )
         # Close figure, otherwise clogs memory
         plt.close(fig)
@@ -157,8 +187,8 @@ def find_plane_mesh_intersection(mesh, proj):
 
 
 def animate_contours(contours, prefix, config, save_dir, subfolder):
-    nbins = len(config["pca"]["map_points"])
-    hmin, hmax, vmin, vmax = config["pca"]["plot"]["limits"]
+    nbins = len(config["shapespace"]["map_points"])
+    hmin, hmax, vmin, vmax = config["shapespace"]["plot"]["limits"]
     offset = 0.05 * (hmax - hmin)
 
     fig, ax = plt.subplots(1, 1, figsize=(3, 3))
