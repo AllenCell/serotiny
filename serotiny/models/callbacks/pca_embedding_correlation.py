@@ -41,12 +41,12 @@ class PCALatentCorrelation(Callback):
 
             corr.to_csv(dir_path / "correlations_pc_embeddings.csv")
 
-        f, ax = plt.subplots(1, 1, figsize=(10, 10))
-        cbar_ax = f.add_axes([1, 0.35, 0.04, 0.3])
+        f, (ax, cbar_ax) = plt.subplots(1, 2, figsize=(10, 10),
+                                        gridspec_kw=dict(width_ratios=(0.9, 0.05)))
         sns.set_context("talk")
         g = sns.heatmap(corr.T, cmap="vlag", square=True, ax=ax, cbar_ax=cbar_ax,
-                        xticklabels=True, yticklabels=True)
+                        xticklabels=True, yticklabels=True, cbar_kws=dict(shrink=0.05),
+                        vmin=-1, vmax=1)
         ax.set_xticklabels(ax.get_xmajorticklabels(), fontsize = 13)
         ax.set_yticklabels(ax.get_ymajorticklabels(), fontsize = 13)
-        plt.tight_layout()
         f.savefig(dir_path / "correlation_embeddings_PC.png")
