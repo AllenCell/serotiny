@@ -96,8 +96,6 @@ class SpharmLatentWalk(Callback):
                 "local_staging"
             ] = dir_path  # This is where plots get saved
 
-            print(self.config["shapespace"])
-
             subdir = dir_path / self.subfolder
             subdir.mkdir(parents=True, exist_ok=True)
 
@@ -107,6 +105,8 @@ class SpharmLatentWalk(Callback):
             ranked_z_dim_list, mu_std_list, mu_mean_list = get_ranked_dims(
                 dir_path, self.cutoff_kld_per_dim, max_num_shapemodes=8
             )
+
+            self.config['shapespace']['number_of_shape_modes'] = len(ranked_z_dim_list)
 
             batch_size = trainer.test_dataloaders[0].batch_size
             latent_dims = pl_module.encoder.enc_layers[-1]
