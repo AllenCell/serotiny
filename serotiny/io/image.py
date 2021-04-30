@@ -5,8 +5,7 @@ import torch
 
 import aicsimageio
 import aicsimageio.transforms as transforms
-from aicsimageio.writers import OmeTiffWriter
-
+from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
 import aicsimageprocessing
 
 ALL_CHANNELS = ["C", "Y", "X", "S", "T", "Z"]
@@ -102,6 +101,70 @@ def infer_dims(img):
     return "CZYX"
 
 
+def tiff_loader_CZYX(
+    path_str,
+    select_channels=None,
+    output_dtype=np.float32,
+    channel_masks=None,
+    mask_thresh=0,
+    transform=None,
+):
+    """
+    Load TIFF image from path given by `path_str`.
+    ---
+    Parameters:
+      path_str: str -> path of the image to load
+      select_channels: list -> channels to be retrieved from the image
+      output_dtype: numpy dtype TODO: explain
+      channel_masks: TODO: explain
+      mask_thresh: float -> TODO: explain this
+      transform: callable (optional) -> transform to apply before returning
+    Returns:
+      torch.Tensor
+    """
+    aicsimg = aicsimageio.AICSImage(path_str)
+    channel_names = aicsimg.get_channel_names()
+    data = aicsimg.get_image_data("CZYX", S=0, T=0)
+
+    mask_keys = channel_masks.keys() if channel_masks else {}
+    
+    if select_channels is None:
+        select_channels = channel_names
+
+    if (not set(select_channels).issubset(channel_names)) or (
+        not set(mask_keys).issubset(channel_names)
+    ):
+        raise KeyError(
+            "Some elements of `select_channels` or `channel_masks` "
+            "are not present in `channel_names`:\n"
+            f"\tchannel_names: {channel_names}\n"
+            f"\tchannel_masks: {channel_masks}\n"
+            f"\tselect_channels:: {select_channels}"
+        )
+
+    channel_map = {
+        channel_name: index for index, channel_name in enumerate(channel_names)
+    }
+
+    if channel_masks is not None:
+        for channel, mask in channel_masks.items():
+            channel_index = channel_map[channel]
+            mask_index = channel_map[mask]
+            mask = data[mask_index] > mask_thresh
+            data[channel_index][~mask] = 0
+
+    if select_channels:
+        channel_indexes = [channel_map[channel] for channel in select_channels]
+        data = data[channel_indexes, ...]
+
+    data = data.astype(output_dtype)
+    if transform:
+        data = transform(data)
+
+    return data
+
+
+
 def tiff_loader(
     path,
     select_channels=None,
@@ -137,13 +200,15 @@ def tiff_loader(
     """
     aicsimg = aicsimageio.AICSImage(path)
     channel_names = aicsimg.get_channel_names()
+    
     if (select_channels is None) or (len(select_channels) == 0):
         select_channels = channel_names
     if channel_masks is None:
         channel_masks = {}
+    mask_keys = channel_masks.keys()
 
     if (not set(select_channels).issubset(channel_names)) or (
-        not set(channel_masks.keys()).issubset(channel_names)
+        not set(mask_keys).issubset(channel_names)
     ):
         raise KeyError(
             "Some elements of `select_channels` or `channel_masks` "
@@ -187,6 +252,7 @@ def tiff_writer(
     img,
     path: Union[str, Path],
     channels: Optional[Sequence] = None,
+    overwrite: bool = False,
 ):
 
     if len(img.shape) == 4:
@@ -196,8 +262,73 @@ def tiff_writer(
     else:
         raise ValueError(f"Unexpected image shape {img.shape}")
 
-    with OmeTiffWriter(path) as writer:
+    with OmeTiffWriter(path, overwrite_file=overwrite) as writer:
         writer.save(img, dimension_order=dims, channel_names=channels)
+
+
+def change_resolution(
+    path_in: Union[str, Path],
+    path_out: Union[str, Path],
+    ZYX_resolution: Union[float, list],
+):
+    """
+    Changes the resolution of a 3D OME TIFF file
+    Parameters
+    ----------
+    path_in: Union[str, Path]
+        The path to the input OME TIFF file
+    path_out: Union[str, Path]
+        The path to the output OME TIFF file
+    ZYX_resolution: Union[float, list]
+        Resolution scaling factor or desired ZYX dimensions (list of 3)
+    Returns
+    -------
+    data_new.shape: Tuple
+        Tuple that contains the image dimensions of output image
+    """
+
+    aicsimageio.use_dask(False)
+
+    # Read in image and get channel names
+    aicsimg = aicsimageio.AICSImage(path_in)
+    channel_names = aicsimg.get_channel_names()
+    data = aicsimg.get_image_data("CZYX", S=0, T=0)
+    # this function should change when we have multiple scenes (S>0) or time series (T>0)
+
+    # Get image dimensions
+    num_channels, z_dim, y_dim, x_dim = data.shape
+
+    # Get image dimensions of new image
+    if isinstance(ZYX_resolution, list):
+        if len(ZYX_resolution) != 3:
+            raise ValueError(
+                f"Resolution must be three long (Z Y X) not {len(ZYX_resolution)}"
+            )
+        z_dim_new, y_dim_new, x_dim_new = ZYX_resolution
+    else:
+        z_dim_new = np.round(z_dim * ZYX_resolution).astype(np.int)
+        y_dim_new = np.round(y_dim * ZYX_resolution).astype(np.int)
+        x_dim_new = np.round(x_dim * ZYX_resolution).astype(np.int)
+    # Resize to get desired resolution
+    data_new = np.zeros(
+        (1, num_channels, z_dim_new, y_dim_new, x_dim_new), dtype="uint8"
+    )
+    for channel in np.arange(num_channels):
+        data_new[0, channel, :, :, :] = resize(
+            data[channel, :, :, :].squeeze(),
+            (z_dim_new, y_dim_new, x_dim_new),
+            preserve_range=True,
+        )
+    data_new = data_new.astype((np.uint8))
+    # change this to do it across all channels at once, perhaps this can be done without for loop
+
+    # Write output image
+    with OmeTiffWriter(path_out, overwrite_file=True) as writer:
+        writer.save(
+            data=data_new, channel_names=channel_names, dimension_order="STCZYX"
+        )
+
+    return data_new.shape
 
 
 def project_2d(

@@ -7,6 +7,7 @@ from torch import nn
 
 from torch.nn.utils import spectral_norm
 
+
 class CBVAEEncoder(nn.Module):
     def __init__(
         self,
@@ -71,8 +72,11 @@ class CBVAEEncoder(nn.Module):
         self.target_path = nn.ModuleList(
             [
                 DownResidualLayer(
-                    n_ch_target, conv_channels_list[0], ch_cond_list=target_cond_list,
-                    activation=activation, activation_last=activation
+                    n_ch_target,
+                    conv_channels_list[0],
+                    ch_cond_list=target_cond_list,
+                    activation=activation,
+                    activation_last=activation,
                 )
             ]
         )
@@ -80,8 +84,11 @@ class CBVAEEncoder(nn.Module):
         for ch_in, ch_out in zip(conv_channels_list[0:-1], conv_channels_list[1:]):
             self.target_path.append(
                 DownResidualLayer(
-                    ch_in, ch_out, ch_cond_list=target_cond_list,
-                    activation=activation, activation_last=activation
+                    ch_in,
+                    ch_out,
+                    ch_cond_list=target_cond_list,
+                    activation=activation,
+                    activation_last=activation,
                 )
             )
 

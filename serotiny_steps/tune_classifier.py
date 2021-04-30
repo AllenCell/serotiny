@@ -65,7 +65,7 @@ def tune_classifier(
 
     search_space: dict
         Parameters to perform hyper param search on
-        Example: 
+        Example:
         {
         "lr": tune.loguniform(1e-4, 1e-1),
         "batch_size": tune.choice([32, 64, 128]),
@@ -100,7 +100,7 @@ def tune_classifier(
         "test": False,
         "tune_bool": True,
         "x_label": x_label,
-        "y_label": y_label
+        "y_label": y_label,
     }
 
     config.update(search_space)

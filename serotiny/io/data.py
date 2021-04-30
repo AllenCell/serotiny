@@ -170,7 +170,6 @@ def load_data_loader(
     """
 
     # Load a dataframe from the dataset, using the provided row processing fns
-
     dataframe = DataframeDataset(dataset, loaders=loaders)
 
     # Configure WeightedRandomSampler to handle class imbalances

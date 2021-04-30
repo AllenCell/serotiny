@@ -58,9 +58,11 @@ class CBVAEDecoder(nn.Module):
         """
         if dimensionality == 2:
             from ..layers._2d.up_residual import UpResidualLayer
+
             batch_norm = nn.BatchNorm2d
         elif dimensionality == 3:
             from ..layers._3d.up_residual import UpResidualLayer
+
             batch_norm = nn.BatchNorm3d
         else:
             raise ValueError("`dimensionality` has to be 2 or 3")
@@ -126,7 +128,7 @@ class CBVAEDecoder(nn.Module):
                 ch_cond_list=target_cond_list,
                 activation=activation,
                 activation_last=activation_last,
-                output_padding=0
+                output_padding=0,
             )
         )
 
