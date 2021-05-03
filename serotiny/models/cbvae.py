@@ -18,8 +18,8 @@ import torch.nn.functional as F
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.parsing import get_init_args
 
-from serotiny.losses import KLDLoss
-from serotiny.utils.model_utils import index_to_onehot, find_optimizer
+from serotiny.losses.elbo import calculate_elbo
+from serotiny.models._utils import index_to_onehot, find_optimizer
 
 
 def reparameterize(mu, log_var, add_noise=True):
@@ -53,8 +53,10 @@ class CBVAEModel(pl.LightningModule):
         target_channels: Sequence[int],
         reference_channels: Sequence[int],
         input_dims: Sequence[int],
-        kld_reduction: str = "sum",
         auto_padding: bool = True,
+        prior_mode: str = "isotropic"
+        prior_logvar=None,
+        learn_prior_logvar=False,
     ):
         """
         Instantiate a CBVAEModel, which implements the final version of the
@@ -88,8 +90,6 @@ class CBVAEModel(pl.LightningModule):
             Indices of reference channels
         input_dims: Sequence[int]
             Dimensions of the input images
-        kld_reduction: str
-            Reduction operation for the KLD loss term
         auto_padding: bool
             Whether to apply automatic padding to the generated images, to match
             the input_dimensions
@@ -109,8 +109,26 @@ class CBVAEModel(pl.LightningModule):
         self.encoder = encoder
         self.decoder = decoder
         self.crit_recon = crit_recon
-        self.kld_loss = KLDLoss(reduction=kld_reduction)
+        self.kld_loss =
         self.beta = beta
+
+        self.prior_mean = None
+        self.prior_logvar = prior_logvar
+
+        if prior_mode not in ["isotropic", "anisotropic"]:
+            raise NotImplementedError(f"KLD mode '{prior_mode}' not implemented")
+
+        if prior_mode == "anisotropic":
+            self.prior_mean = torch.zeros(self.embedding_dim)
+            if prior_logvar is None:
+                self.prior_logvar = torch.zeros(self.embedding_dim)
+            else:
+                self.prior_logvar = torch.tensor(prior_logvar)
+            # if learn_prior_logvar:
+            self.prior_logvar = nn.Parameter(
+                self.prior_logvar, requires_grad=learn_prior_logvar
+            )
+
 
     def parse_batch(self, batch):
         x = batch[self.hparams.x_label].float()

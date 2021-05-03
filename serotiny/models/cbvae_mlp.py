@@ -12,11 +12,8 @@ import pytorch_lightning as pl
 from pathlib import Path
 from typing import Optional
 
-from ..loss_formulations import calculate_elbo
-from serotiny.utils.model_utils import log_metrics
-
-AVAILABLE_OPTIMIZERS = {"adam": torch.optim.Adam, "sgd": torch.optim.SGD}
-AVAILABLE_SCHEDULERS = {"reduce_lr_plateau": torch.optim.lr_scheduler.ReduceLROnPlateau}
+from serotiny.model._utils import find_optimizer, find_lr_scheduler
+from serotiny.losses.elbo import calculate_elbo
 
 
 class CBVAEMLPModel(pl.LightningModule):
@@ -150,10 +147,6 @@ class CBVAEMLPModel(pl.LightningModule):
             "mu_per_elem": mu,
         }
 
-    def training_epoch_end(self, outputs):
-
-        log_metrics(outputs, "train", self.current_epoch, Path(self.logger[1].save_dir))
-
     def validation_step(self, batch, batch_idx):
         x, x_cond, x_cond_inds = self.parse_batch(batch)
         x_hat, mu, _, loss, recon_loss, kld_loss, kld_elem, rcl_elem = self(x, x_cond)
@@ -178,10 +171,6 @@ class CBVAEMLPModel(pl.LightningModule):
             "batch": batch,
             "mu_per_elem": mu,
         }
-
-    def validation_epoch_end(self, outputs):
-
-        log_metrics(outputs, "val", self.current_epoch, Path(self.logger[1].save_dir))
 
     def test_step(self, batch, batch_idx):
         x, x_cond, x_cond_inds = self.parse_batch(batch)
@@ -213,44 +202,25 @@ class CBVAEMLPModel(pl.LightningModule):
 
     def configure_optimizers(self):
         # with it like shceduler
-        if self.hparams.optimizer in AVAILABLE_OPTIMIZERS:
-            optimizer_class = AVAILABLE_OPTIMIZERS[self.hparams.optimizer]
-            optimizer = optimizer_class(self.parameters(), lr=self.hparams.lr)
-        else:
-            raise Exception(
-                (
-                    f"optimizer {self.hparams.optimizer} not available, "
-                    f"options are {list(AVAILABLE_OPTIMIZERS.keys())}"
-                )
-            )
+        optimizer_class = find_optimizer(self.hparams.optimizer)
+        optimizer = optimizer_class(self.parameters(), lr=self.hparams.lr)
 
-        if self.hparams.scheduler in AVAILABLE_SCHEDULERS:
-            scheduler_class = AVAILABLE_SCHEDULERS[self.hparams.scheduler]
-            scheduler = scheduler_class(optimizer)
-        else:
-            raise Exception(
-                (
-                    f"scheduler {self.hparams.scheduler} not available, "
-                    f"options are {list(AVAILABLE_SCHEDULERS.keys())}"
-                )
-            )
+        scheduler_class = find_lr_scheduler(self.hparams.scheduler)
+        scheduler = scheduler_class(self.hparams.scheduler)
 
-        return (
-            {
-                "optimizer": optimizer,
-                "scheduler": scheduler,
-                "monitor": "val_accuracy",
-                "interval": "epoch",
-                "frequency": 1,
-                "strict": True,
-            },
-        )
+        return {
+            "optimizer": optimizer,
+            "scheduler": scheduler,
+            "monitor": "val_accuracy",
+            "interval": "epoch",
+            "frequency": 1,
+            "strict": True,
+        },
 
     def on_after_backward(self):
         # example to inspect gradient information in tensorboard
-        if (
-            self.log_grads and self.trainer.global_step % 100 == 0
-        ):  # don't make the file huge
+        if self.log_grads and self.trainer.global_step % 100 == 0:
+            # don't make the file huge
             params = self.state_dict()
             for k, v in params.items():
                 grads = v

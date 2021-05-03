@@ -98,3 +98,48 @@ class GetClosestCellsToDims(Callback):
                 self.c_shape,
                 self.dna_spharm_cols,
             )
+
+def get_closest_cells(
+    ranked_z_dim_list,
+    mu_std_list,
+    all_embeddings,
+    dir_path,
+    path_in_stdv,
+    metric,
+    id_col,
+    N_cells,
+):
+    embeddings_most_important_dims = all_embeddings[
+        [f"mu_{i}" for i in ranked_z_dim_list]
+    ]
+
+    dist_cols = embeddings_most_important_dims.columns
+
+    df_list = []
+    dims = []
+    for index, dim in enumerate(ranked_z_dim_list):
+        mu_std = mu_std_list[index]
+        df_cells = scan_pc_for_cells(
+            all_embeddings,
+            pc=index + 1,  # This function assumes first index is 1
+            path=np.array(path_in_stdv) * mu_std,
+            dist_cols=dist_cols,
+            metric=metric,
+            id_col=id_col,
+            N_cells=N_cells,
+        )
+        dims.append([dim] * df_cells.shape[0])
+        df_list.append(df_cells)
+
+    tmp = pd.concat(df_list)
+    tmp = tmp.reset_index(drop=True)
+    dims = [item for sublist in dims for item in sublist]
+    df2 = pd.DataFrame(dims, columns=["ranked_dim"])
+    result = pd.concat([tmp, df2], axis=1)
+
+    path = dir_path / "closest_real_cells_to_top_dims.csv"
+
+    if path.exists():
+        result.to_csv(path, header="column_names", index=False)
+
+    return result

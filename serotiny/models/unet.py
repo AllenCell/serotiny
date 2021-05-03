@@ -24,7 +24,6 @@ import torch.nn as nn
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.parsing import get_init_args
 
-from ..losses import KLDLoss
 from ..utils.model_utils import index_to_onehot, find_optimizer
 
 

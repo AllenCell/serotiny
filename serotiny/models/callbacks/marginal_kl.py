@@ -6,9 +6,9 @@ import numpy as np
 import torch
 from pytorch_lightning import Callback, LightningModule, Trainer
 
-from serotiny.losses import KLDLoss
 from serotiny.utils.model_utils import marginal_kl
 from serotiny.utils.model_utils import to_device
+from serotiny.losses.elbo import diagonal_gaussian_kl
 
 
 class MarginalKL(Callback):
@@ -40,7 +40,6 @@ class MarginalKL(Callback):
         self.x_label = x_label
         self.c_label = c_label
 
-        self.kl_div = KLDLoss(mode=mode, reduction="sum")
 
     def on_test_epoch_end(self, trainer: Trainer, pl_module: LightningModule):
 
@@ -72,10 +71,10 @@ class MarginalKL(Callback):
                 )
                 _, mu, logvar, _, _, _, _, _ = pl_module(this_x, this_c)
 
-                total_kld += self.kl_div(
+                total_kld += diagonal_gaussian_kl(
                     mu,
-                    logvar,
                     prior_mu=self.prior_mean,
+                    logvar,
                     prior_logvar=self.prior_logvar,
                 )
 

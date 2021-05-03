@@ -343,3 +343,15 @@ class ClassificationModel(pl.LightningModule):
                 self.logger[0].experiment.add_histogram(
                     tag=name, values=grads, global_step=self.trainer.global_step
                 )
+
+def acc_prec_recall(n_classes):
+    """
+    util function to instantiate a ModuleDict for metrics
+    """
+    return nn.ModuleDict(
+        {
+            "accuracy": pl.metrics.Accuracy(),
+            "precision": pl.metrics.Precision(num_classes=n_classes, average="macro"),
+            "recall": pl.metrics.Recall(num_classes=n_classes, average="macro"),
+        }
+    )

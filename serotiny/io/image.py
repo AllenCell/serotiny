@@ -6,6 +6,7 @@ import torch
 import aicsimageio
 import aicsimageio.transforms as transforms
 from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
+
 import aicsimageprocessing
 
 ALL_CHANNELS = ["C", "Y", "X", "S", "T", "Z"]
@@ -162,7 +163,6 @@ def tiff_loader_CZYX(
         data = transform(data)
 
     return data
-
 
 
 def tiff_loader(
