@@ -24,9 +24,9 @@ class DummyDataset(Dataset):
 
     """
 
-    def __init__(self, x_label, y_label, length, dims, *args, **kwargs):
+    def __init__(self, x_label, y_label, length, dims):
         self.length = length
-        self.dims = dims
+        self.dims = tuple(dims)
         self.x_label = x_label
         self.y_label = y_label
 
@@ -93,7 +93,6 @@ class DummyDatamodule(pl.LightningDataModule):
         dims: list,
         length: int,
         channels: list = [],
-        **kwargs
     ):
 
         super().__init__()
@@ -106,11 +105,16 @@ class DummyDatamodule(pl.LightningDataModule):
         self.num_channels = len(channels)
         self.dims = dims
 
+        if self.num_channels > 0:
+            dl_dims = tuple([self.num_channels] + list(dims)),
+        else:
+            dl_dims = dims
+
         self.dataloader = make_dataloader(
             x_label,
             y_label,
             length,
-            tuple([self.num_channels] + dims),
+            dl_dims,
             batch_size,
             num_workers,
         )

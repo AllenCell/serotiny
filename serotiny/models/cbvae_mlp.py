@@ -172,6 +172,7 @@ class CBVAEMLPModel(pl.LightningModule):
             "mu_per_elem": mu,
         }
 
+
     def test_step(self, batch, batch_idx):
         x, x_cond, x_cond_inds = self.parse_batch(batch)
         x_hat, mu, _, loss, recon_loss, kld_loss, kld_elem, rcl_elem = self(x, x_cond)
@@ -216,16 +217,3 @@ class CBVAEMLPModel(pl.LightningModule):
             "frequency": 1,
             "strict": True,
         },
-
-    def on_after_backward(self):
-        # example to inspect gradient information in tensorboard
-        if self.log_grads and self.trainer.global_step % 100 == 0:
-            # don't make the file huge
-            params = self.state_dict()
-            for k, v in params.items():
-                grads = v
-                name = k
-                # logger[0] is tensorboard logger
-                self.logger[0].experiment.add_histogram(
-                    tag=name, values=grads, global_step=self.trainer.global_step
-                )

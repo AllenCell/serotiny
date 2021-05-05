@@ -1,4 +1,5 @@
 import torch
+from torch.nn.modules.loss import _Loss as Loss
 
 def diagonal_gaussian_kl(mu1, mu2, logvar1, logvar2):
     mu_diff = mu2 - mu1
@@ -19,28 +20,15 @@ def calculate_elbo(
     mean,
     log_var,
     beta,
-    mask=False,
+    recon_loss: Loss = torch.nn.MSELoss,
     mode="isotropic",
     prior_mu=None,
     prior_logvar=None,
 ):
-    """
-    MSE loss for reconstruction,
-    KLD loss as per VAE.
-    Also want to output dimension (element) wise RCL and KLD
-    """
 
-    loss = torch.nn.MSELoss(size_average=False)
-    loss_per_observation = torch.nn.MSELoss(size_average=False, reduce=False)
-
-    # if x is masked, find indices in x
-    # that are 0 and set reconstructed x to 0 as well
-    if mask:
-        indices = x == 0
-        reconstructed_x[indices] = 0
-
-    rcl = loss(reconstructed_x, x)
-    rcl_per_input_dimension = loss_per_observation(reconstructed_x, x)
+    recon_loss = recon_loss(reduction="none")
+    rcl_per_input_dimension = recon_loss(reconstructed_x, x)
+    rcl = rcl_per_input_dimension.sum(dim=1).mean()
 
     if mode == "isotropic":
         kld_per_dimension = isotropic_gaussian_kl(mean, log_var)
@@ -50,6 +38,12 @@ def calculate_elbo(
     else:
         raise NotImplementedError(f"KLD mode '{mode}' not implemented")
 
-    kld = kld_per_dimension.sum()
+    kld = kld_per_dimension.sum(dim=1).mean()
 
-    return rcl + beta * kld, rcl, kld, rcl_per_input_dimension, kld_per_dimension
+    return (
+        rcl + beta * kld,
+        rcl,
+        kld,
+        rcl_per_input_dimension.mean(dim=0),
+        kld_per_dimension.mean(dim=0)
+    )

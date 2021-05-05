@@ -1,31 +1,19 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import os
+import importlib
 import logging
+
+from typing import Optional, List, Dict
 from pathlib import Path
-from typing import Optional, Sequence, Any, Dict
 from datetime import datetime
 
 import fire
 import pytorch_lightning as pl
-from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
-from pytorch_lightning.callbacks import ModelCheckpoint, GPUStatsMonitor, EarlyStopping
-from pytorch_lightning.profiler import PyTorchProfiler
-
-#from serotiny.networks.vae import CBVAEDecoder, CBVAEEncoder
-#from serotiny.models import CBVAEModel
-# from serotiny.networks._3d.unet import Unet
-# from serotiny.models.unet import UnetModel
 
 import serotiny.datamodules as datamodules
-import serotiny.losses as losses
-import serotiny.networks as networks
 import serotiny.models as models
-from serotiny.models.callbacks.progress_bar import GlobalProgressBar
+from serotiny.models.zoo import get_checkpoint_callback, store_called_args
 
 log = logging.getLogger(__name__)
-pl.seed_everything(42)
 
 def module_get(module, key):
     if key not in module.__dict__:
@@ -37,150 +25,86 @@ def module_get(module, key):
 
     return module.__dict__[key]
 
+
+def get_classes_from_config(configs: Dict):
+    """
+    Return a list of instantiated classes given by `configs`. Each key in
+    `configs` is a class path, to be imported dynamically via importlib,
+    with arguments given by the correponding value in the dict.
+    """
+    instantiated_classes = []
+    for class_path, class_config in configs.items():
+        class_path = class_path.split(".")
+        class_module = ".".join(class_path[:-1])
+        class_name = class_path[-1]
+        the_class = getattr(importlib.import_module(class_module), class_name)
+        instantiated_class = the_class(**class_config)
+        instantiated_classes.append(instantiated_class)
+
+    return instantiated_classes
+
+
 def train_model(
-    datamodule: Dict[str, Any],
-    network: Dict[str, Any],
-    loss: Dict[str, Any],
-    model: Dict[str, Any],
-    training: Dict[str, Any],
+    model_name: str,
+    model_config: Dict,
+    datamodule_name: str,
+    datamodule_config: Dict,
+    trainer_config: Dict,
+    gpu_ids: List[int],
+    callbacks: Dict = {},
+    loggers: Dict = {},
+    model_zoo_path: Optional[str] = None,
+    seed: int = 42,
+    store_config: bool = True,
+    checkpoint_monitor: Optional[str] = None,
+    checkpoint_mode: str = "min",
 ):
-    """
-    Instantiate and train a bVAE.
+    called_args = locals()
 
-    Parameters
-    ----------
-    data_dir: str
-        Path to dataset, read by the datamodule
-    output_path: str
-        Path to store model and logs
-    datamodule: str,
-        String specifying which datamodule to use
-    batch_size: int
-        Batch size used for trainig and evaluation
-    num_gpus: int
-        Number of GPU cards to use
-    num_workers: int
-        Number of workers allocated to the dataloader
-    num_epochs: int
-        Maximum number of epochs to train on
-    lr: float
-        Learning rate used for training
-    optimizer: str
-        String to specify the optimizer to use
-    loss: str
-        String to specify the loss function to use
-    test: bool
-        Flag to tell whether to run the test step after training
-    # x_label: str
-    #     String to specify the inputs (x)
-    # y_label: str
-    #     String to specify the outputs (y)
-    # input_channels: Sequence[int]
-    #     Which channel (indices) to use as input
-    # output_channels: Sequence[int]
-    #     Which channel (indices) to use as output
-    # depth: int
-    #     How many layers the Unet will have
-    # auto_padding: bool = False
-    #     Whether to apply padding to ensure images from down double conv match up double conv
+    pl.seed_everything(seed)
 
-    """
+    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
+    os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(gpu_ids)
+    num_gpus = len(gpu_ids)
+    num_gpus = (num_gpus if num_gpus != 0 else None)
 
-    datamodule_key = training['datamodule']
-    create_datamodule = module_get(datamodules, datamodule_key)
-    datamodule = create_datamodule(**datamodule)
-    datamodule.setup()
-    
-    print(f'datamodule.dims = {datamodule.dims}')
-
-    loss_key = training['loss']
-    create_loss = module_get(losses, loss_key)
-    loss = create_loss(**loss)
-
-    network_key = training['network']
-    create_network = module_get(networks, network_key)
-    network = create_network(**network)
-    network.print_network()
-    
+    model_class = module_get(models, model_name)
+    model = model_class(**model_config)
     version_string = "version_" + datetime.now().strftime("%d-%m-%Y--%H-%M-%S")
-    output_path = training['output_path']
-    lightning_logs_path = Path(output_path) / "lightning_logs"
 
-    model_key = training['model']
-    create_model = module_get(models, model_key)
-    model_params = dict(
-        model,
-        loss=loss,
-        network=network,
-        input_dims=datamodule.dims,
-        output_path=output_path,
-        version_string=version_string,
-    )    
-    model = create_model(**model_params)
-    
-    tb_logger = TensorBoardLogger(
-        save_dir=lightning_logs_path,
-        version=version_string,
-        name="",
-    )
+    if store_config:
+        store_called_args(called_args, model_name, version_string, model_zoo_path)
 
-    ckpt_path = os.path.join(
-        lightning_logs_path,
-        tb_logger.version,
-        "checkpoints",
-    )
+    create_datamodule = module_get(datamodules, datamodule_name)
+    datamodule = create_datamodule(**datamodule_config)
+    datamodule.setup()
 
-    # Initialize model checkpoint
-    checkpoint_callback = ModelCheckpoint(
-        dirpath=ckpt_path,
-        # if save_top_k = 1, all files in this local staging dir
-        # will be deleted when a checkpoint is saved
-        # save_top_k=1,
-        monitor="validation_loss",
-        verbose=True,
-    )
+    if checkpoint_monitor is not None:
+        checkpoint_callback = get_checkpoint_callback(
+            model_name,
+            version_string,
+            checkpoint_monitor,
+            checkpoint_mode,
+            model_zoo_path
+        )
+    else:
+        checkpoint_callback = None
 
-    # TODO: make early_stopping optional
-    early_stopping = EarlyStopping("validation_loss")
+    callbacks = get_classes_from_config(callbacks)
+    loggers = get_classes_from_config(loggers)
 
-    callbacks = [
-        GPUStatsMonitor(),
-        GlobalProgressBar(),
-        early_stopping,
-    ]
-    
-    # TODO: option to create profiler
-    profiler = PyTorchProfiler(profile_memory=True)
-    
     trainer = pl.Trainer(
-        logger=[tb_logger],
-        # accelerator="ddp",
-        # replace_sampler_ddp=False,
-        gpus=training['num_gpus'],
-        max_epochs=training['num_epochs'],
-        progress_bar_refresh_rate=5,
+        **trainer_config,
+        logger=loggers,
+        gpus=num_gpus,
         checkpoint_callback=checkpoint_callback,
         callbacks=callbacks,
-        benchmark=False,
-        # TODO: make profiling optional
-        profiler=profiler,
-        deterministic=True,
-        # TODO: provide ability to specify optimizer
-        #automatic_optimization=False,  # Set this to True (default) for automatic optimization
-        # TODO: provide an option for precision?
-        precision=16,
     )
-    
-    #import torch
-    #print(f'GPU {num_gpus}: allocated memory = {torch.cuda.memory_allocated(num_gpus)}, cached memory = {torch.cuda.memory_reserved(num_gpus)}')
-    
+
+    log.info("Calling trainer.fit")
     trainer.fit(model, datamodule)
 
-    # test the model
-    if training.get('test'):
-        trainer.test(datamodule=datamodule)
-
-    return checkpoint_callback.best_model_path
+    trainer.test(datamodule=datamodule)
 
 
 if __name__ == "__main__":

@@ -1,11 +1,14 @@
 from pathlib import Path
 import os
+import omegaconf
+
 
 from pytorch_lightning import Trainer
+from pytorch_lightning.callbacks import ModelCheckpoint
 import serotiny.models as models
 
 
-def _get_root(model_root=None):
+def get_root(model_root=None):
     if model_root is not None:
         model_root = Path(model_root)
     elif "SEROTINY_ZOO_ROOT" in os.environ:
@@ -19,7 +22,7 @@ def _get_root(model_root=None):
 
 
 def get_model(model_path, model_root=None):
-    model_root = _get_root(model_root)
+    model_root = get_root(model_root)
 
     if not model_root.exists():
         raise FileNotFoundError("Given model_root does not exists.")
@@ -34,7 +37,7 @@ def get_model(model_path, model_root=None):
 
 
 def get_trainer_at_checkpoint(model_path, model_root=None):
-    model_root = _get_root(model_root)
+    model_root = get_root(model_root)
 
     if not model_root.exists():
         raise FileNotFoundError("Given model_root does not exists.")
@@ -49,7 +52,7 @@ def get_trainer_at_checkpoint(model_path, model_root=None):
 
 
 def store_model(trainer, model_class, model_id, model_root=None):
-    model_root = _get_root(model_root)
+    model_root = get_root(model_root)
 
     if not model_root.exists():
         model_root.mkdir(parents=True)
@@ -62,3 +65,43 @@ def store_model(trainer, model_class, model_id, model_root=None):
 
     model_path = model_path / model_id
     trainer.save_checkpoint(model_path)
+
+def get_checkpoint_callback(model_class, model_id, checkpoint_monitor,
+                            checkpoint_mode, model_root=None):
+    model_root = get_root(model_root)
+
+    if not model_root.exists():
+        model_root.mkdir(parents=True)
+
+    model_path = model_root / model_class
+    if not model_path.exists():
+        model_path.mkdir(parents=True)
+
+    model_id = model_id.split(".ckpt")[0]
+
+    model_path = model_path / model_id
+    if not model_path.exists():
+        model_path.mkdir(parents=True)
+
+    return ModelCheckpoint(
+        monitor=checkpoint_monitor,
+        mode=checkpoint_mode,
+        dirpath=model_path,
+        filename="epoch{epoch:02d}"
+    )
+
+def store_called_args(called_args, model_class, model_id, model_root=None):
+    model_root = get_root(model_root)
+
+    if not model_root.exists():
+        model_root.mkdir(parents=True)
+
+    model_path = model_root / model_class
+    if not model_path.exists():
+        model_path.mkdir(parents=True)
+
+    model_id = model_id if ".yaml" in model_id else model_id + ".yaml"
+
+    model_path = model_path / model_id
+
+    omegaconf.OmegaConf.save(called_args, model_path, resolve=True)
