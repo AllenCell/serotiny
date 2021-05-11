@@ -6,19 +6,32 @@ import re
 import torch
 import numpy as np
 
-from .image import tiff_loader_CZYX, png_loader
+from torchvision import transforms
+
+from serotiny.image import tiff_loader_CZYX, png_loader
+from serotiny.utils import get_classes_from_config
 
 __all__ = ["LoadColumns", "LoadClass", "Load2DImage", "Load3DImage"]
 
+class Loader:
+    def __init__(self):
+        self.train()
 
-class LoadColumns:
+    def train(self):
+        self.mode = "train"
+
+    def eval(self):
+        self.mode = "eval"
+
+
+class LoadColumns(Loader):
     """
     Loader class, used to retrieve fields directly from dataframe columns
     """
 
     def __init__(self, columns=None, startswith=None, endswith=None,
                  contains=None, excludes=None, regex=None, dtype="float"):
-
+        super().__init__()
         self.columns = columns
         self.startswith = startswith
         self.endswith = endswith
@@ -71,12 +84,13 @@ class LoadColumns:
                     in self._filter(row.index)]].values.astype(self.dtype)
 
 
-class LoadClass:
+class LoadClass(Loader):
     """
     Loader class, used to retrieve class values from the dataframe,
     """
 
     def __init__(self, num_classes, y_encoded_label, binary=False):
+        super().__init__()
         self.num_classes = num_classes
         self.binary = binary
         self.y_encoded_label = y_encoded_label
@@ -88,35 +102,43 @@ class LoadClass:
         return torch.tensor(row[self.y_encoded_label])
 
 
-class Load2DImage:
+class Load2DImage(Loader):
     """
     Loader class, used to retrieve images from paths given in a dataframe column
     """
 
-    def __init__(self, chosen_col, num_channels, channel_indexes, transform):
+    def __init__(self, chosen_col, num_channels, channel_indexes,
+                 train_transforms, eval_transforms):
+        super().__init__()
         self.chosen_col = chosen_col
         self.num_channels = num_channels
         self.channel_indexes = channel_indexes
-        self.transform = transform
+        self.train_transform = load_transforms(train_transforms)
+        self.eval_transform = load_transforms(eval_transforms)
+
 
     def __call__(self, row):
         return png_loader(
             row[self.chosen_col],
             channel_order="CYX",
             indexes={"C": self.channel_indexes or range(self.num_channels)},
-            transform=self.transform,
+            transform=(self.train_transform if self.mode == "train"
+                       else self.eval_transform)
         )
 
 
-class Load3DImage:
+class Load3DImage(Loader):
     """
     Loader class, used to retrieve images from paths given in a dataframe column
     """
 
-    def __init__(self, chosen_col, select_channels=None, transform=None):
+    def __init__(self, chosen_col, select_channels=None, train_transforms=None,
+                 eval_transforms=None):
+        super().__init__()
         self.chosen_col = chosen_col
         self.select_channels = select_channels
-        self.transform = transform
+        self.train_transform = load_transforms(train_transforms)
+        self.eval_transform = load_transforms(eval_transforms)
 
     def __call__(self, row):
         return tiff_loader_CZYX(
@@ -125,8 +147,17 @@ class Load3DImage:
             output_dtype=np.float32,
             channel_masks=None,
             mask_thresh=0,
-            transform=self.transform,
+            transform=(self.train_transform if self.mode == "train"
+                       else self.eval_transform)
         )
+
+
+def load_transforms(transforms_dict):
+    if transforms_dict is not None:
+        return transforms.Compose(
+            get_classes_from_config(transforms_dict)
+        )
+    return None
 
 
 def infer_extension_loader(extension, chosen_col="true_paths"):

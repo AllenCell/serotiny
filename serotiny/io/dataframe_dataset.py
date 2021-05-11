@@ -51,6 +51,18 @@ class DataframeDataset(Dataset):
                 self.dataframe[split_col] == "test"
             ].index.tolist()
 
+        self.train()
+
+    def train(self):
+        self.mode = "train"
+        for key in self.loaders:
+            self.loaders[key].train()
+
+    def eval(self):
+        self.mode = "eval"
+        for key in self.loaders:
+            self.loaders[key].eval()
+
     def __len__(self):
         return len(self.dataframe)
 

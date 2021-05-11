@@ -1,5 +1,5 @@
 from typing import Sequence, Union
-
+from torch.utils.data import DataLoader
 
 def subset_channels(
     channel_subset: Sequence[Union[int, str]], channels: Sequence[Union[int, str]]
@@ -36,3 +36,14 @@ def subset_channels(
                 )
             )
     return channel_indexes, num_channels
+
+
+class TrainDataLoader(DataLoader):
+    def __iter__(self):
+        self.dataset.train()
+        return super().__iter__()
+
+class EvalDataLoader(DataLoader):
+    def __iter__(self):
+        self.dataset.eval()
+        return super().__iter__()

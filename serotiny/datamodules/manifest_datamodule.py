@@ -7,11 +7,11 @@ import pandas as pd
 import multiprocessing as mp
 import pytorch_lightning as pl
 
-from torch.utils.data import DataLoader
 from torch.utils.data.sampler import SubsetRandomSampler
 
 from serotiny.io.dataframe_dataset import DataframeDataset
 from serotiny.utils import get_classes_from_config
+from serotiny.datamodules.utils import TrainDataLoader, EvalDataLoader
 
 def make_manifest_dataset(
     manifest: Union[Path, str],
@@ -34,8 +34,14 @@ def make_manifest_dataset(
     return DataframeDataset(dataframe=df, loaders=loaders,
                             iloc=True, split_col=split_col)
 
-def make_dataloader(dataset, batch_size, num_workers, sampler, pin_memory, drop_last=False):
-    return DataLoader(
+def make_dataloader(dataset, batch_size, num_workers, sampler, pin_memory,
+                    stage, drop_last=False):
+    if stage == "train":
+        dataloader_class = TrainDataLoader
+    else:
+        dataloader_class = EvalDataLoader
+
+    return dataloader_class(
         dataset,
         batch_size=batch_size,
         pin_memory=True,
@@ -85,7 +91,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         split_col: Optional[str] = None,
         pin_memory: bool = True,
         drop_last: bool = True,
-
+        metadata: dict,
     ):
 
         super().__init__()
@@ -97,6 +103,7 @@ class ManifestDatamodule(pl.LightningDataModule):
 
         self.pin_memory = pin_memory
         self.drop_last = drop_last
+        self.metadata = metadata
 
         indices = list(range(self.length))
         if split_col is not None:
@@ -114,12 +121,15 @@ class ManifestDatamodule(pl.LightningDataModule):
 
     def train_dataloader(self):
         return make_dataloader(self.dataset, self.batch_size, self.num_workers,
-                               self.train_sampler, self.pin_memory, self.drop_last)
+                               self.train_sampler, self.pin_memory, "train",
+                               self.drop_last)
 
     def val_dataloader(self):
         return make_dataloader(self.dataset, self.batch_size, self.num_workers,
-                               self.val_sampler, self.pin_memory, self.drop_last)
+                               self.val_sampler, self.pin_memory, "eval",
+                               self.drop_last)
 
     def test_dataloader(self):
         return make_dataloader(self.dataset, self.batch_size, self.num_workers,
-                               self.test_sampler, self.pin_memory, self.drop_last)
+                               self.test_sampler, self.pin_memory, "eval",
+                               self.drop_last)
