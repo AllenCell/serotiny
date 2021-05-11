@@ -24,7 +24,7 @@ import torch.nn as nn
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.parsing import get_init_args
 
-from ..utils.model_utils import index_to_onehot, find_optimizer
+from serotiny.models._utils import index_to_onehot, find_optimizer
 
 
 class UnetModel(pl.LightningModule):

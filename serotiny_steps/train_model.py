@@ -12,36 +12,9 @@ import pytorch_lightning as pl
 import serotiny.datamodules as datamodules
 import serotiny.models as models
 from serotiny.models.zoo import get_checkpoint_callback, store_called_args
+from serotiny.utils import module_get, get_classes_from_config
 
 log = logging.getLogger(__name__)
-
-def module_get(module, key):
-    if key not in module.__dict__:
-        raise KeyError(
-            f"Chosen {module} module {key} not available.\n"
-            f"Available {module}(s):\n"
-            f"{module.__all__}"
-        )
-
-    return module.__dict__[key]
-
-
-def get_classes_from_config(configs: Dict):
-    """
-    Return a list of instantiated classes given by `configs`. Each key in
-    `configs` is a class path, to be imported dynamically via importlib,
-    with arguments given by the correponding value in the dict.
-    """
-    instantiated_classes = []
-    for class_path, class_config in configs.items():
-        class_path = class_path.split(".")
-        class_module = ".".join(class_path[:-1])
-        class_name = class_path[-1]
-        the_class = getattr(importlib.import_module(class_module), class_name)
-        instantiated_class = the_class(**class_config)
-        instantiated_classes.append(instantiated_class)
-
-    return instantiated_classes
 
 
 def train_model(
@@ -51,17 +24,20 @@ def train_model(
     datamodule_config: Dict,
     trainer_config: Dict,
     gpu_ids: List[int],
+    model_zoo_config: Dict,
     callbacks: Dict = {},
     loggers: Dict = {},
-    model_zoo_path: Optional[str] = None,
     seed: int = 42,
-    store_config: bool = True,
-    checkpoint_monitor: Optional[str] = None,
-    checkpoint_mode: str = "min",
+
 ):
     called_args = locals()
 
     pl.seed_everything(seed)
+
+    model_zoo_path = model_zoo_config.get("path")
+    store_config = model_zoo_config.get("store_config", True)
+    checkpoint_monitor = model_zoo_config.get("checkpoint_monitor", None)
+    checkpoint_mode = model_zoo_config.get("checkpoint_mode", None)
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
     os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(gpu_ids)

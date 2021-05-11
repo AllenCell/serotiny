@@ -18,10 +18,6 @@ from .image import (
 from .loaders import (
     LoadColumns,
     LoadClass,
-    LoadOneHotClass,
-    LoadIntClass,
-    LoadPCA,
-    LoadSpharmCoeffs,
     Load2DImage,
     Load3DImage,
 )

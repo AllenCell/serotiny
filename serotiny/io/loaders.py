@@ -2,11 +2,11 @@
 Module to define classes used to load values from manifest dataframes
 """
 
+import re
 import torch
 import numpy as np
 
 from .image import tiff_loader_CZYX, png_loader
-from serotiny.utils.model_utils import index_to_onehot
 
 __all__ = ["LoadColumns", "LoadClass", "Load2DImage", "Load3DImage"]
 
@@ -16,11 +16,59 @@ class LoadColumns:
     Loader class, used to retrieve fields directly from dataframe columns
     """
 
-    def __init__(self, columns):
+    def __init__(self, columns=None, startswith=None, endswith=None,
+                 contains=None, excludes=None, regex=None, dtype="float"):
+
         self.columns = columns
+        self.startswith = startswith
+        self.endswith = endswith
+        self.contains = contains
+        self.excludes = excludes
+        self.regex = regex
+        self.dtype = dtype
+
+        if columns is None:
+            assert (
+                (startswith is not None) or
+                (endswith is not None) or
+                (contains is not None) or
+                (excludes is not None) or
+                (regex is not None)
+            )
+        else:
+            self.columns = set(columns)
+
+    def _filter(self, cols_to_filter):
+        if self.columns is not None:
+            return (col for col in cols_to_filter if col in self.columns)
+
+        if self.regex is not None:
+            # cache regex results
+            self.columns = {
+                col for col in cols_to_filter if re.match(self.regex, col)
+            }
+            return (col for col in cols_to_filter if col in self.columns)
+
+        keep = [True] * len(cols_to_filter)
+        for i in range(len(cols_to_filter)):
+            if self.startswith is not None:
+                keep[i] &= str(cols_to_filter[i]).startswith(self.startswith)
+            if self.endswith is not None:
+                keep[i] &= str(cols_to_filter[i]).endswith(self.endswith)
+            if self.contains is not None:
+                keep[i] &= (self.contains in str(cols_to_filter[i]))
+            if self.excludes is not None:
+                keep[i] &= (self.excludes not in str(cols_to_filter[i]))
+
+        self.columns = {
+            col for col, keep_col in zip(cols_to_filter, keep)
+            if keep_col
+        }
+        return (col for col in cols_to_filter if col in self.columns)
 
     def __call__(self, row):
-        return {column: row[column] for column in self.columns}
+        return row[[column for column
+                    in self._filter(row.index)]].values.astype(self.dtype)
 
 
 class LoadClass:
@@ -38,90 +86,6 @@ class LoadClass:
             return torch.tensor([row[str(i)] for i in range(self.num_classes)])
 
         return torch.tensor(row[self.y_encoded_label])
-
-
-class LoadOneHotClass:
-    """
-    A hacky one hot loader
-    Load one hot encoding, also set it to 0 if
-    we dont want any condition
-    """
-
-    def __init__(self, num_classes, y_encoded_label, set_zero=False):
-        self.num_classes = num_classes
-        self.y_encoded_label = y_encoded_label
-        self.set_zero = set_zero
-
-    def __call__(self, row):
-        x_cond = torch.tensor(row[self.y_encoded_label])
-        x_cond = torch.unsqueeze(x_cond, 0)
-        x_cond = torch.unsqueeze(x_cond, 0)
-        x_cond_one_hot = index_to_onehot(x_cond, self.num_classes)
-        x_cond_one_hot = x_cond_one_hot.squeeze(0)
-        if self.set_zero:
-            x_cond_one_hot[x_cond_one_hot != 0] = 0
-        return x_cond_one_hot
-
-
-class LoadIntClass:
-    """
-    A hacky int class loader
-    Load int values for classes, also set to 0 if
-    we dont want any condition
-    """
-
-    def __init__(self, num_classes, y_encoded_label, set_zero=False):
-        self.num_classes = num_classes
-        self.y_encoded_label = y_encoded_label
-        self.set_zero = set_zero
-
-    def __call__(self, row):
-        x_cond = torch.tensor(row[self.y_encoded_label])
-        x_cond = torch.unsqueeze(x_cond, 0)
-        x_cond = torch.unsqueeze(x_cond, 0)
-        x_cond_one_hot = index_to_onehot(x_cond, self.num_classes)
-        # x_cond_one_hot = x_cond_one_hot.squeeze(0)
-        x_cond_argmax = torch.argmax(x_cond_one_hot, axis=1)
-        if self.set_zero:
-            x_cond_argmax[x_cond_argmax != 0] = 0
-        x_cond_argmax = x_cond_argmax.squeeze(0)
-        return x_cond_argmax
-
-
-class LoadPCA:
-    """
-    Loader class, used to retrieve PCA from the dataframe,
-    also set to 0 if we dont want any pca values
-    """
-
-    def __init__(self, x_label, get_inds=False, set_zero=False):
-        self.x_label = x_label  # DNA_PC1...
-        self.get_inds = get_inds
-        self.set_zero = set_zero
-
-    def __call__(self, row):
-        pca_cols = [col for col in row.keys() if self.x_label in col]
-        pca_cols = pca_cols[:8]
-        pca = torch.tensor(row[pca_cols]).float()
-        if self.set_zero:
-            pca[pca != 0] = 0
-        if self.get_inds:
-            pca = torch.ones(1) * len(pca)
-            pca = pca.squeeze(0)
-        return pca
-
-
-class LoadSpharmCoeffs:
-    """
-    Loader class, used to retrieve spharm coeffs from the dataframe,
-    """
-
-    def __init__(self, x_label, spharm_cols):
-        self.x_label = x_label
-        self.spharm_cols = spharm_cols
-
-    def __call__(self, row):
-        return torch.tensor(row[self.spharm_cols])
 
 
 class Load2DImage:

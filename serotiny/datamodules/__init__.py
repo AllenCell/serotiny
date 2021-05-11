@@ -1,12 +1,9 @@
 from .actk.actk2d import ACTK2DDataModule
 from .actk.actk3d import ACTK3DDataModule
 from .aics_mnist import AICS_MNIST_DataModule
-from .dummy import DummyDatamodule
-from .folder_datamodule import FolderDatamodule
-from .variance_spharm_coeffs import VarianceSpharmCoeffs
-from .gaussian import GaussianDataModule
 from .image_image import ImageImage
-from .dummy_image import DummyImageDatamodule
+from .dummy import DummyDatamodule
+from .manifest_datamodule import ManifestDatamodule
 
 __all__ = [
     "ACTK2DDataModule",
@@ -14,8 +11,5 @@ __all__ = [
     "AICS_MNIST_DataModule",
     "DummyDatamodule",
     "ImageImage",
-    "DummyImageDatamodule",
-    "VarianceSpharmCoeffs",
-    "GaussianDataModule",
-    "FolderDatamodule",
+    "ManifestDatamodule",
 ]

@@ -54,18 +54,12 @@ class DataframeDataset(Dataset):
     def __len__(self):
         return len(self.dataframe)
 
-    def _get_single_item(self, idx):
-        if self.iloc:
-            row = self.dataframe.iloc[idx, :]
-        else:
-            row = self.dataframe.loc[idx, :]
-
-        return {key: loader(row) for key, loader in self.loaders.items()}
-
     def __getitem__(self, idx):
-        sample = (
-            collate([self._get_single_item(i) for i in idx])
-            if (isinstance(idx, Iterable) and not isinstance(idx, str))
-            else self._get_single_item(idx)
-        )
-        return sample
+        if self.iloc:
+            row = self.dataframe.iloc[idx]
+        else:
+            row = self.dataframe.loc[idx]
+
+        return {
+            key: loader(row) for key, loader in self.loaders.items()
+        }
