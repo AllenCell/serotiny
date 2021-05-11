@@ -71,7 +71,7 @@ class SpharmLatentWalk(Callback):
             ]
 
         if self.cutoff_kld_per_dim is None:
-            self.cutoff_kld_per_dim = 0
+            self.cutoff_kld_per_dim = 0.1
 
         if self.plot_limits is None:
             self.plot_limits = [-150, 150, -80, 80]
@@ -106,7 +106,7 @@ class SpharmLatentWalk(Callback):
                 dir_path, self.cutoff_kld_per_dim, max_num_shapemodes=8
             )
 
-            self.config['shapespace']['number_of_shape_modes'] = len(ranked_z_dim_list)
+            self.config["shapespace"]["number_of_shape_modes"] = len(ranked_z_dim_list)
 
             batch_size = trainer.test_dataloaders[0].batch_size
             latent_dims = pl_module.encoder.enc_layers[-1]
@@ -130,7 +130,7 @@ class SpharmLatentWalk(Callback):
                 self.config,
                 self.dna_spharm_cols,
             )
-
+            print(ranked_z_dim_list)
             print(self.config["shapespace"])
 
             if not self.ignore_mesh_and_contour_plots:

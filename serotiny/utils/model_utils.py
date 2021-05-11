@@ -39,6 +39,14 @@ def get_ranked_dims(
     stats = pd.read_csv(dir_path / "stats_per_dim_test.csv")
 
     stats = (
+        stats.loc[stats["test_kld_per_dim"] > 0]
+        .sort_values(by=["test_kld_per_dim"])
+        .reset_index(drop=True)
+    )
+
+    mu_mean_list = [i for i in stats["mu_mean_per_dim"][::-1]]
+
+    stats = (
         stats.loc[stats["test_kld_per_dim"] > cutoff_kld_per_dim]
         .sort_values(by=["test_kld_per_dim"])
         .reset_index(drop=True)
@@ -46,7 +54,6 @@ def get_ranked_dims(
 
     ranked_z_dim_list = [i for i in stats["dimension"][::-1]]
     mu_std_list = [i for i in stats["mu_std_per_dim"][::-1]]
-    mu_mean_list = [i for i in stats["mu_mean_per_dim"][::-1]]
 
     if len(ranked_z_dim_list) > max_num_shapemodes:
         ranked_z_dim_list = ranked_z_dim_list[:max_num_shapemodes]
@@ -634,8 +641,8 @@ def log_metrics(outputs, prefix, current_epoch, dir_path):
         sns.set_context("talk")
         sns.heatmap(
             mu_corrs.abs(),
-            cmap="Blues",
-            vmin=0,
+            cmap="RdBu_r",
+            vmin=-1,
             vmax=1,
             xticklabels=True,
             yticklabels=True,
