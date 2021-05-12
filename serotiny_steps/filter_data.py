@@ -1,13 +1,10 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import logging
 from typing import Optional, List
 import pandas as pd
 
 import fire
 
-from serotiny.io.data import load_csv
+from serotiny.io.dataframe import load_csv
 
 ###############################################################################
 

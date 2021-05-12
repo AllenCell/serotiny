@@ -7,7 +7,7 @@ import fire
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 
-from serotiny.io import download_quilt_data
+from serotiny.io.utils import download_quilt_data
 
 
 def cellpath2dict(path):
