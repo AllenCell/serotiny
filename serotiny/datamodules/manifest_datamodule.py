@@ -9,7 +9,7 @@ import pytorch_lightning as pl
 
 from torch.utils.data.sampler import SubsetRandomSampler
 
-from serotiny.io.dataframe_dataset import DataframeDataset
+from serotiny.io.dataframe import DataframeDataset
 from serotiny.utils import get_classes_from_config
 from serotiny.datamodules.utils import TrainDataLoader, EvalDataLoader
 
