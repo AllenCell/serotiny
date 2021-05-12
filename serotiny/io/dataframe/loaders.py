@@ -6,22 +6,20 @@ import re
 import torch
 import numpy as np
 
+from collections import defaultdict
 from torchvision import transforms
 
-from serotiny.image import tiff_loader_CZYX, png_loader
+from serotiny.io.image import tiff_loader_CZYX, png_loader
 from serotiny.utils import get_classes_from_config
 
 __all__ = ["LoadColumns", "LoadClass", "Load2DImage", "Load3DImage"]
 
 class Loader:
     def __init__(self):
-        self.train()
+        self.set_mode("train")
 
-    def train(self):
-        self.mode = "train"
-
-    def eval(self):
-        self.mode = "eval"
+    def set_mode(self, mode):
+        self.mode = mode
 
 
 class LoadColumns(Loader):
@@ -108,13 +106,16 @@ class Load2DImage(Loader):
     """
 
     def __init__(self, chosen_col, num_channels, channel_indexes,
-                 train_transforms, eval_transforms):
+                 transforms_dict={}):
+
         super().__init__()
         self.chosen_col = chosen_col
         self.num_channels = num_channels
         self.channel_indexes = channel_indexes
-        self.train_transform = load_transforms(train_transforms)
-        self.eval_transform = load_transforms(eval_transforms)
+
+        self.transforms = defaultdict(None)
+        for key, transforms_config in transforms_dict.items():
+            self.transforms[key] = load_transforms(transforms_config)
 
 
     def __call__(self, row):
@@ -122,8 +123,7 @@ class Load2DImage(Loader):
             row[self.chosen_col],
             channel_order="CYX",
             indexes={"C": self.channel_indexes or range(self.num_channels)},
-            transform=(self.train_transform if self.mode == "train"
-                       else self.eval_transform)
+            transform=self.transforms[self.mode]
         )
 
 
@@ -132,13 +132,15 @@ class Load3DImage(Loader):
     Loader class, used to retrieve images from paths given in a dataframe column
     """
 
-    def __init__(self, chosen_col, select_channels=None, train_transforms=None,
-                 eval_transforms=None):
+    def __init__(self, chosen_col, select_channels=None, transforms_dict={}):
         super().__init__()
         self.chosen_col = chosen_col
         self.select_channels = select_channels
-        self.train_transform = load_transforms(train_transforms)
-        self.eval_transform = load_transforms(eval_transforms)
+
+        self.transforms = defaultdict(None)
+        for key, transforms_config in transforms_dict.items():
+            self.transforms[key] = load_transforms(transforms_config)
+
 
     def __call__(self, row):
         return tiff_loader_CZYX(
@@ -147,8 +149,7 @@ class Load3DImage(Loader):
             output_dtype=np.float32,
             channel_masks=None,
             mask_thresh=0,
-            transform=(self.train_transform if self.mode == "train"
-                       else self.eval_transform)
+            transform=self.transforms[self.mode]
         )
 
 

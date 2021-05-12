@@ -11,7 +11,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 from serotiny.io.dataframe import DataframeDataset
 from serotiny.utils import get_classes_from_config
-from serotiny.datamodules.utils import TrainDataLoader, EvalDataLoader
+from serotiny.datamodules.utils import ModeDataLoader
 
 def make_manifest_dataset(
     manifest: Union[Path, str],
@@ -36,15 +36,11 @@ def make_manifest_dataset(
 
 def make_dataloader(dataset, batch_size, num_workers, sampler, pin_memory,
                     stage, drop_last=False):
-    if stage == "train":
-        dataloader_class = TrainDataLoader
-    else:
-        dataloader_class = EvalDataLoader
-
-    return dataloader_class(
-        dataset,
+    return ModeDataLoader(
+        mode=stage,
+        dataset=dataset,
         batch_size=batch_size,
-        pin_memory=True,
+        pin_memory=pin_memory,
         drop_last=drop_last,
         num_workers=num_workers,
         multiprocessing_context=mp.get_context("fork"),
@@ -91,7 +87,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         split_col: Optional[str] = None,
         pin_memory: bool = True,
         drop_last: bool = True,
-        metadata: dict,
+        metadata: Dict = {},
     ):
 
         super().__init__()

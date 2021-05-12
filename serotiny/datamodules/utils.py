@@ -1,12 +1,11 @@
 from torch.utils.data import DataLoader
 
 
-class TrainDataLoader(DataLoader):
-    def __iter__(self):
-        self.dataset.train()
-        return super().__iter__()
+class ModeDataLoader(DataLoader):
+    def __init__(self, mode, *args, **kwargs):
+        self.mode = mode
+        super(ModeDataLoader, self).__init__(*args, **kwargs)
 
-class EvalDataLoader(DataLoader):
     def __iter__(self):
-        self.dataset.eval()
+        self.dataset.set_mode(self.mode)
         return super().__iter__()
