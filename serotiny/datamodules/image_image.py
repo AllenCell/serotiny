@@ -10,7 +10,6 @@ from aicsimageprocessing.resize import resize_to
 from ..io.image import tiff_loader
 from ..io.data import load_data_loader
 from ..io.loaders import Load3DImage, LoadClass, LoadColumns
-from .constants import DatasetFields
 from .base_datamodule import BaseDataModule
 
 
