@@ -1,11 +1,7 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import logging
 import fire
 
-from serotiny.io.data import load_csv
-from serotiny.io import append_one_hot
+from serotiny.io.dataframe import load_csv, append_one_hot
 
 ###############################################################################
 
