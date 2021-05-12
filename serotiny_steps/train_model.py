@@ -1,9 +1,7 @@
 import os
-import importlib
 import logging
 
-from typing import Optional, List, Dict
-from pathlib import Path
+from typing import List, Dict
 from datetime import datetime
 
 import fire
@@ -28,7 +26,6 @@ def train_model(
     callbacks: Dict = {},
     loggers: Dict = {},
     seed: int = 42,
-
 ):
     called_args = locals()
 
