@@ -1,0 +1,76 @@
+import os
+import logging
+from pathlib import Path
+import fire
+
+from sklearn.model_selection import train_test_split
+
+import pandas as pd
+
+
+from serotiny.io.dataframe import load_csv, append_one_hot
+
+###############################################################################
+
+log = logging.getLogger(__name__)
+
+###############################################################################
+
+
+def reset_index(dataset, index):
+    pd.DataFrame(
+        dataset.loc[index, :].reset_index(drop=True))
+
+
+def write_csvs(datasets, output_path):
+    for key, dataset in datasets.items():
+        if not os.path.exists(output_path):
+            os.makedirs(output_path)
+        save_path = Path(output_path) / f"{key}.csv"
+        dataset.to_csv(save_path, index=False)
+
+
+def partition_data(
+        dataset_path: str,
+        output_path: str,
+        partition=100,
+        partition_prefix='partition',
+    ):
+
+    """
+    Split the incoming data into N sets of output data, where
+    each set has `partition` elements, generating filenames
+    based on `partition_prefix`.
+    """
+
+    if required_fields is None:
+        required_fields = {}
+
+    dataset = load_csv(dataset_path, required_fields)
+    partition_count = len(dataset) // partition
+    remaining = len(dataset) % partition
+    if remaining > 0:
+        partition_count += 1
+
+    cursor = 0
+    partitions = {}
+    for partition_index in range(partition_count):
+        seek = cursor + partition
+        if seek > len(dataset):
+            seek = cursor + remaining
+        partition_rows = dataset[cursor:seek]
+        partition_key = f'{partition_prefix}_{index}'
+        partitions[partition_key] = partition_rows
+        cursor += partition
+
+    write_csvs(partitions, output_path)
+
+
+if __name__ == "__main__":
+    # example command:
+    # python -m serotiny_steps.partition_data \
+    #     --dataset_path "data/filtered.csv" \
+    #     --output_path "data/partitions/" \
+    #     --partition 50
+
+    fire.Fire(partition_data)
