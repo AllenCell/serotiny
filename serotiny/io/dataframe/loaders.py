@@ -10,7 +10,7 @@ from collections import defaultdict
 from torchvision import transforms
 
 from serotiny.io.image import tiff_loader_CZYX, png_loader
-from serotiny.utils import get_classes_from_config
+from serotiny.utils import get_classes_from_config, filter_columns
 
 __all__ = ["LoadColumns", "LoadClass", "Load2DImage", "Load3DImage"]
 
@@ -49,37 +49,18 @@ class LoadColumns(Loader):
         else:
             self.columns = set(columns)
 
-    def _filter(self, cols_to_filter):
-        if self.columns is not None:
-            return (col for col in cols_to_filter if col in self.columns)
+    def _filter_columns(self, cols_to_filter):
+        if self.columns is None:
+            self.columns = filter_columns(
+                cols_to_filter, self.regex, self.startswith, self.endswith,
+                self.contains, self.excludes)
 
-        if self.regex is not None:
-            # cache regex results
-            self.columns = {
-                col for col in cols_to_filter if re.match(self.regex, col)
-            }
-            return (col for col in cols_to_filter if col in self.columns)
+        return self.columns
 
-        keep = [True] * len(cols_to_filter)
-        for i in range(len(cols_to_filter)):
-            if self.startswith is not None:
-                keep[i] &= str(cols_to_filter[i]).startswith(self.startswith)
-            if self.endswith is not None:
-                keep[i] &= str(cols_to_filter[i]).endswith(self.endswith)
-            if self.contains is not None:
-                keep[i] &= (self.contains in str(cols_to_filter[i]))
-            if self.excludes is not None:
-                keep[i] &= (self.excludes not in str(cols_to_filter[i]))
-
-        self.columns = {
-            col for col, keep_col in zip(cols_to_filter, keep)
-            if keep_col
-        }
-        return (col for col in cols_to_filter if col in self.columns)
 
     def __call__(self, row):
-        return row[[column for column
-                    in self._filter(row.index)]].values.astype(self.dtype)
+        filtered_cols = self._filter_columns(row.index)
+        return row[filtered_cols].values.astype(self.dtype)
 
 
 class LoadClass(Loader):
