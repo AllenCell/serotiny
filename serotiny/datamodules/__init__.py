@@ -5,6 +5,7 @@ from .dummy import DummyDatamodule
 from .folder_datamodule import FolderDatamodule
 from .variance_spharm_coeffs import VarianceSpharmCoeffs
 from .gaussian import GaussianDataModule
+from .intensity_representation import IntensityRepresentation
 
 __all__ = [
     "ACTK2DDataModule",
@@ -14,4 +15,5 @@ __all__ = [
     "VarianceSpharmCoeffs",
     "GaussianDataModule",
     "FolderDatamodule",
+    "IntensityRepresentation",
 ]

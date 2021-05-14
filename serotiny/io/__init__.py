@@ -24,5 +24,7 @@ from .loaders import (
     LoadSpharmCoeffs,
     Load2DImage,
     Load3DImage,
+    LoadPIRFlattened,
+    LoadCond,
 )
 

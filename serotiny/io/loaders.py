@@ -4,6 +4,8 @@ Module to define classes used to load values from manifest dataframes
 
 import torch
 import numpy as np
+from aicsimageio import AICSImage
+from sklearn.preprocessing import MinMaxScaler
 
 from .image import tiff_loader, png_loader
 from serotiny.utils.model_utils import index_to_onehot
@@ -110,6 +112,27 @@ class LoadPCA:
             pca = pca.squeeze(0)
         return pca
 
+class LoadCond:
+    """
+    Loader class, used to retrieve PCA from the dataframe,
+    also set to 0 if we dont want any pca values
+    """
+
+    def __init__(self, x_label, get_inds=False, set_zero=False):
+        self.x_label = x_label  # DNA_PC1...
+        self.get_inds = get_inds
+        self.set_zero = set_zero
+
+    def __call__(self, row):
+        cols = [col for col in row.keys() if self.x_label in col]
+        cols = torch.tensor(row[cols]).float()
+        if self.set_zero:
+            cols[cols != 0] = 0
+        if self.get_inds:
+            cols = torch.ones(1) * len(cols)
+            cols = cols.squeeze(0)
+        return cols
+
 
 class LoadSpharmCoeffs:
     """
@@ -122,6 +145,32 @@ class LoadSpharmCoeffs:
 
     def __call__(self, row):
         return torch.tensor(row[self.spharm_cols])
+
+class LoadPIRFlattened:
+    """
+    Loader class, used to retrieve PIR from the dataframe,
+    """
+
+    def __init__(self, x_label, common_path):
+        self.x_label = x_label # PathToRepresentationFile
+        self.common_path = common_path
+
+    def __call__(self, row):
+        img = AICSImage(self.common_path + row[self.x_label])
+        # img2 = img.get_image_data("CYX", S=0, T=0, Z=0)
+        img2 = img.data[0,0,:,0,:,:]
+        img3 = img2[:,:,:]
+
+        scaler = MinMaxScaler()
+        scaler.fit(img3[1,:,:])
+        img3[1,:,:]=scaler.transform(img3[1,:,:])
+
+        scaler2 = MinMaxScaler()
+        scaler2.fit(img3[0,:,:])
+        img3[0,:,:]=scaler2.transform(img3[0,:,:])
+
+        img3 = img3[:, ::3, ::10]
+        return torch.tensor(img3.flatten())
 
 
 class Load2DImage:

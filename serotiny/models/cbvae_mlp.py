@@ -125,6 +125,7 @@ class CBVAEMLPModel(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         x, x_cond, x_cond_inds = self.parse_batch(batch)
+        print('train', batch_idx)
         # kld_elem is batch * num_latent_dims
         # rcl_elem is batch * Y shape of input
         x_hat, mu, _, loss, recon_loss, kld_loss, kld_elem, rcl_elem = self(x, x_cond)
