@@ -62,6 +62,9 @@ class CBVAEMLPModel(pl.LightningModule):
         self.prior_mean = None
         self.prior_logvar = prior_logvar
 
+        self.loss = torch.nn.MSELoss(size_average=False)
+        self.loss_per_element = torch.nn.MSELoss(size_average=False, reduce=False)
+
         if prior_mode not in ["isotropic", "anisotropic"]:
             raise NotImplementedError(f"KLD mode '{prior_mode}' not implemented")
 
@@ -106,6 +109,8 @@ class CBVAEMLPModel(pl.LightningModule):
             mu,
             logsigma,
             self.beta,
+            self.loss,
+            self.loss_per_element,
             mask=self.mask,
             mode=self.prior_mode,
             prior_mu=(None if self.prior_mean is None else self.prior_mean.type_as(mu)),
@@ -138,17 +143,17 @@ class CBVAEMLPModel(pl.LightningModule):
 
         return {
             "loss": loss,
-            "train_loss": loss,  # for epoch end logging purposes
-            "recon_loss": recon_loss,
-            "kld_loss": kld_loss,
-            "input": x,
-            "recon": x_hat,
-            "cond": x_cond,
-            "cond_labels": x_cond_inds,
-            "kld_per_elem": kld_elem,
-            "rcl_per_elem": rcl_elem,
+            "train_loss": loss.detach().cpu(),  # for epoch end logging purposes
+            "recon_loss": recon_loss.detach().cpu(),
+            "kld_loss": kld_loss.detach().cpu(),
+            "input": x.detach().cpu(),
+            "recon": x_hat.detach().cpu(),
+            "cond": x_cond.detach().cpu(),
+            "cond_labels": x_cond_inds.detach().cpu(),
+            "kld_per_elem": kld_elem.detach().cpu(),
+            "rcl_per_elem": rcl_elem.detach().cpu(),
             "batch_idx": batch_idx,
-            "mu_per_elem": mu,
+            "mu_per_elem": mu.detach().cpu(),
         }
 
     def training_epoch_end(self, outputs):
@@ -167,17 +172,16 @@ class CBVAEMLPModel(pl.LightningModule):
 
         return {
             "val_loss": loss,
-            "recon_loss": recon_loss,
-            "kld_loss": kld_loss,
-            "input": x,
-            "recon": x_hat,
-            "cond": x_cond,
-            "cond_labels": x_cond_inds,
-            "kld_per_elem": kld_elem,
-            "rcl_per_elem": rcl_elem,
+            "recon_loss": recon_loss.detach().cpu(),
+            "kld_loss": kld_loss.detach().cpu(),
+            "input": x.detach().cpu(),
+            "recon": x_hat.detach().cpu(),
+            "cond": x_cond.detach().cpu(),
+            "cond_labels": x_cond_inds.detach().cpu(),
+            "kld_per_elem": kld_elem.detach().cpu(),
+            "rcl_per_elem": rcl_elem.detach().cpu(),
             "batch_idx": batch_idx,
-            "batch": batch,
-            "mu_per_elem": mu,
+            "mu_per_elem": mu.detach().cpu(),
         }
 
     def validation_epoch_end(self, outputs):
@@ -195,17 +199,17 @@ class CBVAEMLPModel(pl.LightningModule):
         self.log("test_loss", loss, logger=True)
 
         return {
-            "test_loss": loss,
-            "recon_loss": recon_loss,
-            "kld_loss": kld_loss,
-            "input": x,
-            "recon": x_hat,
-            "cond": x_cond,
-            "cond_labels": x_cond_inds,
-            "kld_per_elem": kld_elem,
-            "rcl_per_elem": rcl_elem,
+            "test_loss": loss.detach().cpu(),
+            "recon_loss": recon_loss.detach().cpu(),
+            "kld_loss": kld_loss.detach().cpu(),
+            "input": x.detach().cpu(),
+            "recon": x_hat.detach().cpu(),
+            "cond": x_cond.detach().cpu(),
+            "cond_labels": x_cond_inds.detach().cpu(),
+            "kld_per_elem": kld_elem.detach().cpu(),
+            "rcl_per_elem": rcl_elem.detach().cpu(),
             "batch_idx": batch_idx,
-            "mu_per_elem": mu,
+            "mu_per_elem": mu.detach().cpu(),
         }
 
     def test_epoch_end(self, outputs):

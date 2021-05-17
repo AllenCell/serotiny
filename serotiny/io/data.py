@@ -173,6 +173,8 @@ def load_data_loader(
 
     dataframe = DataframeDataset(dataset, loaders=loaders)
 
+    # print('made dataframe')
+
     # Configure WeightedRandomSampler to handle class imbalances
     sampler = None
     if weights_col is not None:
@@ -188,8 +190,10 @@ def load_data_loader(
         pin_memory=pin_memory,
         drop_last=drop_last,
         num_workers=num_workers,
-        multiprocessing_context=mp.get_context("fork"),
+        # persistent_workers=True,
+        # multiprocessing_context=mp.get_context("fork"),
     )
+    # print('made dataloader')
 
     return dataloader
 

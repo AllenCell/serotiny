@@ -20,6 +20,8 @@ def calculate_elbo(
     mean,
     log_var,
     beta,
+    loss, 
+    loss_per_element,
     mask=False,
     mode="isotropic",
     prior_mu=None,
@@ -30,9 +32,6 @@ def calculate_elbo(
     KLD loss as per VAE.
     Also want to output dimension (element) wise RCL and KLD
     """
-
-    loss = torch.nn.MSELoss(size_average=False)
-    loss_per_element = torch.nn.MSELoss(size_average=False, reduce=False)
 
     # if x is masked, find indices in x
     # that are 0 and set reconstructed x to 0 as well
