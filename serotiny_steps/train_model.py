@@ -10,7 +10,7 @@ import pytorch_lightning as pl
 import serotiny.datamodules as datamodules
 import serotiny.models as models
 from serotiny.models.zoo import get_checkpoint_callback, store_called_args
-from serotiny.utils import module_get, get_classes_from_config
+from serotiny.utils import module_get, module_or_path, get_classes_from_config
 
 log = logging.getLogger(__name__)
 
@@ -41,14 +41,14 @@ def train_model(
     num_gpus = len(gpu_ids)
     num_gpus = (num_gpus if num_gpus != 0 else None)
 
-    model_class = module_get(models, model_name)
+    model_class = module_or_path(models, model_name)
     model = model_class(**model_config)
     version_string = "version_" + datetime.now().strftime("%d-%m-%Y--%H-%M-%S")
 
     if store_config:
         store_called_args(called_args, model_name, version_string, model_zoo_path)
 
-    create_datamodule = module_get(datamodules, datamodule_name)
+    create_datamodule = module_or_path(datamodules, datamodule_name)
     datamodule = create_datamodule(**datamodule_config)
     datamodule.setup()
 

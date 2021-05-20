@@ -13,6 +13,25 @@ def module_get(module, key):
     return module.__dict__[key]
 
 
+def module_path(module, path):
+    if not path:
+        return module
+    else:
+        down = module_get(module, path[0])
+        return module_path(down, path[1:])
+
+
+def search_modules(modules, path):
+    found = None
+    for module in modules:
+        try:
+            found = module_path(module, path)
+            break
+        except KeyError:
+            pass
+    return found
+
+
 def get_class_from_path(class_path: str):
     """
     Given a class path as a string (e.g. some.module.ClassName),
@@ -22,6 +41,13 @@ def get_class_from_path(class_path: str):
     class_module = ".".join(class_path[:-1])
     class_name = class_path[-1]
     return getattr(importlib.import_module(class_module), class_name)
+
+
+def module_or_path(module, key)
+    try:
+        return module_get(module, key)
+    except KeyError:
+        return get_class_from_path(key)
 
 
 def get_classes_from_config(configs: Dict):
