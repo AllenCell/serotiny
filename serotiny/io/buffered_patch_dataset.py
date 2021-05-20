@@ -38,14 +38,12 @@ class BufferedPatchDataset(Dataset):
         buffer_size: int = 1,
         buffer_switch_interval: int = -1,
         shuffle_images: bool = True,
-        keys: Sequence[str] = ('x', 'y')
     ):
         self.dataset = dataset
         self.patch_shape = patch_shape
         self.buffer_size = min(len(self.dataset), buffer_size)
         self.buffer_switch_interval = buffer_switch_interval
         self.shuffle_images = shuffle_images
-        self.keys = keys
 
         self.counter = 0
         self.epochs = -1  # incremented to 0 when buffer initially filled
@@ -66,10 +64,7 @@ class BufferedPatchDataset(Dataset):
         ):
             self.insert_new_element_into_buffer()
 
-        return {
-            key: patch[index]
-            for index, key in enumerate(self.keys())
-        }
+        return patch
 
     def get_patch(self, buffer_index):
         """Samples patch from the item in the buffer at the given buffer_index.

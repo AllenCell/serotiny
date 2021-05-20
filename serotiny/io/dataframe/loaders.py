@@ -86,11 +86,11 @@ class Load2DImage(Loader):
     Loader class, used to retrieve images from paths given in a dataframe column
     """
 
-    def __init__(self, chosen_col, num_channels, channel_indexes,
+    def __init__(self, column='image', num_channels, channel_indexes,
                  transforms_dict={}):
 
         super().__init__()
-        self.chosen_col = chosen_col
+        self.column = column
         self.num_channels = num_channels
         self.channel_indexes = channel_indexes
 
@@ -101,7 +101,7 @@ class Load2DImage(Loader):
 
     def __call__(self, row):
         return png_loader(
-            row[self.chosen_col],
+            row[self.column],
             channel_order="CYX",
             indexes={"C": self.channel_indexes or range(self.num_channels)},
             transform=self.transforms[self.mode]
@@ -113,10 +113,11 @@ class Load3DImage(Loader):
     Loader class, used to retrieve images from paths given in a dataframe column
     """
 
-    def __init__(self, chosen_col, select_channels=None, transforms_dict={}):
+    def __init__(self, column='image', select_channels=None, transforms_dict=None):
         super().__init__()
-        self.chosen_col = chosen_col
+        self.column = column
         self.select_channels = select_channels
+        transforms_dict = transforms_dict or {}
 
         self.transforms = defaultdict(None)
         for key, transforms_config in transforms_dict.items():
@@ -125,7 +126,7 @@ class Load3DImage(Loader):
 
     def __call__(self, row):
         return tiff_loader_CZYX(
-            row[self.chosen_col],
+            row[self.column],
             select_channels=self.select_channels,
             output_dtype=np.float32,
             channel_masks=None,
@@ -142,10 +143,10 @@ def load_transforms(transforms_dict):
     return None
 
 
-def infer_extension_loader(extension, chosen_col="true_paths"):
+def infer_extension_loader(extension, column="true_paths"):
     if extension == ".png":
         return Load2DImage(
-            chosen_col=chosen_col,
+            column=column,
             num_channels=3,
             channel_indexes=[0, 1, 2],
             transform=None,
@@ -153,7 +154,7 @@ def infer_extension_loader(extension, chosen_col="true_paths"):
 
     if extension == ".tiff":
         return Load3DImage(
-            chosen_col=chosen_col,
+            column=column,
         )
 
     raise NotImplementedError(

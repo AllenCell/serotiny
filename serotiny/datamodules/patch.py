@@ -9,33 +9,63 @@ import pytorch_lightning as pl
 
 from torch.utils.data import DataLoader
 
-from serotiny.utils import get_classes_from_config
+from serotiny.utils import get_classes_from_config, get_class_from_path, path_invocations
 from serotiny.io.buffered_patch_dataset import BufferedPatchDataset
 
 
-make_patch_dataset(manifest_path):
+def make_manifest_dataset(
+        manifest: str,
+        loaders: dict):
+    dataframe = pd.read_csv(manifest)
 
-
+    return DataframeDataset(
+        dataframe=dataframe,
+        loaders=loaders,
+        iloc=True)
 
 
 class PatchDatamodule(pl.LightningDataModule):
     def __init__(
         self,
         manifest_path: str,
+        loaders: dict,
         batch_size: int,
         num_workers: int,
         pin_memory: bool = True,
         drop_last: bool = True,
+        patch_shape: Sequence[int] = (32, 64, 64),
+        buffer_size: int = 1,
+        buffer_switch_interval: int = -1,
+        shuffle_images: bool = True,
     ):
         self.manifest_path = Path(manifest_path)
+        self.loaders = path_invocations(loaders)
+
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.pin_memory = pin_memory
         self.drop_last = drop_last
 
-        self.train = make_patch_dataset(self.manifest_path / 'train.csv')
-        self.valid = make_patch_dataset(self.manifest_path / 'valid.csv')
-        self.test = make_patch_dataset(self.manifest_path / 'test.csv')
+        self.patch_shape = patch_shape
+        self.buffer_size = buffer_size
+        self.buffer_switch_interval = buffer_switch_interval
+        self.shuffle_images = shuffle_images
+
+        self.train_manifest = make_manifest_dataset(self.manifest_path / 'train.csv', self.loaders)
+        self.valid_manifest = make_manifest_dataset(self.manifest_path / 'valid.csv', self.loaders)
+        self.test_manifest = make_manifest_dataset(self.manifest_path / 'test.csv', self.loaders)
+
+        self.train = self.make_patch_dataset(self.train_manifest)
+        self.valid = self.make_patch_dataset(self.valid_manifest)
+        self.test = self.make_patch_dataset(self.test_manifest)
+
+    def make_patch_dataset(self, dataset):
+        return BufferedPatchDataset(
+            dataset=dataset,
+            patch_shape=self.patch_shape,
+            buffer_size=self.buffer_size,
+            buffer_switch_interval=self.buffer_switch_interval,
+            shuffle_images=self.shuffle_images)
 
     def make_dataloader(self, dataset):
         return DataLoader(

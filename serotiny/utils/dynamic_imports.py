@@ -68,3 +68,19 @@ def get_classes_from_config(configs: Dict):
         instantiated_classes.append(instantiated_class)
 
     return instantiated_classes
+
+def keep(d: Dict, f: callable):
+    return {
+        key: value
+        for key, value in d.items()
+        if f(key, value)}
+
+PATH_KEY = '_path'
+
+def path_invocations(configs: Dict):
+    return {
+        key: get_class_from_path(
+            config[PATH_KEY])(keep(
+                config,
+                lambda k, v: k != PATH_KEY))
+        for key, config in configs.items()}
