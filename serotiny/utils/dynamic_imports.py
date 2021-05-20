@@ -43,6 +43,11 @@ def get_class_from_path(class_path: str):
     return getattr(importlib.import_module(class_module), class_name)
 
 
+def invoke_path(name, config):
+    invoke_class = get_class_from_path(name)
+    return invoke_class(**config)
+
+
 def module_or_path(module, key)
     try:
         return module_get(module, key)
