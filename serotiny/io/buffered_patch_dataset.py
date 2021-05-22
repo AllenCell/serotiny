@@ -33,13 +33,15 @@ class BufferedPatchDataset(Dataset):
 
     def __init__(
         self,
-        dataset: collections.abc.Sequence,
+        dataset: Dataset,
+        patch_columns: Sequence[str] = None,
         patch_shape: Sequence[int] = (32, 64, 64),
         buffer_size: int = 1,
         buffer_switch_interval: int = -1,
         shuffle_images: bool = True,
     ):
         self.dataset = dataset
+        self.patch_columns = patch_columns or []
         self.patch_shape = patch_shape
         self.buffer_size = min(len(self.dataset), buffer_size)
         self.buffer_switch_interval = buffer_switch_interval
@@ -81,23 +83,29 @@ class BufferedPatchDataset(Dataset):
         """
 
         datum = self.buffer[buffer_index]
-        shape_spatial = datum[0].shape[-nd:]
-        patch = []
-        slices = None
-        for part in datum:
-            if slices is None:
-                starts = np.array(
-                    [
-                        np.random.randint(0, d - p + 1)
-                        for d, p in zip(shape_spatial, self.patch_shape)
-                    ]
-                )
-                ends = starts + np.array(self.patch_shape)
-                slices = tuple(slice(s, e) for s, e in zip(starts, ends))
-            # Pad slices with "slice(None)" if there are non-spatial dimensions
-            slices_pad = (slice(None),) * (len(part.shape) - len(shape_spatial))
-            patch.append(part[slices_pad + slices])
-        return patch
+        if not self.patch_columns:
+            return datum
+        else:
+            dimensions = len(self.patch_shape)
+            shape_spatial = datum[self.patch_columns[0]].shape[-dimensions:]
+            patch = {}
+            slices = None
+
+            for key, part in datum.items():
+                if key in self.patch_columns:
+                    if slices is None:
+                        starts = np.array([
+                            np.random.randint(0, d - p + 1)
+                            for d, p in zip(shape_spatial, self.patch_shape)])
+                        ends = starts + np.array(self.patch_shape)
+                        slices = tuple(slice(s, e) for s, e in zip(starts, ends))
+                    # Pad slices with "slice(None)" if there are non-spatial dimensions
+                    slices_pad = (slice(None),) * (len(part.shape) - len(shape_spatial))
+                    patch[key] = part[slices_pad + slices]
+                else:
+                    patch[key] = part
+
+            return patch
 
     def get_random_patch(self) -> List[ArrayLike]:
         """Samples random patch from an item in the buffer.

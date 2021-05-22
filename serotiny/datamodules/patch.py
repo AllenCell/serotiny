@@ -33,6 +33,7 @@ class PatchDatamodule(pl.LightningDataModule):
         num_workers: int,
         pin_memory: bool = True,
         drop_last: bool = True,
+        patch_columns: Sequence[str] = None,
         patch_shape: Sequence[int] = (32, 64, 64),
         buffer_size: int = 1,
         buffer_switch_interval: int = -1,
@@ -46,26 +47,30 @@ class PatchDatamodule(pl.LightningDataModule):
         self.pin_memory = pin_memory
         self.drop_last = drop_last
 
+        self.patch_columns = patch_columns
         self.patch_shape = patch_shape
         self.buffer_size = buffer_size
         self.buffer_switch_interval = buffer_switch_interval
         self.shuffle_images = shuffle_images
 
-        self.train_manifest = make_manifest_dataset(self.manifest_path / 'train.csv', self.loaders)
-        self.valid_manifest = make_manifest_dataset(self.manifest_path / 'valid.csv', self.loaders)
-        self.test_manifest = make_manifest_dataset(self.manifest_path / 'test.csv', self.loaders)
-
-        self.train = self.make_patch_dataset(self.train_manifest)
-        self.valid = self.make_patch_dataset(self.valid_manifest)
-        self.test = self.make_patch_dataset(self.test_manifest)
+        self.train = self.load_patch_manifest('train')
+        self.valid = self.load_patch_manifest('valid')
+        self.test = self.load_patch_manifest('test')
 
     def make_patch_dataset(self, dataset):
         return BufferedPatchDataset(
             dataset=dataset,
+            patch_columns=self.patch_columns,
             patch_shape=self.patch_shape,
             buffer_size=self.buffer_size,
             buffer_switch_interval=self.buffer_switch_interval,
             shuffle_images=self.shuffle_images)
+
+    def load_patch_manifest(self, manifest_key):
+        manifest = make_manifest_dataset(
+            self.manifest_path / f'{manifest_key}.csv',
+            self.loaders)
+        return self.make_patch_dataset(manifest)
 
     def make_dataloader(self, dataset):
         return DataLoader(
@@ -74,8 +79,7 @@ class PatchDatamodule(pl.LightningDataModule):
             pin_memory=self.pin_memory,
             drop_last=self.drop_last,
             num_workers=self.num_workers,
-            multiprocessing_context=mp.get_context("fork"),
-        )
+            multiprocessing_context=mp.get_context("fork"))
 
     def train_dataloader(self):
         return self.make_dataloader(self.train)

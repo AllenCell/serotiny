@@ -48,7 +48,7 @@ def invoke_path(name, config):
     return invoke_class(**config)
 
 
-def module_or_path(module, key)
+def module_or_path(module, key):
     try:
         return module_get(module, key)
     except KeyError:

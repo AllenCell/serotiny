@@ -22,6 +22,24 @@ class Loader:
         self.mode = mode
 
 
+class LoadColumn(Loader):
+    """
+    Loader class, used to retrieve fields directly from dataframe columns
+    """
+
+    def __init__(
+            self,
+            column='index',
+            dtype="float"):
+        super().__init__()
+
+        self.column = column
+        self.dtype = dtype
+
+    def __call__(self, row):
+        return row[self.column].astype(self.dtype)
+
+
 class LoadColumns(Loader):
     """
     Loader class, used to retrieve fields directly from dataframe columns
@@ -86,8 +104,12 @@ class Load2DImage(Loader):
     Loader class, used to retrieve images from paths given in a dataframe column
     """
 
-    def __init__(self, column='image', num_channels, channel_indexes,
-                 transforms_dict={}):
+    def __init__(
+            self,
+            column='image',
+            num_channels=1,
+            channel_indexes=None,
+            transforms_dict=None):
 
         super().__init__()
         self.column = column
@@ -113,7 +135,11 @@ class Load3DImage(Loader):
     Loader class, used to retrieve images from paths given in a dataframe column
     """
 
-    def __init__(self, column='image', select_channels=None, transforms_dict=None):
+    def __init__(
+            self,
+            column='image',
+            select_channels=None,
+            transforms_dict=None):
         super().__init__()
         self.column = column
         self.select_channels = select_channels
