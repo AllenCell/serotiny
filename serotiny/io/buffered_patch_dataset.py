@@ -138,7 +138,7 @@ class BufferedPatchDataset(Dataset):
                 raise ValueError(
                     f"Dataset item {buffer_index}, component {key} shape "
                     f"{component.shape} incompatible with first component "
-                    f"shape {self.buffer[-1][0].shape}"
+                    f"shape {self.buffer[-1][key].shape}"
                 )
             if dimensions > len(component.shape) or any(
                 self.patch_shape[d] > shape_spatial[d] for d in range(dimensions)
