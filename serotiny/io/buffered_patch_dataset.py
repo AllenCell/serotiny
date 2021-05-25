@@ -56,7 +56,7 @@ class BufferedPatchDataset(Dataset):
             self.insert_new_element_into_buffer()
 
     def __len__(self):
-        return len(self.dataset)
+        return len(self.buffer)
 
     def __getitem__(self, index):
         patch = self.get_patch(index)
