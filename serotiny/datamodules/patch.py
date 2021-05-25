@@ -39,6 +39,8 @@ class PatchDatamodule(pl.LightningDataModule):
         buffer_switch_interval: int = -1,
         shuffle_images: bool = True,
     ):
+        super().__init__()
+
         self.manifest_path = Path(manifest_path)
         self.loaders = path_invocations(loaders)
 
