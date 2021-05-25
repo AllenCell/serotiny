@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 
 from serotiny.utils import get_classes_from_config, get_class_from_path, path_invocations
 from serotiny.io.buffered_patch_dataset import BufferedPatchDataset
-
+from serotiny.io.dataframe import DataframeDataset
 
 def make_manifest_dataset(
         manifest: str,
