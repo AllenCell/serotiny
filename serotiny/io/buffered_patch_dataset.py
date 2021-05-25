@@ -129,7 +129,7 @@ class BufferedPatchDataset(Dataset):
         buffer_index = self.buffer_history[-1]
         shape_spatial = None
         for key, component in self.buffer[-1].items():
-            if not hasattr(component, 'shape'):
+            if not hasattr(component, 'shape') or component.shape == ():
                 continue
 
             if shape_spatial is None:
