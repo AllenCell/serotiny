@@ -125,23 +125,26 @@ class BufferedPatchDataset(Dataset):
         
     def _check_last_datum(self) -> None:
         """Checks last dataset item added to buffer."""
-        nd = len(self.patch_shape)
-        idx_buf = self.buffer_history[-1]
+        dimensions = len(self.patch_shape)
+        buffer_index = self.buffer_history[-1]
         shape_spatial = None
-        for idx_c, component in enumerate(self.buffer[-1]):
+        for key, component in self.buffer[-1].items():
+            if not hasattr(component, 'shape'):
+                continue
+
             if shape_spatial is None:
-                shape_spatial = component.shape[-nd:]
-            elif component.shape[-nd:] != shape_spatial:
+                shape_spatial = component.shape[-dimensions:]
+            elif component.shape[-dimensions:] != shape_spatial:
                 raise ValueError(
-                    f"Dataset item {idx_buf}, component {idx_c} shape "
+                    f"Dataset item {buffer_index}, component {key} shape "
                     f"{component.shape} incompatible with first component "
                     f"shape {self.buffer[-1][0].shape}"
                 )
-            if nd > len(component.shape) or any(
-                self.patch_shape[d] > shape_spatial[d] for d in range(nd)
+            if dimensions > len(component.shape) or any(
+                self.patch_shape[d] > shape_spatial[d] for d in range(dimensions)
             ):
                 raise ValueError(
-                    f"Dataset item {idx_buf}, component {idx_c} shape "
+                    f"Dataset item {buffer_index}, component {key} shape "
                     f"{component.shape} incompatible with patch_shape "
                     f"{self.patch_shape}"
                 )
