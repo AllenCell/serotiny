@@ -1,4 +1,4 @@
-from typing import Union, Optional, Dict
+from typing import Union, Optional, Dict, Sequence
 from pathlib import Path
 
 import json

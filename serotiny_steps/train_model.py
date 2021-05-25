@@ -37,7 +37,7 @@ def train_model(
     checkpoint_mode = model_zoo_config.get("checkpoint_mode", None)
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
-    os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(gpu_ids)
+    os.environ["CUDA_VISIBLE_DEVICES"] = ",".join([str(id) for id in gpu_ids])
     num_gpus = len(gpu_ids)
     num_gpus = (num_gpus if num_gpus != 0 else None)
 
@@ -47,6 +47,8 @@ def train_model(
 
     if store_config:
         store_called_args(called_args, model_name, version_string, model_zoo_path)
+
+    log.info(f"creating datamodule {datamodule_name} with {datamodule_config}")
 
     create_datamodule = module_or_path(datamodules, datamodule_name)
     datamodule = create_datamodule(**datamodule_config)
