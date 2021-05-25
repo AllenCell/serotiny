@@ -80,7 +80,7 @@ PATH_KEY = '_path'
 def path_invocations(configs: Dict):
     return {
         key: get_class_from_path(
-            config[PATH_KEY])(keep(
+            config[PATH_KEY])(**keep(
                 config,
                 lambda k, v: k != PATH_KEY))
         for key, config in configs.items()}
