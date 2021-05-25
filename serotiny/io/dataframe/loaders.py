@@ -126,7 +126,7 @@ class Load2DImage(Loader):
             row[self.column],
             channel_order="CYX",
             indexes={"C": self.channel_indexes or range(self.num_channels)},
-            transform=self.transforms[self.mode]
+            transform=self.transforms.get(self.mode)
         )
 
 
@@ -157,7 +157,7 @@ class Load3DImage(Loader):
             output_dtype=np.float32,
             channel_masks=None,
             mask_thresh=0,
-            transform=self.transforms[self.mode]
+            transform=self.transforms.get(self.mode)
         )
 
 
