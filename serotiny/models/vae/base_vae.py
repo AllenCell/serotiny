@@ -1,4 +1,4 @@
-from typing import Callable, Union, Optional, Sequence, Dict
+from typing import Union, Optional, Sequence, Dict
 import inspect
 
 import logging
@@ -15,8 +15,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.utilities.parsing import get_init_args
 
 from serotiny.losses.elbo import calculate_elbo
-from serotiny.models._utils import find_optimizer, find_lr_scheduler
-from serotiny.networks.mlp import MLP
+from serotiny.models._utils import find_optimizer
 from serotiny.utils import get_class_from_path
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]
@@ -86,6 +85,8 @@ class BaseVAE(pl.LightningModule):
             *[arg for arg in init_args if arg not in ["encoder", "decoder"]]
         )
 
+        if isinstance(recon_loss, str):
+            recon_loss = get_class_from_path(recon_loss)
         self.recon_loss = recon_loss
 
         if isinstance(encoder, str):
@@ -93,7 +94,7 @@ class BaseVAE(pl.LightningModule):
             encoder = encoder(**encoder_config)
         if isinstance(decoder, str):
             decoder = get_class_from_path(decoder)
-            decoder = encoder(**decoder_config)
+            decoder = decoder(**decoder_config)
 
         self.encoder = encoder
         self.decoder = decoder
@@ -119,8 +120,8 @@ class BaseVAE(pl.LightningModule):
                 self.prior_logvar, requires_grad=learn_prior_logvar
             )
 
-        self.encoder_args = inspect.getargspec(self.encoder.forward).args
-        self.decoder_args = inspect.getargspec(self.decoder.forward).args
+        self.encoder_args = inspect.getfullargspec(self.encoder.forward).args
+        self.decoder_args = inspect.getfullargspec(self.decoder.forward).args
 
     def parse_batch(self, batch):
         return batch[self.hparams.x_label].float()

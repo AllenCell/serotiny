@@ -4,7 +4,7 @@ import torch
 import numpy as np
 
 from serotiny.networks.mlp import MLP
-from .basic_vae import BaseVAE
+from .base_vae import BaseVAE
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]
 
@@ -21,7 +21,6 @@ class TabularVAE(BaseVAE):
         prior_mode: str = "isotropic",
         prior_logvar: Optional[Array] = None,
         learn_prior_logvar: bool = False,
-
     ):
         encoder = MLP(
             x_dim,

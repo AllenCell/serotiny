@@ -37,7 +37,7 @@ def train_model(
     checkpoint_mode = model_zoo_config.get("checkpoint_mode", None)
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
-    os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(gpu_ids)
+    os.environ["CUDA_VISIBLE_DEVICES"] = ",".join([str(_) for _ in gpu_ids])
     num_gpus = len(gpu_ids)
     num_gpus = (num_gpus if num_gpus != 0 else None)
 
