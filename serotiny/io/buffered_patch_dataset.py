@@ -56,10 +56,10 @@ class BufferedPatchDataset(Dataset):
             self.insert_new_element_into_buffer()
 
     def __len__(self):
-        return len(self.buffer)
+        return len(self.dataset)
 
     def __getitem__(self, index):
-        patch = self.get_patch(index)
+        patch = self.get_patch(index % len(self.buffer))
         self.counter += 1
         if (self.buffer_switch_interval > 0) and (
             self.counter % self.buffer_switch_interval == 0
