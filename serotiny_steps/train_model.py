@@ -65,6 +65,9 @@ def train_model(
     else:
         checkpoint_callback = None
 
+    if checkpoint_callback:
+        trainer_config['checkpoint_callback'] = checkpoint_callback
+
     callbacks = get_classes_from_config(callbacks)
     loggers = get_classes_from_config(loggers)
 
@@ -72,7 +75,7 @@ def train_model(
         **trainer_config,
         logger=loggers,
         gpus=num_gpus,
-        checkpoint_callback=checkpoint_callback,
+        # checkpoint_callback=checkpoint_callback,
         callbacks=callbacks,
     )
 
