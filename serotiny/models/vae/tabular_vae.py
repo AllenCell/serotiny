@@ -37,6 +37,7 @@ class TabularVAE(BaseVAE):
         super().__init__(
             encoder=encoder,
             decoder=decoder,
+            latent_dim=latent_dim,
             optimizer=optimizer,
             x_label=x_label,
             lr=lr,

@@ -14,27 +14,24 @@ import torch
 from torch.nn.modules.loss import _Loss as Loss
 
 from serotiny.networks.mlp import MLP
-from .conditional_vae import ConditionalVAE
+from .condprior_vae import ConditionalPriorVAE
 
 Array = Union[torch.Tensor, np.array]
 
-class ConditionalTabularVAE(ConditionalVAE):
+class TabularConditionalPriorVAE(ConditionalPriorVAE):
     def __init__(
         self,
         x_dim: int,
-        latent_dim: int,
         c_dim: int,
+        latent_dim: int,
         hidden_layers: Sequence[int],
+        prior_encoder_hidden_layers: Sequence[int],
         optimizer: str,
         lr: float,
-        beta: float,
         x_label: str,
         c_label: Union[str, int, Sequence[int]],
         recon_loss: Union[Loss, str] = torch.nn.MSELoss,
         condition_mode: str = "label",
-        prior_mode: str = "isotropic",
-        prior_logvar: Optional[Array] = None,
-        learn_prior_logvar: bool = False,
     ):
         """
         Instantiate a conditional VAE model
@@ -76,26 +73,32 @@ class ConditionalTabularVAE(ConditionalVAE):
         """
 
         encoder = MLP(
-            x_dim + c_dim,
+            x_dim,
             2 * latent_dim,
             hidden_layers=hidden_layers,
         )
 
+        prior_encoder = MLP(
+            c_dim,
+            latent_dim,
+            hidden_layers=prior_encoder_hidden_layers,
+        )
+
         decoder = MLP(
-            latent_dim + c_dim,
+            latent_dim,
             x_dim,
             hidden_layers=hidden_layers,
         )
 
-        super().__init__(encoder, decoder, optimizer, lr,
-                         beta, x_label, c_label, recon_loss, condition_mode,
-                         prior_mode, prior_logvar, learn_prior_logvar)
-
-        if condition_mode not in ("channel", "label"):
-            raise ValueError("`condition_mode` should be "
-                             "either 'channel' or 'label")
-
-    def parse_batch(self, batch):
-        batch = super().parse_batch(batch)
-        batch[1]["x2"] = batch[1].pop("condition")
-        return batch
+        super().__init__(
+            encoder=encoder,
+            decoder=decoder,
+            latent_dim=latent_dim,
+            prior_encoder=prior_encoder,
+            optimizer=optimizer,
+            lr=lr,
+            x_label=x_label,
+            c_label=c_label,
+            recon_loss=recon_loss,
+            condition_mode=condition_mode,
+        )

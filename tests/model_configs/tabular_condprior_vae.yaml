@@ -10,16 +10,14 @@ datamodule:
     y_dims: [32]
 
 model:
-  name: ConditionalTabularVAE
+  name: TabularConditionalPriorVAE
   config:
     x_dim: 32
     c_dim: 32
     latent_dim: 8
     hidden_layers: [8]
+    prior_encoder_hidden_layers: [8]
     x_label: x
     c_label: y
-    prior_mode: "isotropic"
-    learn_prior_logvar: False
     optimizer: "Adam"
     lr: 0.001
-    beta: 1

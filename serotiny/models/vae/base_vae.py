@@ -2,12 +2,9 @@ from typing import Union, Optional, Sequence, Dict
 import inspect
 
 import logging
-logger = logging.getLogger("lightning")
-logger.propagate = False
 
 import numpy as np
 import torch
-import torch.optim as opt
 import torch.nn as nn
 from torch.nn.modules.loss import _Loss as Loss
 
@@ -19,17 +16,21 @@ from serotiny.models._utils import find_optimizer
 from serotiny.utils import get_class_from_path
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]
+logger = logging.getLogger("lightning")
+logger.propagate = False
+
 
 class BaseVAE(pl.LightningModule):
     def __init__(
         self,
         encoder: Union[nn.Module, str],
         decoder: Union[nn.Module, str],
+        latent_dim: Union[int, Sequence[int]],
         optimizer: str,
         lr: float,
         beta: float,
         x_label: str,
-        recon_loss: Union[Loss, str] = torch.nn.MSELoss,
+        recon_loss: Union[Loss, str] = nn.MSELoss,
         prior_mode: str = "isotropic",
         prior_logvar: Optional[Array] = None,
         learn_prior_logvar: bool = False,
@@ -49,7 +50,7 @@ class BaseVAE(pl.LightningModule):
             Decoder network. If `str`, expects a class path, to be used for
             importing the given class. Instantiation arguments are to be
             given by `decoder_config`
-        optimizer: opt.Optimizer
+        optimizer: str
             Optimizer to use
         lr: float
             Learning rate for training
@@ -99,6 +100,7 @@ class BaseVAE(pl.LightningModule):
         self.encoder = encoder
         self.decoder = decoder
         self.beta = beta
+        self.latent_dim = latent_dim
 
         self.prior_mode = prior_mode
         self.prior_mean = None
@@ -110,15 +112,18 @@ class BaseVAE(pl.LightningModule):
             raise NotImplementedError(f"KLD mode '{prior_mode}' not implemented")
 
         if prior_mode == "anisotropic":
-            self.prior_mean = torch.zeros(self.embedding_dim)
+            self.prior_mean = torch.zeros(self.latent_dim)
             if prior_logvar is None:
-                self.prior_logvar = torch.zeros(self.embedding_dim)
+                self.prior_logvar = torch.zeros(self.latent_dim)
             else:
                 self.prior_logvar = torch.tensor(prior_logvar)
-            # if learn_prior_logvar:
-            self.prior_logvar = nn.Parameter(
-                self.prior_logvar, requires_grad=learn_prior_logvar
-            )
+
+            if learn_prior_logvar:
+                self.prior_logvar = nn.Parameter(
+                    self.prior_logvar, requires_grad=True
+                )
+            else:
+                self.prior_logvar.requires_grad = False
 
         self.encoder_args = inspect.getfullargspec(self.encoder.forward).args
         self.decoder_args = inspect.getfullargspec(self.decoder.forward).args
