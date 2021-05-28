@@ -12,10 +12,56 @@ import torch
 from .model_utils import to_device
 import pandas as pd
 import numpy as np
-
+from skimage import measure as skmeasure
+from skimage import morphology as skmorpho
 # Configure z for inference
 import matplotlib
 
+def get_basic_features(img):
+    features = {}
+    input_image = img.copy()
+    input_image = (input_image>0).astype(np.uint8)
+    input_image_lcc = skmeasure.label(input_image)
+    features[f'connectivity_cc'] = input_image_lcc.max()
+    if features[f'connectivity_cc'] > 0:
+        counts = np.bincount(input_image_lcc.reshape(-1))
+        lcc = 1+np.argmax(counts[1:])
+        input_image_lcc[input_image_lcc!=lcc] = 0
+        input_image_lcc[input_image_lcc==lcc] = 1
+        input_image_lcc = input_image_lcc.astype(np.uint8)
+        for img, suffix in zip([input_image, input_image_lcc], ['', '_lcc']):
+            z, y, x = np.where(img)
+            features[f'shape_volume{suffix}'] = img.sum()
+            features[f'position_depth{suffix}'] = 1+np.ptp(z)
+            for uname, u in zip(['x', 'y', 'z'], [x, y, z]):
+                features[f'position_{uname}_centroid{suffix}'] = u.mean()
+            features[f'roundness_surface_area{suffix}'] = get_surface_area(img)
+    else:
+        for img, suffix in zip([input_image,input_image_lcc], ['', '_lcc']):
+            features[f'shape_volume{suffix}'] = np.nan
+            features[f'position_depth{suffix}'] = np.nan
+            for uname in ['x', 'y', 'z']:
+                features[f'position_{uname}_centroid{suffix}'] = np.nan
+            features[f'roundness_surface_area{suffix}'] = np.nan
+    return features
+
+def get_surface_area(input_img):
+    # Forces a 1 pixel-wide offset to avoid problems with binary
+    # erosion algorithm
+    input_img[:, :, [0, -1]] = 0
+    input_img[:, [0, -1], :] = 0
+    input_img[[0, -1], :, :] = 0
+    input_img_surface = np.logical_xor(input_img, skmorpho.binary_erosion(input_img)).astype(np.uint8)
+    # Loop through the boundary voxels to calculate the number of
+    # boundary faces. Using 6-neighborhod.
+    pxl_z, pxl_y, pxl_x = np.nonzero(input_img_surface)
+    dx = np.array([0, -1, 0, 1, 0, 0])
+    dy = np.array([0, 0, 1, 0, -1, 0])
+    dz = np.array([-1, 0, 0, 0, 0, 1])
+    surface_area = 0
+    for (k, j, i) in zip(pxl_z, pxl_y, pxl_x):
+        surface_area += 6 - input_img_surface[k+dz, j+dy, i+dx].sum()
+    return int(surface_area)
 
 def get_meshes(
     pl_module: LightningModule,
@@ -45,7 +91,9 @@ def get_meshes(
 
     save_dir = config["project"]["local_staging"] / subfolder
     meshes = {}
+    
     for rank, z_dim in enumerate(ranked_z_dim_list):
+        all_features_df = []
         # Set subplots
         fig, ax_array = plt.subplots(
             3,
@@ -78,7 +126,12 @@ def get_meshes(
 
                 mesh = get_mesh_from_series(test_spharm_series, "dna", 32)
                 img, origin = cytoparam.voxelize_meshes([mesh])
-                print(origin)
+                features = get_basic_features(img)
+                # features['shapemode'] = rank
+                features['sigma'] = value * mu_variance_list[rank]
+                this_feature_df = pd.DataFrame.from_dict(features, orient='index', columns = ['value'])
+                this_feature_df = pd.DataFrame(features, index = [0])
+                all_features_df.append(this_feature_df)
                 meshes[rank][alias].append(mesh)
                 for proj in [0, 1, 2]:
                     plt.style.use("dark_background")
@@ -101,6 +154,29 @@ def get_meshes(
         )
         # Close figure, otherwise clogs memory
         plt.close(fig)
+        all_features = pd.concat(all_features_df,axis=0).reset_index(drop=True)
+        # all_features.to_csv(save_dir / "all_features.csv")
+
+        df_corr = all_features.corr()
+        # print(df_corr.shape)
+        df_corr = df_corr.iloc[1:7, -1:]
+
+
+        import seaborn as sns
+        f, ax = plt.subplots(1, 1, figsize=(6, 6))
+        cbar_ax = f.add_axes([1, 0.35, 0.04, 0.3])
+        sns.set_context("talk")
+        # print(df_corr.T)
+        g = sns.heatmap(df_corr.T, cmap="vlag", square=True, annot=True,ax=ax, cbar_ax=cbar_ax,
+                        xticklabels=True, yticklabels=True, vmin=-1, vmax=1, annot_kws={"fontsize":6})
+        g.set_xticklabels(g.get_xticklabels(), rotation = 85)
+        
+        ax.set_xticklabels(ax.get_xmajorticklabels(), fontsize = 13)
+        ax.set_yticklabels(ax.get_ymajorticklabels(), fontsize = 13)
+        plt.tight_layout()
+        f.savefig(save_dir / f"correlation_all_features_shapemode_{rank + 1}.png")
+
+
 
     return meshes
 

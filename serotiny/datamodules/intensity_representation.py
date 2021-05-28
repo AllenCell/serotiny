@@ -132,12 +132,12 @@ class IntensityRepresentation(pl.LightningDataModule):
         self.dl_pin_memory = dl_pin_memory
 
         # source_path = "/allen/aics/assay-dev/MicroscopyOtherData/Viana/projects/cvapipe_analysis/"
-        df1 = pd.read_csv(self.source_path + "local_staging_full/preprocessing/manifest.csv")
+        # df1 = pd.read_csv(self.source_path + "local_staging_full/preprocessing/manifest.csv")
         df2 = pd.read_csv(self.source_path + "local_staging_full/parameterization/manifest.csv")
         # df2 = df2.set_index('CellId')
-        self.df1 = df1
+        # self.df1 = df1
         self.df2 = df2
-        self.num_rows = df1.shape[0]
+        self.num_rows = df2.shape[0]
 
         self.loaders = {
             # Use callable class objects here because lambdas aren't picklable

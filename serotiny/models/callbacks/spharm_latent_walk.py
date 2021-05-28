@@ -158,7 +158,7 @@ class SpharmLatentWalk(Callback):
                         print(f"Beginning gif generation for proj {proj}")
                         plot_maker.animate_contours(
                             contours,
-                            f"dna_PC{shapemode + 1}_{proj}",
+                            f"NUC_PC{shapemode + 1}_{proj}",
                             # self.config,
                             # dir_path,
                             # self.subfolder,

@@ -8,6 +8,7 @@ from serotiny.metrics.inception import InceptionV3
 from serotiny.metrics.calculate_fid import get_activations
 from serotiny.metrics.calculate_fid import calculate_fid
 from sklearn.decomposition import PCA
+import torch
 
 
 def get_singular_values(df, cols, n_principal_components=None):
@@ -118,7 +119,8 @@ def visualize_encoder_tabular(
         recon_batch = torch.mean(torch.stack(my_recon_list), dim=0)
         z_means = torch.mean(torch.stack(my_z_means_list), dim=0)
         log_var = torch.mean(torch.stack(my_log_var_list), dim=0)
-
+        loss = torch.nn.MSELoss(size_average=False)
+        loss_per_element = torch.nn.MSELoss(size_average=False, reduce=False)
         # Calculate loss for this
         (
             elbo_loss_total,
@@ -132,6 +134,8 @@ def visualize_encoder_tabular(
             z_means,
             log_var,
             beta,
+            loss,
+            loss_per_element,
             mask,
         )
 
@@ -156,6 +160,8 @@ def visualize_encoder_tabular(
                 z_means[:, ii],
                 log_var[:, ii],
                 beta,
+                loss,
+                loss_per_element,
                 mask,
             )
 

@@ -271,20 +271,20 @@ def train_mlp_vae(
             pca_df=pca_df,
         )
 
-        # pca_latent_corr = PCALatentCorrelation(pca_df=pca_df)
+        pca_latent_corr = PCALatentCorrelation(pca_df=pca_df)
         callbacks = [
             # GPUStatsMonitor(),
             GlobalProgressBar(),
             EarlyStopping("val_loss", patience=15),
-            marginal_kl,
-            empirical_kl,
+            # marginal_kl,
+            # empirical_kl,
             mlp_vae_logging,
             get_embeddings,
             embedding_scatterplots,
             get_closest_cells_to_dims,
             spharm_latent_walk,
-            pca_walks,
-            # pca_latent_corr,
+            # pca_walks,
+            pca_latent_corr,
         ]
 
     trainer = pl.Trainer(

@@ -159,17 +159,17 @@ class LoadPIRFlattened:
         img = AICSImage(self.common_path + row[self.x_label])
         # img2 = img.get_image_data("CYX", S=0, T=0, Z=0)
         img2 = img.data[0,0,:,0,:,:]
-        img3 = img2[:,:,:]
 
         scaler = MinMaxScaler()
-        scaler.fit(img3[1,:,:])
-        img3[1,:,:]=scaler.transform(img3[1,:,:])
+        scaler.fit(img2[1,:,:])
+        img2[1,:,:]=scaler.transform(img2[1,:,:])
 
-        scaler2 = MinMaxScaler()
-        scaler2.fit(img3[0,:,:])
-        img3[0,:,:]=scaler2.transform(img3[0,:,:])
+        # scaler2 = MinMaxScaler()
+        # scaler2.fit(img3[0,:,:])
+        # img3[0,:,:]=scaler2.transform(img3[0,:,:])
 
-        img3 = img3[:, ::3, ::10]
+        # img3 = img2[1, ::3, ::10]
+        img3 = img2[1, ::3, ::10]
         return torch.tensor(img3.flatten())
 
 
