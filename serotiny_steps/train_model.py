@@ -1,7 +1,7 @@
 import os
 import logging
 
-from typing import List, Dict
+from typing import List, Dict, Optional
 from datetime import datetime
 
 import fire
@@ -26,10 +26,18 @@ def train_model(
     callbacks: Dict = {},
     loggers: Dict = {},
     seed: int = 42,
+    override_save_path: Optional[str] = None,
 ):
     called_args = locals()
 
     pl.seed_everything(seed)
+
+    if override_save_path:
+        model_zoo_config.update({'path': override_save_path + "checkpoints/"})
+        if "pytorch_lightning.loggers.TensorBoardLogger" in loggers.keys():
+            loggers['pytorch_lightning.loggers.TensorBoardLogger'].update({"save_dir": override_save_path + "tensorboard/"})
+        if "pytorch_lightning.loggers.CSVLogger" in loggers.keys():
+            loggers['pytorch_lightning.loggers.CSVLogger'].update({"save_dir": override_save_path + "csv_logs/"})
 
     model_zoo_path = model_zoo_config.get("path")
     store_config = model_zoo_config.get("store_config", True)
@@ -60,17 +68,20 @@ def train_model(
             checkpoint_mode,
             model_zoo_path
         )
+        print(checkpoint_callback)
     else:
         checkpoint_callback = None
 
     callbacks = get_classes_from_config(callbacks)
+    callbacks += [checkpoint_callback]
+
     loggers = get_classes_from_config(loggers)
 
     trainer = pl.Trainer(
         **trainer_config,
         logger=loggers,
         gpus=num_gpus,
-        checkpoint_callback=checkpoint_callback,
+        # checkpoint_callback=checkpoint_callback,
         callbacks=callbacks,
     )
 
