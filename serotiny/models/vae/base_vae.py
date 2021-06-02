@@ -166,6 +166,7 @@ class BaseVAE(pl.LightningModule):
         return (
             x_hat,
             mu,
+            logvar,
             loss / batch_size,
             recon_loss / batch_size,
             kld_loss / batch_size,
@@ -180,7 +181,7 @@ class BaseVAE(pl.LightningModule):
         else:
             forward_kwargs = dict()
 
-        (_, _, loss, recon_loss, kld_loss,
+        (_, _, _, loss, recon_loss, kld_loss,
          rcl_per_input_dimension,
          kld_per_latent_dimension) = self.forward(x, **forward_kwargs)
 
