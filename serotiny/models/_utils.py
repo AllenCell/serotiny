@@ -17,14 +17,20 @@ import matplotlib.pyplot as plt
 from tqdm import trange, tqdm
 
 def to_device(
-    batch_x: Sequence, batch_y: Sequence, device: Union[str, device]
-) -> Tuple[Tensor, Tensor]:
+    *args
+):
 
-    # last input is for online eval
-    batch_x = batch_x.to(device)
-    batch_y = batch_y.to(device)
+    assert len(args) > 1
+    target_device = args[-1]
+    assert isinstance(target_device, (str, device))
+    args = args[:-1]
 
-    return batch_x, batch_y
+    if len(args) > 1:
+        return tuple(
+            arg.to(target_device) for arg in args
+        )
+    else:
+        return args[0].to(target_device)
 
 
 def get_ranked_dims(
