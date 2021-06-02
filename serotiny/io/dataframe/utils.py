@@ -31,8 +31,8 @@ def load_csv(dataset: Union[str, Path, pd.DataFrame], required_fields: Sequence[
     # Check that all columns provided as required are in the dataset
     missing_fields = set(required_fields) - set(dataset.columns)
     if len(missing_fields) > 0:
-        raise ValueError(f"Some or all of the required fields were not
-                           found on the given dataframe:\n{missing_fields}")
+        raise ValueError(f"Some or all of the required fields were not "
+                         f"found on the given dataframe:\n{missing_fields}")
 
     return dataset
 
