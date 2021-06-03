@@ -181,7 +181,7 @@ class BaseVAE(pl.LightningModule):
         else:
             forward_kwargs = dict()
 
-        (_, _, _, loss, recon_loss, kld_loss,
+        (_, _, mu, loss, recon_loss, kld_loss,
          rcl_per_input_dimension,
          kld_per_latent_dimension) = self.forward(x, **forward_kwargs)
 
@@ -189,24 +189,31 @@ class BaseVAE(pl.LightningModule):
         self.log(f"{stage} kld loss", kld_loss, logger=logger)
         self.log(f"{stage}_loss", loss, logger=logger)
 
-        return {
+        results = {
             "loss": loss,
             f"{stage}_loss": loss,  # for epoch end logging purposes
             "recon_loss": recon_loss,
             "kld_loss": kld_loss,
-            #"kld_per_latent_dimension": kld_per_latent_dimension,
-            #"rcl_per_input_dimension": rcl_per_input_dimension,
             "batch_idx": batch_idx,
         }
 
+        if stage == "test":
+            results.update({
+                "mu": mu,
+                "kld_per_latent_dimension": kld_per_latent_dimension.float(),
+                "rcl_per_input_dimension": rcl_per_input_dimension.float(),
+            })
+
+        return results
+
     def training_step(self, batch, batch_idx):
-        return self._step("train", batch, batch_idx, logger=False)
+        return self._step("train", batch, batch_idx, logger=True)
 
     def validation_step(self, batch, batch_idx):
         return self._step("val", batch, batch_idx, logger=True)
 
     def test_step(self, batch, batch_idx):
-        return self._step("test", batch, batch_idx, logger=True)
+        return self._step("test", batch, batch_idx, logger=False)
 
     def configure_optimizers(self):
         optimizer_class = find_optimizer(self.hparams.optimizer)

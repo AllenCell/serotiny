@@ -90,7 +90,7 @@ def get_checkpoint_callback(model_class, model_id, checkpoint_monitor,
         filename="epoch{epoch:02d}"
     )
 
-def store_called_args(called_args, model_class, model_id, model_root=None):
+def store_metadata(metadata, model_class, model_id, model_root=None):
     model_root = get_root(model_root)
 
     if not model_root.exists():
@@ -104,4 +104,4 @@ def store_called_args(called_args, model_class, model_id, model_root=None):
 
     model_path = model_path / model_id
 
-    omegaconf.OmegaConf.save(called_args, model_path, resolve=True)
+    omegaconf.OmegaConf.save(metadata, model_path, resolve=True)
