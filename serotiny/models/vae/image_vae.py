@@ -1,4 +1,4 @@
-from .basic_vae import BaseVAE
+from .base_vae import BaseVAE
 
 class ImageVAE(BaseVAE):
     def __init__(

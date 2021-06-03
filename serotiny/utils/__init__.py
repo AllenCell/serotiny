@@ -6,5 +6,3 @@ from .dynamic_imports import (
     invoke_path,
     path_invocations,
 )
-
-from .filter_cols import filter_columns

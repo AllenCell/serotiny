@@ -1,7 +1,7 @@
 import os
 import logging
 
-from typing import List, Dict
+from typing import List, Dict, Optional
 from datetime import datetime
 
 import fire
@@ -26,6 +26,7 @@ def train_model(
     callbacks: Dict = {},
     loggers: Dict = {},
     seed: int = 42,
+    override_save_path: Optional[str] = None,
 ):
     called_args = locals()
 
@@ -69,13 +70,14 @@ def train_model(
         trainer_config['checkpoint_callback'] = checkpoint_callback
 
     callbacks = get_classes_from_config(callbacks)
+    callbacks += [checkpoint_callback]
+
     loggers = get_classes_from_config(loggers)
 
     trainer = pl.Trainer(
         **trainer_config,
         logger=loggers,
         gpus=num_gpus,
-        # checkpoint_callback=checkpoint_callback,
         callbacks=callbacks,
     )
 

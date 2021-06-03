@@ -1,0 +1,22 @@
+datamodule:
+  name: DummyDatamodule
+  config:
+    batch_size: 16
+    num_workers: 2
+    x_label: x
+    y_label: y
+    length: 64
+    x_dims: [32]
+
+model:
+  name: TabularVAE
+  config:
+    x_dim: 32
+    latent_dim: 8
+    hidden_layers: [8]
+    x_label: x
+    prior_mode: "isotropic"
+    learn_prior_logvar: False
+    optimizer: "Adam"
+    lr: 0.001
+    beta: 1
