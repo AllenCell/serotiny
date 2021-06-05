@@ -2,6 +2,7 @@ from typing import Union, Optional, Dict
 from pathlib import Path
 
 import multiprocessing as mp
+import numpy as np
 import pandas as pd
 import pytorch_lightning as pl
 
@@ -73,7 +74,7 @@ class ManifestDatamodule(pl.LightningDataModule):
     drop_last: bool = False
         Whether to drop the last batch (in case the given batch size is the only
         supported)
-
+    subset_train: float = 1.0
     """
 
     def __init__(
@@ -86,6 +87,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         pin_memory: bool = True,
         drop_last: bool = False,
         metadata: Dict = {},
+        subset_train: float = 1.0
     ):
 
         super().__init__()
@@ -99,6 +101,8 @@ class ManifestDatamodule(pl.LightningDataModule):
         self.drop_last = drop_last
         self.metadata = metadata
 
+        assert subset_train <= 1
+
         indices = list(range(self.length))
         if split_col is not None:
             train_idx = self.dataset.train_split
@@ -108,6 +112,10 @@ class ManifestDatamodule(pl.LightningDataModule):
             train_idx = indices
             val_idx = [0] * self.batch_size
             test_idx = [0] * self.batch_size
+
+        train_idx = np.random.choice(train_idx,
+                                     replace=False,
+                                     size=(int(subset_train) * len(train_idx)))
 
         self.train_sampler = SubsetRandomSampler(train_idx)
         self.val_sampler = SubsetRandomSampler(val_idx)
