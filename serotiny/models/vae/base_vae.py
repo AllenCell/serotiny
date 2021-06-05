@@ -191,17 +191,17 @@ class BaseVAE(pl.LightningModule):
 
         results = {
             "loss": loss,
-            f"{stage}_loss": loss,  # for epoch end logging purposes
-            "recon_loss": recon_loss,
-            "kld_loss": kld_loss,
+            f"{stage}_loss": loss.detach(),  # for epoch end logging purposes
+            "recon_loss": recon_loss.detach(),
+            "kld_loss": kld_loss.detach(),
             "batch_idx": batch_idx,
         }
 
         if stage == "test":
             results.update({
-                "mu": mu,
-                "kld_per_latent_dimension": kld_per_latent_dimension.float(),
-                "rcl_per_input_dimension": rcl_per_input_dimension.float(),
+                "mu": mu.detach(),
+                "kld_per_latent_dimension": kld_per_latent_dimension.detach().float(),
+                "rcl_per_input_dimension": rcl_per_input_dimension.detach().float(),
             })
 
         return results
