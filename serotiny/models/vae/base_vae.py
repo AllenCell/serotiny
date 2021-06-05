@@ -181,7 +181,7 @@ class BaseVAE(pl.LightningModule):
         else:
             forward_kwargs = dict()
 
-        (_, _, mu, loss, recon_loss, kld_loss,
+        (_, mu, _, loss, recon_loss, kld_loss,
          rcl_per_input_dimension,
          kld_per_latent_dimension) = self.forward(x, **forward_kwargs)
 
