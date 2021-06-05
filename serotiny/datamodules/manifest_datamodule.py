@@ -1,10 +1,8 @@
 from typing import Union, Optional, Dict
 from pathlib import Path
 
-import json
-import numpy as np
-import pandas as pd
 import multiprocessing as mp
+import pandas as pd
 import pytorch_lightning as pl
 
 from torch.utils.data.sampler import SubsetRandomSampler
@@ -86,7 +84,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         loader_dict: Dict,
         split_col: Optional[str] = None,
         pin_memory: bool = True,
-        drop_last: bool = True,
+        drop_last: bool = False,
         metadata: Dict = {},
     ):
 
