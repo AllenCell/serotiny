@@ -1,7 +1,7 @@
 from pathlib import Path
 import os
 import omegaconf
-
+import yaml
 
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
@@ -20,35 +20,40 @@ def get_root(model_root=None):
 
     return model_root
 
-
-def get_model(model_path, model_root=None):
+def _get_checkpoint(model_path, model_root):
     model_root = get_root(model_root)
 
     if not model_root.exists():
         raise FileNotFoundError("Given model_root does not exists.")
 
-    model_class, model_id = model_path.split("/")
-    model_class = models.__dict__[model_class]
+    model_class_name, model_id = model_path.split("/")
 
-    model_id = model_id if ".ckpt" in model_id else model_id + ".ckpt"
-    model_path = (model_root / model_class) / model_id
+    model_path = (model_root / model_class_name) / model_id
 
-    return model_class.load_from_checkpoint(checkpoint_path=model_path)
+    with open(str(model_path) + ".yaml") as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
+
+    ckpt_path = list(model_path.glob("*.ckpt"))[0]
+
+    return ckpt_path, model_class_name, config
+
+
+
+def get_model(model_path, model_root=None):
+    ckpt_path, model_class_name, config = _get_checkpoint(model_path, model_root)
+    model_class = models.__dict__[model_class_name]
+
+    model_config = config["model_config"]
+
+    return model_class.load_from_checkpoint(checkpoint_path=ckpt_path, **model_config)
 
 
 def get_trainer_at_checkpoint(model_path, model_root=None):
-    model_root = get_root(model_root)
+    ckpt_path, _, config = _get_checkpoint(model_path, model_root)
 
-    if not model_root.exists():
-        raise FileNotFoundError("Given model_root does not exists.")
+    trainer_config = config["trainer_config"]
 
-    model_class, model_id = model_path.split("/")
-    model_class = models.__dict__[model_class]
-
-    model_id = model_id if ".ckpt" in model_id else model_id + ".ckpt"
-    model_path = (model_root / model_class) / model_id
-
-    return Trainer(resume_from_checkpoint=model_path)
+    return Trainer(resume_from_checkpoint=ckpt_path, **trainer_config)
 
 
 def store_model(trainer, model_class, model_id, model_root=None):
