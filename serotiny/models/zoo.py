@@ -6,6 +6,7 @@ import yaml
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
 import serotiny.models as models
+from serotiny.utils import get_classes_from_config
 
 
 def get_root(model_root=None):
@@ -48,12 +49,35 @@ def get_model(model_path, model_root=None):
     return model_class.load_from_checkpoint(checkpoint_path=ckpt_path, **model_config)
 
 
-def get_trainer_at_checkpoint(model_path, model_root=None):
-    ckpt_path, _, config = _get_checkpoint(model_path, model_root)
+def get_trainer_at_checkpoint(model_path, model_root=None, reload_callbacks=False,
+                              reload_loggers=True):
+    ckpt_path, model_class_name, config = _get_checkpoint(model_path, model_root)
 
     trainer_config = config["trainer_config"]
 
-    return Trainer(resume_from_checkpoint=ckpt_path, **trainer_config)
+    model_zoo_config = config["model_zoo_config"]
+    checkpoint_callback = get_checkpoint_callback(
+        model_class_name,
+        model_path.split("/")[1],
+        model_zoo_config.get("checkpoint_monitor"),
+        model_zoo_config.get("checkpoint_mode"),
+        model_root,
+    )
+
+    checkpoint_callback.best_model_path = str(ckpt_path)
+    loggers = (get_classes_from_config(config["loggers"])
+               if reload_loggers else None)
+
+    callbacks = [checkpoint_callback]
+    if reload_callbacks:
+        callbacks += get_classes_from_config(config["callbacks"])
+
+    trainer = Trainer(resume_from_checkpoint=ckpt_path,
+                      **trainer_config,
+                      callbacks=callbacks,
+                      logger=loggers)
+
+    return trainer
 
 
 def store_model(trainer, model_class, model_id, model_root=None):
