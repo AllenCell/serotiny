@@ -1,6 +1,6 @@
 import os
 import logging
-from collections import OrderedDict
+from copy import deepcopy
 
 from typing import List, Dict, Optional
 from datetime import datetime
@@ -30,13 +30,15 @@ def train_model(
     seed: int = 42,
     metadata: Dict = {},
 ):
+    called_args = deepcopy(locals())
 
     pl.seed_everything(seed)
 
     model_zoo_path = model_zoo_config.get("path")
-    store_metadata_flag = model_zoo_config.get("store_metadata", True)
     checkpoint_monitor = model_zoo_config.get("checkpoint_monitor", None)
     checkpoint_mode = model_zoo_config.get("checkpoint_mode", None)
+
+    store_metadata(called_args, model_name, version_string, model_zoo_path)
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
     os.environ["CUDA_VISIBLE_DEVICES"] = ",".join([str(_) for _ in gpu_ids])
@@ -80,9 +82,6 @@ def train_model(
     trainer.fit(model, datamodule)
 
     trainer.test(datamodule=datamodule)
-
-    if store_metadata_flag:
-        store_metadata(metadata, model_name, version_string, model_zoo_path)
 
 
 if __name__ == "__main__":
