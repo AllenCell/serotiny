@@ -12,7 +12,7 @@ def make_split_col(
     train_frac: float,
     val_frac: Optional[float] = None,
 ):
-    manifest = load_csv(manifest_path)
+    manifest = load_csv(manifest_path, required_fields=[])
 
     train_ix, val_test_ix = train_test_split(manifest.index.tolist(),
                                              train_size=train_frac)
@@ -26,7 +26,7 @@ def make_split_col(
 
     manifest.loc[train_ix, "split"] = "train"
     manifest.loc[val_ix, "split"] = "test"
-    manifest.loc[test_ix, "split"] = "val"
+    manifest.loc[test_ix, "split"] = "validation"
 
     return manifest
 
