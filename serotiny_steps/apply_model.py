@@ -5,6 +5,7 @@ from typing import Dict, List
 import fire
 import pytorch_lightning as pl
 
+import serotiny.datamodules as datamodules
 from serotiny.models.zoo import get_model
 from serotiny.utils import module_get, get_classes_from_config
 
