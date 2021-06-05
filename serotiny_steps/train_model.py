@@ -1,6 +1,6 @@
 import os
 import logging
-from copy import deepcopy
+import inspect
 
 from typing import List, Dict, Optional
 from datetime import datetime
@@ -15,6 +15,14 @@ from serotiny.utils import module_get, get_classes_from_config
 
 log = logging.getLogger(__name__)
 
+def _get_kwargs():
+    frame = inspect.currentframe().f_back
+    keys, _, _, values = inspect.getargvalues(frame)
+    kwargs = {}
+    for key in keys:
+        if key != 'self':
+            kwargs[key] = values[key]
+    return kwargs
 
 def train_model(
     model_name: str,
@@ -30,7 +38,7 @@ def train_model(
     seed: int = 42,
     metadata: Dict = {},
 ):
-    called_args = deepcopy(locals())
+    called_args = _get_kwargs()
 
     pl.seed_everything(seed)
 
