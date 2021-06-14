@@ -34,7 +34,7 @@ def train_model(
     model_zoo_config: Dict,
     callbacks: Dict = {},
     loggers: Dict = {},
-    version_string: Optional[str] = None,
+    version_string: str = 'zero',
     seed: int = 42,
     metadata: Dict = {},
 ):
