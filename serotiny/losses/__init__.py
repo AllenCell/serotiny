@@ -1,17 +1,3 @@
-from .losses import (
-    KLDLoss,
-    BatchLoss,
-    ListMSELoss,
-    BatchMSELoss,
-    MSELoss,
-    NormalizedMSELoss,
-    ClassMSELoss,
-    ListClassMSELoss,
-    ClassMSELossV2,
-    ContinuousBCELoss,
-    GaussianNLL,
-    HeteroscedasticLoss,
-    CrossEntropyLoss,
-    ChannelMSELoss,
-    BatchBCELoss,
-)
+from .elbo import calculate_elbo
+from .elbo import diagonal_gaussian_kl
+from .elbo import isotropic_gaussian_kl

@@ -100,3 +100,77 @@ class GetEmbeddings(Callback):
             all_dim_bin_counts.to_csv(path3, index=False)
 
             plot_bin_count_table(all_dim_bin_counts, subdir)
+
+
+def find_outliers(
+    ranked_z_dim_list: list,
+    test_embeddings: pd.DataFrame,
+    bins: list,
+):
+    for dim in ranked_z_dim_list:
+        mu_array = np.array(test_embeddings[[f"mu_{dim}"]]).astype(np.float32)
+        mu_array -= mu_array.mean()
+        mu_array /= mu_array.std()
+
+        binw = 0.5 * np.diff(bins).mean()
+        bin_edges = np.unique([(b - binw, b + binw) for b in bins])
+
+        inds = np.digitize(mu_array, bin_edges)
+        # Find outliers per dim and add to embeddings
+        left_outliers = np.where(inds.flatten() == 0)
+        right_outliers = np.where(inds.flatten() == len(bin_edges))
+        outlier_col = np.zeros(test_embeddings.shape[0], dtype="object")
+
+        if left_outliers[0].size > 0:
+            outlier_col[left_outliers[0]] = "Left Outlier"
+            inds[left_outliers[0]] = 0  # Map left outlier to bin 1
+        if right_outliers[0].size > 0:
+            outlier_col[right_outliers[0]] = "Right Outlier"
+            inds[right_outliers[0]] = (
+                len(bin_edges) - 1
+            )  # Map right outlier to last bin
+
+        outlier_col[np.where(outlier_col == 0)] = False
+        test_embeddings[f"outliers_mu_{dim}"] = outlier_col
+
+    return test_embeddings
+
+
+def get_bins_for_each_cell(
+    ranked_z_dim_list: list,
+    test_embeddings: pd.DataFrame,
+    bins: list,
+):
+
+    for dim in ranked_z_dim_list:
+        mu_array = np.array(test_embeddings[[f"mu_{dim}"]]).astype(np.float32)
+        mu_array -= mu_array.mean()
+        mu_array /= mu_array.std()
+
+        binw = 0.5 * np.diff(bins).mean()
+        bin_edges = np.unique([(b - binw, b + binw) for b in bins])
+        bin_edges[0] = -np.inf
+        bin_edges[-1] = np.inf
+
+        inds = np.digitize(mu_array, bin_edges)
+
+        # Add bins per dim to embeddings
+        bin_values = []
+        for i in inds:
+            bin_values.append((bin_edges[i - 1].item(), bin_edges[i].item()))
+        test_embeddings[f"bins_mu_{dim}"] = bin_values
+
+    bin_embeddings = test_embeddings[[i for i in test_embeddings.columns if "bin" in i]]
+
+    ranked_z_dim_bin_counts = []
+    for dim in ranked_z_dim_list:
+        bin_counts = bin_embeddings.pivot_table(
+            index=[f"bins_mu_{dim}"], aggfunc="size"
+        )
+        bin_counts = bin_counts.to_frame(f"bin_count_mu_{dim}")
+
+        ranked_z_dim_bin_counts.append(bin_counts)
+
+    all_dim_bin_counts = pd.concat(ranked_z_dim_bin_counts, axis=1)
+
+    return test_embeddings, all_dim_bin_counts
