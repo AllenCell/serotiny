@@ -6,7 +6,7 @@ import yaml
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
 import serotiny.models as models
-from serotiny.utils import get_classes_from_config
+from serotiny.utils import get_classes_from_config, module_or_path
 
 
 def get_root(model_root=None):
@@ -42,7 +42,7 @@ def _get_checkpoint(model_path, model_root):
 
 def get_model(model_path, model_root=None):
     ckpt_path, model_class_name, config = _get_checkpoint(model_path, model_root)
-    model_class = models.__dict__[model_class_name]
+    model_class = module_or_path(models, model_class_name)
 
     model_config = config["model_config"]
 
