@@ -1,13 +1,10 @@
-from typing import Callable, Union, Optional, Sequence, Dict
+from typing import Union, Optional, Sequence, Dict
 import inspect
 
 import logging
-logger = logging.getLogger("lightning")
-logger.propagate = False
 
 import numpy as np
 import torch
-import torch.optim as opt
 import torch.nn as nn
 from torch.nn.modules.loss import _Loss as Loss
 
@@ -15,22 +12,25 @@ import pytorch_lightning as pl
 from pytorch_lightning.utilities.parsing import get_init_args
 
 from serotiny.losses.elbo import calculate_elbo
-from serotiny.models._utils import find_optimizer, find_lr_scheduler
-from serotiny.networks.mlp import MLP
+from serotiny.models._utils import find_optimizer
 from serotiny.utils import get_class_from_path
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]
+logger = logging.getLogger("lightning")
+logger.propagate = False
+
 
 class BaseVAE(pl.LightningModule):
     def __init__(
         self,
         encoder: Union[nn.Module, str],
         decoder: Union[nn.Module, str],
+        latent_dim: Union[int, Sequence[int]],
         optimizer: str,
         lr: float,
         beta: float,
         x_label: str,
-        recon_loss: Union[Loss, str] = torch.nn.MSELoss,
+        recon_loss: Union[Loss, str] = nn.MSELoss,
         prior_mode: str = "isotropic",
         prior_logvar: Optional[Array] = None,
         learn_prior_logvar: bool = False,
@@ -50,7 +50,7 @@ class BaseVAE(pl.LightningModule):
             Decoder network. If `str`, expects a class path, to be used for
             importing the given class. Instantiation arguments are to be
             given by `decoder_config`
-        optimizer: opt.Optimizer
+        optimizer: str
             Optimizer to use
         lr: float
             Learning rate for training
@@ -86,6 +86,8 @@ class BaseVAE(pl.LightningModule):
             *[arg for arg in init_args if arg not in ["encoder", "decoder"]]
         )
 
+        if isinstance(recon_loss, str):
+            recon_loss = get_class_from_path(recon_loss)
         self.recon_loss = recon_loss
 
         if isinstance(encoder, str):
@@ -93,11 +95,12 @@ class BaseVAE(pl.LightningModule):
             encoder = encoder(**encoder_config)
         if isinstance(decoder, str):
             decoder = get_class_from_path(decoder)
-            decoder = encoder(**decoder_config)
+            decoder = decoder(**decoder_config)
 
         self.encoder = encoder
         self.decoder = decoder
         self.beta = beta
+        self.latent_dim = latent_dim
 
         self.prior_mode = prior_mode
         self.prior_mean = None
@@ -109,18 +112,21 @@ class BaseVAE(pl.LightningModule):
             raise NotImplementedError(f"KLD mode '{prior_mode}' not implemented")
 
         if prior_mode == "anisotropic":
-            self.prior_mean = torch.zeros(self.embedding_dim)
+            self.prior_mean = torch.zeros(self.latent_dim)
             if prior_logvar is None:
-                self.prior_logvar = torch.zeros(self.embedding_dim)
+                self.prior_logvar = torch.zeros(self.latent_dim)
             else:
                 self.prior_logvar = torch.tensor(prior_logvar)
-            # if learn_prior_logvar:
-            self.prior_logvar = nn.Parameter(
-                self.prior_logvar, requires_grad=learn_prior_logvar
-            )
 
-        self.encoder_args = inspect.getargspec(self.encoder.forward).args
-        self.decoder_args = inspect.getargspec(self.decoder.forward).args
+            if learn_prior_logvar:
+                self.prior_logvar = nn.Parameter(
+                    self.prior_logvar, requires_grad=True
+                )
+            else:
+                self.prior_logvar.requires_grad = False
+
+        self.encoder_args = inspect.getfullargspec(self.encoder.forward).args
+        self.decoder_args = inspect.getfullargspec(self.decoder.forward).args
 
     def parse_batch(self, batch):
         return batch[self.hparams.x_label].float()
@@ -160,6 +166,7 @@ class BaseVAE(pl.LightningModule):
         return (
             x_hat,
             mu,
+            logvar,
             loss / batch_size,
             recon_loss / batch_size,
             kld_loss / batch_size,
@@ -174,7 +181,7 @@ class BaseVAE(pl.LightningModule):
         else:
             forward_kwargs = dict()
 
-        (_, _, loss, recon_loss, kld_loss,
+        (_, mu, _, loss, recon_loss, kld_loss,
          rcl_per_input_dimension,
          kld_per_latent_dimension) = self.forward(x, **forward_kwargs)
 
@@ -182,24 +189,31 @@ class BaseVAE(pl.LightningModule):
         self.log(f"{stage} kld loss", kld_loss, logger=logger)
         self.log(f"{stage}_loss", loss, logger=logger)
 
-        return {
+        results = {
             "loss": loss,
-            f"{stage}_loss": loss,  # for epoch end logging purposes
-            "recon_loss": recon_loss,
-            "kld_loss": kld_loss,
-            #"kld_per_latent_dimension": kld_per_latent_dimension,
-            #"rcl_per_input_dimension": rcl_per_input_dimension,
+            f"{stage}_loss": loss.detach(),  # for epoch end logging purposes
+            "recon_loss": recon_loss.detach(),
+            "kld_loss": kld_loss.detach(),
             "batch_idx": batch_idx,
         }
 
+        if stage == "test":
+            results.update({
+                "mu": mu.detach(),
+                "kld_per_latent_dimension": kld_per_latent_dimension.detach().float(),
+                "rcl_per_input_dimension": rcl_per_input_dimension.detach().float(),
+            })
+
+        return results
+
     def training_step(self, batch, batch_idx):
-        return self._step("train", batch, batch_idx, logger=False)
+        return self._step("train", batch, batch_idx, logger=True)
 
     def validation_step(self, batch, batch_idx):
         return self._step("val", batch, batch_idx, logger=True)
 
     def test_step(self, batch, batch_idx):
-        return self._step("test", batch, batch_idx, logger=True)
+        return self._step("test", batch, batch_idx, logger=False)
 
     def configure_optimizers(self):
         optimizer_class = find_optimizer(self.hparams.optimizer)

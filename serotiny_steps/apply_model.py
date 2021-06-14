@@ -5,6 +5,7 @@ from typing import Dict, List
 import fire
 import pytorch_lightning as pl
 
+import serotiny.datamodules as datamodules
 from serotiny.models.zoo import get_model
 from serotiny.utils import module_get, get_classes_from_config
 
@@ -20,7 +21,7 @@ def apply_model(
 ):
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
-    os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(gpu_ids)
+    os.environ["CUDA_VISIBLE_DEVICES"] = ",".join([str(id) for id in gpu_ids])
     num_gpus = len(gpu_ids)
     num_gpus = (num_gpus if num_gpus != 0 else None)
 
@@ -38,8 +39,9 @@ def apply_model(
         gpus=num_gpus,
     )
 
-    trainer.test(model=model,
-                 datamodule=datamodule)
+    trainer.test(
+        model=model,
+        datamodule=datamodule)
 
 
 if __name__ == "__main__":

@@ -12,7 +12,7 @@ import pytorch_lightning as pl
 from pathlib import Path
 from typing import Optional
 
-from serotiny.model._utils import find_optimizer, find_lr_scheduler
+from serotiny.models._utils import find_optimizer, find_lr_scheduler
 from serotiny.losses.elbo import calculate_elbo
 
 

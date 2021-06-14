@@ -44,6 +44,6 @@ def calculate_elbo(
         rcl + beta * kld,
         rcl,
         kld,
-        rcl_per_input_dimension.mean(dim=0),
-        kld_per_dimension.mean(dim=0)
+        rcl_per_input_dimension,
+        kld_per_dimension,
     )

@@ -1,10 +1,9 @@
 """
-Base conditional variational autoencoder module, implemented as a
+Tabular conditional variational autoencoder module, implemented as a
 Pytorch Lightning module
 """
 
-from typing import Sequence, Union, Optional, Dict
-import inspect
+from typing import Sequence, Union, Optional
 
 import logging
 logger = logging.getLogger("lightning")
@@ -12,19 +11,20 @@ logger.propagate = False
 
 import numpy as np
 import torch
-import torch.nn as nn
 from torch.nn.modules.loss import _Loss as Loss
 
-from .base_vae import BaseVAE
+from serotiny.networks.mlp import MLP
+from .conditional_vae import ConditionalVAE
 
 Array = Union[torch.Tensor, np.array]
 
-class ConditionalVAE(BaseVAE):
+class TabularConditionalVAE(ConditionalVAE):
     def __init__(
         self,
-        encoder: Union[nn.Module, str],
-        decoder: Union[nn.Module, str],
-        latent_dim: Union[int, Sequence[int]],
+        x_dim: int,
+        latent_dim: int,
+        c_dim: int,
+        hidden_layers: Sequence[int],
         optimizer: str,
         lr: float,
         beta: float,
@@ -35,8 +35,6 @@ class ConditionalVAE(BaseVAE):
         prior_mode: str = "isotropic",
         prior_logvar: Optional[Array] = None,
         learn_prior_logvar: bool = False,
-        encoder_config: Optional[Dict] = None,
-        decoder_config: Optional[Dict] = None,
     ):
         """
         Instantiate a conditional VAE model
@@ -49,7 +47,7 @@ class ConditionalVAE(BaseVAE):
             Decoder network.
         optimizer: opt.Optimizer
             Optimizer to use
-        recon_loss: Callable
+        reconstruction_loss: Callable
             Loss function for the reconstruction loss term
         lr: float
             Learning rate for training
@@ -77,34 +75,23 @@ class ConditionalVAE(BaseVAE):
             Boolean flag to determine whether to learn the prior log-variances
         """
 
+        encoder = MLP(
+            x_dim + c_dim,
+            2 * latent_dim,
+            hidden_layers=hidden_layers,
+        )
+
+        decoder = MLP(
+            latent_dim + c_dim,
+            x_dim,
+            hidden_layers=hidden_layers,
+        )
+
         super().__init__(encoder, decoder, latent_dim, optimizer, lr,
-                         beta, x_label, recon_loss,
-                         prior_mode, prior_logvar, learn_prior_logvar,
-                         encoder_config, decoder_config)
-
-        if condition_mode not in ("channel", "label"):
-            raise ValueError("`condition_mode` should be "
-                             "either 'channel' or 'label")
-
-        self.c_label = c_label
-        if condition_mode == "channel":
-            if isinstance(c_label, int):
-                self.c_label = [c_label]
-
-            assert isinstance(self.c_label, Sequence[int])
-
-        self.condition_mode = condition_mode
+                         beta, x_label, c_label, recon_loss, condition_mode,
+                         prior_mode, prior_logvar, learn_prior_logvar)
 
     def parse_batch(self, batch):
-        if self.condition_mode == "label":
-            x = batch[self.hparams.x_label].float()
-            condition = batch[self.c_label].float()
-        else:
-            x = batch[self.hparams.x_label].float()
-            x_channels = [channel for channel in range(x.shape[1])
-                          if channel not in self.c_label]
-
-            x = x[:, x_channels]
-            condition = x[:, self.c_label]
-
-        return x, {"condition": condition}
+        batch = super().parse_batch(batch)
+        batch[1]["x2"] = batch[1].pop("condition")
+        return batch

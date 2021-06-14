@@ -38,6 +38,7 @@ class MLP(nn.Module):
         self.net = nn.Sequential(*net)
         self.net.apply(weight_init)
 
-    def forward(self, *x):
-        x = torch.cat(x, dim=1)
-        return self.net(x)
+    def forward(self, x1, x2=None):
+        if x2 is not None:
+            x1 = torch.cat([x1, x2], dim=1)
+        return self.net(x1)

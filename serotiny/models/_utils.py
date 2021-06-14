@@ -17,83 +17,20 @@ import matplotlib.pyplot as plt
 from tqdm import trange, tqdm
 
 def to_device(
-    batch_x: Sequence, batch_y: Sequence, device: Union[str, device]
-) -> Tuple[Tensor, Tensor]:
-
-    # last input is for online eval
-    batch_x = batch_x.to(device)
-    batch_y = batch_y.to(device)
-
-    return batch_x, batch_y
-
-
-def get_ranked_dims(
-    stats,
-    cutoff_kld_per_dim,
-    max_num_shapemodes,
-):
-    stats = (
-        stats.loc[stats["test_kld_per_dim"] > cutoff_kld_per_dim]
-        .sort_values(by=["test_kld_per_dim"])
-        .reset_index(drop=True)
-    )
-
-    ranked_z_dim_list = [i for i in stats["dimension"][::-1]]
-    mu_std_list = [i for i in stats["mu_std_per_dim"][::-1]]
-    mu_mean_list = [i for i in stats["mu_mean_per_dim"][::-1]]
-
-    if len(ranked_z_dim_list) > max_num_shapemodes:
-        ranked_z_dim_list = ranked_z_dim_list[:max_num_shapemodes]
-        mu_std_list = mu_std_list[:max_num_shapemodes]
-
-    return ranked_z_dim_list, mu_std_list, mu_mean_list
-
-
-def get_all_embeddings(
-    train_dataloader,
-    val_dataloader,
-    test_dataloader,
-    pl_module: LightningModule,
-    x_label: str,
-    c_label: str,
-    id_fields: list,
+    *args
 ):
 
-    all_embeddings = []
-    cell_ids = []
-    split = []
+    assert len(args) > 1
+    target_device = args[-1]
+    assert isinstance(target_device, (str, device))
+    args = args[:-1]
 
-    zip_iter = zip(
-        ["train", "val", "test"], [train_dataloader, val_dataloader, test_dataloader]
-    )
-
-    with torch.no_grad():
-        for split_name, dataloader in zip_iter:
-            for batch in dataloader:
-                input_x = batch[x_label]
-                cond_c = batch[c_label]
-                cell_id = batch["id"][id_fields[0]]
-
-                _, mus, _, _, _, _, _, _ = pl_module(input_x.float(), cond_c.float())
-                all_embeddings.append(mus)
-
-                cell_ids.append(cell_id)
-                split.append([split_name] * mus.shape[0])
-
-    all_embeddings = torch.cat(all_embeddings, dim=0)
-    cell_ids = torch.cat(cell_ids, dim=0)
-    split = [item for sublist in split for item in sublist]
-    all_embeddings = all_embeddings.cpu().numpy()
-
-    df1 = pd.DataFrame(
-        all_embeddings, columns=[f"mu_{i}" for i in range(all_embeddings.shape[1])]
-    )
-    df2 = pd.DataFrame(cell_ids, columns=["CellId"])
-    df3 = pd.DataFrame(split, columns=["split"])
-    frames = [df1, df2, df3]
-    result = pd.concat(frames, axis=1)
-
-    return result
+    if len(args) > 1:
+        return tuple(
+            arg.to(target_device) for arg in args
+        )
+    else:
+        return args[0].to(target_device)
 
 
 def matplotlib_imshow(img, one_channel=False):
@@ -122,7 +59,6 @@ def images_to_probs(net, images):
     return preds, [F.softmax(el, dim=0)[i].item() for i, el in zip(preds, output)]
 
 
-
 def plot_classes_preds(net, images, labels, classes):
     """
     Generates matplotlib Figure using a trained network, along with images
@@ -148,7 +84,6 @@ def plot_classes_preds(net, images, labels, classes):
             ),
         )
     return fig
-
 
 
 def add_pr_curve_tensorboard(

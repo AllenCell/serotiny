@@ -10,7 +10,8 @@ from collections import defaultdict
 from torchvision import transforms
 
 from serotiny.io.image import tiff_loader_CZYX, png_loader
-from serotiny.utils import get_classes_from_config, filter_columns
+from serotiny.io.dataframe.utils import filter_columns
+from serotiny.utils import get_classes_from_config
 
 __all__ = ["LoadColumns", "LoadClass", "Load2DImage", "Load3DImage"]
 

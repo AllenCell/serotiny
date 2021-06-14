@@ -1,3 +1,4 @@
+from typing import Optional, List
 import multiprocessing as mp
 import pytorch_lightning as pl
 
@@ -24,9 +25,10 @@ class DummyDataset(Dataset):
 
     """
 
-    def __init__(self, x_label, y_label, length, dims):
+    def __init__(self, x_label, y_label, length, x_dims, y_dims=None):
         self.length = length
-        self.dims = tuple(dims)
+        self.x_dims = tuple(x_dims)
+        self.y_dims = (tuple(y_dims) if y_dims is not None else None)
         self.x_label = x_label
         self.y_label = y_label
 
@@ -34,17 +36,24 @@ class DummyDataset(Dataset):
         return self.length
 
     def __getitem__(self, idx):
+        if self.y_dims is not None:
+            y = torch.randn(self.y_dims)
+        else:
+            y = torch.randint(high=10, size=(1,))
+
         return {
-            self.x_label: torch.randn(self.dims),
-            self.y_label: torch.randint(high=10, size=(1,)),
+            self.x_label: torch.randn(self.x_dims),
+            self.y_label: y,
         }
 
 
-def make_dataloader(x_label, y_label, length, dims, batch_size, num_workers):
+def make_dataloader(x_label, y_label, length, x_dims, batch_size, num_workers,
+                    y_dims=None):
     """
     Instantiate dummy dataset and return dataloader
     """
-    dataset = DummyDataset(x_label, y_label, length, dims)
+    dataset = DummyDataset(x_label, y_label, length, x_dims,
+                           y_dims=y_dims)
     return DataLoader(
         dataset,
         batch_size=batch_size,
@@ -90,9 +99,10 @@ class DummyDatamodule(pl.LightningDataModule):
         num_workers: int,
         x_label: str,
         y_label: str,
-        dims: list,
+        x_dims: list,
         length: int,
         channels: list = [],
+        y_dims: Optional[List] = None,
     ):
 
         super().__init__()
@@ -103,12 +113,12 @@ class DummyDatamodule(pl.LightningDataModule):
         self.length = length
 
         self.num_channels = len(channels)
-        self.dims = dims
+        self.x_dims = x_dims
 
         if self.num_channels > 0:
-            dl_dims = tuple([self.num_channels] + list(dims)),
+            dl_dims = tuple([self.num_channels] + list(x_dims)),
         else:
-            dl_dims = dims
+            dl_dims = x_dims
 
         self.dataloader = make_dataloader(
             x_label,
@@ -117,6 +127,7 @@ class DummyDatamodule(pl.LightningDataModule):
             dl_dims,
             batch_size,
             num_workers,
+            y_dims=y_dims
         )
 
     def train_dataloader(self):

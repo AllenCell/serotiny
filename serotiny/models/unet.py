@@ -3,40 +3,35 @@ General conditional beta variational autoencoder module,
 implemented as a Pytorch Lightning module
 """
 
-import numpy as np
 from pathlib import Path
-from typing import Sequence
 import inspect
-from pathlib import Path
-
+from typing import Sequence, Union, Optional, Dict
 import logging
-
-from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
-
 logger = logging.getLogger("lightning")
 logger.propagate = False
 
-import torch
-import torch.optim as opt
+import numpy as np
+
 import torch.nn as nn
-#import torch.nn.functional as F
+from torch.nn.modules.loss import _Loss as Loss
 
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.parsing import get_init_args
 
+from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
+
 from serotiny.models._utils import index_to_onehot, find_optimizer
+from serotiny.utils import get_class_from_path
 
 
 class UnetModel(pl.LightningModule):
     def __init__(
         self,
-        network: nn.Module,
-        optimizer: opt.Optimizer,
-        loss: nn.Module,
+        network: Union[nn.Module, str],
+        optimizer: str,
+        loss: Union[Loss, str],
         lr: float,
         input_dims: Sequence[int],
-
-        # additional parameters
         x_label: str,
         y_label: str,
         input_channels: Sequence[str],
@@ -45,6 +40,7 @@ class UnetModel(pl.LightningModule):
         output_path: str,
         version_string: str,
         test_image_output: bool,
+        network_config: Optional[Dict] = None,
     ):
         """
         Instantiate a UnetModel.
@@ -82,9 +78,15 @@ class UnetModel(pl.LightningModule):
 
         self.log_grads = True
 
+        if isinstance(network, str):
+            network = get_class_from_path(network)
+            network = network(**network_config)
         self.network = network
+
+        if isinstance(loss, str):
+            loss = get_class_from_path(loss)()
         self.loss = loss
-        
+
         self.input_channels = input_channels
         self.output_channels = output_channels
 
@@ -109,7 +111,9 @@ class UnetModel(pl.LightningModule):
         #print(f'batch = {batch}')
         x = batch[self.hparams.x_label].float()
         y = batch[self.hparams.y_label].float()
-        ids = batch["id"]
+        ids = dict()
+        if "id" in batch:
+            ids = batch["id"]
 
         return x, y, ids
 
@@ -230,10 +234,10 @@ class UnetModel(pl.LightningModule):
 
         # Default logger=False for training_step
         # set it to true to log train loss to all lggers
-        self.log("validation_loss", loss, logger=True)
+        self.log("val_loss", loss, logger=True)
 
         return {
-            "validation_loss": loss,
+            "val_loss": loss,
             "y_hat": y_hat,
             "batch_idx": batch_idx,
         }
