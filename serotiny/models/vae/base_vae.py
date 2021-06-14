@@ -88,6 +88,7 @@ class BaseVAE(pl.LightningModule):
 
         if isinstance(recon_loss, str):
             recon_loss = get_class_from_path(recon_loss)
+            recon_loss = recon_loss()
         self.recon_loss = recon_loss
 
         if isinstance(encoder, str):
