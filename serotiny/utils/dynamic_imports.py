@@ -75,12 +75,28 @@ def keep(d: Dict, f: callable):
         for key, value in d.items()
         if f(key, value)}
 
-PATH_KEY = '_path'
+PATH_KEY = '@invoke'
 
-def path_invocations(configs: Dict):
-    return {
-        key: get_class_from_path(
-            config[PATH_KEY])(**keep(
-                config,
-                lambda k, v: k != PATH_KEY))
-        for key, config in configs.items()}
+def invoke_class(config):
+    invoke = get_class_from_path(
+        config[PATH_KEY])
+    arguments = keep(
+        config,
+        lambda k, v: k != PATH_KEY)
+
+    return invoke(**arguments)
+
+def path_invocations(configs):
+    try:
+        if isinstance(configs, dict):
+            return {
+                key: invoke_class(config)
+                for key, config in configs.items()}
+        elif iter(configs):
+            return [
+                invoke_class(config)
+                for config in configs]
+        else:
+            raise Exception(f"can only invoke paths from a dict or an iterable, not {configs}")
+    except TypeError:
+        raise Exception(f"invoking paths on non-iterable object {configs}")

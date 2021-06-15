@@ -11,7 +11,7 @@ from torchvision import transforms
 
 from serotiny.io.image import tiff_loader_CZYX, png_loader
 from serotiny.io.dataframe.utils import filter_columns
-from serotiny.utils import get_classes_from_config
+from serotiny.utils import path_invocations
 
 __all__ = ["LoadColumns", "LoadClass", "Load2DImage", "Load3DImage"]
 
@@ -110,7 +110,7 @@ class Load2DImage(Loader):
             column='image',
             num_channels=1,
             channel_indexes=None,
-            transforms_dict=None):
+            transforms=None):
 
         super().__init__()
         self.column = column
@@ -118,7 +118,7 @@ class Load2DImage(Loader):
         self.channel_indexes = channel_indexes
 
         self.transforms = defaultdict(None)
-        for key, transforms_config in transforms_dict.items():
+        for key, transforms_config in transforms.items():
             self.transforms[key] = load_transforms(transforms_config)
 
 
@@ -140,14 +140,14 @@ class Load3DImage(Loader):
             self,
             column='image',
             select_channels=None,
-            transforms_dict=None):
+            transforms=None):
         super().__init__()
         self.column = column
         self.select_channels = select_channels
-        transforms_dict = transforms_dict or {}
+        transforms = transforms or []
 
         self.transforms = defaultdict(None)
-        for key, transforms_config in transforms_dict.items():
+        for key, transforms_config in transforms.items():
             self.transforms[key] = load_transforms(transforms_config)
 
 
@@ -162,12 +162,18 @@ class Load3DImage(Loader):
         )
 
 
-def load_transforms(transforms_dict):
-    if transforms_dict is not None:
-        return transforms.Compose(
-            get_classes_from_config(transforms_dict)
-        )
-    return None
+def load_transforms(transforms_config):
+    if isinstance(transforms_config, dict):
+        invocations = list(path_invocations(transforms_config).values())
+    elif isinstance(transforms_config, list):
+        invocations = path_invocations(transforms_config)
+    elif transforms_config is None:
+        invocations = None
+    else:
+        raise Exception(f"Can only load transforms from dicts or iterables, not {transforms_config}")
+        
+    if invocations is not None:
+        return transforms.Compose(invocations)
 
 
 def infer_extension_loader(extension, column="true_paths"):
