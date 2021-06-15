@@ -1,3 +1,4 @@
+import logging
 from typing import Union, Optional, Dict
 from pathlib import Path
 
@@ -11,6 +12,8 @@ from torch.utils.data.sampler import SubsetRandomSampler
 from serotiny.io.dataframe import DataframeDataset
 from serotiny.utils import get_classes_from_config
 from serotiny.datamodules.utils import ModeDataLoader
+
+log = logging.getLogger(__name__)
 
 def make_manifest_dataset(
     manifest: Union[Path, str],
@@ -113,9 +116,14 @@ class ManifestDatamodule(pl.LightningDataModule):
             val_idx = [0] * self.batch_size
             test_idx = [0] * self.batch_size
 
-        train_idx = np.random.choice(train_idx,
-                                     replace=False,
-                                     size=(int(subset_train) * len(train_idx)))
+        if subset_train < 1:
+            new_size = int(subset_train * len(train_idx))
+            log.info(f"Subsetting the training data by {100*subset_train:.2f}%, "
+                     f"from {len(train_idx)} to {new_size}")
+            train_idx = np.random.choice(train_idx,
+                                         replace=False,
+                                         size=new_size)
+
 
         self.train_sampler = SubsetRandomSampler(train_idx)
         self.val_sampler = SubsetRandomSampler(val_idx)
