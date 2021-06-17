@@ -4,5 +4,7 @@ from .dynamic_imports import (
     get_classes_from_config,
     get_class_from_path,
     invoke_path,
+    invoke_class,
     path_invocations,
+    PATH_KEY,
 )

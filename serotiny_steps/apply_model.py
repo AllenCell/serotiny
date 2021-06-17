@@ -7,7 +7,7 @@ import pytorch_lightning as pl
 
 import serotiny.datamodules as datamodules
 from serotiny.models.zoo import get_model
-from serotiny.utils import module_get, get_classes_from_config
+from serotiny.utils import module_get, get_classes_from_config, module_or_path
 
 
 def apply_model(
@@ -28,7 +28,7 @@ def apply_model(
     model_zoo_path = model_zoo_config.get("path")
     model = get_model(model_path, model_zoo_path)
 
-    create_datamodule = module_get(datamodules, datamodule_name)
+    create_datamodule = module_or_path(datamodules, datamodule_name)
     datamodule = create_datamodule(**datamodule_config)
     datamodule.setup()
 
