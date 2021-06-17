@@ -43,8 +43,7 @@ def train_model(
     pl.seed_everything(seed)
 
     model_zoo_path = model_zoo_config.get("path")
-    checkpoint_monitor = model_zoo_config.get("checkpoint_monitor", None)
-    checkpoint_mode = model_zoo_config.get("checkpoint_mode", None)
+    checkpoint_config = model_zoo_config.get("checkpoint", {})
 
     model_name = model_config.get(PATH_KEY, 'UNDEFINED_MODEL_NAME')
     datamodule_name = datamodule_config.get(PATH_KEY, 'UNDEFINED_DATAMODULE_NAME')
@@ -67,14 +66,15 @@ def train_model(
 
     loggers = path_invocations(loggers_config)
 
-    if checkpoint_monitor is not None:
-        checkpoint_callback = get_checkpoint_callback(
-            model_name,
-            version_string,
-            checkpoint_monitor,
-            checkpoint_mode,
-            model_zoo_path
-        )
+    if checkpoint_config:
+        model_path = build_model_path(
+            model_zoo_path,
+            (model_name, version_string))
+        config = {
+            'dirpath': model_path,
+            'filename': "epoch-{epoch:02d}"}
+        config.update(checkpoint_config)
+        checkpoint_callback = ModelCheckpoint(**config)
     else:
         checkpoint_callback = None
 
