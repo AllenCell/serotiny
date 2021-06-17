@@ -11,7 +11,7 @@ import pytorch_lightning as pl
 import serotiny.datamodules as datamodules
 import serotiny.models as models
 from serotiny.models.zoo import get_checkpoint_callback, store_metadata
-from serotiny.utils import module_get, module_or_path, get_classes_from_config, PATH_KEY, invoke_class
+from serotiny.utils import module_get, module_or_path, get_classes_from_config, PATH_KEY, invoke_class, path_invocations
 
 log = logging.getLogger(__name__)
 
