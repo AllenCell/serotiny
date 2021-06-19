@@ -1,18 +1,20 @@
 """
-General classifier module, implemented as a Pytorch Lightning module
+General regression module, implemented as a Pytorch Lightning module
 """
 
-from typing import Optional, Union
+from typing import Optional, Union, Dict
 from pathlib import Path
 import numpy as np
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.nn.modules.loss import _Loss as Loss
 
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger
 
+from serotiny.utils import get_class_from_path
 from serotiny.models._utils import find_optimizer
 
 
@@ -60,14 +62,14 @@ class RegressionModel(pl.LightningModule):
         super().__init__()
         # Can be accessed via checkpoint['hyper_parameters']
         self.save_hyperparameters()
-        if isinstance(recon_loss, str):
+        if isinstance(loss, str):
             loss = get_class_from_path(loss)
-        if isinstance(encoder, str):
+        if isinstance(network, str):
             network = get_class_from_path(network)
-            network = encoder(**network_config)
+            network = network(**network_config)
 
 
-        self.loss = loss
+        self.loss = loss()
         self.network = network
 
     def parse_batch(self, batch):
@@ -92,6 +94,7 @@ class RegressionModel(pl.LightningModule):
 
         results = {
             "loss": loss,
+            "yhat": yhat.detach(),
             f"{stage}_loss": loss.detach(),  # for epoch end logging purposes
             "batch_idx": batch_idx,
         }
