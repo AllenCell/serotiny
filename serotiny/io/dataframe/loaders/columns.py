@@ -1,6 +1,25 @@
 from serotiny.io.dataframe.utils import filter_columns
 from .abstract_loader import Loader
 
+
+class LoadColumn(Loader):
+    """
+    Loader class, used to retrieve fields directly from dataframe columns
+    """
+
+    def __init__(
+            self,
+            column='index',
+            dtype="float"):
+        super().__init__()
+
+        self.column = column
+        self.dtype = dtype
+
+    def __call__(self, row):
+        return row[self.column].astype(self.dtype)
+
+
 class LoadColumns(Loader):
     """
     Loader class, used to retrieve fields directly from dataframe columns

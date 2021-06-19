@@ -7,7 +7,7 @@ import pytorch_lightning as pl
 
 import serotiny.datamodules as datamodules
 from serotiny.models.zoo import get_model
-from serotiny.utils import module_get, get_classes_from_config
+from serotiny.utils import module_get, get_classes_from_config, module_or_path
 
 
 def apply_model(
@@ -21,14 +21,14 @@ def apply_model(
 ):
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
-    os.environ["CUDA_VISIBLE_DEVICES"] = ",".join(gpu_ids)
+    os.environ["CUDA_VISIBLE_DEVICES"] = ",".join([str(id) for id in gpu_ids])
     num_gpus = len(gpu_ids)
     num_gpus = (num_gpus if num_gpus != 0 else None)
 
     model_zoo_path = model_zoo_config.get("path")
     model = get_model(model_path, model_zoo_path)
 
-    create_datamodule = module_get(datamodules, datamodule_name)
+    create_datamodule = module_or_path(datamodules, datamodule_name)
     datamodule = create_datamodule(**datamodule_config)
     datamodule.setup()
 
@@ -39,8 +39,9 @@ def apply_model(
         gpus=num_gpus,
     )
 
-    trainer.test(model=model,
-                 datamodule=datamodule)
+    trainer.test(
+        model=model,
+        datamodule=datamodule)
 
 
 if __name__ == "__main__":

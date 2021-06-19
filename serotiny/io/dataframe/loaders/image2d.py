@@ -12,29 +12,27 @@ class Load2DImage(Loader):
     Loader class, used to retrieve images from paths given in a dataframe column
     """
 
-    def __init__(self, chosen_col, num_channels, channel_indexes,
-                 transforms_dict={}, fms=False):
+    def __init__(
+            self,
+            column='image',
+            num_channels=1,
+            channel_indexes=None,
+            transforms=None):
 
         super().__init__()
-        self.chosen_col = chosen_col
+        self.column = column
         self.num_channels = num_channels
         self.channel_indexes = channel_indexes
 
         self.transforms = defaultdict(None)
-        for key, transforms_config in transforms_dict.items():
+        for key, transforms_config in transforms.items():
             self.transforms[key] = load_transforms(transforms_config)
 
-        self.fms = (FileManagementSystem() if fms else None)
-
-    def _get_path(self, row):
-        if self.fms is not None:
-            return self.fms.get_file_by_id(row[self.chosen_col]).path
-        return row[self.chosen_col]
 
     def __call__(self, row):
         return png_loader(
-            self._get_path(row),
+            row[self.column],
             channel_order="CYX",
             indexes={"C": self.channel_indexes or range(self.num_channels)},
-            transform=self.transforms[self.mode]
+            transform=self.transforms.get(self.mode)
         )

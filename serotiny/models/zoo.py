@@ -6,7 +6,7 @@ import yaml
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
 import serotiny.models as models
-from serotiny.utils import get_classes_from_config
+from serotiny.utils import get_classes_from_config, module_or_path
 
 
 def get_root(model_root=None):
@@ -42,15 +42,19 @@ def _get_checkpoint(model_path, model_root):
 
 def get_model(model_path, model_root=None):
     ckpt_path, model_class_name, config = _get_checkpoint(model_path, model_root)
-    model_class = models.__dict__[model_class_name]
+    model_class = module_or_path(models, model_class_name)
 
     model_config = config["model_config"]
 
     return model_class.load_from_checkpoint(checkpoint_path=ckpt_path, **model_config)
 
 
-def get_trainer_at_checkpoint(model_path, model_root=None, reload_callbacks=False,
-                              reload_loggers=True):
+def get_trainer_at_checkpoint(
+        model_path,
+        model_root=None,
+        reload_callbacks=False,
+        reload_loggers=True):
+
     ckpt_path, model_class_name, config = _get_checkpoint(model_path, model_root)
 
     trainer_config = config["trainer_config"]
@@ -58,7 +62,7 @@ def get_trainer_at_checkpoint(model_path, model_root=None, reload_callbacks=Fals
     model_zoo_config = config["model_zoo_config"]
     checkpoint_callback = get_checkpoint_callback(
         model_class_name,
-        model_path.split("/")[1],
+        model_path.split("/")[1].split('.ckpt')[0],
         model_zoo_config.get("checkpoint_monitor"),
         model_zoo_config.get("checkpoint_mode"),
         model_root,
@@ -95,22 +99,29 @@ def store_model(trainer, model_class, model_id, model_root=None):
     model_path = model_path / model_id
     trainer.save_checkpoint(model_path)
 
-def get_checkpoint_callback(model_class, model_id, checkpoint_monitor,
-                            checkpoint_mode, model_root=None):
-    model_root = get_root(model_root)
 
-    if not model_root.exists():
-        model_root.mkdir(parents=True)
+def build_model_path(model_root, path):
+    model_path = get_root(model_root)
 
-    model_path = model_root / model_class
     if not model_path.exists():
         model_path.mkdir(parents=True)
 
-    model_id = model_id.split(".ckpt")[0]
+    for step in path:
+        model_path = model_path / step
+        if not model_path.exists():
+            model_path.mkdir(parents=True)
 
-    model_path = model_path / model_id
-    if not model_path.exists():
-        model_path.mkdir(parents=True)
+    return model_path
+
+
+def get_checkpoint_callback(
+        model_class,
+        model_id,
+        checkpoint_monitor,
+        checkpoint_mode,
+        model_root=None):
+
+    model_path = build_model_path(model_root, (model_class, model_id))
 
     return ModelCheckpoint(
         monitor=checkpoint_monitor,
@@ -118,6 +129,7 @@ def get_checkpoint_callback(model_class, model_id, checkpoint_monitor,
         dirpath=model_path,
         filename="epoch{epoch:02d}"
     )
+
 
 def store_metadata(metadata, model_class, model_id, model_root=None):
     model_root = get_root(model_root)
