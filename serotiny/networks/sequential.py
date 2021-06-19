@@ -12,8 +12,9 @@ class Sequential(nn.Module):
         self,
         modules: Dict,
     ):
+        super().__init__()
         modules = get_classes_from_config(modules)
-        self.model = nn.Sequential(*modules)
+        self.net = nn.Sequential(*modules)
 
     def forward(self, x):
-        return self.model(x)
+        return self.net(x)
