@@ -7,6 +7,7 @@ from datetime import datetime
 
 import fire
 import pytorch_lightning as pl
+from pytorch_lightning.callbacks import ModelCheckpoint
 
 import serotiny.datamodules as datamodules
 import serotiny.models as models
