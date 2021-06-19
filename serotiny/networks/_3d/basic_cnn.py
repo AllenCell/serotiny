@@ -1,7 +1,3 @@
-"""
-Basic Neural Net for 3D classification
-"""
-
 from typing import Sequence
 
 import numpy as np
@@ -38,12 +34,12 @@ class BasicCNN(nn.Module):
         self,
         in_channels: int,
         input_dims: Sequence[int],
-        num_classes: int,
-        num_layers: int = 5,
+        output_dim: int,
+        hidden_channels: Sequence[int],
         max_pool_layers: Sequence[int] = [],
     ):
         """
-        Instantiate a 3D CNN for classification
+        Instantiate a 3D CNN
 
         Parameters
         ----------
@@ -51,10 +47,11 @@ class BasicCNN(nn.Module):
             Number of input channels
         input_dims: Sequence[int]
             Dimensions of input channels
-        num_classes: int
-            Number of classes in the dataset
-        num_layers: int
-            Depth of the network
+        output_dim: int
+            Dimensionality of the output
+        hidden_channels: Sequence[int]
+            Number of channels for each hidden layer. (And implicitly, the
+            depth of the network)
         max_pool_layers: int
             Sequence of layers in which to apply a max pooling operation
         pretrained: bool
@@ -62,20 +59,18 @@ class BasicCNN(nn.Module):
             leveraging a pretrained 2d resnet
         """
         super().__init__()
-        self.num_classes = num_classes
+        self.output_dim = output_dim
         self.max_pool = nn.MaxPool3d(kernel_size=2, padding=0)
         self.max_pool_layers = max_pool_layers
 
         layers = []
 
-        out_channels = 4
         _in_channels = in_channels
-        for i in range(num_layers):
+        for out_channels in hidden_channels:
             layers.append(
                 _conv_layer(_in_channels, out_channels, kernel_size=(3, 3, 3))
             )
             _in_channels = out_channels
-            out_channels = out_channels * int(1.5 ** (i))
 
         self.layers = nn.Sequential(*layers)
 
@@ -84,7 +79,7 @@ class BasicCNN(nn.Module):
         dummy_conv_output = self.conv_forward(torch.zeros(1, in_channels, *input_dims))
         compressed_size = np.prod(dummy_conv_output.shape[1:])
 
-        self.output = nn.Linear(compressed_size, num_classes)
+        self.output = nn.Linear(compressed_size, output_dim)
 
     def conv_forward(self, x):
         for i, layer in enumerate(self.layers):
