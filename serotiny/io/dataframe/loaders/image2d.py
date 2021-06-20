@@ -17,7 +17,8 @@ class Load2DImage(Loader):
             column='image',
             num_channels=1,
             channel_indexes=None,
-            transforms=None):
+            transforms=None,
+            fms=False):
 
         super().__init__()
         self.column = column
@@ -28,10 +29,16 @@ class Load2DImage(Loader):
         for key, transforms_config in transforms.items():
             self.transforms[key] = load_transforms(transforms_config)
 
+        self.fms = (FileManagementSystem() if fms else None)
+
+    def _get_path(self, row):
+        if self.fms is not None:
+            return self.fms.get_file_by_id(row[self.column]).path
+        return row[self.column]
 
     def __call__(self, row):
         return png_loader(
-            row[self.column],
+            self._get_path(row),
             channel_order="CYX",
             indexes={"C": self.channel_indexes or range(self.num_channels)},
             transform=self.transforms.get(self.mode)

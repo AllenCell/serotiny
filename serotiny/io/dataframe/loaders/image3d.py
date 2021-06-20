@@ -17,7 +17,8 @@ class Load3DImage(Loader):
             self,
             column='image',
             select_channels=None,
-            transforms=None):
+            transforms=None,
+            fms=False):
         super().__init__()
         self.column = column
         self.select_channels = select_channels
@@ -27,10 +28,16 @@ class Load3DImage(Loader):
         for key, transforms_config in transforms.items():
             self.transforms[key] = load_transforms(transforms_config)
 
+        self.fms = (FileManagementSystem() if fms else None)
+
+    def _get_path(self, row):
+        if self.fms is not None:
+            return self.fms.get_file_by_id(row[self.column]).path
+        return row[self.column]
 
     def __call__(self, row):
         return tiff_loader_CZYX(
-            row[self.column],
+            self._get_path(row),
             select_channels=self.select_channels,
             output_dtype=np.float32,
             channel_masks=None,
