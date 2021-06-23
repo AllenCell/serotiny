@@ -1,5 +1,5 @@
 import multiprocessing as mp
-from typing import Sequence, Union
+from typing import Sequence, Union, Optional
 
 import re
 import numpy as np
@@ -15,7 +15,9 @@ from pathlib import Path
 from actk.utils import dataset_utils
 
 
-def load_csv(dataset: Union[str, Path, pd.DataFrame], required_fields: Sequence[str]):
+def load_csv(
+        dataset: Union[str, Path, pd.DataFrame],
+        required_fields: Optional[Sequence[str]])=None:
     """
     Read dataframe from either a path or an existing pd.DataFrame, checking
     the fields given by `required` are present
@@ -27,6 +29,8 @@ def load_csv(dataset: Union[str, Path, pd.DataFrame], required_fields: Sequence[
 
         # Read dataset
         dataset = pd.read_csv(dataset)
+
+    required_fields = required_fields or []
 
     # Check that all columns provided as required are in the dataset
     missing_fields = set(required_fields) - set(dataset.columns)
