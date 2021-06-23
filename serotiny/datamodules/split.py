@@ -70,7 +70,7 @@ class SplitDatamodule(pl.LightningDataModule):
         split_path = Path(split_path)
         self.datasets = {}
         for csv in list(split_path.glob("*.csv")):
-            key = re.findall('(.*)\.csv')[0]
+            key = re.findall(r'(.*)\.csv', csv.name)[0]
             dataframe = load_csv(csv)
             dataset = DataframeDataset(dataframe, loaders)
             self.datasets[key] = dataset
