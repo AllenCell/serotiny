@@ -85,7 +85,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         batch_size: int,
         num_workers: int,
         manifest: Union[Path, str],
-        loader_dict: Dict,
+        loaders: Dict,
         split_col: Optional[str] = None,
         pin_memory: bool = True,
         drop_last: bool = False,

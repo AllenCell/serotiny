@@ -16,7 +16,7 @@ def _get_weights(shape):
     return np.broadcast_to(weights, shape_in).astype(np.float32)
 
 
-def _predict_piecewise_recurse(
+def _tile_prediction_recurse(
     predictor,
     ar_in: np.ndarray,
     dims_max: Union[int, List[int]],
@@ -46,7 +46,7 @@ def _predict_piecewise_recurse(
         slices[dim] = slice(offset, end)
         slices = tuple(slices)
         ar_in_sub = ar_in[slices]
-        pred_sub, pred_weight_sub = _predict_piecewise_recurse(
+        pred_sub, pred_weight_sub = _tile_prediction_recurse(
             predictor, ar_in_sub, dims_max, overlaps, **predict_kwargs
         )
         if ar_out is None or ar_weight is None:
@@ -63,7 +63,7 @@ def _predict_piecewise_recurse(
     return ar_out, ar_weight
 
 
-def predict_piecewise(
+def tile_prediction(
     predictor,
     tensor_in: torch.Tensor,
     dims_max: Union[int, List[int]] = 64,
@@ -108,7 +108,7 @@ def predict_piecewise(
     dims_max[0] = None
     overlaps[0] = None
     ar_in = tensor_in.numpy()
-    ar_out, ar_weight = _predict_piecewise_recurse(
+    ar_out, ar_weight = _tile_prediction_recurse(
         predictor, ar_in, dims_max=dims_max, overlaps=overlaps, **predict_kwargs
     )
     # tifffile.imsave('debug/ar_sum.tif', ar_out)
