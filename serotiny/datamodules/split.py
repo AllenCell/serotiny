@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 def make_dataloader(
         dataset,
         mode,
-        **kwargs)
+        **kwargs):
 
     return ModeDataLoader(
         dataset=dataset,
