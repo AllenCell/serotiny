@@ -144,12 +144,11 @@ class Load3DImage(Loader):
         super().__init__()
         self.column = column
         self.select_channels = select_channels
-        transforms = transforms or []
+        transforms = transforms or {}
 
         self.transforms = defaultdict(None)
         for key, transforms_config in transforms.items():
             self.transforms[key] = load_transforms(transforms_config)
-
 
     def __call__(self, row):
         return tiff_loader_CZYX(
