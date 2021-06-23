@@ -17,7 +17,7 @@ from actk.utils import dataset_utils
 
 def load_csv(
         dataset: Union[str, Path, pd.DataFrame],
-        required_fields: Optional[Sequence[str]])=None:
+        required_fields: Optional[Sequence[str]]=None):
     """
     Read dataframe from either a path or an existing pd.DataFrame, checking
     the fields given by `required` are present
