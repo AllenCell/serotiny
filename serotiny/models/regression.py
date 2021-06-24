@@ -13,9 +13,11 @@ from torch.nn.modules.loss import _Loss as Loss
 
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger
+from pytorch_lightning.utilities import rank_zero_only
 
-from serotiny.utils import get_class_from_path
+from serotiny.utils import invoke_class
 from serotiny.models._utils import find_optimizer
+from serotiny.networks.weight_init import weight_init
 
 
 class RegressionModel(pl.LightningModule):
@@ -51,26 +53,26 @@ class RegressionModel(pl.LightningModule):
 
     def __init__(
         self,
-        network: Union[nn.Module, str],
+        network: Union[nn.Module, Dict],
         x_label: str,
         y_label: str,
         lr: float,
         optimizer: str,
-        loss: Union[Loss, str] = nn.MSELoss,
-        network_config: Optional[Dict] = None,
+        loss: Union[Loss, Dict] = nn.MSELoss(),
     ):
         super().__init__()
         # Can be accessed via checkpoint['hyper_parameters']
         self.save_hyperparameters()
-        if isinstance(loss, str):
-            loss = get_class_from_path(loss)
-        if isinstance(network, str):
-            network = get_class_from_path(network)
-            network = network(**network_config)
+        if isinstance(loss, dict):
+            self.loss = invoke_class(loss)
+        else:
+            self.loss = loss
 
+        if isinstance(network, dict):
+            network = invoke_class(network)
 
-        self.loss = loss()
-        self.network = network
+        self.network = network.apply(weight_init)
+        self._cache = dict()
 
     def parse_batch(self, batch):
         """
@@ -89,14 +91,14 @@ class RegressionModel(pl.LightningModule):
 
         yhat = self.network(x)
 
-        loss = self.loss(y, yhat)
-        self.log(f"{stage} loss", loss, logger=logger)
+        loss = self.loss(yhat, y)
+
+        self.log(f"{stage} loss", loss.detach(), logger=logger)
 
         results = {
             "loss": loss,
-            "yhat": yhat.detach(),
-            f"{stage}_loss": loss.detach(),  # for epoch end logging purposes
-            "batch_idx": batch_idx,
+            "yhat": yhat.detach().squeeze(),
+            "ytrue": y.detach().squeeze(),
         }
 
         return results
@@ -104,11 +106,20 @@ class RegressionModel(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         return self._step("train", batch, batch_idx, logger=True)
 
+    def training_epoch_end(self, outputs):
+        self._cache["train"] = outputs
+
     def validation_step(self, batch, batch_idx):
         return self._step("val", batch, batch_idx, logger=True)
 
+    def validation_epoch_end(self, outputs):
+        self._cache["val"] = outputs
+
     def test_step(self, batch, batch_idx):
         return self._step("test", batch, batch_idx, logger=False)
+
+    def test_epoch_end(self, outputs):
+        self._cache["test"] = outputs
 
     def configure_optimizers(self):
         optimizer_class = find_optimizer(self.hparams.optimizer)
