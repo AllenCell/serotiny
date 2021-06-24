@@ -91,9 +91,13 @@ def train_model(
     )
 
     log.info("Calling trainer.fit")
-    trainer.fit(model, datamodule)
+    trainer.fit(
+        model,
+        datamodule)
 
-    trainer.test(datamodule=datamodule)
+    trainer.test(
+        datamodule=datamodule,
+        ckpt_path=None)
 
 
 if __name__ == "__main__":

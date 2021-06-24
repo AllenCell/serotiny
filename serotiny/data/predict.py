@@ -3,6 +3,8 @@ from typing import Union, List
 import numpy as np
 import torch
 
+from serotiny.transform.pad import pull_to
+
 
 def _get_weights(shape):
     shape_in = shape
@@ -16,16 +18,17 @@ def _get_weights(shape):
     return np.broadcast_to(weights, shape_in).astype(np.float32)
 
 
-def _predict_piecewise_recurse(
+def _tile_prediction_recurse(
     predictor,
-    ar_in: np.ndarray,
+    ar_in: torch.Tensor,
     dims_max: Union[int, List[int]],
     overlaps: Union[int, List[int]],
+    device: str = 'cuda',
     **predict_kwargs,
 ):
     """Performs piecewise prediction recursively."""
     if tuple(ar_in.shape[1:]) == tuple(dims_max[1:]):
-        ar_out = predictor.predict(ar_in, **predict_kwargs).numpy().astype(np.float32)
+        ar_out = predictor(ar_in.to(device), **predict_kwargs).numpy().astype(np.float32)
         ar_weight = _get_weights(ar_out.shape)
         return ar_out * ar_weight, ar_weight
     dim = None
@@ -46,7 +49,7 @@ def _predict_piecewise_recurse(
         slices[dim] = slice(offset, end)
         slices = tuple(slices)
         ar_in_sub = ar_in[slices]
-        pred_sub, pred_weight_sub = _predict_piecewise_recurse(
+        pred_sub, pred_weight_sub = _tile_prediction_recurse(
             predictor, ar_in_sub, dims_max, overlaps, **predict_kwargs
         )
         if ar_out is None or ar_weight is None:
@@ -63,7 +66,7 @@ def _predict_piecewise_recurse(
     return ar_out, ar_weight
 
 
-def predict_piecewise(
+def tile_prediction(
     predictor,
     tensor_in: torch.Tensor,
     dims_max: Union[int, List[int]] = 64,
@@ -96,8 +99,13 @@ def predict_piecewise(
     assert len(tensor_in.size()) > 2
     shape_in = tuple(tensor_in.size())
     n_dim = len(shape_in)
+    ar_in = tensor_in.cpu()
     if isinstance(dims_max, int):
         dims_max = [dims_max] * n_dim
+    # deal with dims_max less that n_dim
+    if len(dims_max) < n_dim:
+        missing = n_dim - len(dims_max)
+        dims_max = [1 for _ in range(missing)] + dims_max
     for idx_d in range(1, n_dim):
         if dims_max[idx_d] > shape_in[idx_d]:
             dims_max[idx_d] = shape_in[idx_d]
@@ -107,8 +115,7 @@ def predict_piecewise(
     # Remove restrictions on channel dimension.
     dims_max[0] = None
     overlaps[0] = None
-    ar_in = tensor_in.numpy()
-    ar_out, ar_weight = _predict_piecewise_recurse(
+    ar_out, ar_weight = _tile_prediction_recurse(
         predictor, ar_in, dims_max=dims_max, overlaps=overlaps, **predict_kwargs
     )
     # tifffile.imsave('debug/ar_sum.tif', ar_out)

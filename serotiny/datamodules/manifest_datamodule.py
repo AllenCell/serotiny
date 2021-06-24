@@ -18,9 +18,9 @@ log = logging.getLogger(__name__)
 def make_manifest_dataset(
     manifest: Union[Path, str],
     loader_dict: Dict,
-    split_col: Optional[str] = None,
     columns: Optional[Sequence[str]] = None,
-    fms: bool = False
+    fms: bool = False,
+    iloc: bool = False,
 ):
     if fms:
         manifest = Path(FileManagementSystem().get_file_by_id(manifest).path)
@@ -42,8 +42,10 @@ def make_manifest_dataset(
         for key, value in loader_dict.items()
     }
 
-    return DataframeDataset(dataframe=df, loaders=loaders,
-                            iloc=True, split_col=split_col)
+    return DataframeDataset(
+        dataframe=df,
+        loaders=loaders,
+        iloc=iloc)
 
 def make_dataloader(dataset, batch_size, num_workers, sampler, pin_memory,
                     stage, drop_last=False):
@@ -97,7 +99,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         batch_size: int,
         num_workers: int,
         manifest: Union[Path, str],
-        loader_dict: Dict,
+        loaders: Dict,
         split_col: Optional[str] = None,
         columns: Optional[Sequence[str]] = None,
         pin_memory: bool = True,
@@ -111,8 +113,7 @@ class ManifestDatamodule(pl.LightningDataModule):
 
         self.batch_size = batch_size
         self.num_workers = num_workers
-        self.dataset = make_manifest_dataset(manifest, loader_dict, split_col,
-                                             columns, fms)
+        self.dataset = make_manifest_dataset(manifest, loader_dict, columns, fms)
         self.length = len(self.dataset)
 
         self.pin_memory = pin_memory
@@ -123,9 +124,22 @@ class ManifestDatamodule(pl.LightningDataModule):
 
         indices = list(range(self.length))
         if split_col is not None:
-            train_idx = self.dataset.train_split
-            val_idx = self.dataset.val_split
-            test_idx = self.dataset.test_split
+            dataframe = self.dataset.dataframe
+
+            assert dataframe.dtypes[split_col] == np.dtype("O")
+            dataframe[split_col] = dataframe[split_col].str.lower()
+            split_names = dataframe[split_col].unique().tolist()
+            assert set(split_names).issubset({"train", "validation", "test"})
+
+            train_idx = dataframe.loc[
+                dataframe[split_col] == "train"
+            ].index.tolist()
+            val_idx = dataframe.loc[
+                dataframe[split_col] == "validation"
+            ].index.tolist()
+            test_idx = dataframe.loc[
+                dataframe[split_col] == "test"
+            ].index.tolist()
         else:
             train_idx = indices
             val_idx = [0] * self.batch_size
