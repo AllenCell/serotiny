@@ -14,12 +14,12 @@ def expand_to(array, dimensions, pad=None):
     pad = pad or {}
     in_shape = array.shape
     in_dimensions = len(in_shape)
-    missing = len(self.dimensions) - in_dimensions
+    missing = len(dimensions) - in_dimensions
     pull = np.expand_dims(array, tuple(range(missing)))
     around = [
-        split_number(self.dimensions[dimension] - pull.shape[dimension])
+        split_number(dimensions[dimension] - pull.shape[dimension])
         for dimension in range(in_dimensions)]
-    expand = np.pad(pull, around, **self.pad)
+    expand = np.pad(pull, around, **pad)
     return expand
     
 
