@@ -23,6 +23,13 @@ def expand_to(array, dimensions, pad=None):
     return expand
     
 
+def to_tensor(value):
+    if isinstance(value, np.ndarray):
+        return torch.from_numpy(value)
+    else:
+        return torch.Tensor([value])
+
+
 def expand_columns(rows, expanded_columns, dimensions, pad=None):
     if not rows:
         return []
@@ -42,7 +49,7 @@ def expand_columns(rows, expanded_columns, dimensions, pad=None):
                     value,
                     dimensions,
                     pad)
-            tensor = torch.from_numpy(value)
+            tensor = to_tensor(value)
             collated[column].append(tensor)
 
     for column in all_columns:
