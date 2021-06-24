@@ -3,6 +3,8 @@ from typing import Union, List
 import numpy as np
 import torch
 
+from serotiny.transform.pad import pull_to
+
 
 def _get_weights(shape):
     shape_in = shape
@@ -98,6 +100,7 @@ def tile_prediction(
     n_dim = len(shape_in)
     if isinstance(dims_max, int):
         dims_max = [dims_max] * n_dim
+    dims_max = pull_to(dims_max, n_dim)
     for idx_d in range(1, n_dim):
         if dims_max[idx_d] > shape_in[idx_d]:
             dims_max[idx_d] = shape_in[idx_d]

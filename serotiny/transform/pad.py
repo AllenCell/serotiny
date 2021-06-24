@@ -10,12 +10,18 @@ def split_number(n):
     return (bottom, top)
 
 
+def pull_to(array: np.ndarray, axes: int):
+    missing = axes - len(array.shape)
+    pull = np.expand_dims(array, tuple(range(missing)))
+    return pull
+
+
 def expand_to(array, dimensions, pad=None):
     pad = pad or {}
     in_shape = array.shape
     in_dimensions = len(in_shape)
-    missing = len(dimensions) - in_dimensions
-    pull = np.expand_dims(array, tuple(range(missing)))
+    # missing = len(dimensions) - in_dimensions
+    pull = pull_to(array, len(dimensions)) # np.expand_dims(array, tuple(range(missing)))
     around = [
         split_number(dimensions[dimension] - pull.shape[dimension])
         for dimension in range(in_dimensions)]
@@ -55,7 +61,7 @@ def expand_columns(rows, expanded_columns, dimensions, pad=None):
     for column in all_columns:
         collated[column] = torch.stack(collated[column])
 
-    return tuple(collated.values())
+    return collated
 
 
 class ExpandTo():
