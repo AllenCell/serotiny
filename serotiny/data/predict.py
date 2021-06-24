@@ -27,7 +27,7 @@ def _tile_prediction_recurse(
 ):
     """Performs piecewise prediction recursively."""
     if tuple(ar_in.shape[1:]) == tuple(dims_max[1:]):
-        ar_out = predictor.predict(ar_in, **predict_kwargs).numpy().astype(np.float32)
+        ar_out = predictor(ar_in, **predict_kwargs).numpy().astype(np.float32)
         ar_weight = _get_weights(ar_out.shape)
         return ar_out * ar_weight, ar_weight
     dim = None
