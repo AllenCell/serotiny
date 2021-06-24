@@ -38,12 +38,12 @@ def expand_columns(rows, expanded_columns, dimensions, pad=None):
         for column in all_columns:
             value = row[column]
             if column in expanded_columns:
-                value = torch.from_numpy(
-                    expand_to(
-                        value,
-                        dimensions,
-                        pad))
-            collated[column].append(value)
+                value = expand_to(
+                    value,
+                    dimensions,
+                    pad)
+            tensor = torch.from_numpy(value)
+            collated[column].append(tensor)
 
     for column in all_columns:
         collated[column] = torch.stack(collated[column])
