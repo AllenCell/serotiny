@@ -124,7 +124,7 @@ def tiff_loader_CZYX(
       torch.Tensor
     """
     aicsimg = aicsimageio.AICSImage(path_str)
-    channel_names = aicsimg.get_channel_names()
+    channel_names = aicsimg.channel_names
     data = aicsimg.get_image_data("CZYX", S=0, T=0)
 
     mask_keys = channel_masks.keys() if channel_masks else {}
@@ -199,7 +199,7 @@ def tiff_loader(
 
     """
     aicsimg = aicsimageio.AICSImage(path)
-    channel_names = aicsimg.get_channel_names()
+    channel_names = aicsimg.channel_names
     
     if (select_channels is None) or (len(select_channels) == 0):
         select_channels = channel_names
@@ -291,7 +291,7 @@ def change_resolution(
 
     # Read in image and get channel names
     aicsimg = aicsimageio.AICSImage(path_in)
-    channel_names = aicsimg.get_channel_names()
+    channel_names = aicsimg.channel_names
     data = aicsimg.get_image_data("CZYX", S=0, T=0)
     # this function should change when we have multiple scenes (S>0) or time series (T>0)
 
