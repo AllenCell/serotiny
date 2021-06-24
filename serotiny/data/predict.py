@@ -52,6 +52,7 @@ def _tile_prediction_recurse(
         )
         if ar_out is None or ar_weight is None:
             shape_out[0] = pred_sub.shape[0]  # Set channel dim for output
+            shape_out = tuple(shape_out)
             ar_out = torch.zeros(shape_out, dtype=pred_sub.dtype)
             ar_weight = torch.zeros(shape_out, dtype=pred_weight_sub.dtype)
         ar_out[slices] += pred_sub
