@@ -10,7 +10,7 @@ import pytorch_lightning as pl
 from torch.utils.data.sampler import SubsetRandomSampler
 
 from serotiny.io.dataframe import DataframeDataset
-from serotiny.utils import get_classes_from_config
+from serotiny.utils import invoke_class
 from serotiny.datamodules.utils import ModeDataLoader
 
 log = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ def make_manifest_dataset(
 
 
     loaders = {
-        key: get_classes_from_config(value)[0]
+        key: invoke_class(value)
         for key, value in loader_dict.items()
     }
 
