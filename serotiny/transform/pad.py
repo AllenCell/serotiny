@@ -6,7 +6,7 @@ import torch
 def split_number(n):
     middle = n / 2
     bottom = math.floor(middle)
-    top = Math.ceil(middle)
+    top = math.ceil(middle)
     return (bottom, top)
 
 
@@ -38,7 +38,11 @@ def expand_columns(rows, expanded_columns, dimensions, pad=None):
         for column in all_columns:
             value = row[column]
             if column in expanded_columns:
-                value = expand_to(value, dimensions, pad)
+                value = torch.from_numpy(
+                    expand_to(
+                        value,
+                        dimensions,
+                        pad))
             collated[column].append(value)
 
     for column in all_columns:
