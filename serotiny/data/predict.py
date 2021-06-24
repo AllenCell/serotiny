@@ -13,7 +13,7 @@ def _get_weights(shape):
         slicey[idx_d] = slice(None)
         size = shape[idx_d]
         weights = weights * triang(size)[tuple(slicey)]
-    return torch.broadcast_to(weights, shape_in).astype(np.float32)
+    return np.broadcast_to(weights, shape_in) # .astype(np.float32)
 
 
 def _tile_prediction_recurse(
