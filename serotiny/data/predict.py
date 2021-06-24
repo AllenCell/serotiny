@@ -3,8 +3,6 @@ from typing import Union, List
 import numpy as np
 import torch
 
-from serotiny.transform.pad import pull_to
-
 
 def _get_weights(shape):
     shape_in = shape
@@ -28,7 +26,7 @@ def _tile_prediction_recurse(
 ):
     """Performs piecewise prediction recursively."""
     if tuple(ar_in.shape[1:]) == tuple(dims_max[1:]):
-        ar_out = predictor(ar_in.to(device), **predict_kwargs).cpu().astype(np.float32)
+        ar_out = predictor(ar_in.to(device), **predict_kwargs).cpu() # .astype(np.float32)
         ar_weight = _get_weights(ar_out.shape)
         return ar_out * ar_weight, ar_weight
     dim = None
