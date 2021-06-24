@@ -20,7 +20,7 @@ def _get_weights(shape):
 
 def _tile_prediction_recurse(
     predictor,
-    ar_in: np.ndarray,
+    ar_in: torch.Tensor,
     dims_max: Union[int, List[int]],
     overlaps: Union[int, List[int]],
     **predict_kwargs,
@@ -98,6 +98,7 @@ def tile_prediction(
     assert len(tensor_in.size()) > 2
     shape_in = tuple(tensor_in.size())
     n_dim = len(shape_in)
+    ar_in = tensor_in.cpu()
     if isinstance(dims_max, int):
         dims_max = [dims_max] * n_dim
     # deal with dims_max less that n_dim
@@ -113,7 +114,6 @@ def tile_prediction(
     # Remove restrictions on channel dimension.
     dims_max[0] = None
     overlaps[0] = None
-    ar_in = tensor_in.numpy()
     ar_out, ar_weight = _tile_prediction_recurse(
         predictor, ar_in, dims_max=dims_max, overlaps=overlaps, **predict_kwargs
     )
