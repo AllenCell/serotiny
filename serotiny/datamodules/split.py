@@ -12,7 +12,7 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 from serotiny.io.dataframe import DataframeDataset, load_csv
 from serotiny.datamodules.utils import ModeDataLoader
-from serotiny.utils import path_invocations
+from serotiny.utils import path_invocations, invoke_class
 
 log = logging.getLogger(__name__)
 
@@ -64,6 +64,7 @@ class SplitDatamodule(pl.LightningDataModule):
         loaders: Dict,
         pin_memory: bool = True,
         drop_last: bool = False,
+        collate: Dict = None,
     ):
 
         super().__init__()
@@ -81,30 +82,42 @@ class SplitDatamodule(pl.LightningDataModule):
         self.num_workers = num_workers
         self.pin_memory = pin_memory
         self.drop_last = drop_last
+        self.collate = None
+
+        if collate is not None:
+            self.collate = invoke_class(collate)
+
+    def generate_args(self):
+        args = {
+            'batch_size': self.batch_size,
+            'num_workers': self.num_workers,
+            'pin_memory': self.pin_memory,
+            'drop_last': self.drop_last}
+
+        if self.collate is not None:
+            args['collate_fn'] = self.collate
+
+        return args
 
     def train_dataloader(self):
+        args = self.generate_args()
         return make_dataloader(
             self.datasets['train'],
             "train",
-            batch_size=self.batch_size,
-            num_workers=self.num_workers,
-            pin_memory=self.pin_memory,
-            drop_last=self.drop_last)
+            **args)
 
     def val_dataloader(self):
+        args = self.generate_args()
         return make_dataloader(
             self.datasets['valid'],
             "eval",
-            batch_size=self.batch_size,
-            num_workers=self.num_workers,
-            pin_memory=self.pin_memory,
-            drop_last=self.drop_last)
+            **args)
 
     def test_dataloader(self):
+        args = self.generate_args()
         return make_dataloader(
             self.datasets['test'],
             "eval",
-            batch_size=self.batch_size,
-            num_workers=self.num_workers,
-            pin_memory=self.pin_memory,
-            drop_last=self.drop_last)
+            **args)
+
+
