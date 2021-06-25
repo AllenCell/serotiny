@@ -25,6 +25,7 @@ def _tile_prediction_recurse(
     **predict_kwargs,
 ):
     """Performs piecewise prediction recursively."""
+    # TODO: use pytorch_lightning `as_type` instead of `to`
     if tuple(ar_in.shape[1:]) == tuple(dims_max[1:]):
         ar_out = predictor(ar_in.to(device), **predict_kwargs).cpu() # .astype(np.float32)
         ar_weight = _get_weights(ar_out.shape)
