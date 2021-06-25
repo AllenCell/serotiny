@@ -1,5 +1,5 @@
 import logging
-from typing import Union, Optional, Dict
+from typing import Union, Optional, Dict, Sequence
 from pathlib import Path
 
 import multiprocessing as mp
@@ -10,7 +10,7 @@ import pytorch_lightning as pl
 from torch.utils.data.sampler import SubsetRandomSampler
 
 from serotiny.io.dataframe import DataframeDataset
-from serotiny.utils import get_classes_from_config
+from serotiny.utils import invoke_class
 from serotiny.datamodules.utils import ModeDataLoader
 
 log = logging.getLogger(__name__)
@@ -18,24 +18,34 @@ log = logging.getLogger(__name__)
 def make_manifest_dataset(
     manifest: Union[Path, str],
     loader_dict: Dict,
+    columns: Optional[Sequence[str]] = None,
+    fms: bool = False,
+    iloc: bool = False,
 ):
-    manifest = Path(manifest)
+    if fms:
+        manifest = Path(FileManagementSystem().get_file_by_id(manifest).path)
+    else:
+        manifest = Path(manifest)
+
     if not manifest.is_file():
         raise FileNotFoundError("Manifest file not found at given path")
-    if not manifest.suffix == ".csv":
+    if manifest.suffix == ".csv":
+        df = pd.read_csv(manifest)
+    elif manifest.suffix == ".parquet":
+        df = pd.read_parquet(manifest, columns=columns)
+    else:
         raise TypeError("File type of provided manifest is not .csv")
 
-    df = pd.read_csv(manifest)
 
     loaders = {
-        key: get_classes_from_config(value)[0]
+        key: invoke_class(value)
         for key, value in loader_dict.items()
     }
 
     return DataframeDataset(
         dataframe=df,
         loaders=loaders,
-        iloc=True)
+        iloc=iloc)
 
 def make_dataloader(dataset, batch_size, num_workers, sampler, pin_memory,
                     stage, drop_last=False):
@@ -73,6 +83,9 @@ class ManifestDatamodule(pl.LightningDataModule):
     split_col: Optional[str] = None
         Name of a column in the dataset which can be used to create train, val, test
         splits.
+    columns: Optional[Sequence[str]] = None
+        List of columns to load from the dataset, in case it's a parquet file.
+        If None, load everything.
     pin_memory: bool = True
         Set to true when using GPU, for better performance
     drop_last: bool = False
@@ -88,17 +101,19 @@ class ManifestDatamodule(pl.LightningDataModule):
         manifest: Union[Path, str],
         loaders: Dict,
         split_col: Optional[str] = None,
+        columns: Optional[Sequence[str]] = None,
         pin_memory: bool = True,
         drop_last: bool = False,
         metadata: Dict = {},
-        subset_train: float = 1.0
+        subset_train: float = 1.0,
+        fms: bool = False
     ):
 
         super().__init__()
 
         self.batch_size = batch_size
         self.num_workers = num_workers
-        self.dataset = make_manifest_dataset(manifest, loader_dict)
+        self.dataset = make_manifest_dataset(manifest, loader_dict, columns, fms)
         self.length = len(self.dataset)
 
         self.pin_memory = pin_memory
