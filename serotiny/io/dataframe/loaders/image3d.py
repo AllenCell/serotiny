@@ -23,10 +23,7 @@ class Load3DImage(Loader):
         self.column = column
         self.select_channels = select_channels
         transforms = transforms or []
-
-        self.transforms = defaultdict(None)
-        for key, transforms_config in transforms.items():
-            self.transforms[key] = load_transforms(transforms_config)
+        self.transforms = load_transforms(transforms)
 
         self.fms = (FileManagementSystem() if fms else None)
 
@@ -42,5 +39,5 @@ class Load3DImage(Loader):
             output_dtype=np.float32,
             channel_masks=None,
             mask_thresh=0,
-            transform=self.transforms.get(self.mode)
+            transform=self.transforms
         )

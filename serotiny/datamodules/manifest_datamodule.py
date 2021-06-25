@@ -8,16 +8,16 @@ import pandas as pd
 import pytorch_lightning as pl
 
 from torch.utils.data.sampler import SubsetRandomSampler
+from torch.utils.data import DataLoader
 
 from serotiny.io.dataframe import DataframeDataset
 from serotiny.utils import invoke_class
-from serotiny.datamodules.utils import ModeDataLoader
 
 log = logging.getLogger(__name__)
 
 def make_manifest_dataset(
     manifest: Union[Path, str],
-    loader_dict: Dict,
+    loaders_config: Dict,
     columns: Optional[Sequence[str]] = None,
     fms: bool = False,
     iloc: bool = False,
@@ -36,29 +36,15 @@ def make_manifest_dataset(
     else:
         raise TypeError("File type of provided manifest is not .csv")
 
-
     loaders = {
         key: invoke_class(value)
-        for key, value in loader_dict.items()
+        for key, value in loaders_config.items()
     }
 
     return DataframeDataset(
         dataframe=df,
         loaders=loaders,
         iloc=iloc)
-
-def make_dataloader(dataset, batch_size, num_workers, sampler, pin_memory,
-                    stage, drop_last=False):
-    return ModeDataLoader(
-        mode=stage,
-        dataset=dataset,
-        batch_size=batch_size,
-        pin_memory=pin_memory,
-        drop_last=drop_last,
-        num_workers=num_workers,
-        multiprocessing_context=mp.get_context("fork"),
-        sampler=sampler,
-    )
 
 
 class ManifestDatamodule(pl.LightningDataModule):
@@ -99,7 +85,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         batch_size: int,
         num_workers: int,
         manifest: Union[Path, str],
-        loaders: Dict,
+        loaders_config: Dict,
         split_col: Optional[str] = None,
         columns: Optional[Sequence[str]] = None,
         pin_memory: bool = True,
@@ -113,7 +99,11 @@ class ManifestDatamodule(pl.LightningDataModule):
 
         self.batch_size = batch_size
         self.num_workers = num_workers
-        self.dataset = make_manifest_dataset(manifest, loader_dict, columns, fms)
+        self.dataset = make_manifest_dataset(
+            manifest,
+            loaders_config['train'],
+            columns,
+            fms)
         self.length = len(self.dataset)
 
         self.pin_memory = pin_memory
@@ -123,6 +113,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         assert subset_train <= 1
 
         indices = list(range(self.length))
+        index = {}
         if split_col is not None:
             dataframe = self.dataset.dataframe
 
@@ -131,44 +122,57 @@ class ManifestDatamodule(pl.LightningDataModule):
             split_names = dataframe[split_col].unique().tolist()
             assert set(split_names).issubset({"train", "validation", "test"})
 
-            train_idx = dataframe.loc[
-                dataframe[split_col] == "train"
-            ].index.tolist()
-            val_idx = dataframe.loc[
-                dataframe[split_col] == "validation"
-            ].index.tolist()
-            test_idx = dataframe.loc[
-                dataframe[split_col] == "test"
-            ].index.tolist()
+            index_mapping = {
+                'train': 'train',
+                'valid': 'validation',
+                'test': 'test'}
+            index = {}
+            for mode, value in index_mapping.items():
+                index[mode] = dataframe.loc[
+                    dataframe[split_col] == value
+                ].index.tolist()
         else:
-            train_idx = indices
-            val_idx = [0] * self.batch_size
-            test_idx = [0] * self.batch_size
+            index['train'] = indices
+            index['valid'] = [0] * self.batch_size
+            index['test'] = [0] * self.batch_size
 
         if subset_train < 1:
-            new_size = int(subset_train * len(train_idx))
-            log.info(f"Subsetting the training data by {100*subset_train:.2f}%, "
-                     f"from {len(train_idx)} to {new_size}")
-            train_idx = np.random.choice(train_idx,
-                                         replace=False,
-                                         size=new_size)
+            new_size = int(subset_train * len(index['train']))
 
+            log.info(
+                f"Subsetting the training data by {100*subset_train:.2f}%, "
+                f"from {len(train_idx)} to {new_size}")
 
-        self.train_sampler = SubsetRandomSampler(train_idx)
-        self.val_sampler = SubsetRandomSampler(val_idx)
-        self.test_sampler = SubsetRandomSampler(test_idx)
+            index['train'] = np.random.choice(
+                index['train'],
+                replace=False,
+                size=new_size)
+
+        self.samplers = {}
+        self.datasets = {}
+
+        for mode in index:
+            self.samplers[mode] = SubsetRandomSampler(index[mode])
+            self.datasets[mode] = make_manifest_dataset(
+                manifest,
+                loaders_config[mode],
+                columns,
+                fms)
+        
+    def make_dataloader(self, mode):
+        return DataLoader(
+            dataset=self.datasets[mode],
+            sampler=self.samplers[mode],
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            pin_memory=self.pin_memory,
+            drop_last=self.drop_last)
 
     def train_dataloader(self):
-        return make_dataloader(self.dataset, self.batch_size, self.num_workers,
-                               self.train_sampler, self.pin_memory, "train",
-                               self.drop_last)
+        return self.make_dataloader("train")
 
     def val_dataloader(self):
-        return make_dataloader(self.dataset, self.batch_size, self.num_workers,
-                               self.val_sampler, self.pin_memory, "eval",
-                               self.drop_last)
+        return self.make_dataloader("valid")
 
     def test_dataloader(self):
-        return make_dataloader(self.dataset, self.batch_size, self.num_workers,
-                               self.test_sampler, self.pin_memory, "eval",
-                               self.drop_last)
+        return self.make_dataloader("test")

@@ -9,9 +9,9 @@ import pandas as pd
 import pytorch_lightning as pl
 
 from torch.utils.data.sampler import SubsetRandomSampler
+from torch.utils.data import DataLoader
 
 from serotiny.io.dataframe import DataframeDataset, load_csv
-from serotiny.datamodules.utils import ModeDataLoader
 from serotiny.utils import path_invocations, invoke_class
 
 log = logging.getLogger(__name__)
@@ -70,13 +70,20 @@ class SplitDatamodule(pl.LightningDataModule):
         super().__init__()
 
         split_path = Path(split_path)
+
         self.datasets = {}
-        self.loaders = path_invocations(loaders)
+        self.loaders = {}
+
+        for mode, loaders_config in loaders.items():
+            self.loaders[mode] = path_invocations(loaders_config)
+
         for csv in list(split_path.glob("*.csv")):
-            key = re.findall(r'(.*)\.csv', csv.name)[0]
+            mode = re.findall(r'(.*)\.csv', csv.name)[0]
             dataframe = load_csv(csv)
-            dataset = DataframeDataset(dataframe, self.loaders)
-            self.datasets[key] = dataset
+            dataset = DataframeDataset(
+                dataframe,
+                loaders=self.loaders[mode])
+            self.datasets[mode] = dataset
 
         self.batch_size = batch_size
         self.num_workers = num_workers
@@ -99,25 +106,20 @@ class SplitDatamodule(pl.LightningDataModule):
 
         return args
 
-    def train_dataloader(self):
+    def make_dataloader(self, mode):
         args = self.generate_args()
-        return make_dataloader(
-            self.datasets['train'],
-            "train",
+        return DataLoader(
+            dataset=self.datasets[mode],
+            multiprocessing_context=mp.get_context("fork")
             **args)
+
+    def train_dataloader(self):
+        return self.make_dataloader('train')
 
     def val_dataloader(self):
-        args = self.generate_args()
-        return make_dataloader(
-            self.datasets['valid'],
-            "eval",
-            **args)
+        return self.make_dataloader('valid')
 
     def test_dataloader(self):
-        args = self.generate_args()
-        return make_dataloader(
-            self.datasets['test'],
-            "eval",
-            **args)
+        return self.make_dataloader('test')
 
 

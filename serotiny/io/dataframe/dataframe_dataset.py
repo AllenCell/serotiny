@@ -30,13 +30,6 @@ class DataframeDataset(Dataset):
         self.loaders = loaders
         self.iloc = iloc
 
-        self.set_mode("train")
-
-    def set_mode(self, mode):
-        self.mode = mode
-        for key in self.loaders:
-            self.loaders[key].set_mode(mode)
-
     def __len__(self):
         return len(self.dataframe)
 

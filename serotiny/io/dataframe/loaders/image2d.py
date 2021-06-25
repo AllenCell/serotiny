@@ -24,10 +24,7 @@ class Load2DImage(Loader):
         self.column = column
         self.num_channels = num_channels
         self.channel_indexes = channel_indexes
-
-        self.transforms = defaultdict(None)
-        for key, transforms_config in transforms.items():
-            self.transforms[key] = load_transforms(transforms_config)
+        self.transforms = load_transforms(transforms)
 
         self.fms = (FileManagementSystem() if fms else None)
 
@@ -41,5 +38,5 @@ class Load2DImage(Loader):
             self._get_path(row),
             channel_order="CYX",
             indexes={"C": self.channel_indexes or range(self.num_channels)},
-            transform=self.transforms.get(self.mode)
+            transform=self.transforms,
         )

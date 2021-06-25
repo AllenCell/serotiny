@@ -1,6 +1,4 @@
 class Loader:
     def __init__(self):
-        self.set_mode("train")
+        pass
 
-    def set_mode(self, mode):
-        self.mode = mode
