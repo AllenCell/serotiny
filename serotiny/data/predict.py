@@ -3,8 +3,6 @@ from typing import Union, List
 import numpy as np
 import torch
 
-from serotiny.transform.pad import pull_to
-
 
 def _get_weights(shape):
     shape_in = shape
@@ -15,7 +13,7 @@ def _get_weights(shape):
         slicey[idx_d] = slice(None)
         size = shape[idx_d]
         weights = weights * triang(size)[tuple(slicey)]
-    return np.broadcast_to(weights, shape_in).astype(np.float32)
+    return np.broadcast_to(weights, shape_in) # .astype(np.float32)
 
 
 def _tile_prediction_recurse(
@@ -28,7 +26,7 @@ def _tile_prediction_recurse(
 ):
     """Performs piecewise prediction recursively."""
     if tuple(ar_in.shape[1:]) == tuple(dims_max[1:]):
-        ar_out = predictor(ar_in.to(device), **predict_kwargs).numpy().astype(np.float32)
+        ar_out = predictor(ar_in.to(device), **predict_kwargs).cpu() # .astype(np.float32)
         ar_weight = _get_weights(ar_out.shape)
         return ar_out * ar_weight, ar_weight
     dim = None
@@ -50,11 +48,12 @@ def _tile_prediction_recurse(
         slices = tuple(slices)
         ar_in_sub = ar_in[slices]
         pred_sub, pred_weight_sub = _tile_prediction_recurse(
-            predictor, ar_in_sub, dims_max, overlaps, **predict_kwargs
+            predictor, ar_in_sub, dims_max, overlaps, device=device, **predict_kwargs
         )
         if ar_out is None or ar_weight is None:
             shape_out[0] = pred_sub.shape[0]  # Set channel dim for output
-            ar_out = np.zeros(shape_out, dtype=pred_sub.dtype)
+            shape_out = tuple([int(dim) for dim in shape_out])
+            ar_out = torch.zeros(shape_out, dtype=pred_sub.dtype)
             ar_weight = np.zeros(shape_out, dtype=pred_weight_sub.dtype)
         ar_out[slices] += pred_sub
         ar_weight[slices] += pred_weight_sub
@@ -71,6 +70,7 @@ def tile_prediction(
     tensor_in: torch.Tensor,
     dims_max: Union[int, List[int]] = 64,
     overlaps: Union[int, List[int]] = 0,
+    device: str = 'cuda',
     **predict_kwargs,
 ) -> torch.Tensor:
     """Performs piecewise prediction and combines results.
@@ -116,11 +116,11 @@ def tile_prediction(
     dims_max[0] = None
     overlaps[0] = None
     ar_out, ar_weight = _tile_prediction_recurse(
-        predictor, ar_in, dims_max=dims_max, overlaps=overlaps, **predict_kwargs
+        predictor, ar_in, dims_max=dims_max, overlaps=overlaps, device=device, **predict_kwargs
     )
     # tifffile.imsave('debug/ar_sum.tif', ar_out)
     mask = ar_weight > 0.0
     ar_out[mask] = ar_out[mask] / ar_weight[mask]
     # tifffile.imsave('debug/ar_weight.tif', ar_weight)
     # tifffile.imsave('debug/ar_out.tif', ar_out)
-    return torch.tensor(ar_out)
+    return torch.tensor(ar_out).to(device)
