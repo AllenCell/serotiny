@@ -42,7 +42,12 @@ class PatchDatamodule(pl.LightningDataModule):
         super().__init__()
 
         self.manifest_path = Path(manifest_path)
-        self.loaders = path_invocations(loaders)
+
+        self.datasets = {}
+        self.loaders = {}
+
+        for mode, loaders_config in loaders.items():
+            self.loaders[mode] = path_invocations(loaders_config)
 
         self.batch_size = batch_size
         self.num_workers = num_workers
@@ -68,10 +73,10 @@ class PatchDatamodule(pl.LightningDataModule):
             buffer_switch_interval=self.buffer_switch_interval,
             shuffle_images=self.shuffle_images)
 
-    def load_patch_manifest(self, manifest_key):
+    def load_patch_manifest(self, mode):
         manifest = make_manifest_dataset(
-            self.manifest_path / f'{manifest_key}.csv',
-            self.loaders)
+            self.manifest_path / f'{mode}.csv',
+            self.loaders[mode])
         return self.make_patch_dataset(manifest)
 
     def make_dataloader(self, dataset):

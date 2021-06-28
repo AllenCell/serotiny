@@ -1,7 +1,7 @@
 from collections import defaultdict
 import numpy as np
 
-from aicsfiles import FileManagementSystem
+# from aicsfiles import FileManagementSystem
 
 from serotiny.io.image import tiff_loader_CZYX
 from .abstract_loader import Loader
@@ -17,19 +17,19 @@ class Load3DImage(Loader):
             self,
             column='image',
             select_channels=None,
-            transforms=None,
-            fms=False):
+            transforms=None):
+            # fms=False):
         super().__init__()
         self.column = column
         self.select_channels = select_channels
         transforms = transforms or []
         self.transforms = load_transforms(transforms)
 
-        self.fms = (FileManagementSystem() if fms else None)
+        # self.fms = (FileManagementSystem() if fms else None)
 
     def _get_path(self, row):
-        if self.fms is not None:
-            return self.fms.get_file_by_id(row[self.column]).path
+        # if self.fms is not None:
+        #     return self.fms.get_file_by_id(row[self.column]).path
         return row[self.column]
 
     def __call__(self, row):

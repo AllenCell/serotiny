@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from aicsfiles import FileManagementSystem
+# from aicsfiles import FileManagementSystem
 
 from serotiny.io.image import png_loader
 from .abstract_loader import Loader
@@ -17,8 +17,8 @@ class Load2DImage(Loader):
             column='image',
             num_channels=1,
             channel_indexes=None,
-            transforms=None,
-            fms=False):
+            transforms=None):
+            # fms=False):
 
         super().__init__()
         self.column = column
@@ -26,11 +26,11 @@ class Load2DImage(Loader):
         self.channel_indexes = channel_indexes
         self.transforms = load_transforms(transforms)
 
-        self.fms = (FileManagementSystem() if fms else None)
+        # self.fms = (FileManagementSystem() if fms else None)
 
     def _get_path(self, row):
-        if self.fms is not None:
-            return self.fms.get_file_by_id(row[self.column]).path
+        # if self.fms is not None:
+        #     return self.fms.get_file_by_id(row[self.column]).path
         return row[self.column]
 
     def __call__(self, row):
