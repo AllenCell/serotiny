@@ -12,10 +12,10 @@ from serotiny.utils import PATH_KEY, invoke_class, path_invocations
 
 def apply_model(
     model_path: str,
-    datamodule_config: Dict,
-    trainer_config: Dict,
-    model_zoo_config: Dict,
-    callbacks_config: Dict,
+    datamodule: Dict,
+    trainer: Dict,
+    model_zoo: Dict,
+    callbacks: Dict,
     gpu_ids: List[int],
 ):
 
@@ -23,6 +23,11 @@ def apply_model(
     os.environ["CUDA_VISIBLE_DEVICES"] = ",".join([str(id) for id in gpu_ids])
     num_gpus = len(gpu_ids)
     num_gpus = (num_gpus if num_gpus != 0 else None)
+
+    datamodule_config = datamodule
+    trainer_config = trainer
+    model_zoo_config = model_zoo
+    callbacks_config = callbacks
 
     model_zoo_path = model_zoo_config.get("path")
     model = get_model(model_path, model_zoo_path)
