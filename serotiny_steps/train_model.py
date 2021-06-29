@@ -26,12 +26,12 @@ def _get_kwargs():
 
 
 def train_model(
-    model_config: Dict,
-    datamodule_config: Dict,
-    trainer_config: Dict,
-    model_zoo_config: Dict,
-    loggers_config: List[Dict] = [],
-    callbacks_config: List[Dict] = [],
+    model: Dict,
+    datamodule: Dict,
+    trainer: Dict,
+    model_zoo: Dict,
+    loggers: List[Dict] = [],
+    callbacks: List[Dict] = [],
     gpu_ids: List[int] = [0],
     version_string: str = 'zero',
     seed: int = 42,
@@ -40,6 +40,13 @@ def train_model(
     called_args = _get_kwargs()
 
     pl.seed_everything(seed)
+
+    model_config = model
+    datamodule_config = datamodule
+    trainer_config = trainer
+    model_zoo_config = model_zoo
+    loggers_config = loggers
+    callbacks_config = callbacks
 
     model_zoo_path = model_zoo_config.get("path")
     checkpoint_config = model_zoo_config.get("checkpoint", {})
