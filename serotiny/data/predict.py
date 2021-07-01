@@ -106,7 +106,7 @@ def tile_prediction(
     # deal with dims_max less that n_dim
     if len(dims_max) < n_dim:
         missing = n_dim - len(dims_max)
-        dims_max = [1 for _ in range(missing)] + dims_max
+        dims_max = [1 for _ in range(missing)] + list(dims_max)
     for idx_d in range(1, n_dim):
         if dims_max[idx_d] > shape_in[idx_d]:
             dims_max[idx_d] = shape_in[idx_d]
