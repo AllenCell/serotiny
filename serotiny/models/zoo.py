@@ -44,7 +44,7 @@ def get_model(model_path, model_root=None):
     ckpt_path, model_class_name, config = _get_checkpoint(model_path, model_root)
     model_class = module_or_path(models, model_class_name)
 
-    model_config = config["model_config"]
+    model_config = config["model"]
 
     return model_class.load_from_checkpoint(checkpoint_path=ckpt_path, **model_config)
 
