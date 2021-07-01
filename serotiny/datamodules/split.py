@@ -110,7 +110,7 @@ class SplitDatamodule(pl.LightningDataModule):
         args = self.generate_args()
         return DataLoader(
             dataset=self.datasets[mode],
-            multiprocessing_context=mp.get_context("fork")
+            multiprocessing_context=mp.get_context("fork"),
             **args)
 
     def train_dataloader(self):

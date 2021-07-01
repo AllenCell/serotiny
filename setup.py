@@ -55,6 +55,7 @@ step_workflow_requirements = [
 requirements = [
     *step_workflow_requirements,
     # project requires
+    "aicsimageio>=4.0.2",
     "numpy",
     "pandas",
     "Pillow",
