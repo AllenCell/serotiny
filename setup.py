@@ -71,9 +71,6 @@ requirements = [
     "brokenaxes",
     "torchio",
     "hydra-core",
-    "aicsshparam>=0.1.1",
-    "aicscytoparam>=0.1.2",
-    "cvapipe_analysis @ git+https://git@github.com/AllenCell/cvapipe_analysis",
 ]
 
 extra_requirements = {
