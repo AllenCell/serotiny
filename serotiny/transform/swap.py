@@ -7,4 +7,7 @@ class SwapAxes():
         self.second = second
 
     def __call__(self, input: np.ndarray):
-        return np.swapaxes(input, self.first, self.second)
+        print(f"swapping axes {self.first} and {self.second}: {input.shape}")
+        output = np.swapaxes(input, self.first, self.second)
+        print(f"swapping axes result: {output.shape}")
+        return output

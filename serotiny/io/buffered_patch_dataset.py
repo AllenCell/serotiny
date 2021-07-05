@@ -128,17 +128,19 @@ class BufferedPatchDataset(Dataset):
         dimensions = len(self.patch_shape)
         buffer_index = self.buffer_history[-1]
         shape_spatial = None
+        key_spatial = None
         for key, component in self.buffer[-1].items():
             if not hasattr(component, 'shape') or component.shape == ():
                 continue
 
             if shape_spatial is None:
                 shape_spatial = component.shape[-dimensions:]
+                key_spatial = key
             elif component.shape[-dimensions:] != shape_spatial:
                 raise ValueError(
                     f"Dataset item {buffer_index}, component {key} shape "
                     f"{component.shape} incompatible with first component "
-                    f"shape {self.buffer[-1][key].shape}"
+                    f"shape {self.buffer[-1][key_spatial].shape}"
                 )
             if dimensions > len(component.shape) or any(
                 self.patch_shape[d] > shape_spatial[d] for d in range(dimensions)
