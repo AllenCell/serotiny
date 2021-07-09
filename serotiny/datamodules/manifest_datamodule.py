@@ -1,5 +1,5 @@
 import logging
-from typing import Union, Optional, Dict
+from typing import Union, Optional, Dict, Sequence
 from pathlib import Path
 
 import multiprocessing as mp
@@ -8,46 +8,43 @@ import pandas as pd
 import pytorch_lightning as pl
 
 from torch.utils.data.sampler import SubsetRandomSampler
+from torch.utils.data import DataLoader
 
 from serotiny.io.dataframe import DataframeDataset
-from serotiny.utils import get_classes_from_config
-from serotiny.datamodules.utils import ModeDataLoader
+from serotiny.utils import invoke_class
 
 log = logging.getLogger(__name__)
 
 def make_manifest_dataset(
     manifest: Union[Path, str],
-    loader_dict: Dict,
-    split_col: Optional[str] = None,
+    loaders_config: Dict,
+    columns: Optional[Sequence[str]] = None,
+    fms: bool = False,
+    iloc: bool = False,
 ):
-    manifest = Path(manifest)
+    if fms:
+        manifest = Path(FileManagementSystem().get_file_by_id(manifest).path)
+    else:
+        manifest = Path(manifest)
+
     if not manifest.is_file():
         raise FileNotFoundError("Manifest file not found at given path")
-    if not manifest.suffix == ".csv":
+    if manifest.suffix == ".csv":
+        df = pd.read_csv(manifest)
+    elif manifest.suffix == ".parquet":
+        df = pd.read_parquet(manifest, columns=columns)
+    else:
         raise TypeError("File type of provided manifest is not .csv")
 
-    df = pd.read_csv(manifest)
-
     loaders = {
-        key: get_classes_from_config(value)[0]
-        for key, value in loader_dict.items()
+        key: invoke_class(value)
+        for key, value in loaders_config.items()
     }
 
-    return DataframeDataset(dataframe=df, loaders=loaders,
-                            iloc=True, split_col=split_col)
-
-def make_dataloader(dataset, batch_size, num_workers, sampler, pin_memory,
-                    stage, drop_last=False):
-    return ModeDataLoader(
-        mode=stage,
-        dataset=dataset,
-        batch_size=batch_size,
-        pin_memory=pin_memory,
-        drop_last=drop_last,
-        num_workers=num_workers,
-        multiprocessing_context=mp.get_context("fork"),
-        sampler=sampler,
-    )
+    return DataframeDataset(
+        dataframe=df,
+        loaders=loaders,
+        iloc=iloc)
 
 
 class ManifestDatamodule(pl.LightningDataModule):
@@ -72,6 +69,9 @@ class ManifestDatamodule(pl.LightningDataModule):
     split_col: Optional[str] = None
         Name of a column in the dataset which can be used to create train, val, test
         splits.
+    columns: Optional[Sequence[str]] = None
+        List of columns to load from the dataset, in case it's a parquet file.
+        If None, load everything.
     pin_memory: bool = True
         Set to true when using GPU, for better performance
     drop_last: bool = False
@@ -85,19 +85,25 @@ class ManifestDatamodule(pl.LightningDataModule):
         batch_size: int,
         num_workers: int,
         manifest: Union[Path, str],
-        loader_dict: Dict,
+        loaders_config: Dict,
         split_col: Optional[str] = None,
+        columns: Optional[Sequence[str]] = None,
         pin_memory: bool = True,
         drop_last: bool = False,
         metadata: Dict = {},
-        subset_train: float = 1.0
+        subset_train: float = 1.0,
+        fms: bool = False
     ):
 
         super().__init__()
 
         self.batch_size = batch_size
         self.num_workers = num_workers
-        self.dataset = make_manifest_dataset(manifest, loader_dict, split_col)
+        self.dataset = make_manifest_dataset(
+            manifest,
+            loaders_config['train'],
+            columns,
+            fms)
         self.length = len(self.dataset)
 
         self.pin_memory = pin_memory
@@ -107,39 +113,66 @@ class ManifestDatamodule(pl.LightningDataModule):
         assert subset_train <= 1
 
         indices = list(range(self.length))
+        index = {}
         if split_col is not None:
-            train_idx = self.dataset.train_split
-            val_idx = self.dataset.val_split
-            test_idx = self.dataset.test_split
+            dataframe = self.dataset.dataframe
+
+            assert dataframe.dtypes[split_col] == np.dtype("O")
+            dataframe[split_col] = dataframe[split_col].str.lower()
+            split_names = dataframe[split_col].unique().tolist()
+            assert set(split_names).issubset({"train", "validation", "test"})
+
+            index_mapping = {
+                'train': 'train',
+                'valid': 'validation',
+                'test': 'test'}
+            index = {}
+            for mode, value in index_mapping.items():
+                index[mode] = dataframe.loc[
+                    dataframe[split_col] == value
+                ].index.tolist()
         else:
-            train_idx = indices
-            val_idx = [0] * self.batch_size
-            test_idx = [0] * self.batch_size
+            index['train'] = indices
+            index['valid'] = [0] * self.batch_size
+            index['test'] = [0] * self.batch_size
 
         if subset_train < 1:
-            new_size = int(subset_train * len(train_idx))
-            log.info(f"Subsetting the training data by {100*subset_train:.2f}%, "
-                     f"from {len(train_idx)} to {new_size}")
-            train_idx = np.random.choice(train_idx,
-                                         replace=False,
-                                         size=new_size)
+            new_size = int(subset_train * len(index['train']))
 
+            log.info(
+                f"Subsetting the training data by {100*subset_train:.2f}%, "
+                f"from {len(train_idx)} to {new_size}")
 
-        self.train_sampler = SubsetRandomSampler(train_idx)
-        self.val_sampler = SubsetRandomSampler(val_idx)
-        self.test_sampler = SubsetRandomSampler(test_idx)
+            index['train'] = np.random.choice(
+                index['train'],
+                replace=False,
+                size=new_size)
+
+        self.samplers = {}
+        self.datasets = {}
+
+        for mode in index:
+            self.samplers[mode] = SubsetRandomSampler(index[mode])
+            self.datasets[mode] = make_manifest_dataset(
+                manifest,
+                loaders_config[mode],
+                columns,
+                fms)
+        
+    def make_dataloader(self, mode):
+        return DataLoader(
+            dataset=self.datasets[mode],
+            sampler=self.samplers[mode],
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            pin_memory=self.pin_memory,
+            drop_last=self.drop_last)
 
     def train_dataloader(self):
-        return make_dataloader(self.dataset, self.batch_size, self.num_workers,
-                               self.train_sampler, self.pin_memory, "train",
-                               self.drop_last)
+        return self.make_dataloader("train")
 
     def val_dataloader(self):
-        return make_dataloader(self.dataset, self.batch_size, self.num_workers,
-                               self.val_sampler, self.pin_memory, "eval",
-                               self.drop_last)
+        return self.make_dataloader("valid")
 
     def test_dataloader(self):
-        return make_dataloader(self.dataset, self.batch_size, self.num_workers,
-                               self.test_sampler, self.pin_memory, "eval",
-                               self.drop_last)
+        return self.make_dataloader("test")

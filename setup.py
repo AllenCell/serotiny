@@ -55,6 +55,7 @@ step_workflow_requirements = [
 requirements = [
     *step_workflow_requirements,
     # project requires
+    "aicsimageio>=4.0.2",
     "numpy",
     "pandas",
     "Pillow",
@@ -70,9 +71,7 @@ requirements = [
     "ray[tune]",
     "brokenaxes",
     "torchio",
-    "aicsshparam>=0.1.1",
-    "aicscytoparam>=0.1.2",
-    "cvapipe_analysis @ git+https://git@github.com/AllenCell/cvapipe_analysis",
+    "hydra-core",
 ]
 
 extra_requirements = {

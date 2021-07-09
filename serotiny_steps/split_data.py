@@ -17,7 +17,11 @@ log = logging.getLogger(__name__)
 ###############################################################################
 
 
-def split_data(dataset_path: str, output_path: str, ratios=None, required_fields=None):
+def split_data(
+        dataset_path: str,
+        output_path: str,
+        ratios=None,
+        required_fields=None):
 
     """
     Split the incoming data into N sets of output data, randomly
@@ -29,28 +33,29 @@ def split_data(dataset_path: str, output_path: str, ratios=None, required_fields
         required_fields = {}
 
     dataset = load_csv(dataset_path, required_fields)
+    datasets = split_dataset(dataset, ratios)
 
-    if ratios is None:
-        ratios = {"train": 0.6, "test": 0.2, "valid": 0.2}
+    # if ratios is None:
+    #     ratios = {"train": 0.6, "test": 0.2, "valid": 0.2}
 
-    indexes = {}
-    remaining_portion = 1.0
-    remaining_data = dataset.index
+    # indexes = {}
+    # remaining_portion = 1.0
+    # remaining_data = dataset.index
 
-    for key, portion in list(ratios.items())[:-1]:
-        this_portion = portion / remaining_portion
-        remaining_portion -= portion
-        remaining_data, indexes[key] = train_test_split(
-            dataset.loc[remaining_data, :].index, test_size=this_portion
-        )
+    # for key, portion in list(ratios.items())[:-1]:
+    #     this_portion = portion / remaining_portion
+    #     remaining_portion -= portion
+    #     remaining_data, indexes[key] = train_test_split(
+    #         dataset.loc[remaining_data, :].index, test_size=this_portion
+    #     )
 
-    indexes[list(ratios.keys())[-1]] = remaining_data
+    # indexes[list(ratios.keys())[-1]] = remaining_data
 
-    # index split datasets
-    datasets = {
-        key: pd.DataFrame(dataset.loc[index, :].reset_index(drop=True))
-        for key, index in indexes.items()
-    }
+    # # index split datasets
+    # datasets = {
+    #     key: pd.DataFrame(dataset.loc[index, :].reset_index(drop=True))
+    #     for key, index in indexes.items()
+    # }
 
     # save a dataloader for each dataset
     dataset_paths = {}
