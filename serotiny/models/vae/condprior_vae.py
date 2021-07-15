@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 from torch.nn.modules.loss import _Loss as Loss
 
-from serotiny.utils import get_class_from_path
+from serotiny.utils import invoke_class
 from .conditional_vae import ConditionalVAE
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]
@@ -17,19 +17,16 @@ logger.propagate = False
 class ConditionalPriorVAE(ConditionalVAE):
     def __init__(
         self,
-        encoder: Union[nn.Module, str],
-        decoder: Union[nn.Module, str],
+        encoder: Union[nn.Module, Dict],
+        decoder: Union[nn.Module, Dict],
         latent_dim: Union[int, Sequence[int]],
-        prior_encoder: Union[nn.Module, str],
+        prior_encoder: Union[nn.Module, Dict],
         optimizer: str,
         lr: float,
         x_label: str,
         c_label: Union[str, int, Sequence[int]],
         recon_loss: Union[Loss, str] = torch.nn.MSELoss,
         condition_mode: str = "label",
-        encoder_config: Optional[Dict] = None,
-        decoder_config: Optional[Dict] = None,
-        prior_encoder_config: Optional[Dict] = None,
     ):
 
         super().__init__(
@@ -46,13 +43,10 @@ class ConditionalPriorVAE(ConditionalVAE):
             prior_mode="anisotropic",
             prior_logvar=None,
             learn_prior_logvar=False,
-            encoder_config=encoder_config,
-            decoder_config=decoder_config
         )
 
-        if isinstance(prior_encoder, str):
-            prior_encoder = get_class_from_path(prior_encoder)
-            prior_encoder = prior_encoder(**prior_encoder_config)
+        if isinstance(prior_encoder, dict):
+            prior_encoder = invoke_class(prior_encoder)
         self.prior_encoder = prior_encoder
 
     def forward(self, x, condition):

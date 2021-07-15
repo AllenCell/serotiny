@@ -22,8 +22,8 @@ Array = Union[torch.Tensor, np.array]
 class ConditionalVAE(BaseVAE):
     def __init__(
         self,
-        encoder: Union[nn.Module, str],
-        decoder: Union[nn.Module, str],
+        encoder: Union[nn.Module, Dict],
+        decoder: Union[nn.Module, Dict],
         latent_dim: Union[int, Sequence[int]],
         optimizer: str,
         lr: float,
@@ -35,8 +35,6 @@ class ConditionalVAE(BaseVAE):
         prior_mode: str = "isotropic",
         prior_logvar: Optional[Array] = None,
         learn_prior_logvar: bool = False,
-        encoder_config: Optional[Dict] = None,
-        decoder_config: Optional[Dict] = None,
     ):
         """
         Instantiate a conditional VAE model
@@ -79,8 +77,7 @@ class ConditionalVAE(BaseVAE):
 
         super().__init__(encoder, decoder, latent_dim, optimizer, lr,
                          beta, x_label, recon_loss,
-                         prior_mode, prior_logvar, learn_prior_logvar,
-                         encoder_config, decoder_config)
+                         prior_mode, prior_logvar, learn_prior_logvar)
 
         if condition_mode not in ("channel", "label"):
             raise ValueError("`condition_mode` should be "

@@ -13,7 +13,7 @@ from pytorch_lightning.utilities.parsing import get_init_args
 
 from serotiny.losses.elbo import calculate_elbo
 from serotiny.models._utils import find_optimizer
-from serotiny.utils import get_class_from_path
+from serotiny.utils import invoke_class
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]
 logger = logging.getLogger("lightning")
@@ -23,8 +23,8 @@ logger.propagate = False
 class BaseVAE(pl.LightningModule):
     def __init__(
         self,
-        encoder: Union[nn.Module, str],
-        decoder: Union[nn.Module, str],
+        encoder: Union[nn.Module, Dict],
+        decoder: Union[nn.Module, Dict],
         latent_dim: Union[int, Sequence[int]],
         optimizer: str,
         lr: float,
@@ -34,22 +34,18 @@ class BaseVAE(pl.LightningModule):
         prior_mode: str = "isotropic",
         prior_logvar: Optional[Array] = None,
         learn_prior_logvar: bool = False,
-        encoder_config: Optional[Dict] = None,
-        decoder_config: Optional[Dict] = None,
     ):
         """
         Instantiate a basic VAE model
 
         Parameters
         ----------
-        encoder: Union[nn.Module, str]
-`           Encoder network. If `str`, expects a class path, to be used for
-            importing the given class. Instantiation arguments are to be
-            given by `encoder_config`
+        encoder: Union[nn.Module, dict]
+`           Encoder network. If `dict`, expects a class dict, to be used for
+            instantiating the given class.
         decoder: Union[nn.Module, str]
-            Decoder network. If `str`, expects a class path, to be used for
-            importing the given class. Instantiation arguments are to be
-            given by `decoder_config`
+            Decoder network. If `dict`, expects a class dict, to be used for
+            instantiating the given class.
         optimizer: str
             Optimizer to use
         lr: float
@@ -69,12 +65,6 @@ class BaseVAE(pl.LightningModule):
             value for the diagonal of the prior covariance matrix
         learn_prior_logvar: bool
             Boolean flag to determine whether to learn the prior log-variances
-        encoder_config: Optional[Dict]
-            Arguments to instantiate encoder, in the case when `encoder` is a
-            class path
-        decoder_config: Optional[Dict]
-            Arguments to instantiate decoder, in the case when `decoder` is a
-            class path
         """
         super().__init__()
 
@@ -86,19 +76,17 @@ class BaseVAE(pl.LightningModule):
             *[arg for arg in init_args if arg not in ["encoder", "decoder"]]
         )
 
-        if isinstance(recon_loss, str):
-            recon_loss = get_class_from_path(recon_loss)
-        self.recon_loss = recon_loss()
-
-        if isinstance(encoder, str):
-            encoder = get_class_from_path(encoder)
-            encoder = encoder(**encoder_config)
+        if isinstance(recon_loss, dict):
+            recon_loss = invoke_class(recon_loss)
+        if isinstance(encoder, dict):
+            encoder = invoke_class(encoder)
         if isinstance(decoder, str):
-            decoder = get_class_from_path(decoder)
-            decoder = decoder(**decoder_config)
+            decoder = invoke_class(decoder)
 
+        self.recon_loss = recon_loss
         self.encoder = encoder
         self.decoder = decoder
+
         self.beta = beta
         self.latent_dim = latent_dim
 
