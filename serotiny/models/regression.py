@@ -15,7 +15,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning.utilities import rank_zero_only
 
-from serotiny.utils import invoke_class
+from serotiny.utils import init
 from serotiny.models._utils import find_optimizer
 from serotiny.networks.weight_init import weight_init
 
@@ -64,12 +64,12 @@ class RegressionModel(pl.LightningModule):
         # Can be accessed via checkpoint['hyper_parameters']
         self.save_hyperparameters()
         if isinstance(loss, dict):
-            self.loss = invoke_class(loss)
+            self.loss = init(loss)
         else:
             self.loss = loss
 
         if isinstance(network, dict):
-            network = invoke_class(network)
+            network = init(network)
 
         self.network = network.apply(weight_init)
         self._cache = dict()

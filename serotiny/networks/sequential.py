@@ -1,7 +1,7 @@
 from typing import Dict
 
 import torch.nn as nn
-from serotiny.utils import path_invocations
+from serotiny.utils import load_multiple
 
 class Sequential(nn.Module):
     """
@@ -13,7 +13,7 @@ class Sequential(nn.Module):
         modules: Dict,
     ):
         super().__init__()
-        modules = path_invocations(modules)
+        modules = load_multiple(modules)
         self.net = nn.Sequential(*modules)
 
     def forward(self, x):

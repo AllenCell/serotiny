@@ -6,7 +6,7 @@ import yaml
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
 import serotiny.models as models
-from serotiny.utils import get_classes_from_config, module_or_path
+from serotiny.utils import load_multiple, module_or_path
 
 
 def get_root(model_root=None):
@@ -39,7 +39,6 @@ def _get_checkpoint(model_path, model_root):
     return ckpt_path, model_class_name, config
 
 
-
 def get_model(model_path, model_root=None):
     ckpt_path, model_class_name, config = _get_checkpoint(model_path, model_root)
     model_class = module_or_path(models, model_class_name)
@@ -69,12 +68,12 @@ def get_trainer_at_checkpoint(
     )
 
     checkpoint_callback.best_model_path = str(ckpt_path)
-    loggers = (get_classes_from_config(config["loggers"])
+    loggers = (load_multiple(config["loggers"])
                if reload_loggers else None)
 
     callbacks = [checkpoint_callback]
     if reload_callbacks:
-        callbacks += get_classes_from_config(config["callbacks"])
+        callbacks += load_multiple(config["callbacks"])
 
     trainer = Trainer(resume_from_checkpoint=ckpt_path,
                       **trainer_config,

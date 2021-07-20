@@ -1,15 +1,13 @@
-from typing import Union, Optional, Dict, Sequence
+from typing import Sequence
 from pathlib import Path
 
-import json
-import numpy as np
 import pandas as pd
 import multiprocessing as mp
 import pytorch_lightning as pl
 
 from torch.utils.data import DataLoader
 
-from serotiny.utils import get_classes_from_config, get_class_from_path, path_invocations
+from serotiny.utils.dynamic_imports import load_multiple
 from serotiny.io.buffered_patch_dataset import BufferedPatchDataset
 from serotiny.io.dataframe import DataframeDataset
 
@@ -47,7 +45,7 @@ class PatchDatamodule(pl.LightningDataModule):
         self.loaders = {}
 
         for mode, loaders_config in loaders.items():
-            self.loaders[mode] = path_invocations(loaders_config)
+            self.loaders[mode] = load_multiple(loaders_config)
 
         self.batch_size = batch_size
         self.num_workers = num_workers

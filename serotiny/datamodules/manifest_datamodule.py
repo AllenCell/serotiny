@@ -11,7 +11,9 @@ from torch.utils.data.sampler import SubsetRandomSampler
 from torch.utils.data import DataLoader
 
 from serotiny.io.dataframe import DataframeDataset
-from serotiny.utils import invoke_class
+from serotiny.utils import load_multiple
+
+from aicsfiles import FileManagementSystem
 
 log = logging.getLogger(__name__)
 
@@ -36,10 +38,7 @@ def make_manifest_dataset(
     else:
         raise TypeError("File type of provided manifest is not .csv")
 
-    loaders = {
-        key: invoke_class(value)
-        for key, value in loaders_config.items()
-    }
+    loaders = load_multiple(loaders_config)
 
     return DataframeDataset(
         dataframe=df,

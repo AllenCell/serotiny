@@ -5,9 +5,8 @@ from typing import Dict, List
 import fire
 import pytorch_lightning as pl
 
-import serotiny.datamodules as datamodules
 from serotiny.models.zoo import get_model
-from serotiny.utils import PATH_KEY, invoke_class, path_invocations
+from serotiny.utils import init, load_multiple
 
 
 def apply_model(
@@ -32,10 +31,10 @@ def apply_model(
     model_zoo_path = model_zoo_config.get("path")
     model = get_model(model_path, model_zoo_path)
 
-    datamodule = invoke_class(datamodule_config)
+    datamodule = init(datamodule_config)
     datamodule.setup()
 
-    callbacks = path_invocations(callbacks_config)
+    callbacks = load_multiple(callbacks_config)
     trainer = pl.Trainer(
         **trainer_config,
         callbacks=callbacks,
@@ -44,7 +43,8 @@ def apply_model(
 
     trainer.test(
         model=model,
-        datamodule=datamodule)
+        datamodule=datamodule
+    )
 
 
 if __name__ == "__main__":

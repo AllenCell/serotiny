@@ -13,7 +13,7 @@ from pytorch_lightning.utilities.parsing import get_init_args
 
 from serotiny.losses.elbo import calculate_elbo
 from serotiny.models._utils import find_optimizer
-from serotiny.utils import invoke_class
+from serotiny.utils import init
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]
 logger = logging.getLogger("lightning")
@@ -77,11 +77,11 @@ class BaseVAE(pl.LightningModule):
         )
 
         if isinstance(recon_loss, dict):
-            recon_loss = invoke_class(recon_loss)
+            recon_loss = init(recon_loss)
         if isinstance(encoder, dict):
-            encoder = invoke_class(encoder)
+            encoder = init(encoder)
         if isinstance(decoder, str):
-            decoder = invoke_class(decoder)
+            decoder = init(decoder)
 
         self.recon_loss = recon_loss
         self.encoder = encoder
