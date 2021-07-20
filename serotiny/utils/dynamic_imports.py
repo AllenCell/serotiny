@@ -1,6 +1,24 @@
 from typing import Dict
 
 import importlib
+from inspect import isfunction
+from functools import partial
+
+INVOKE_KEY = '^invoke'
+BIND_KEY = '^bind'
+INIT_KEY = '^invoke'
+
+
+class _bind(partial):
+    """
+    An improved version of partial which accepts Ellipsis (...) as a placeholder
+    """
+    def __call__(self, *args, **keywords):
+        keywords = {**self.keywords, **keywords}
+        iargs = iter(args)
+        args = (next(iargs) if arg is ... else arg for arg in self.args)
+        return self.func(*args, *iargs, **keywords)
+
 
 def module_get(module, key):
     if key not in module.__dict__:
@@ -32,68 +50,73 @@ def search_modules(modules, path):
     return found
 
 
-def get_class_from_path(class_path: str):
+def get_name_from_path(path: str):
     """
-    Given a class path as a string (e.g. some.module.ClassName),
-    retrieve the class
+    Given a class/function/variable path as a string (e.g. some.module.ClassName),
+    retrieve the class/function/variable
     """
-    class_path = class_path.split(".")
-    class_module = ".".join(class_path[:-1])
-    class_name = class_path[-1]
-    return getattr(importlib.import_module(class_module), class_name)
-
-
-def invoke_path(name, config):
-    invoke_class = get_class_from_path(name)
-    return invoke_class(**config)
+    path = path.split(".")
+    module = ".".join(path[:-1])
+    name = path[-1]
+    return getattr(importlib.import_module(module), name)
 
 
 def module_or_path(module, key):
     try:
         return module_get(module, key)
     except KeyError:
-        return get_class_from_path(key)
+        return get_name_from_path(key)
 
 
-def get_classes_from_config(configs: Dict):
-    """
-    Return a list of instantiated classes given by `configs`. Each key in
-    `configs` is a class path, to be imported dynamically via importlib,
-    with arguments given by the correponding value in the dict.
-    """
-    instantiated_classes = []
-    for class_path, class_config in configs.items():
-        the_class = get_class_from_path(class_path)
-        instantiated_class = the_class(**class_config)
-        instantiated_classes.append(instantiated_class)
+def get_name_and_arguments(key, config):
+    path = config[key]
+    name = get_name_from_path(path)
+    arguments = {k:v for k,v in config.items() if k != key}
+    return name, arguments
 
-    return instantiated_classes
 
-def keep(d: Dict, f: callable):
-    return {
-        key: value
-        for key, value in d.items()
-        if f(key, value)}
+def invoke(config):
+    to_invoke, arguments = get_name_and_arguments(INVOKE_KEY, config)
+    return to_invoke(**arguments)
 
-PATH_KEY = '^invoke'
 
-def invoke_class(config):
-    invoke = get_class_from_path(
-        config[PATH_KEY])
-    arguments = keep(
-        config,
-        lambda k, v: k != PATH_KEY)
+def init(config):
+    to_init, arguments = get_name_and_arguments(INIT_KEY, config)
+    if not isinstance(to_init, type):
+        raise TypeError(f"Expected {to_init} to be a class, but it is "
+                        f"{type(to_init)}")
 
-    return invoke(**arguments)
+    return init(**arguments)
 
-def path_invocations(configs):
+
+def bind(config):
+    to_bind, arguments = get_name_and_arguments(BIND_KEY, config)
+    return _bind(to_bind, arguments)
+
+
+def load_config(config):
+    if BIND_KEY in config:
+        return bind(config)
+    elif INIT_KEY in config:
+        return init(config)
+    elif INVOKE_KEY in config:
+        return invoke(config)
+    else:
+        raise ValueError(f"None of [{BIND_KEY}, {INVOKE_KEY}, {INIT_KEY}] found "
+                         f"in config.")
+
+
+def load_multiple(configs):
     if isinstance(configs, dict):
         return {
-            key: invoke_class(config)
-            for key, config in configs.items()}
+            key: load_config(config)
+            for key, config in configs.items()
+        }
     elif iter(configs):
         return [
-            invoke_class(config)
-            for config in configs]
+            load_config(config)
+            for config in configs
+        ]
     else:
-        raise Exception(f"can only invoke paths from a dict or an iterable, not {configs}")
+        raise TypeError(f"can only bind/invoke/init paths from a dict or an "
+                        f"iterable, not {type(configs)}")
