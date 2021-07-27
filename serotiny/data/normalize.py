@@ -33,3 +33,33 @@ class NormalizeMean():
         return result
 
 
+class NormalizeMinMax():
+    def __init__(self, z_center):
+        self.z_center = z_center
+
+    def __call__(self, ar: np.ndarray):
+        """Returns normalized version of input array.                          
+        The array will be normalized from [min, max] to [-1, 1] linearly                 
+        Parameters                                            
+        ----------                                            
+        ar                                                
+        Input 3d array to be normalized.                               
+        z_center                                             
+        Deprecated: Z-index of cell centers.                             
+        Returns                                             
+        -------                                             
+        np.ndarray                                            
+        Nomralized array, dtype = float32                               
+        """                                               
+        if ar.ndim != 3:                                         
+            raise ValueError('Input array must be 3d')
+        if ar.shape[0] < 32:                                       
+            raise ValueError(
+                'Input array must be at least length 32 in first dimension')                                              
+
+        ar = ar.astype(np.float32)
+        norm_min = ar.min()
+        norm_max = ar.max()
+        ar = 2*(ar - norm_min) / (norm_max - norm_min)-1
+
+        return ar.astype(np.float32)
