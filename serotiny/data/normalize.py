@@ -44,18 +44,11 @@ class NormalizeMinMax():
         ----------                                            
         ar                                                
         Input 3d array to be normalized.                               
-        z_center                                             
-        Deprecated: Z-index of cell centers.                             
         Returns                                             
         -------                                             
         np.ndarray                                            
         Nomralized array, dtype = float32                               
         """                                               
-        if ar.ndim != 3:                                         
-            raise ValueError('Input array must be 3d')
-        if ar.shape[0] < 32:                                       
-            raise ValueError(
-                'Input array must be at least length 32 in first dimension')                                              
 
         ar = ar.astype(np.float32)
         norm_min = ar.min()
