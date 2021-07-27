@@ -34,7 +34,7 @@ class NormalizeMean():
 
 
 class NormalizeMinMax():
-    def __init__(self, z_center):
+    def __init__(self, z_center=None):
         self.z_center = z_center
 
     def __call__(self, ar: np.ndarray):
