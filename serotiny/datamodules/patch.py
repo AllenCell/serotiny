@@ -82,11 +82,11 @@ class PatchDatamodule(pl.LightningDataModule):
     def make_dataloader(self, dataset):
         return DataLoader(
             dataset=dataset,
-            batch_size=self.batch_size,
-            pin_memory=self.pin_memory,
-            drop_last=self.drop_last,
-            num_workers=self.num_workers,
-            multiprocessing_context=mp.get_context("fork"))
+            batch_size=self.batch_size)
+            # pin_memory=self.pin_memory,
+            # drop_last=self.drop_last,
+            # num_workers=self.num_workers,
+            # multiprocessing_context=mp.get_context("fork"))
 
     def train_dataloader(self):
         return self.make_dataloader(self.train)
