@@ -49,10 +49,9 @@ def train_model(
     callbacks_config = callbacks
 
     model_zoo_path = model_zoo_config.get("path")
-    checkpoint_config = model_zoo_config.get("checkpoint", {})
-
     model_name = model_config.get(INIT_KEY, 'UNDEFINED_MODEL_NAME')
     datamodule_name = datamodule_config.get(INIT_KEY, 'UNDEFINED_DATAMODULE_NAME')
+
     store_metadata(called_args, model_name, version_string, model_zoo_path)
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
@@ -72,13 +71,15 @@ def train_model(
 
     loggers = load_multiple(loggers_config)
 
-    if checkpoint_config:
+
+    if len(model_zoo) > 0:
         model_path = build_model_path(
             model_zoo_path,
             (model_name, version_string))
         config = {
             'dirpath': model_path,
             'filename': "epoch-{epoch:02d}"}
+        checkpoint_config = model_zoo_config.get("checkpoint", {})
         config.update(checkpoint_config)
         checkpoint_callback = ModelCheckpoint(**config)
     else:
@@ -88,7 +89,6 @@ def train_model(
         trainer_config['checkpoint_callback'] = checkpoint_callback
 
     callbacks = load_multiple(callbacks_config)
-    callbacks.append(checkpoint_callback)
 
     trainer = pl.Trainer(
         **trainer_config,

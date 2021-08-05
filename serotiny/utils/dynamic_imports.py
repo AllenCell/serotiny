@@ -91,6 +91,7 @@ def invoke(config):
 
 def init(config):
     to_init, arguments = get_name_and_arguments(INIT_KEY, config)
+
     if not isinstance(to_init, type):
         raise TypeError(f"Expected {to_init} to be a class, but it is "
                         f"{type(to_init)}")
@@ -119,6 +120,7 @@ def bind(config):
 
 
 def load_config(config):
+
     if BIND_KEY in config:
         return bind(config)
     elif INIT_KEY in config:

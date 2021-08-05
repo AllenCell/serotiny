@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 
 def make_manifest_dataset(
     manifest: Union[Path, str],
-    loaders_config: Dict,
+    loaders: Dict,
     columns: Optional[Sequence[str]] = None,
     fms: bool = False,
     iloc: bool = False,
@@ -33,12 +33,14 @@ def make_manifest_dataset(
         raise FileNotFoundError("Manifest file not found at given path")
     if manifest.suffix == ".csv":
         df = pd.read_csv(manifest)
+        if columns is not None:
+            df = df[columns]
     elif manifest.suffix == ".parquet":
         df = pd.read_parquet(manifest, columns=columns)
     else:
         raise TypeError("File type of provided manifest is not .csv")
 
-    loaders = load_multiple(loaders_config)
+    loaders = load_multiple(loaders)
 
     return DataframeDataset(
         dataframe=df,
@@ -84,7 +86,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         batch_size: int,
         num_workers: int,
         manifest: Union[Path, str],
-        loaders_config: Dict,
+        loaders: Dict,
         split_col: Optional[str] = None,
         columns: Optional[Sequence[str]] = None,
         pin_memory: bool = True,
@@ -98,12 +100,6 @@ class ManifestDatamodule(pl.LightningDataModule):
 
         self.batch_size = batch_size
         self.num_workers = num_workers
-        self.dataset = make_manifest_dataset(
-            manifest,
-            loaders_config['train'],
-            columns,
-            fms)
-        self.length = len(self.dataset)
 
         self.pin_memory = pin_memory
         self.drop_last = drop_last
@@ -111,7 +107,16 @@ class ManifestDatamodule(pl.LightningDataModule):
 
         assert subset_train <= 1
 
+        # To delete later, this is only to get length
+        dataset = make_manifest_dataset(
+            manifest,
+            loaders['train'],
+            columns,
+            fms)
+        self.dataset = dataset
+        self.length = len(dataset)
         indices = list(range(self.length))
+
         index = {}
         if split_col is not None:
             dataframe = self.dataset.dataframe
@@ -154,7 +159,7 @@ class ManifestDatamodule(pl.LightningDataModule):
             self.samplers[mode] = SubsetRandomSampler(index[mode])
             self.datasets[mode] = make_manifest_dataset(
                 manifest,
-                loaders_config[mode],
+                loaders[mode],
                 columns,
                 fms)
         
