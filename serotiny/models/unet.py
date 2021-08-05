@@ -21,7 +21,7 @@ from pytorch_lightning.utilities.parsing import get_init_args
 from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
 
 from serotiny.models._utils import index_to_onehot, find_optimizer
-from serotiny.utils import get_class_from_path
+from serotiny.utils import get_name_from_path
 
 
 class UnetModel(pl.LightningModule):
@@ -79,12 +79,12 @@ class UnetModel(pl.LightningModule):
         self.log_grads = True
 
         if isinstance(network, str):
-            network = get_class_from_path(network)
+            network = get_name_from_path(network)
             network = network(**network_config)
         self.network = network
 
         if isinstance(loss, str):
-            loss = get_class_from_path(loss)()
+            loss = get_name_from_path(loss)()
         self.loss = loss
 
         self.input_channels = input_channels

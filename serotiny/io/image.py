@@ -83,7 +83,7 @@ def png_loader(
 
 
 def infer_dims(img):
-    dims = dict(zip(img.dims, img.shape))
+    dims = dict(img.dims.items())
 
     if "S" in dims:
         if dims["S"] > 1:
@@ -200,7 +200,7 @@ def tiff_loader(
     """
     aicsimg = aicsimageio.AICSImage(path)
     channel_names = aicsimg.channel_names
-    
+
     if (select_channels is None) or (len(select_channels) == 0):
         select_channels = channel_names
     if channel_masks is None:
@@ -262,8 +262,11 @@ def tiff_writer(
     else:
         raise ValueError(f"Unexpected image shape {img.shape}")
 
-    with OmeTiffWriter(path, overwrite_file=overwrite) as writer:
-        writer.save(img, dimension_order=dims, channel_names=channels)
+    # Write output image
+    OmeTiffWriter.save(
+        data=img, uri=path, channel_names=channels,
+        dimension_order="STCZYX"
+    )
 
 
 def change_resolution(
@@ -323,10 +326,10 @@ def change_resolution(
     # change this to do it across all channels at once, perhaps this can be done without for loop
 
     # Write output image
-    with OmeTiffWriter(path_out, overwrite_file=True) as writer:
-        writer.save(
-            data=data_new, channel_names=channel_names, dimension_order="STCZYX"
-        )
+    OmeTiffWriter.save(
+        data=data_new, uri=path_out, channel_names=channel_names,
+        dimension_order="STCZYX"
+    )
 
     return data_new.shape
 

@@ -6,7 +6,7 @@ from functools import partial
 
 INVOKE_KEY = '^invoke'
 BIND_KEY = '^bind'
-INIT_KEY = '^invoke'
+INIT_KEY = '^init'
 
 
 class _bind(partial):
@@ -75,8 +75,17 @@ def get_name_and_arguments(key, config):
     return name, arguments
 
 
+
 def invoke(config):
     to_invoke, arguments = get_name_and_arguments(INVOKE_KEY, config)
+
+    for key, value in arguments.items():
+        if isinstance(value, dict):
+            try:
+                arguments[key] = load_config(value)
+            except:
+                pass
+
     return to_invoke(**arguments)
 
 
@@ -86,12 +95,27 @@ def init(config):
         raise TypeError(f"Expected {to_init} to be a class, but it is "
                         f"{type(to_init)}")
 
-    return init(**arguments)
+    for key, value in arguments.items():
+        if isinstance(value, dict):
+            try:
+                arguments[key] = load_config(value)
+            except:
+                pass
+
+    return to_init(**arguments)
 
 
 def bind(config):
     to_bind, arguments = get_name_and_arguments(BIND_KEY, config)
-    return _bind(to_bind, arguments)
+
+    for key, value in arguments.items():
+        if isinstance(value, dict):
+            try:
+                arguments[key] = load_config(value)
+            except:
+                pass
+
+    return _bind(to_bind, **arguments)
 
 
 def load_config(config):
@@ -102,8 +126,8 @@ def load_config(config):
     elif INVOKE_KEY in config:
         return invoke(config)
     else:
-        raise ValueError(f"None of [{BIND_KEY}, {INVOKE_KEY}, {INIT_KEY}] found "
-                         f"in config.")
+        raise KeyError(f"None of [{BIND_KEY}, {INVOKE_KEY}, {INIT_KEY}] found "
+                       f"in config.")
 
 
 def load_multiple(configs):

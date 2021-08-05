@@ -30,7 +30,7 @@ class BaseVAE(pl.LightningModule):
         lr: float,
         beta: float,
         x_label: str,
-        recon_loss: Union[Loss, str] = nn.MSELoss,
+        recon_loss: Union[Loss, Dict] = nn.MSELoss,
         prior_mode: str = "isotropic",
         prior_logvar: Optional[Array] = None,
         learn_prior_logvar: bool = False,
