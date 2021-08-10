@@ -17,11 +17,17 @@ from aicsfiles import FileManagementSystem
 
 log = logging.getLogger(__name__)
 
-def _read_dataframe(
+def make_manifest_dataset(
     manifest: Union[Path, str],
+    loaders: Dict,
     columns: Optional[Sequence[str]] = None,
+    fms: bool = False,
+    iloc: bool = False,
 ):
-    manifest = Path(manifest)
+    if fms:
+        manifest = Path(FileManagementSystem().get_file_by_id(manifest).path)
+    else:
+        manifest = Path(manifest)
 
     if not manifest.is_file():
         raise FileNotFoundError("Manifest file not found at given path")
@@ -34,7 +40,12 @@ def _read_dataframe(
     else:
         raise TypeError("File type of provided manifest is not .csv")
 
-    return df
+    loaders = load_multiple(loaders)
+
+    return DataframeDataset(
+        dataframe=df,
+        loaders=loaders,
+        iloc=iloc)
 
 
 class ManifestDatamodule(pl.LightningDataModule):
@@ -96,59 +107,78 @@ class ManifestDatamodule(pl.LightningDataModule):
 
         assert subset_train <= 1
 
-        self.dataframe = _read_dataframe(manifest, columns)
-        self.length = len(self.dataframe)
+        # To delete later, this is only to get length
+        dataset = make_manifest_dataset(
+            manifest,
+            loaders['train'],
+            columns,
+            fms)
+        self.dataset = dataset
+        self.length = len(dataset)
         indices = list(range(self.length))
 
-        indices = {}
+        index = {}
         if split_col is not None:
-            assert self.dataframe.dtypes[split_col] == np.dtype("O")
-            self.dataframe[split_col] = self.dataframe[split_col].str.lower()
-            split_names = self.dataframe[split_col].unique().tolist()
+            dataframe = self.dataset.dataframe
+
+            assert dataframe.dtypes[split_col] == np.dtype("O")
+            dataframe[split_col] = dataframe[split_col].str.lower()
+            split_names = dataframe[split_col].unique().tolist()
             assert set(split_names).issubset({"train", "validation", "test"})
 
-            for split in ["train", "validation", "test"]:
-                indices[split] = self.dataframe.loc[
-                    self.dataframe[split_col] == split
+            index_mapping = {
+                'train': 'train',
+                'valid': 'validation',
+                'test': 'test'}
+            index = {}
+            for mode, value in index_mapping.items():
+                index[mode] = dataframe.loc[
+                    dataframe[split_col] == value
                 ].index.tolist()
         else:
-            indices['train'] = indices
-            indices['validation'] = [0] * self.batch_size
-            indices['test'] = [0] * self.batch_size
+            index['train'] = indices
+            index['valid'] = [0] * self.batch_size
+            index['test'] = [0] * self.batch_size
 
         if subset_train < 1:
-            new_size = int(subset_train * len(indices['train']))
+            new_size = int(subset_train * len(index['train']))
 
             log.info(
                 f"Subsetting the training data by {100*subset_train:.2f}%, "
-                f"from {len(indices['train'])} to {new_size}")
+                f"from {len(train_idx)} to {new_size}")
 
-            indices['train'] = np.random.choice(
-                indices['train'],
+            index['train'] = np.random.choice(
+                index['train'],
                 replace=False,
                 size=new_size)
 
         self.samplers = {}
         self.datasets = {}
 
-        for split in indices:
-            self.samplers[split] = SubsetRandomSampler(indices[split])
-            self.datasets[split] = DataframeDataset(self.dataframe, loaders[split])
-
-    def make_dataloader(self, split):
+        for mode in index:
+            self.samplers[mode] = SubsetRandomSampler(index[mode])
+            self.datasets[mode] = make_manifest_dataset(
+                manifest,
+                loaders[mode],
+                columns,
+                fms)
+        
+    def make_dataloader(self, mode):
         return DataLoader(
-            dataset=self.datasets[split],
-            sampler=self.samplers[split],
+            dataset=self.datasets[mode],
+            sampler=self.samplers[mode],
             batch_size=self.batch_size,
             num_workers=self.num_workers,
             pin_memory=self.pin_memory,
-            drop_last=self.drop_last)
+            drop_last=self.drop_last,
+            multiprocessing_context=mp.get_context("fork")
+            )
 
     def train_dataloader(self):
         return self.make_dataloader("train")
 
     def val_dataloader(self):
-        return self.make_dataloader("validation")
+        return self.make_dataloader("valid")
 
     def test_dataloader(self):
         return self.make_dataloader("test")

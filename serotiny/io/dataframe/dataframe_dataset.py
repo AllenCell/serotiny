@@ -25,8 +25,9 @@ class DataframeDataset(Dataset):
     def __init__(self, dataframe, loaders=None, iloc=True):
         self.dataframe = dataframe
         if iloc:
-            self.dataframe.reset_index(inplace=True)
+            self.dataframe = self.dataframe.reset_index()
 
+        self.loaders = loaders
         self.iloc = iloc
 
     def __len__(self):

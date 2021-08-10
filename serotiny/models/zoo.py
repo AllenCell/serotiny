@@ -56,14 +56,14 @@ def get_trainer_at_checkpoint(
 
     ckpt_path, model_class_name, config = _get_checkpoint(model_path, model_root)
 
-    trainer_config = config["trainer_config"]
+    trainer_config = config["trainer"]
 
-    model_zoo_config = config["model_zoo_config"]
+    model_zoo_config = config["model_zoo"]
     checkpoint_callback = get_checkpoint_callback(
         model_class_name,
         model_path.split("/")[1].split('.ckpt')[0],
-        model_zoo_config.get("checkpoint_monitor"),
-        model_zoo_config.get("checkpoint_mode"),
+        model_zoo_config['checkpoint'].get("monitor"),
+        model_zoo_config['checkpoint'].get("mode"),
         model_root,
     )
 
@@ -87,11 +87,11 @@ def store_model(trainer, model_class, model_id, model_root=None):
     model_root = get_root(model_root)
 
     if not model_root.exists():
-        model_root.mkdir(parents=True, exist_ok=True)
+        model_root.mkdir(parents=True)
 
     model_path = model_root / model_class
     if not model_path.exists():
-        model_path.mkdir(parents=True, exist_ok=True)
+        model_path.mkdir(parents=True)
 
     model_id = model_id if ".ckpt" in model_id else model_id + ".ckpt"
 
@@ -103,12 +103,12 @@ def build_model_path(model_root, path):
     model_path = get_root(model_root)
 
     if not model_path.exists():
-        model_path.mkdir(parents=True, exist_ok=True)
+        model_path.mkdir(parents=True)
 
     for step in path:
         model_path = model_path / step
         if not model_path.exists():
-            model_path.mkdir(parents=True, exist_ok=True)
+            model_path.mkdir(parents=True)
 
     return model_path
 
@@ -130,29 +130,18 @@ def get_checkpoint_callback(
     )
 
 
-def _normalize_dict(d):
-    _new_d = {}
-    for k,v in d.items():
-        if isinstance(v, dict):
-            _new_d[k] = _normalize_dict(v)
-        else:
-            _new_d[k] = v
-    return _new_d
-
-
 def store_metadata(metadata, model_class, model_id, model_root=None):
     model_root = get_root(model_root)
 
     if not model_root.exists():
-        model_root.mkdir(parents=True, exist_ok=True)
+        model_root.mkdir(parents=True)
 
     model_path = model_root / model_class
     if not model_path.exists():
-        model_path.mkdir(parents=True, exist_ok=True)
+        model_path.mkdir(parents=True)
 
     model_id = model_id if ".yaml" in model_id else model_id + ".yaml"
 
     model_path = model_path / model_id
 
-    omegaconf.OmegaConf.save(_normalize_dict(metadata), model_path,
-                             resolve=True)
+    omegaconf.OmegaConf.save(metadata, model_path, resolve=True)
