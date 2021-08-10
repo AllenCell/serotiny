@@ -39,7 +39,6 @@ For full package documentation please visit [AllenCellModeling.github.io/serotin
 
 ### To load a trained model:
 
-,
 ```python
 from serotiny.models.zoo import get_model, get_trainer_at_checkpoint, _get_checkpoint
 
@@ -50,7 +49,6 @@ ckpt_path, _, config  = _get_checkpoint(model_path, model_zoo_path)
 
 ### To setup a datamodule given the config from a trained model:
 
-,
 ```python
 datamodule_name = config["datamodule"]['^init']
 datamodule_config = config["datamodule"]   
