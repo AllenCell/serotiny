@@ -6,8 +6,9 @@ SPHINXOPTS    =
 SPHINXBUILD   = python -msphinx
 SPHINXPROJ    = serotiny
 SOURCEDIR     = .
-# BUILDDIR      = _build
-BUILDDIR      = ../../gh-pages
+BUILDDIR      = _build
+DOCS          = ../../gh-pages
+# BUILDDIR      = ../../gh-pages
 
 # Put it first so that "make" without argument is like "make help".
 help:
