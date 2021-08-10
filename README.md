@@ -36,7 +36,7 @@ The deep-learning functionality is built on [pytorch](https://github.com/pytorch
 
 ## Quick Start
 
-### To change the resolution of input images:
+<!-- ### To change the resolution of input images:
 
 ```python
 python -m  serotiny.steps.change_resolution \
@@ -46,9 +46,9 @@ python -m  serotiny.steps.change_resolution \
     --path_3d_resized_column "CellSampledImage3DPath" \
     --path_out "/allen/aics/modeling/spanglry/data/mitotic-classifier/sampled_output/" \
     --resolution [10,20,50]
-```
+``` -->
 
-### To apply 2D projections to 3D images:
+<!-- ### To apply 2D projections to 3D images:
 
 ```python
 python -m serotiny.steps.apply_projection \
@@ -85,7 +85,7 @@ python -m serotiny.steps.train_model \
     --test True \
     --x_label 'projection_image' \
     --y_label 'ChosenMitoticClass'
-```
+``` -->
 
 ## Documentation
 
