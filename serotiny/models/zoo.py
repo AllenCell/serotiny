@@ -87,11 +87,11 @@ def store_model(trainer, model_class, model_id, model_root=None):
     model_root = get_root(model_root)
 
     if not model_root.exists():
-        model_root.mkdir(parents=True)
+        model_root.mkdir(parents=True, exist_ok=True)
 
     model_path = model_root / model_class
     if not model_path.exists():
-        model_path.mkdir(parents=True)
+        model_path.mkdir(parents=True, exist_ok=True)
 
     model_id = model_id if ".ckpt" in model_id else model_id + ".ckpt"
 
@@ -103,12 +103,12 @@ def build_model_path(model_root, path):
     model_path = get_root(model_root)
 
     if not model_path.exists():
-        model_path.mkdir(parents=True)
+        model_path.mkdir(parents=True, exist_ok=True)
 
     for step in path:
         model_path = model_path / step
         if not model_path.exists():
-            model_path.mkdir(parents=True)
+            model_path.mkdir(parents=True, exist_ok=True)
 
     return model_path
 
@@ -129,19 +129,28 @@ def get_checkpoint_callback(
         filename="epoch{epoch:02d}"
     )
 
+def _normalize_dict(d):
+    _new_d = {}
+    for k,v in d.items():
+        if isinstance(v, dict):
+            _new_d[k] = _normalize_dict(v)
+        else:
+            _new_d[k] = v
+    return _new_d
 
 def store_metadata(metadata, model_class, model_id, model_root=None):
     model_root = get_root(model_root)
 
     if not model_root.exists():
-        model_root.mkdir(parents=True)
+        model_root.mkdir(parents=True, exist_ok=True)
 
     model_path = model_root / model_class
     if not model_path.exists():
-        model_path.mkdir(parents=True)
+        model_path.mkdir(parents=True, exist_ok=True)
 
     model_id = model_id if ".yaml" in model_id else model_id + ".yaml"
 
     model_path = model_path / model_id
 
-    omegaconf.OmegaConf.save(metadata, model_path, resolve=True)
+    omegaconf.OmegaConf.save(_normalize_dict(metadata), model_path,
+                             resolve=True)

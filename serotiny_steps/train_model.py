@@ -89,6 +89,7 @@ def train_model(
         trainer_config['checkpoint_callback'] = checkpoint_callback
 
     callbacks = load_multiple(callbacks_config)
+    callbacks.append(checkpoint_callback)
 
     trainer = pl.Trainer(
         **trainer_config,
@@ -102,7 +103,6 @@ def train_model(
         model,
         datamodule
     )
-
     trainer.test(
         datamodule=datamodule,
         ckpt_path=None
