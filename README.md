@@ -44,9 +44,7 @@ For full package documentation please visit [AllenCellModeling.github.io/serotin
 from serotiny.models.zoo import get_model, get_trainer_at_checkpoint, _get_checkpoint
 
 model = get_model(model_path, model_zoo_path)
-
 trainer = get_trainer_at_checkpoint(model_path, model_zoo_path)
-
 ckpt_path, _, config  = _get_checkpoint(model_path, model_zoo_path)
 ``` 
 
@@ -55,19 +53,12 @@ ckpt_path, _, config  = _get_checkpoint(model_path, model_zoo_path)
 ,
 ```python
 datamodule_name = config["datamodule"]['^init']
-
 datamodule_config = config["datamodule"]   
-
 create_datamodule = module_get(datamodules, datamodule_name.split('.')[-1])
-
 datamodule_config["num_workers"] = 2
-
 datamodule_config["pin_memory"] = False
-
 datamodule_config.pop('^init')
-
 datamodule = create_datamodule(**datamodule_config)
-
 datamodule.setup()
 ``` 
 
