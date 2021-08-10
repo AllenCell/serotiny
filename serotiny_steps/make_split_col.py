@@ -14,8 +14,9 @@ def make_split_col(
 ):
     manifest = load_csv(manifest_path, required_fields=[])
 
-    train_ix, val_test_ix = train_test_split(manifest.index.tolist(),
-                                             train_size=train_frac)
+    train_ix, val_test_ix = train_test_split(
+        manifest.index.tolist(), train_size=train_frac
+    )
     if val_frac is not None:
         val_frac = val_frac / (1 - train_frac)
     else:
@@ -29,6 +30,7 @@ def make_split_col(
     manifest.loc[test_ix, "split"] = "validation"
 
     return manifest
+
 
 def main(
     manifest_path: str,

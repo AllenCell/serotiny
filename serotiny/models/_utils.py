@@ -16,9 +16,8 @@ import matplotlib.pyplot as plt
 
 from tqdm import trange, tqdm
 
-def to_device(
-    *args
-):
+
+def to_device(*args):
 
     assert len(args) > 1
     target_device = args[-1]
@@ -26,9 +25,7 @@ def to_device(
     args = args[:-1]
 
     if len(args) > 1:
-        return tuple(
-            arg.to(target_device) for arg in args
-        )
+        return tuple(arg.to(target_device) for arg in args)
     else:
         return args[0].to(target_device)
 
@@ -134,7 +131,6 @@ def find_optimizer(optimizer_name):
     return optimizer_class
 
 
-
 def find_lr_scheduler(scheduler_name):
     """
     Given scheduler name, get it from torch.optim.lr_scheduler
@@ -153,4 +149,3 @@ def find_lr_scheduler(scheduler_name):
             f"options are {available_schedulers}"
         )
     return scheduler_class
-

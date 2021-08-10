@@ -11,15 +11,11 @@ from serotiny.utils.dynamic_imports import load_multiple
 from serotiny.io.buffered_patch_dataset import BufferedPatchDataset
 from serotiny.io.dataframe import DataframeDataset
 
-def make_manifest_dataset(
-        manifest: str,
-        loaders: dict):
+
+def make_manifest_dataset(manifest: str, loaders: dict):
     dataframe = pd.read_csv(manifest)
 
-    return DataframeDataset(
-        dataframe=dataframe,
-        loaders=loaders,
-        iloc=True)
+    return DataframeDataset(dataframe=dataframe, loaders=loaders, iloc=True)
 
 
 class PatchDatamodule(pl.LightningDataModule):
@@ -58,9 +54,9 @@ class PatchDatamodule(pl.LightningDataModule):
         self.buffer_switch_interval = buffer_switch_interval
         self.shuffle_images = shuffle_images
 
-        self.train = self.load_patch_manifest('train')
-        self.valid = self.load_patch_manifest('valid')
-        self.test = self.load_patch_manifest('test')
+        self.train = self.load_patch_manifest("train")
+        self.valid = self.load_patch_manifest("valid")
+        self.test = self.load_patch_manifest("test")
 
     def make_patch_dataset(self, dataset):
         return BufferedPatchDataset(
@@ -69,12 +65,13 @@ class PatchDatamodule(pl.LightningDataModule):
             patch_shape=self.patch_shape,
             buffer_size=self.buffer_size,
             buffer_switch_interval=self.buffer_switch_interval,
-            shuffle_images=self.shuffle_images)
+            shuffle_images=self.shuffle_images,
+        )
 
     def load_patch_manifest(self, mode):
         manifest = make_manifest_dataset(
-            self.manifest_path / f'{mode}.csv',
-            self.loaders[mode])
+            self.manifest_path / f"{mode}.csv", self.loaders[mode]
+        )
         return self.make_patch_dataset(manifest)
 
     def make_dataloader(self, dataset):
@@ -84,7 +81,8 @@ class PatchDatamodule(pl.LightningDataModule):
             pin_memory=self.pin_memory,
             drop_last=self.drop_last,
             num_workers=self.num_workers,
-            multiprocessing_context=mp.get_context("fork"))
+            multiprocessing_context=mp.get_context("fork"),
+        )
 
     def train_dataloader(self):
         return self.make_dataloader(self.train)

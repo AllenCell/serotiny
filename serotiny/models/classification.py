@@ -343,6 +343,7 @@ class ClassificationModel(pl.LightningModule):
                     tag=name, values=grads, global_step=self.trainer.global_step
                 )
 
+
 def acc_prec_recall(n_classes):
     """
     util function to instantiate a ModuleDict for metrics

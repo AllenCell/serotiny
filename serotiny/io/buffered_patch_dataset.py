@@ -94,9 +94,12 @@ class BufferedPatchDataset(Dataset):
             for key, part in datum.items():
                 if key in self.patch_columns:
                     if slices is None:
-                        starts = np.array([
-                            np.random.randint(0, d - p + 1)
-                            for d, p in zip(shape_spatial, self.patch_shape)])
+                        starts = np.array(
+                            [
+                                np.random.randint(0, d - p + 1)
+                                for d, p in zip(shape_spatial, self.patch_shape)
+                            ]
+                        )
                         ends = starts + np.array(self.patch_shape)
                         slices = tuple(slice(s, e) for s, e in zip(starts, ends))
                     # Pad slices with "slice(None)" if there are non-spatial dimensions
@@ -122,7 +125,7 @@ class BufferedPatchDataset(Dataset):
         """
         buffer_index = np.random.randint(len(self.buffer))
         return self.get_patch(buffer_index)
-        
+
     def _check_last_datum(self) -> None:
         """Checks last dataset item added to buffer."""
         dimensions = len(self.patch_shape)
@@ -130,7 +133,7 @@ class BufferedPatchDataset(Dataset):
         shape_spatial = None
         key_spatial = None
         for key, component in self.buffer[-1].items():
-            if not hasattr(component, 'shape') or component.shape == ():
+            if not hasattr(component, "shape") or component.shape == ():
                 continue
 
             if shape_spatial is None:

@@ -134,4 +134,3 @@ class RegressionModel(pl.LightningModule):
                 "strict": True,
             },
         )
-

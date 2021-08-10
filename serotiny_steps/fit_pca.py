@@ -23,6 +23,7 @@ def _fit_pca(
 
     joblib.dump(pca, output_path, compress=compression)
 
+
 def fit_pca(
     dataset_path: str,
     output_path: str,

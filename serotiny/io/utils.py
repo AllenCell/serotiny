@@ -1,6 +1,7 @@
 import warnings
 import quilt3
 
+
 def download_quilt_data(
     package: str,
     bucket: str,

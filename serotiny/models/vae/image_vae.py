@@ -13,6 +13,7 @@ Array = Union[torch.Tensor, np.array, Sequence[float]]
 logger = logging.getLogger("lightning")
 logger.propagate = False
 
+
 class _ImageVAEDecoder(nn.Module):
     def __init__(
         self,
@@ -73,11 +74,12 @@ class ImageVAE(BaseVAE):
             in_channels=in_channels,
             input_dims=input_dims,
             output_dim=latent_dim * 2,  # because it has to return mu and sigma
-            hidden_channels=hidden_channels
+            hidden_channels=hidden_channels,
         )
 
         compressed_img_shape = encoder.conv_forward(
-            torch.zeros(1, in_channels, *input_dims)).shape[2:]
+            torch.zeros(1, in_channels, *input_dims)
+        ).shape[2:]
 
         decoder = _ImageVAEDecoder(
             compressed_img_shape=compressed_img_shape,

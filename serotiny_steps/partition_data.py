@@ -18,8 +18,7 @@ log = logging.getLogger(__name__)
 
 
 def reset_index(dataset, index):
-    pd.DataFrame(
-        dataset.loc[index, :].reset_index(drop=True))
+    pd.DataFrame(dataset.loc[index, :].reset_index(drop=True))
 
 
 def write_csvs(datasets, output_path):
@@ -31,12 +30,12 @@ def write_csvs(datasets, output_path):
 
 
 def partition_data(
-        dataset_path: str,
-        output_path: str,
-        partition_size=100,
-        partition_prefix='partition',
-        required_fields=None,
-    ):
+    dataset_path: str,
+    output_path: str,
+    partition_size=100,
+    partition_prefix="partition",
+    required_fields=None,
+):
 
     """
     Split the incoming data into N sets of output data, where
@@ -60,7 +59,7 @@ def partition_data(
         if seek > len(dataset):
             seek = cursor + remaining
         partition_rows = dataset[cursor:seek]
-        partition_key = f'{partition_prefix}_{partition_index}'
+        partition_key = f"{partition_prefix}_{partition_index}"
         partitions[partition_key] = partition_rows
         cursor += partition_size
 

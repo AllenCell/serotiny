@@ -128,7 +128,7 @@ def tiff_loader_CZYX(
     data = aicsimg.get_image_data("CZYX", S=0, T=0)
 
     mask_keys = channel_masks.keys() if channel_masks else {}
-    
+
     if select_channels is None:
         select_channels = channel_names
 
@@ -264,8 +264,7 @@ def tiff_writer(
 
     # Write output image
     OmeTiffWriter.save(
-        data=img, uri=path, channel_names=channels,
-        dimension_order="STCZYX"
+        data=img, uri=path, channel_names=channels, dimension_order="STCZYX"
     )
 
 
@@ -327,8 +326,10 @@ def change_resolution(
 
     # Write output image
     OmeTiffWriter.save(
-        data=data_new, uri=path_out, channel_names=channel_names,
-        dimension_order="STCZYX"
+        data=data_new,
+        uri=path_out,
+        channel_names=channel_names,
+        dimension_order="STCZYX",
     )
 
     return data_new.shape

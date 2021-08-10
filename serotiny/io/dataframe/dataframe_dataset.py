@@ -39,6 +39,4 @@ class DataframeDataset(Dataset):
         else:
             row = self.dataframe.loc[idx]
 
-        return {
-            key: loader(row) for key, loader in self.loaders.items()
-        }
+        return {key: loader(row) for key, loader in self.loaders.items()}

@@ -6,6 +6,7 @@ Pytorch Lightning module
 from typing import Sequence, Union, Optional
 
 import logging
+
 logger = logging.getLogger("lightning")
 logger.propagate = False
 
@@ -17,6 +18,7 @@ from serotiny.networks.mlp import MLP
 from .condprior_vae import ConditionalPriorVAE
 
 Array = Union[torch.Tensor, np.array]
+
 
 class TabularConditionalPriorVAE(ConditionalPriorVAE):
     def __init__(

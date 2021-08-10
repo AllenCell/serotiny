@@ -13,12 +13,8 @@ class Load3DImage(Loader):
     Loader class, used to retrieve images from paths given in a dataframe column
     """
 
-    def __init__(
-            self,
-            column='image',
-            select_channels=None,
-            transforms=None):
-            # fms=False):
+    def __init__(self, column="image", select_channels=None, transforms=None):
+        # fms=False):
         super().__init__()
         self.column = column
         self.select_channels = select_channels
@@ -39,5 +35,5 @@ class Load3DImage(Loader):
             output_dtype=np.float32,
             channel_masks=None,
             mask_thresh=0,
-            transform=self.transforms
+            transform=self.transforms,
         )

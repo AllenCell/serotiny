@@ -21,7 +21,7 @@ def apply_model(
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
     os.environ["CUDA_VISIBLE_DEVICES"] = ",".join([str(id) for id in gpu_ids])
     num_gpus = len(gpu_ids)
-    num_gpus = (num_gpus if num_gpus != 0 else None)
+    num_gpus = num_gpus if num_gpus != 0 else None
 
     datamodule_config = datamodule
     trainer_config = trainer
@@ -41,10 +41,7 @@ def apply_model(
         gpus=num_gpus,
     )
 
-    trainer.test(
-        model=model,
-        datamodule=datamodule
-    )
+    trainer.test(model=model, datamodule=datamodule)
 
 
 if __name__ == "__main__":

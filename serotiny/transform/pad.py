@@ -26,10 +26,11 @@ def expand_to(array, dimensions, pad=None):
     pull = np.expand_dims(array, tuple(range(missing)))
     around = [
         split_number(dimensions[dimension] - pull.shape[dimension])
-        for dimension in range(in_dimensions)]
+        for dimension in range(in_dimensions)
+    ]
     expand = np.pad(pull, around, **pad)
     return expand
-    
+
 
 def to_tensor(value):
     if isinstance(value, np.ndarray):
@@ -45,18 +46,13 @@ def expand_columns(rows, expanded_columns, dimensions, pad=None):
     first_row = rows[0]
     all_columns = list(first_row.keys())
     unexpanded_columns = set(all_columns) - set(expanded_columns)
-    collated = {
-        column: []
-        for column in all_columns}
+    collated = {column: [] for column in all_columns}
 
     for row in rows:
         for column in all_columns:
             value = row[column]
             if column in expanded_columns:
-                value = expand_to(
-                    value,
-                    dimensions,
-                    pad)
+                value = expand_to(value, dimensions, pad)
             tensor = to_tensor(value)
             collated[column].append(tensor)
 
@@ -66,11 +62,8 @@ def expand_columns(rows, expanded_columns, dimensions, pad=None):
     return collated
 
 
-class ExpandTo():
-    def __init__(
-            self,
-            dimensions,
-            pad=None):
+class ExpandTo:
+    def __init__(self, dimensions, pad=None):
         self.dimensions = dimensions
         self.pad = pad or {}
 
@@ -78,22 +71,12 @@ class ExpandTo():
         return expand_to(in_array, self.dimensions, self.pad)
 
 
-class ExpandColumns():
-    def __init__(
-            self,
-            columns,
-            dimensions,
-            pad=None):
+class ExpandColumns:
+    def __init__(self, columns, dimensions, pad=None):
         self.columns = columns
         self.dimensions = dimensions
         self.pad = pad or {}
 
-    def __call__(
-            self,
-            rows):
+    def __call__(self, rows):
 
-        return expand_columns(
-            rows,
-            self.columns,
-            self.dimensions,
-            self.pad)
+        return expand_columns(rows, self.columns, self.dimensions, self.pad)

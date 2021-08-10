@@ -17,6 +17,7 @@ from aicsfiles import FileManagementSystem
 
 log = logging.getLogger(__name__)
 
+
 def make_manifest_dataset(
     manifest: Union[Path, str],
     loaders: Dict,
@@ -42,10 +43,7 @@ def make_manifest_dataset(
 
     loaders = load_multiple(loaders)
 
-    return DataframeDataset(
-        dataframe=df,
-        loaders=loaders,
-        iloc=iloc)
+    return DataframeDataset(dataframe=df, loaders=loaders, iloc=iloc)
 
 
 class ManifestDatamodule(pl.LightningDataModule):
@@ -93,7 +91,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         drop_last: bool = False,
         metadata: Dict = {},
         subset_train: float = 1.0,
-        fms: bool = False
+        fms: bool = False,
     ):
 
         super().__init__()
@@ -108,11 +106,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         assert subset_train <= 1
 
         # To delete later, this is only to get length
-        dataset = make_manifest_dataset(
-            manifest,
-            loaders['train'],
-            columns,
-            fms)
+        dataset = make_manifest_dataset(manifest, loaders["train"], columns, fms)
         self.dataset = dataset
         self.length = len(dataset)
         indices = list(range(self.length))
@@ -126,31 +120,28 @@ class ManifestDatamodule(pl.LightningDataModule):
             split_names = dataframe[split_col].unique().tolist()
             assert set(split_names).issubset({"train", "validation", "test"})
 
-            index_mapping = {
-                'train': 'train',
-                'valid': 'validation',
-                'test': 'test'}
+            index_mapping = {"train": "train", "valid": "validation", "test": "test"}
             index = {}
             for mode, value in index_mapping.items():
                 index[mode] = dataframe.loc[
                     dataframe[split_col] == value
                 ].index.tolist()
         else:
-            index['train'] = indices
-            index['valid'] = [0] * self.batch_size
-            index['test'] = [0] * self.batch_size
+            index["train"] = indices
+            index["valid"] = [0] * self.batch_size
+            index["test"] = [0] * self.batch_size
 
         if subset_train < 1:
-            new_size = int(subset_train * len(index['train']))
+            new_size = int(subset_train * len(index["train"]))
 
             log.info(
                 f"Subsetting the training data by {100*subset_train:.2f}%, "
-                f"from {len(train_idx)} to {new_size}")
+                f"from {len(train_idx)} to {new_size}"
+            )
 
-            index['train'] = np.random.choice(
-                index['train'],
-                replace=False,
-                size=new_size)
+            index["train"] = np.random.choice(
+                index["train"], replace=False, size=new_size
+            )
 
         self.samplers = {}
         self.datasets = {}
@@ -158,11 +149,9 @@ class ManifestDatamodule(pl.LightningDataModule):
         for mode in index:
             self.samplers[mode] = SubsetRandomSampler(index[mode])
             self.datasets[mode] = make_manifest_dataset(
-                manifest,
-                loaders[mode],
-                columns,
-                fms)
-        
+                manifest, loaders[mode], columns, fms
+            )
+
     def make_dataloader(self, mode):
         return DataLoader(
             dataset=self.datasets[mode],
@@ -171,8 +160,8 @@ class ManifestDatamodule(pl.LightningDataModule):
             num_workers=self.num_workers,
             pin_memory=self.pin_memory,
             drop_last=self.drop_last,
-            multiprocessing_context=mp.get_context("fork")
-            )
+            multiprocessing_context=mp.get_context("fork"),
+        )
 
     def train_dataloader(self):
         return self.make_dataloader("train")
