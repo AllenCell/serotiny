@@ -31,9 +31,6 @@ jobs:
         pip install Cython
         pip install numpy
         pip install .[test]
-    - name: Download Test Data
-      run: |
-        python scripts/download_test_data.py --debug
     - name: Test with pytest
       run: |
         pytest --cov-report xml --cov=serotiny serotiny/tests/
