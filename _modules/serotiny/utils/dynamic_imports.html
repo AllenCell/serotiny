@@ -1,0 +1,384 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>serotiny.utils.dynamic_imports &mdash; serotiny 0.0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> serotiny
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#stable-release">Stable release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#from-sources">From sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Package modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../serotiny.html">serotiny package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../serotiny.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.datamodules.html">serotiny.datamodules package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.io.html">serotiny.io package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.losses.html">serotiny.losses package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.metrics.html">serotiny.metrics package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.models.html">serotiny.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.networks.html">serotiny.networks package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.transform.html">serotiny.transform package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.utils.html">serotiny.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../serotiny.html#module-serotiny">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../contributing.html#deploying">Deploying</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">serotiny</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../../serotiny.html">serotiny</a> &raquo;</li>
+        
+      <li>serotiny.utils.dynamic_imports</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for serotiny.utils.dynamic_imports</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+
+<span class="kn">import</span> <span class="nn">importlib</span>
+<span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">isfunction</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+
+<span class="n">INVOKE_KEY</span> <span class="o">=</span> <span class="s1">&#39;^invoke&#39;</span>
+<span class="n">BIND_KEY</span> <span class="o">=</span> <span class="s1">&#39;^bind&#39;</span>
+<span class="n">INIT_KEY</span> <span class="o">=</span> <span class="s1">&#39;^init&#39;</span>
+
+
+<span class="k">class</span> <span class="nc">_bind</span><span class="p">(</span><span class="n">partial</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An improved version of partial which accepts Ellipsis (...) as a placeholder</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">keywords</span><span class="p">):</span>
+        <span class="n">keywords</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="p">,</span> <span class="o">**</span><span class="n">keywords</span><span class="p">}</span>
+        <span class="n">iargs</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">iargs</span><span class="p">)</span> <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="o">...</span> <span class="k">else</span> <span class="n">arg</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">*</span><span class="n">iargs</span><span class="p">,</span> <span class="o">**</span><span class="n">keywords</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="module_get"><a class="viewcode-back" href="../../../serotiny.utils.html#serotiny.utils.dynamic_imports.module_get">[docs]</a><span class="k">def</span> <span class="nf">module_get</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">module</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Chosen </span><span class="si">{</span><span class="n">module</span><span class="si">}</span><span class="s2"> module </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2"> not available.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Available </span><span class="si">{</span><span class="n">module</span><span class="si">}</span><span class="s2">(s):</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">module</span><span class="o">.</span><span class="n">__all__</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">module</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="module_path"><a class="viewcode-back" href="../../../serotiny.utils.html#serotiny.utils.dynamic_imports.module_path">[docs]</a><span class="k">def</span> <span class="nf">module_path</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">module</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">down</span> <span class="o">=</span> <span class="n">module_get</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">module_path</span><span class="p">(</span><span class="n">down</span><span class="p">,</span> <span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span></div>
+
+
+<div class="viewcode-block" id="search_modules"><a class="viewcode-back" href="../../../serotiny.utils.html#serotiny.utils.dynamic_imports.search_modules">[docs]</a><span class="k">def</span> <span class="nf">search_modules</span><span class="p">(</span><span class="n">modules</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+    <span class="n">found</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="n">modules</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="n">module_path</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+            <span class="k">break</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="k">return</span> <span class="n">found</span></div>
+
+
+<div class="viewcode-block" id="get_name_from_path"><a class="viewcode-back" href="../../../serotiny.utils.html#serotiny.utils.dynamic_imports.get_name_from_path">[docs]</a><span class="k">def</span> <span class="nf">get_name_from_path</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a class/function/variable path as a string (e.g. some.module.ClassName),</span>
+<span class="sd">    retrieve the class/function/variable</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+    <span class="n">module</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module</span><span class="p">),</span> <span class="n">name</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="module_or_path"><a class="viewcode-back" href="../../../serotiny.utils.html#serotiny.utils.dynamic_imports.module_or_path">[docs]</a><span class="k">def</span> <span class="nf">module_or_path</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">module_get</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">get_name_from_path</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_name_and_arguments"><a class="viewcode-back" href="../../../serotiny.utils.html#serotiny.utils.dynamic_imports.get_name_and_arguments">[docs]</a><span class="k">def</span> <span class="nf">get_name_and_arguments</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">get_name_from_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">arguments</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="n">key</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">name</span><span class="p">,</span> <span class="n">arguments</span></div>
+
+
+
+<div class="viewcode-block" id="invoke"><a class="viewcode-back" href="../../../serotiny.utils.html#serotiny.utils.dynamic_imports.invoke">[docs]</a><span class="k">def</span> <span class="nf">invoke</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="n">to_invoke</span><span class="p">,</span> <span class="n">arguments</span> <span class="o">=</span> <span class="n">get_name_and_arguments</span><span class="p">(</span><span class="n">INVOKE_KEY</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">arguments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">arguments</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+    <span class="k">return</span> <span class="n">to_invoke</span><span class="p">(</span><span class="o">**</span><span class="n">arguments</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="init"><a class="viewcode-back" href="../../../serotiny.utils.html#serotiny.utils.dynamic_imports.init">[docs]</a><span class="k">def</span> <span class="nf">init</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="n">to_init</span><span class="p">,</span> <span class="n">arguments</span> <span class="o">=</span> <span class="n">get_name_and_arguments</span><span class="p">(</span><span class="n">INIT_KEY</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">to_init</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">to_init</span><span class="si">}</span><span class="s2"> to be a class, but it is &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">to_init</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">arguments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">arguments</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+    <span class="k">return</span> <span class="n">to_init</span><span class="p">(</span><span class="o">**</span><span class="n">arguments</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="bind"><a class="viewcode-back" href="../../../serotiny.utils.html#serotiny.utils.dynamic_imports.bind">[docs]</a><span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="n">to_bind</span><span class="p">,</span> <span class="n">arguments</span> <span class="o">=</span> <span class="n">get_name_and_arguments</span><span class="p">(</span><span class="n">BIND_KEY</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">arguments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">arguments</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+    <span class="k">return</span> <span class="n">_bind</span><span class="p">(</span><span class="n">to_bind</span><span class="p">,</span> <span class="o">**</span><span class="n">arguments</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="load_config"><a class="viewcode-back" href="../../../serotiny.utils.html#serotiny.utils.dynamic_imports.load_config">[docs]</a><span class="k">def</span> <span class="nf">load_config</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">BIND_KEY</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">bind</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">INIT_KEY</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">init</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">INVOKE_KEY</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">invoke</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;None of [</span><span class="si">{</span><span class="n">BIND_KEY</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">INVOKE_KEY</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">INIT_KEY</span><span class="si">}</span><span class="s2">] found &quot;</span>
+                       <span class="sa">f</span><span class="s2">&quot;in config.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="load_multiple"><a class="viewcode-back" href="../../../serotiny.utils.html#serotiny.utils.dynamic_imports.load_multiple">[docs]</a><span class="k">def</span> <span class="nf">load_multiple</span><span class="p">(</span><span class="n">configs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">configs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">key</span><span class="p">:</span> <span class="n">load_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">configs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+    <span class="k">elif</span> <span class="nb">iter</span><span class="p">(</span><span class="n">configs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">load_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">configs</span>
+        <span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;can only bind/invoke/init paths from a dict or an &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;iterable, not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">configs</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
