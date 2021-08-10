@@ -207,8 +207,6 @@
 <a class="reference external image-reference" href="https://AllenCellModeling.github.io/serotiny/"><img alt="Documentation" src="https://github.com/AllenCellModeling/serotiny/workflows/Documentation/badge.svg" /></a>
 <a class="reference external image-reference" href="https://codecov.io/gh/AllenCellModeling/serotiny"><img alt="Code Coverage" src="https://codecov.io/gh/AllenCellModeling/serotiny/branch/main/graph/badge.svg" /></a>
 <p>Library and commands for pytorch/lightning deep-learning workflows</p>
-<a class="reference external image-reference" href="https://github.com/AllenCellModeling/serotiny/blob/master/resources/serotiny.png"><img alt="SEROTINY" src="https://github.com/AllenCellModeling/serotiny/blob/master/resources/serotiny.png" /></a>
-<p>Serotiny (n) - when fire triggers the release of a seed</p>
 <hr class="docutils" />
 <p>Serotiny is essentially two things:</p>
 <ul class="simple">
@@ -226,7 +224,8 @@
 <li><p>Apply one-hot encoding to class labels</p></li>
 <li><p>Change resolution of input images</p></li>
 <li><p>Apply 2D projections for 3D input images</p></li>
-<li><p>Train classifier and autoencoder models</p></li>
+<li><p>Filter data down to specified columns</p></li>
+<li><p>Train models</p></li>
 </ul>
 </li>
 </ul>
@@ -236,8 +235,34 @@
 <p><strong>Stable Release:</strong> <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">serotiny</span></code><span class="raw-html-m2r"><br></span>
 <strong>Development Head:</strong> <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">git+https://github.com/AllenCellModeling/serotiny.git</span></code></p>
 </section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<p>For full package documentation please visit <a class="reference external" href="https://AllenCellModeling.github.io/serotiny">AllenCellModeling.github.io/serotiny</a>.</p>
+</section>
 <section id="quick-start">
 <h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<section id="to-load-a-trained-model">
+<h3>To load a trained model:<a class="headerlink" href="#to-load-a-trained-model" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">serotiny.models.zoo</span> <span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">get_trainer_at_checkpoint</span><span class="p">,</span> <span class="n">_get_checkpoint</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">model_zoo_path</span><span class="p">)</span>
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">get_trainer_at_checkpoint</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">model_zoo_path</span><span class="p">)</span>
+<span class="n">ckpt_path</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">config</span>  <span class="o">=</span> <span class="n">_get_checkpoint</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">model_zoo_path</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="to-setup-a-datamodule-given-the-config-from-a-trained-model">
+<h3>To setup a datamodule given the config from a trained model:<a class="headerlink" href="#to-setup-a-datamodule-given-the-config-from-a-trained-model" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">datamodule_name</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;datamodule&quot;</span><span class="p">][</span><span class="s1">&#39;^init&#39;</span><span class="p">]</span>
+<span class="n">datamodule_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;datamodule&quot;</span><span class="p">]</span>
+<span class="n">create_datamodule</span> <span class="o">=</span> <span class="n">module_get</span><span class="p">(</span><span class="n">datamodules</span><span class="p">,</span> <span class="n">datamodule_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">datamodule_config</span><span class="p">[</span><span class="s2">&quot;num_workers&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">datamodule_config</span><span class="p">[</span><span class="s2">&quot;pin_memory&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">datamodule_config</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;^init&#39;</span><span class="p">)</span>
+<span class="n">datamodule</span> <span class="o">=</span> <span class="n">create_datamodule</span><span class="p">(</span><span class="o">**</span><span class="n">datamodule_config</span><span class="p">)</span>
+<span class="n">datamodule</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+</pre></div>
+</div>
 <!-- ### To change the resolution of input images:
 
 ```python
@@ -286,13 +311,12 @@ python -m serotiny.steps.train_model \
     --x_label 'projection_image' \
     --y_label 'ChosenMitoticClass'
 ``` --></section>
-<section id="documentation">
-<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
-<p>For full package documentation please visit <a class="reference external" href="https://AllenCellModeling.github.io/serotiny">AllenCellModeling.github.io/serotiny</a>.</p>
 </section>
 <section id="development">
 <h2>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
 <p>See <a class="reference external" href="CONTRIBUTING.md">CONTRIBUTING.md</a> for information related to developing the code.</p>
+<a class="reference external image-reference" href="https://github.com/AllenCellModeling/serotiny/blob/master/resources/serotiny.png"><img alt="SEROTINY" src="https://github.com/AllenCellModeling/serotiny/blob/master/resources/serotiny.png" /></a>
+<p>Serotiny (n) - when fire triggers the release of a seed</p>
 <p><strong>MIT license</strong></p>
 </section>
 </section>
