@@ -134,11 +134,6 @@ class ManifestDatamodule(pl.LightningDataModule):
         if subset_train < 1:
             new_size = int(subset_train * len(index["train"]))
 
-            log.info(
-                f"Subsetting the training data by {100*subset_train:.2f}%, "
-                f"from {len(train_idx)} to {new_size}"
-            )
-
             index["train"] = np.random.choice(
                 index["train"], replace=False, size=new_size
             )

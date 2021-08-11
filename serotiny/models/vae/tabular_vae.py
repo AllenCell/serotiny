@@ -1,4 +1,4 @@
-from typing import Callable, Union, Optional, Sequence
+from typing import Union, Optional, Sequence
 
 import torch
 import numpy as np
@@ -7,6 +7,7 @@ from serotiny.networks.mlp import MLP
 from .base_vae import BaseVAE
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]
+
 
 class TabularVAE(BaseVAE):
     def __init__(

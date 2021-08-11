@@ -1,9 +1,4 @@
-from collections.abc import Iterable
-
-import numpy as np
-
 from torch.utils.data import Dataset
-from torch.utils.data.dataloader import default_collate as collate
 
 
 class DataframeDataset(Dataset):

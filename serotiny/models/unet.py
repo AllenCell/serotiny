@@ -21,7 +21,7 @@ from pytorch_lightning.utilities.parsing import get_init_args
 
 from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
 
-from serotiny.models._utils import index_to_onehot, find_optimizer
+from serotiny.models._utils import find_optimizer
 from serotiny.utils import get_name_from_path
 
 
@@ -67,7 +67,8 @@ class UnetModel(pl.LightningModule):
         input_dims: Sequence[int]
             Dimensions of the input images
         auto_padding: bool = False
-            Whether to apply padding to ensure images from down double conv match up double conv
+            Whether to apply padding to ensure images from down double conv
+            match up double conv
         """
         super().__init__()
 
@@ -161,17 +162,14 @@ class UnetModel(pl.LightningModule):
                     new_size = orig_size
                     next_size = orig_size
 
-                # print(f'{current_depth}: orig_size = {orig_size}, new_size = {new_size}, next_size = {next_size}')
-
             # Calculate the new input image size given the padding, and save the padding
-            # for all the dimensions in a format that is taken by F.pad() (which goes in the
+            # for all the dimensions in a format that is taken by F.pad()
+            # (which goes in the
             # reverse order as the input dimensions)
             new_input_size = new_size * (channel_fan ** depth)
             padding = new_input_size - input_size
             padding_left = padding // 2
             padding_right = padding - padding_left
-
-            # print(f'input_size = {input_size}, new_input_size = {new_input_size}, padding = {padding_left, padding_right}')
 
             input_paddings.insert(0, padding_right)
             input_paddings.insert(0, padding_left)
@@ -188,7 +186,10 @@ class UnetModel(pl.LightningModule):
             # print(f'self.network.channel_fan = {self.network.channel_fan}')
             # print(f'self.input_dims = {self.input_dims}')
 
-            # padding = self.get_unet_padding(list(self.input_dims), self.network.depth, self.network.channel_fan)
+            # padding = self.get_unet_padding(
+            # list(self.input_dims), self.network.depth,
+            # self.network.channel_fan
+            # )
             # print(f'auto_padding = {padding}')
 
             # We need to pad both x and y, otherwise, they will have different sizes.
@@ -286,7 +287,8 @@ class UnetModel(pl.LightningModule):
                         data=y_slice,
                         channel_names=self.output_channels,
                         dimension_order="STCZYX",
-                    )  # TODO: Maybe change this to CZYX since we don't have S and T? Caleb
+                    )  # TODO: Maybe change this to 
+                    # CZYX since we don't have S and T? Caleb
 
         return {
             "test_loss": loss,

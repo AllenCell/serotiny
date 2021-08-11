@@ -1,12 +1,11 @@
 from collections import deque
 from typing import List, Sequence, Union
-import collections.abc
 import logging
 
 from tqdm import tqdm
 import numpy as np
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 
 logger = logging.getLogger(__name__)
 ArrayLike = Union[np.ndarray, torch.Tensor]

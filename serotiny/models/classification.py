@@ -12,7 +12,6 @@ import numpy as np
 import torch
 from torch import nn
 from torch.nn import functional as F
-import torch.optim as opt
 
 import pytorch_lightning as pl
 

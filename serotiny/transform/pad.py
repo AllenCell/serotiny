@@ -45,7 +45,6 @@ def expand_columns(rows, expanded_columns, dimensions, pad=None):
 
     first_row = rows[0]
     all_columns = list(first_row.keys())
-    unexpanded_columns = set(all_columns) - set(expanded_columns)
     collated = {column: [] for column in all_columns}
 
     for row in rows:

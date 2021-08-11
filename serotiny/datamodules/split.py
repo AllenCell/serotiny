@@ -1,14 +1,11 @@
 import re
 import logging
-from typing import Union, Optional, Dict
+from typing import Union, Dict
 from pathlib import Path
 
 import multiprocessing as mp
-import numpy as np
-import pandas as pd
 import pytorch_lightning as pl
 
-from torch.utils.data.sampler import SubsetRandomSampler
 from torch.utils.data import DataLoader
 
 from serotiny.io.dataframe import DataframeDataset, load_csv

@@ -1,7 +1,5 @@
-from typing import Dict
 
 import importlib
-from inspect import isfunction
 from functools import partial
 
 INVOKE_KEY = "^invoke"

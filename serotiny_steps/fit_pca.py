@@ -1,6 +1,3 @@
-import logging
-from typing import Optional, List
-
 import fire
 
 import joblib

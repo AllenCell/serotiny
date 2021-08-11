@@ -56,12 +56,15 @@ class BaseVAE(pl.LightningModule):
                     String label used to retrieve X from the batches
                 recon_loss: Loss
                     Loss to be used for reconstruction. Can be a PyTorch loss or a class
-                    that respects the same interface, i.e. subclasses torch.nn.modules._Loss
+                    that respects the same interface,
+                    i.e. subclasses torch.nn.modules._Loss
                 prior_mode: str
-                    String to determine which type of prior to use. (Only "isotropic" and
+                    String to determine which type of prior to use.
+                    (Only "isotropic" and
                     "anisotropic" currently supported)
                 prior_logvar: Optional[Array]
-                    Array of values to be used as either the fixed value or initialization
+                    Array of values to be used as either the fixed value or
+                    initialization
                     value for the diagonal of the prior covariance matrix
                 learn_prior_logvar: bool
                     Boolean flag to determine whether to learn the prior log-variances
@@ -182,7 +185,7 @@ class BaseVAE(pl.LightningModule):
             recon_loss,
             kld_loss,
             rcl_per_input_dimension,
-            kld_per_latent_dimension,
+            kld_per_lt_dimension,
         ) = self.forward(x, **forward_kwargs)
 
         self.log(f"{stage} reconstruction loss", recon_loss, logger=logger)
@@ -201,7 +204,7 @@ class BaseVAE(pl.LightningModule):
             results.update(
                 {
                     "mu": mu.detach(),
-                    "kld_per_latent_dimension": kld_per_latent_dimension.detach().float(),
+                    "kld_per_latent_dimension": kld_per_lt_dimension.detach().float(),
                     "rcl_per_input_dimension": rcl_per_input_dimension.detach().float(),
                 }
             )

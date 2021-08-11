@@ -7,9 +7,9 @@ class NormalizeAbsolute:
         self.order = order
 
     def __call__(self, a):
-        l2 = np.atleast_1d(np.linalg.norm(a, order, axis))
+        l2 = np.atleast_1d(np.linalg.norm(a, self.order, self.axis))
         l2[l2 == 0] = 1
-        return a / np.expand_dims(l2, axis)
+        return a / np.expand_dims(l2, self.axis)
 
 
 class NormalizeMean:

@@ -1,7 +1,6 @@
 from typing import Sequence
 
 import math
-import numpy as np
 import torch
 import torch.nn.functional as F
 from aicsimageprocessing.resize import resize_to, resize
@@ -28,7 +27,7 @@ class ResizeBy:
             n_dims = len(img.shape[1:])
             factor = (1, *(n_dims * [self.factor]))
         else:
-            raise TypeError(f"Unexpected factor, of type {type(factor)}")
+            raise TypeError("Unexpected factor")
 
         return resize(img, factor, self.method)
 

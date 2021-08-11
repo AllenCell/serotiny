@@ -1,4 +1,4 @@
-from typing import Union, Optional, Sequence, Dict
+from typing import Union, Sequence, Dict
 import logging
 
 import numpy as np

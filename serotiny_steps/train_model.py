@@ -20,7 +20,7 @@ def _get_kwargs():
     keys, _, _, values = inspect.getargvalues(frame)
     kwargs = {}
     for key in keys:
-        if key != 'self':
+        if key != "self":
             kwargs[key] = values[key]
     return kwargs
 
@@ -33,7 +33,7 @@ def train_model(
     loggers: List[Dict] = [],
     callbacks: List[Dict] = [],
     gpu_ids: List[int] = [0],
-    version_string: str = 'zero',
+    version_string: str = "zero",
     seed: int = 42,
     metadata: Dict = {},
 ):
@@ -49,15 +49,15 @@ def train_model(
     callbacks_config = callbacks
 
     model_zoo_path = model_zoo_config.get("path")
-    model_name = model_config.get(INIT_KEY, 'UNDEFINED_MODEL_NAME')
-    datamodule_name = datamodule_config.get(INIT_KEY, 'UNDEFINED_DATAMODULE_NAME')
+    model_name = model_config.get(INIT_KEY, "UNDEFINED_MODEL_NAME")
+    datamodule_name = datamodule_config.get(INIT_KEY, "UNDEFINED_DATAMODULE_NAME")
 
     store_metadata(called_args, model_name, version_string, model_zoo_path)
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
     os.environ["CUDA_VISIBLE_DEVICES"] = ",".join([str(id) for id in gpu_ids])
     num_gpus = len(gpu_ids)
-    num_gpus = (num_gpus if num_gpus != 0 else None)
+    num_gpus = num_gpus if num_gpus != 0 else None
 
     model = init(model_config)
 
@@ -71,14 +71,9 @@ def train_model(
 
     loggers = load_multiple(loggers_config)
 
-
     if len(model_zoo) > 0:
-        model_path = build_model_path(
-            model_zoo_path,
-            (model_name, version_string))
-        config = {
-            'dirpath': model_path,
-            'filename': "epoch-{epoch:02d}"}
+        model_path = build_model_path(model_zoo_path, (model_name, version_string))
+        config = {"dirpath": model_path, "filename": "epoch-{epoch:02d}"}
         checkpoint_config = model_zoo_config.get("checkpoint", {})
         config.update(checkpoint_config)
         checkpoint_callback = ModelCheckpoint(**config)
@@ -86,7 +81,7 @@ def train_model(
         checkpoint_callback = None
 
     if checkpoint_callback:
-        trainer_config['checkpoint_callback'] = checkpoint_callback
+        trainer_config["checkpoint_callback"] = checkpoint_callback
 
     callbacks = load_multiple(callbacks_config)
     callbacks.append(checkpoint_callback)
@@ -99,14 +94,8 @@ def train_model(
     )
 
     log.info("Calling trainer.fit")
-    trainer.fit(
-        model,
-        datamodule
-    )
-    trainer.test(
-        datamodule=datamodule,
-        ckpt_path=None
-    )
+    trainer.fit(model, datamodule)
+    trainer.test(datamodule=datamodule, ckpt_path=None)
 
 
 if __name__ == "__main__":

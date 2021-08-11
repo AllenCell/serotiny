@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 # from aicsfiles import FileManagementSystem
 
 from serotiny.io.image import png_loader
