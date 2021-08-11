@@ -189,11 +189,10 @@
             
   <h1>Source code for serotiny.io.dataframe.split</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
 
-<span class="n">DEFAULT_RATIOS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;train&#39;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>
-    <span class="s1">&#39;test&#39;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
-    <span class="s1">&#39;valid&#39;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">}</span>
+<span class="n">DEFAULT_RATIOS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s2">&quot;valid&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">}</span>
+
 
 <div class="viewcode-block" id="split_dataset"><a class="viewcode-back" href="../../../../serotiny.io.dataframe.html#serotiny.io.dataframe.split.split_dataset">[docs]</a><span class="k">def</span> <span class="nf">split_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">ratios</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">ratios</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>

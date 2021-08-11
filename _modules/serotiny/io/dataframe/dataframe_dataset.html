@@ -188,12 +188,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for serotiny.io.dataframe.dataframe_dataset</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
-
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data.dataloader</span> <span class="kn">import</span> <span class="n">default_collate</span> <span class="k">as</span> <span class="n">collate</span>
+<span></span><span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
 
 
 <div class="viewcode-block" id="DataframeDataset"><a class="viewcode-back" href="../../../../serotiny.io.dataframe.html#serotiny.io.dataframe.dataframe_dataset.DataframeDataset">[docs]</a><span class="k">class</span> <span class="nc">DataframeDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
@@ -229,9 +224,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="n">key</span><span class="p">:</span> <span class="n">loader</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">loader</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaders</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-        <span class="p">}</span></div>
+        <span class="k">return</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">loader</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">loader</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaders</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span></div>
 </pre></div>
 
            </div>

@@ -194,9 +194,9 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
+
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;lightning&quot;</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -208,6 +208,7 @@
 <span class="kn">from</span> <span class="nn">.base_vae</span> <span class="kn">import</span> <span class="n">BaseVAE</span>
 
 <span class="n">Array</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">]</span>
+
 
 <div class="viewcode-block" id="ConditionalVAE"><a class="viewcode-back" href="../../../../serotiny.models.vae.html#serotiny.models.vae.conditional_vae.ConditionalVAE">[docs]</a><span class="k">class</span> <span class="nc">ConditionalVAE</span><span class="p">(</span><span class="n">BaseVAE</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -265,13 +266,22 @@
 <span class="sd">            Boolean flag to determine whether to learn the prior log-variances</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">latent_dim</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">lr</span><span class="p">,</span>
-                         <span class="n">beta</span><span class="p">,</span> <span class="n">x_label</span><span class="p">,</span> <span class="n">recon_loss</span><span class="p">,</span>
-                         <span class="n">prior_mode</span><span class="p">,</span> <span class="n">prior_logvar</span><span class="p">,</span> <span class="n">learn_prior_logvar</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">encoder</span><span class="p">,</span>
+            <span class="n">decoder</span><span class="p">,</span>
+            <span class="n">latent_dim</span><span class="p">,</span>
+            <span class="n">optimizer</span><span class="p">,</span>
+            <span class="n">lr</span><span class="p">,</span>
+            <span class="n">beta</span><span class="p">,</span>
+            <span class="n">x_label</span><span class="p">,</span>
+            <span class="n">recon_loss</span><span class="p">,</span>
+            <span class="n">prior_mode</span><span class="p">,</span>
+            <span class="n">prior_logvar</span><span class="p">,</span>
+            <span class="n">learn_prior_logvar</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">condition_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;channel&quot;</span><span class="p">,</span> <span class="s2">&quot;label&quot;</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`condition_mode` should be &quot;</span>
-                             <span class="s2">&quot;either &#39;channel&#39; or &#39;label&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`condition_mode` should be &quot;</span> <span class="s2">&quot;either &#39;channel&#39; or &#39;label&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">c_label</span> <span class="o">=</span> <span class="n">c_label</span>
         <span class="k">if</span> <span class="n">condition_mode</span> <span class="o">==</span> <span class="s2">&quot;channel&quot;</span><span class="p">:</span>
@@ -288,8 +298,9 @@
             <span class="n">condition</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">c_label</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">x_label</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
-            <span class="n">x_channels</span> <span class="o">=</span> <span class="p">[</span><span class="n">channel</span> <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-                          <span class="k">if</span> <span class="n">channel</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_label</span><span class="p">]</span>
+            <span class="n">x_channels</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">channel</span> <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">if</span> <span class="n">channel</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_label</span>
+            <span class="p">]</span>
 
             <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="n">x_channels</span><span class="p">]</span>
             <span class="n">condition</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_label</span><span class="p">]</span>

@@ -4,8 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Welcome to serotiny’s documentation! &mdash; serotiny 0.0.1 documentation</title>
@@ -196,12 +195,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="welcome-to-serotiny-s-documentation">
+  <div class="section" id="welcome-to-serotiny-s-documentation">
 <h1>Welcome to serotiny’s documentation!<a class="headerlink" href="#welcome-to-serotiny-s-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-</section>
-<section id="serotiny">
+</div>
+<div class="section" id="serotiny">
 <h1>serotiny<a class="headerlink" href="#serotiny" title="Permalink to this headline">¶</a></h1>
 <a class="reference external image-reference" href="https://github.com/AllenCellModeling/serotiny/actions"><img alt="Build Status" src="https://github.com/AllenCellModeling/serotiny/workflows/Build%20Main/badge.svg" /></a>
 <a class="reference external image-reference" href="https://AllenCellModeling.github.io/serotiny/"><img alt="Documentation" src="https://github.com/AllenCellModeling/serotiny/workflows/Documentation/badge.svg" /></a>
@@ -214,7 +213,7 @@
 <li><p>A set of commands built out of this functionality that are intended to be invoked in deep-learning workflows.</p></li>
 </ul>
 <p>The deep-learning functionality is built on <a class="reference external" href="https://github.com/pytorch/pytorch">pytorch</a> and <a class="reference external" href="https://github.com/PyTorchLightning/pytorch-lightning">pytorch-lightning</a>.</p>
-<section id="features">
+<div class="section" id="features">
 <h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Provides an array of commonly-used functionality for pytorch/pytorch-lightning based deep learning tasks and associated data processing tasks.</p></li>
@@ -229,19 +228,19 @@
 </ul>
 </li>
 </ul>
-</section>
-<section id="installation">
+</div>
+<div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p><strong>Stable Release:</strong> <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">serotiny</span></code><span class="raw-html-m2r"><br></span>
 <strong>Development Head:</strong> <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">git+https://github.com/AllenCellModeling/serotiny.git</span></code></p>
-</section>
-<section id="documentation">
+</div>
+<div class="section" id="documentation">
 <h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
 <p>For full package documentation please visit <a class="reference external" href="https://AllenCellModeling.github.io/serotiny">AllenCellModeling.github.io/serotiny</a>.</p>
-</section>
-<section id="quick-start">
+</div>
+<div class="section" id="quick-start">
 <h2>Quick Start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
-<section id="to-load-a-trained-model">
+<div class="section" id="to-load-a-trained-model">
 <h3>To load a trained model:<a class="headerlink" href="#to-load-a-trained-model" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">serotiny.models.zoo</span> <span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">get_trainer_at_checkpoint</span><span class="p">,</span> <span class="n">_get_checkpoint</span>
 
@@ -250,8 +249,8 @@
 <span class="n">ckpt_path</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">config</span>  <span class="o">=</span> <span class="n">_get_checkpoint</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">model_zoo_path</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="to-setup-a-datamodule-given-the-config-from-a-trained-model">
+</div>
+<div class="section" id="to-setup-a-datamodule-given-the-config-from-a-trained-model">
 <h3>To setup a datamodule given the config from a trained model:<a class="headerlink" href="#to-setup-a-datamodule-given-the-config-from-a-trained-model" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">datamodule_name</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;datamodule&quot;</span><span class="p">][</span><span class="s1">&#39;^init&#39;</span><span class="p">]</span>
 <span class="n">datamodule_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;datamodule&quot;</span><span class="p">]</span>
@@ -261,6 +260,26 @@
 <span class="n">datamodule_config</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;^init&#39;</span><span class="p">)</span>
 <span class="n">datamodule</span> <span class="o">=</span> <span class="n">create_datamodule</span><span class="p">(</span><span class="o">**</span><span class="n">datamodule_config</span><span class="p">)</span>
 <span class="n">datamodule</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="to-restart-training-testing">
+<h3>To restart training/testing<a class="headerlink" href="#to-restart-training-testing" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">datamodule</span> <span class="o">=</span> <span class="n">datamodule</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">loggers</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">test_dataloaders</span> <span class="o">=</span> <span class="p">[</span><span class="n">datamodule</span><span class="o">.</span><span class="n">test_dataloader</span><span class="p">()]</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">train_dataloader</span> <span class="o">=</span> <span class="n">datamodule</span><span class="o">.</span><span class="n">train_dataloader</span><span class="p">()</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">val_dataloaders</span> <span class="o">=</span> <span class="p">[</span><span class="n">datamodule</span><span class="o">.</span><span class="n">val_dataloader</span><span class="p">()]</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="to-run-a-callback-after-testing">
+<h3>To run a callback after testing<a class="headerlink" href="#to-run-a-callback-after-testing" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">callback</span> <span class="o">=</span> <span class="n">CustomCallback</span><span class="p">()</span>
+<span class="n">callback</span><span class="o">.</span><span class="n">on_test_epoch_end</span><span class="p">(</span><span class="n">trainer</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
 </pre></div>
 </div>
 <!-- ### To change the resolution of input images:
@@ -310,24 +329,24 @@ python -m serotiny.steps.train_model \
     --test True \
     --x_label 'projection_image' \
     --y_label 'ChosenMitoticClass'
-``` --></section>
-</section>
-<section id="development">
+``` --></div>
+</div>
+<div class="section" id="development">
 <h2>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
 <p>See <a class="reference external" href="CONTRIBUTING.md">CONTRIBUTING.md</a> for information related to developing the code.</p>
 <a class="reference external image-reference" href="https://github.com/AllenCellModeling/serotiny/blob/master/resources/serotiny.png"><img alt="SEROTINY" src="https://github.com/AllenCellModeling/serotiny/blob/master/resources/serotiny.png" /></a>
 <p>Serotiny (n) - when fire triggers the release of a seed</p>
 <p><strong>MIT license</strong></p>
-</section>
-</section>
-<section id="indices-and-tables">
+</div>
+</div>
+<div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
-</section>
+</div>
 
 
            </div>

@@ -4,8 +4,7 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>serotiny.networks.vae package &mdash; serotiny 0.0.1 documentation</title>
@@ -205,12 +204,12 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="serotiny-networks-vae-package">
+  <div class="section" id="serotiny-networks-vae-package">
 <h1>serotiny.networks.vae package<a class="headerlink" href="#serotiny-networks-vae-package" title="Permalink to this headline">¶</a></h1>
-<section id="submodules">
+<div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</section>
-<section id="module-serotiny.networks.vae.cbvae_decoder_mlp">
+</div>
+<div class="section" id="module-serotiny.networks.vae.cbvae_decoder_mlp">
 <span id="serotiny-networks-vae-cbvae-decoder-mlp-module"></span><h2>serotiny.networks.vae.cbvae_decoder_mlp module<a class="headerlink" href="#module-serotiny.networks.vae.cbvae_decoder_mlp" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="serotiny.networks.vae.cbvae_decoder_mlp.CBVAEDecoderMLP">
@@ -243,47 +242,8 @@ registered hooks while the latter silently ignores them.</p>
 
 </dd></dl>
 
-</section>
-<section id="module-serotiny.networks.vae.cbvae_encoder_conv">
-<span id="serotiny-networks-vae-cbvae-encoder-conv-module"></span><h2>serotiny.networks.vae.cbvae_encoder_conv module<a class="headerlink" href="#module-serotiny.networks.vae.cbvae_encoder_conv" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="serotiny.networks.vae.cbvae_encoder_conv.CBVAEEncoderMLP">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.networks.vae.cbvae_encoder_conv.</span></span><span class="sig-name descname"><span class="pre">CBVAEEncoderMLP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">295</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_dim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_layers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[256,</span> <span class="pre">256,</span> <span class="pre">256,</span> <span class="pre">256]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/networks/vae/cbvae_encoder_conv.html#CBVAEEncoderMLP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.networks.vae.cbvae_encoder_conv.CBVAEEncoderMLP" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
-<p>Initializes internal Module state, shared by both nn.Module and ScriptModule.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="serotiny.networks.vae.cbvae_encoder_conv.CBVAEEncoderMLP.encoder">
-<span class="sig-name descname"><span class="pre">encoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/networks/vae/cbvae_encoder_conv.html#CBVAEEncoderMLP.encoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.networks.vae.cbvae_encoder_conv.CBVAEEncoderMLP.encoder" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="serotiny.networks.vae.cbvae_encoder_conv.CBVAEEncoderMLP.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/networks/vae/cbvae_encoder_conv.html#CBVAEEncoderMLP.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.networks.vae.cbvae_encoder_conv.CBVAEEncoderMLP.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Defines the computation performed at every call.</p>
-<p>Should be overridden by all subclasses.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Although the recipe for forward pass needs to be defined within
-this function, one should call the <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code> instance afterwards
-instead of this since the former takes care of running the
-registered hooks while the latter silently ignores them.</p>
 </div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="serotiny.networks.vae.cbvae_encoder_conv.CBVAEEncoderMLP.sampling">
-<span class="sig-name descname"><span class="pre">sampling</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_var</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/networks/vae/cbvae_encoder_conv.html#CBVAEEncoderMLP.sampling"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.networks.vae.cbvae_encoder_conv.CBVAEEncoderMLP.sampling" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="serotiny.networks.vae.cbvae_encoder_conv.CBVAEEncoderMLP.training">
-<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.networks.vae.cbvae_encoder_conv.CBVAEEncoderMLP.training" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</section>
-<section id="module-serotiny.networks.vae.cbvae_encoder_mlp">
+<div class="section" id="module-serotiny.networks.vae.cbvae_encoder_mlp">
 <span id="serotiny-networks-vae-cbvae-encoder-mlp-module"></span><h2>serotiny.networks.vae.cbvae_encoder_mlp module<a class="headerlink" href="#module-serotiny.networks.vae.cbvae_encoder_mlp" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="serotiny.networks.vae.cbvae_encoder_mlp.CBVAEEncoderMLP">
@@ -321,8 +281,8 @@ registered hooks while the latter silently ignores them.</p>
 
 </dd></dl>
 
-</section>
-<section id="module-serotiny.networks.vae">
+</div>
+<div class="section" id="module-serotiny.networks.vae">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-serotiny.networks.vae" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="serotiny.networks.vae.CBVAEDecoderMLP">
@@ -391,8 +351,8 @@ registered hooks while the latter silently ignores them.</p>
 
 </dd></dl>
 
-</section>
-</section>
+</div>
+</div>
 
 
            </div>

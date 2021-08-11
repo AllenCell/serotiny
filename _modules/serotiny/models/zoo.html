@@ -211,6 +211,7 @@
 
     <span class="k">return</span> <span class="n">model_root</span></div>
 
+
 <span class="k">def</span> <span class="nf">_get_checkpoint</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">model_root</span><span class="p">):</span>
     <span class="n">model_root</span> <span class="o">=</span> <span class="n">get_root</span><span class="p">(</span><span class="n">model_root</span><span class="p">)</span>
 
@@ -239,10 +240,8 @@
 
 
 <div class="viewcode-block" id="get_trainer_at_checkpoint"><a class="viewcode-back" href="../../../serotiny.models.html#serotiny.models.zoo.get_trainer_at_checkpoint">[docs]</a><span class="k">def</span> <span class="nf">get_trainer_at_checkpoint</span><span class="p">(</span>
-        <span class="n">model_path</span><span class="p">,</span>
-        <span class="n">model_root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">reload_callbacks</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">reload_loggers</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">model_path</span><span class="p">,</span> <span class="n">model_root</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reload_callbacks</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">reload_loggers</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">):</span>
 
     <span class="n">ckpt_path</span><span class="p">,</span> <span class="n">model_class_name</span><span class="p">,</span> <span class="n">config</span> <span class="o">=</span> <span class="n">_get_checkpoint</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">model_root</span><span class="p">)</span>
 
@@ -251,24 +250,25 @@
     <span class="n">model_zoo_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;model_zoo&quot;</span><span class="p">]</span>
     <span class="n">checkpoint_callback</span> <span class="o">=</span> <span class="n">get_checkpoint_callback</span><span class="p">(</span>
         <span class="n">model_class_name</span><span class="p">,</span>
-        <span class="n">model_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.ckpt&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
-        <span class="n">model_zoo_config</span><span class="p">[</span><span class="s1">&#39;checkpoint&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;monitor&quot;</span><span class="p">),</span>
-        <span class="n">model_zoo_config</span><span class="p">[</span><span class="s1">&#39;checkpoint&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mode&quot;</span><span class="p">),</span>
+        <span class="n">model_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.ckpt&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="n">model_zoo_config</span><span class="p">[</span><span class="s2">&quot;checkpoint&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;monitor&quot;</span><span class="p">),</span>
+        <span class="n">model_zoo_config</span><span class="p">[</span><span class="s2">&quot;checkpoint&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mode&quot;</span><span class="p">),</span>
         <span class="n">model_root</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">checkpoint_callback</span><span class="o">.</span><span class="n">best_model_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ckpt_path</span><span class="p">)</span>
-    <span class="n">loggers</span> <span class="o">=</span> <span class="p">(</span><span class="n">load_multiple</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;loggers&quot;</span><span class="p">])</span>
-               <span class="k">if</span> <span class="n">reload_loggers</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">loggers</span> <span class="o">=</span> <span class="n">load_multiple</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;loggers&quot;</span><span class="p">])</span> <span class="k">if</span> <span class="n">reload_loggers</span> <span class="k">else</span> <span class="kc">None</span>
 
     <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">checkpoint_callback</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">reload_callbacks</span><span class="p">:</span>
         <span class="n">callbacks</span> <span class="o">+=</span> <span class="n">load_multiple</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;callbacks&quot;</span><span class="p">])</span>
 
-    <span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="o">=</span><span class="n">ckpt_path</span><span class="p">,</span>
-                      <span class="o">**</span><span class="n">trainer_config</span><span class="p">,</span>
-                      <span class="n">callbacks</span><span class="o">=</span><span class="n">callbacks</span><span class="p">,</span>
-                      <span class="n">logger</span><span class="o">=</span><span class="n">loggers</span><span class="p">)</span>
+    <span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span>
+        <span class="n">resume_from_checkpoint</span><span class="o">=</span><span class="n">ckpt_path</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">trainer_config</span><span class="p">,</span>
+        <span class="n">callbacks</span><span class="o">=</span><span class="n">callbacks</span><span class="p">,</span>
+        <span class="n">logger</span><span class="o">=</span><span class="n">loggers</span>
+    <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">trainer</span></div>
 
@@ -304,11 +304,8 @@
 
 
 <div class="viewcode-block" id="get_checkpoint_callback"><a class="viewcode-back" href="../../../serotiny.models.html#serotiny.models.zoo.get_checkpoint_callback">[docs]</a><span class="k">def</span> <span class="nf">get_checkpoint_callback</span><span class="p">(</span>
-        <span class="n">model_class</span><span class="p">,</span>
-        <span class="n">model_id</span><span class="p">,</span>
-        <span class="n">checkpoint_monitor</span><span class="p">,</span>
-        <span class="n">checkpoint_mode</span><span class="p">,</span>
-        <span class="n">model_root</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">model_class</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">checkpoint_monitor</span><span class="p">,</span> <span class="n">checkpoint_mode</span><span class="p">,</span> <span class="n">model_root</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">):</span>
 
     <span class="n">model_path</span> <span class="o">=</span> <span class="n">build_model_path</span><span class="p">(</span><span class="n">model_root</span><span class="p">,</span> <span class="p">(</span><span class="n">model_class</span><span class="p">,</span> <span class="n">model_id</span><span class="p">))</span>
 
@@ -316,17 +313,19 @@
         <span class="n">monitor</span><span class="o">=</span><span class="n">checkpoint_monitor</span><span class="p">,</span>
         <span class="n">mode</span><span class="o">=</span><span class="n">checkpoint_mode</span><span class="p">,</span>
         <span class="n">dirpath</span><span class="o">=</span><span class="n">model_path</span><span class="p">,</span>
-        <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;epoch</span><span class="si">{epoch:02d}</span><span class="s2">&quot;</span>
+        <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;epoch</span><span class="si">{epoch:02d}</span><span class="s2">&quot;</span><span class="p">,</span>
     <span class="p">)</span></div>
+
 
 <span class="k">def</span> <span class="nf">_normalize_dict</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
     <span class="n">_new_d</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="n">_new_d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">_normalize_dict</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">_new_d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
     <span class="k">return</span> <span class="n">_new_d</span>
+
 
 <div class="viewcode-block" id="store_metadata"><a class="viewcode-back" href="../../../serotiny.models.html#serotiny.models.zoo.store_metadata">[docs]</a><span class="k">def</span> <span class="nf">store_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">model_class</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">model_root</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">model_root</span> <span class="o">=</span> <span class="n">get_root</span><span class="p">(</span><span class="n">model_root</span><span class="p">)</span>
@@ -342,8 +341,7 @@
 
     <span class="n">model_path</span> <span class="o">=</span> <span class="n">model_path</span> <span class="o">/</span> <span class="n">model_id</span>
 
-    <span class="n">omegaconf</span><span class="o">.</span><span class="n">OmegaConf</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">_normalize_dict</span><span class="p">(</span><span class="n">metadata</span><span class="p">),</span> <span class="n">model_path</span><span class="p">,</span>
-                             <span class="n">resolve</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+    <span class="n">omegaconf</span><span class="o">.</span><span class="n">OmegaConf</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">_normalize_dict</span><span class="p">(</span><span class="n">metadata</span><span class="p">),</span> <span class="n">model_path</span><span class="p">,</span> <span class="n">resolve</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

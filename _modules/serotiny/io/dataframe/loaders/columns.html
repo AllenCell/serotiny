@@ -197,10 +197,7 @@
 <span class="sd">    Loader class, used to retrieve fields directly from dataframe columns</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">column</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">,</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">column</span> <span class="o">=</span> <span class="n">column</span>
@@ -215,8 +212,16 @@
 <span class="sd">    Loader class, used to retrieve fields directly from dataframe columns</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">startswith</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endswith</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">contains</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">excludes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">startswith</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">endswith</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">contains</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">excludes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">regex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">startswith</span> <span class="o">=</span> <span class="n">startswith</span>
@@ -228,11 +233,11 @@
 
         <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">assert</span> <span class="p">(</span>
-                <span class="p">(</span><span class="n">startswith</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span>
-                <span class="p">(</span><span class="n">endswith</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span>
-                <span class="p">(</span><span class="n">contains</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span>
-                <span class="p">(</span><span class="n">excludes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span>
-                <span class="p">(</span><span class="n">regex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="p">(</span><span class="n">startswith</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="n">endswith</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="n">contains</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="n">excludes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="ow">or</span> <span class="p">(</span><span class="n">regex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
@@ -240,11 +245,15 @@
     <span class="k">def</span> <span class="nf">_filter_columns</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cols_to_filter</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">filter_columns</span><span class="p">(</span>
-                <span class="n">cols_to_filter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">regex</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">startswith</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">endswith</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">contains</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">excludes</span><span class="p">)</span>
+                <span class="n">cols_to_filter</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">regex</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">startswith</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">endswith</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">contains</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">excludes</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span>
-
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
         <span class="n">filtered_cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_columns</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>

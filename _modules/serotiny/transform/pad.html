@@ -216,10 +216,11 @@
     <span class="n">pull</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">missing</span><span class="p">)))</span>
     <span class="n">around</span> <span class="o">=</span> <span class="p">[</span>
         <span class="n">split_number</span><span class="p">(</span><span class="n">dimensions</span><span class="p">[</span><span class="n">dimension</span><span class="p">]</span> <span class="o">-</span> <span class="n">pull</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="n">dimension</span><span class="p">])</span>
-        <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">in_dimensions</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">dimension</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">in_dimensions</span><span class="p">)</span>
+    <span class="p">]</span>
     <span class="n">expand</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">pull</span><span class="p">,</span> <span class="n">around</span><span class="p">,</span> <span class="o">**</span><span class="n">pad</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">expand</span></div>
-    
+
 
 <div class="viewcode-block" id="to_tensor"><a class="viewcode-back" href="../../../serotiny.transform.html#serotiny.transform.pad.to_tensor">[docs]</a><span class="k">def</span> <span class="nf">to_tensor</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
@@ -234,19 +235,13 @@
 
     <span class="n">first_row</span> <span class="o">=</span> <span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">all_columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">first_row</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-    <span class="n">unexpanded_columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">all_columns</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">expanded_columns</span><span class="p">)</span>
-    <span class="n">collated</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">column</span><span class="p">:</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">all_columns</span><span class="p">}</span>
+    <span class="n">collated</span> <span class="o">=</span> <span class="p">{</span><span class="n">column</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">all_columns</span><span class="p">}</span>
 
     <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">all_columns</span><span class="p">:</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">column</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">expanded_columns</span><span class="p">:</span>
-                <span class="n">value</span> <span class="o">=</span> <span class="n">expand_to</span><span class="p">(</span>
-                    <span class="n">value</span><span class="p">,</span>
-                    <span class="n">dimensions</span><span class="p">,</span>
-                    <span class="n">pad</span><span class="p">)</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">expand_to</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">pad</span><span class="p">)</span>
             <span class="n">tensor</span> <span class="o">=</span> <span class="n">to_tensor</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
             <span class="n">collated</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span>
 
@@ -256,11 +251,8 @@
     <span class="k">return</span> <span class="n">collated</span></div>
 
 
-<div class="viewcode-block" id="ExpandTo"><a class="viewcode-back" href="../../../serotiny.transform.html#serotiny.transform.pad.ExpandTo">[docs]</a><span class="k">class</span> <span class="nc">ExpandTo</span><span class="p">():</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">dimensions</span><span class="p">,</span>
-            <span class="n">pad</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ExpandTo"><a class="viewcode-back" href="../../../serotiny.transform.html#serotiny.transform.pad.ExpandTo">[docs]</a><span class="k">class</span> <span class="nc">ExpandTo</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span> <span class="o">=</span> <span class="n">dimensions</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pad</span> <span class="o">=</span> <span class="n">pad</span> <span class="ow">or</span> <span class="p">{}</span>
 
@@ -268,25 +260,15 @@
         <span class="k">return</span> <span class="n">expand_to</span><span class="p">(</span><span class="n">in_array</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ExpandColumns"><a class="viewcode-back" href="../../../serotiny.transform.html#serotiny.transform.pad.ExpandColumns">[docs]</a><span class="k">class</span> <span class="nc">ExpandColumns</span><span class="p">():</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">columns</span><span class="p">,</span>
-            <span class="n">dimensions</span><span class="p">,</span>
-            <span class="n">pad</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ExpandColumns"><a class="viewcode-back" href="../../../serotiny.transform.html#serotiny.transform.pad.ExpandColumns">[docs]</a><span class="k">class</span> <span class="nc">ExpandColumns</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">columns</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span> <span class="o">=</span> <span class="n">dimensions</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pad</span> <span class="o">=</span> <span class="n">pad</span> <span class="ow">or</span> <span class="p">{}</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">rows</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
 
-        <span class="k">return</span> <span class="n">expand_columns</span><span class="p">(</span>
-            <span class="n">rows</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">expand_columns</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimensions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pad</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

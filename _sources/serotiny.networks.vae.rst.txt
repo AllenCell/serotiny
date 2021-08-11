@@ -12,14 +12,6 @@ serotiny.networks.vae.cbvae\_decoder\_mlp module
    :undoc-members:
    :show-inheritance:
 
-serotiny.networks.vae.cbvae\_encoder\_conv module
--------------------------------------------------
-
-.. automodule:: serotiny.networks.vae.cbvae_encoder_conv
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 serotiny.networks.vae.cbvae\_encoder\_mlp module
 ------------------------------------------------
 

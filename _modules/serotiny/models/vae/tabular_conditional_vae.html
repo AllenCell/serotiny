@@ -196,6 +196,7 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
+
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;lightning&quot;</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -207,6 +208,7 @@
 <span class="kn">from</span> <span class="nn">.conditional_vae</span> <span class="kn">import</span> <span class="n">ConditionalVAE</span>
 
 <span class="n">Array</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">]</span>
+
 
 <div class="viewcode-block" id="TabularConditionalVAE"><a class="viewcode-back" href="../../../../serotiny.models.vae.html#serotiny.models.TabularConditionalVAE">[docs]</a><span class="k">class</span> <span class="nc">TabularConditionalVAE</span><span class="p">(</span><span class="n">ConditionalVAE</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -277,9 +279,21 @@
             <span class="n">hidden_layers</span><span class="o">=</span><span class="n">hidden_layers</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">decoder</span><span class="p">,</span> <span class="n">latent_dim</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">lr</span><span class="p">,</span>
-                         <span class="n">beta</span><span class="p">,</span> <span class="n">x_label</span><span class="p">,</span> <span class="n">c_label</span><span class="p">,</span> <span class="n">recon_loss</span><span class="p">,</span> <span class="n">condition_mode</span><span class="p">,</span>
-                         <span class="n">prior_mode</span><span class="p">,</span> <span class="n">prior_logvar</span><span class="p">,</span> <span class="n">learn_prior_logvar</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">encoder</span><span class="p">,</span>
+            <span class="n">decoder</span><span class="p">,</span>
+            <span class="n">latent_dim</span><span class="p">,</span>
+            <span class="n">optimizer</span><span class="p">,</span>
+            <span class="n">lr</span><span class="p">,</span>
+            <span class="n">beta</span><span class="p">,</span>
+            <span class="n">x_label</span><span class="p">,</span>
+            <span class="n">c_label</span><span class="p">,</span>
+            <span class="n">recon_loss</span><span class="p">,</span>
+            <span class="n">condition_mode</span><span class="p">,</span>
+            <span class="n">prior_mode</span><span class="p">,</span>
+            <span class="n">prior_logvar</span><span class="p">,</span>
+            <span class="n">learn_prior_logvar</span><span class="p">,</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="TabularConditionalVAE.parse_batch"><a class="viewcode-back" href="../../../../serotiny.models.vae.html#serotiny.models.TabularConditionalVAE.parse_batch">[docs]</a>    <span class="k">def</span> <span class="nf">parse_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
         <span class="n">batch</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">parse_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>

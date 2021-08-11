@@ -188,8 +188,7 @@
            <div itemprop="articleBody">
             
   <h1>Source code for serotiny.io.dataframe.loaders.image3d</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="c1"># from aicsfiles import FileManagementSystem</span>
 
@@ -203,12 +202,8 @@
 <span class="sd">    Loader class, used to retrieve images from paths given in a dataframe column</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">column</span><span class="o">=</span><span class="s1">&#39;image&#39;</span><span class="p">,</span>
-            <span class="n">select_channels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">transforms</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-            <span class="c1"># fms=False):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="n">select_channels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">transforms</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># fms=False):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">column</span> <span class="o">=</span> <span class="n">column</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">select_channels</span> <span class="o">=</span> <span class="n">select_channels</span>
@@ -229,7 +224,7 @@
             <span class="n">output_dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
             <span class="n">channel_masks</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">mask_thresh</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-            <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transforms</span>
+            <span class="n">transform</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">transforms</span><span class="p">,</span>
         <span class="p">)</span></div>
 </pre></div>
 

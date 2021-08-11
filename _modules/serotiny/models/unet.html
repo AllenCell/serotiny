@@ -197,6 +197,7 @@
 <span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;lightning&quot;</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -210,7 +211,7 @@
 
 <span class="kn">from</span> <span class="nn">aicsimageio.writers.ome_tiff_writer</span> <span class="kn">import</span> <span class="n">OmeTiffWriter</span>
 
-<span class="kn">from</span> <span class="nn">serotiny.models._utils</span> <span class="kn">import</span> <span class="n">index_to_onehot</span><span class="p">,</span> <span class="n">find_optimizer</span>
+<span class="kn">from</span> <span class="nn">serotiny.models._utils</span> <span class="kn">import</span> <span class="n">find_optimizer</span>
 <span class="kn">from</span> <span class="nn">serotiny.utils</span> <span class="kn">import</span> <span class="n">get_name_from_path</span>
 
 
@@ -256,7 +257,8 @@
 <span class="sd">        input_dims: Sequence[int]</span>
 <span class="sd">            Dimensions of the input images</span>
 <span class="sd">        auto_padding: bool = False</span>
-<span class="sd">            Whether to apply padding to ensure images from down double conv match up double conv</span>
+<span class="sd">            Whether to apply padding to ensure images from down double conv</span>
+<span class="sd">            match up double conv</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
@@ -285,20 +287,22 @@
         <span class="k">if</span> <span class="n">test_image_output</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_image_output</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">output_path</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;test_images&quot;</span> <span class="o">/</span> <span class="n">version_string</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">test_image_output</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">auto_padding</span><span class="p">:</span>
-            <span class="c1">#print(f&#39;self.network.depth = {self.network.depth}&#39;)</span>
-            <span class="c1">#print(f&#39;self.network.channel_fan = {self.network.channel_fan}&#39;)</span>
-            <span class="c1">#print(f&#39;self.input_dims = {self.input_dims}&#39;)</span>
-            
-            <span class="bp">self</span><span class="o">.</span><span class="n">padding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_unet_padding</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_dims</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">channel_fan</span><span class="p">)</span>
-            
+            <span class="c1"># print(f&#39;self.network.depth = {self.network.depth}&#39;)</span>
+            <span class="c1"># print(f&#39;self.network.channel_fan = {self.network.channel_fan}&#39;)</span>
+            <span class="c1"># print(f&#39;self.input_dims = {self.input_dims}&#39;)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">padding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_unet_padding</span><span class="p">(</span>
+                <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_dims</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">channel_fan</span>
+            <span class="p">)</span>
+
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;this is the file we are running: </span><span class="si">{</span><span class="vm">__file__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="UnetModel.parse_batch"><a class="viewcode-back" href="../../../serotiny.models.html#serotiny.models.unet.UnetModel.parse_batch">[docs]</a>    <span class="k">def</span> <span class="nf">parse_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
         <span class="c1"># TODO: The values of x_label and y_label are used as keys in the batch dictionary.</span>
         <span class="c1">#       If they are the same column names, there may be conflict</span>
-        <span class="c1">#print(f&#39;batch = {batch}&#39;)</span>
+        <span class="c1"># print(f&#39;batch = {batch}&#39;)</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">x_label</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">y_label</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
         <span class="n">ids</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -309,14 +313,14 @@
 
     <span class="c1"># Calculate the amount of padding required given an input image dimension,</span>
     <span class="c1"># a specific Unet depth and a channel_fan factor</span>
-    
+
     <span class="c1"># Issues:</span>
     <span class="c1">#   - Padding may introduce a lot of blank space depending on the input</span>
     <span class="c1">#     image size and the network depth</span>
     <span class="c1">#   - May not be most efficient to do it in the forward pass since the</span>
     <span class="c1">#     amount of padding is the same, so we should not need to recalculate</span>
     <span class="c1">#     this for each image</span>
-    
+
 <div class="viewcode-block" id="UnetModel.get_unet_padding"><a class="viewcode-back" href="../../../serotiny.models.html#serotiny.models.unet.UnetModel.get_unet_padding">[docs]</a>    <span class="k">def</span> <span class="nf">get_unet_padding</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_dims</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">channel_fan</span><span class="p">):</span>
 
         <span class="n">input_paddings</span> <span class="o">=</span> <span class="p">[]</span>
@@ -340,53 +344,53 @@
                         <span class="n">new_size</span> <span class="o">=</span> <span class="n">channel_fan</span> <span class="o">*</span> <span class="p">(</span><span class="n">next_size_float</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">new_size</span> <span class="o">=</span> <span class="n">orig_size</span>
-                        
+
                     <span class="c1"># Calculate the image size of the next level down</span>
                     <span class="n">next_size</span> <span class="o">=</span> <span class="n">new_size</span> <span class="o">//</span> <span class="n">channel_fan</span>
-                    
+
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">new_size</span> <span class="o">=</span> <span class="n">orig_size</span>
                     <span class="n">next_size</span> <span class="o">=</span> <span class="n">orig_size</span>
 
-                <span class="c1">#print(f&#39;{current_depth}: orig_size = {orig_size}, new_size = {new_size}, next_size = {next_size}&#39;)</span>
-
             <span class="c1"># Calculate the new input image size given the padding, and save the padding</span>
-            <span class="c1"># for all the dimensions in a format that is taken by F.pad() (which goes in the</span>
+            <span class="c1"># for all the dimensions in a format that is taken by F.pad()</span>
+            <span class="c1"># (which goes in the</span>
             <span class="c1"># reverse order as the input dimensions)</span>
-            <span class="n">new_input_size</span> <span class="o">=</span> <span class="n">new_size</span> <span class="o">*</span> <span class="p">(</span><span class="n">channel_fan</span><span class="o">**</span><span class="n">depth</span><span class="p">)</span>
+            <span class="n">new_input_size</span> <span class="o">=</span> <span class="n">new_size</span> <span class="o">*</span> <span class="p">(</span><span class="n">channel_fan</span> <span class="o">**</span> <span class="n">depth</span><span class="p">)</span>
             <span class="n">padding</span> <span class="o">=</span> <span class="n">new_input_size</span> <span class="o">-</span> <span class="n">input_size</span>
             <span class="n">padding_left</span> <span class="o">=</span> <span class="n">padding</span> <span class="o">//</span> <span class="mi">2</span>
             <span class="n">padding_right</span> <span class="o">=</span> <span class="n">padding</span> <span class="o">-</span> <span class="n">padding_left</span>
-
-            <span class="c1"># print(f&#39;input_size = {input_size}, new_input_size = {new_input_size}, padding = {padding_left, padding_right}&#39;)</span>
 
             <span class="n">input_paddings</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">padding_right</span><span class="p">)</span>
             <span class="n">input_paddings</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">padding_left</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">input_paddings</span><span class="p">)</span></div>
-    
+
 <div class="viewcode-block" id="UnetModel.forward"><a class="viewcode-back" href="../../../serotiny.models.html#serotiny.models.unet.UnetModel.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
         <span class="c1">#####################</span>
         <span class="c1"># train unet</span>
         <span class="c1">#####################</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">auto_padding</span><span class="p">:</span>
-            <span class="c1">#print(f&#39;self.network.depth = {self.network.depth}&#39;)</span>
-            <span class="c1">#print(f&#39;self.network.channel_fan = {self.network.channel_fan}&#39;)</span>
-            <span class="c1">#print(f&#39;self.input_dims = {self.input_dims}&#39;)</span>
-            
-            <span class="c1">#padding = self.get_unet_padding(list(self.input_dims), self.network.depth, self.network.channel_fan)</span>
-            <span class="c1">#print(f&#39;auto_padding = {padding}&#39;)</span>
-            
+            <span class="c1"># print(f&#39;self.network.depth = {self.network.depth}&#39;)</span>
+            <span class="c1"># print(f&#39;self.network.channel_fan = {self.network.channel_fan}&#39;)</span>
+            <span class="c1"># print(f&#39;self.input_dims = {self.input_dims}&#39;)</span>
+
+            <span class="c1"># padding = self.get_unet_padding(</span>
+            <span class="c1"># list(self.input_dims), self.network.depth,</span>
+            <span class="c1"># self.network.channel_fan</span>
+            <span class="c1"># )</span>
+            <span class="c1"># print(f&#39;auto_padding = {padding}&#39;)</span>
+
             <span class="c1"># We need to pad both x and y, otherwise, they will have different sizes.</span>
             <span class="c1"># This assumes that x and y have the same sizes to begin with</span>
-            <span class="c1">#x = F.pad(x, self.padding, mode=&quot;constant&quot;, value=0)</span>
-            <span class="c1">#y = F.pad(y, self.padding, mode=&quot;constant&quot;, value=0)</span>
-            
+            <span class="c1"># x = F.pad(x, self.padding, mode=&quot;constant&quot;, value=0)</span>
+            <span class="c1"># y = F.pad(y, self.padding, mode=&quot;constant&quot;, value=0)</span>
+
             <span class="n">pad_mod</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ConstantPad3d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">padding</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">x</span> <span class="o">=</span> <span class="n">pad_mod</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="n">y</span> <span class="o">=</span> <span class="n">pad_mod</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-            
+
         <span class="c1"># Forward passes</span>
         <span class="n">y_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">y_hat</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
@@ -394,23 +398,23 @@
         <span class="k">return</span> <span class="n">y_hat</span><span class="p">,</span> <span class="n">loss</span></div>
 
     <span class="c1"># NOTE: Had to remove optimizer_idx if using automatic backprop</span>
-    <span class="c1">#def training_step(self, batch, batch_idx, optimizer_idx):</span>
+    <span class="c1"># def training_step(self, batch, batch_idx, optimizer_idx):</span>
 <div class="viewcode-block" id="UnetModel.training_step"><a class="viewcode-back" href="../../../serotiny.models.html#serotiny.models.unet.UnetModel.training_step">[docs]</a>    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;In unet training step (batch_idx = </span><span class="si">{</span><span class="n">batch_idx</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;In unet training step (batch_idx = </span><span class="si">{</span><span class="n">batch_idx</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
         <span class="n">y_hat</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 
         <span class="c1"># NOTE: Nothing needs to be done here with backprop if using</span>
         <span class="c1">#       automatic optimization</span>
-        
-        <span class="c1">#optimizer = self.hparams.optimizer</span>
-        
-        <span class="c1">#opt = self.optimizers()</span>
-        <span class="c1">#self.manual_backward(loss, opt)</span>
-        <span class="c1">#optimizer.step()</span>
-        <span class="c1">#optimizer.zero_grad()</span>
-        <span class="c1">#opt.step()</span>
-        <span class="c1">#opt.zero_grad()</span>
+
+        <span class="c1"># optimizer = self.hparams.optimizer</span>
+
+        <span class="c1"># opt = self.optimizers()</span>
+        <span class="c1"># self.manual_backward(loss, opt)</span>
+        <span class="c1"># optimizer.step()</span>
+        <span class="c1"># optimizer.zero_grad()</span>
+        <span class="c1"># opt.step()</span>
+        <span class="c1"># opt.zero_grad()</span>
 
         <span class="c1"># Default logger=False for training_step</span>
         <span class="c1"># set it to true to log train loss to all lggers</span>
@@ -418,7 +422,7 @@
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">loss</span><span class="p">,</span> <span class="s2">&quot;batch_idx&quot;</span><span class="p">:</span> <span class="n">batch_idx</span><span class="p">}</span></div>
 
 <div class="viewcode-block" id="UnetModel.validation_step"><a class="viewcode-back" href="../../../serotiny.models.html#serotiny.models.unet.UnetModel.validation_step">[docs]</a>    <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;In unet validation step (batch_idx = </span><span class="si">{</span><span class="n">batch_idx</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;In unet validation step (batch_idx = </span><span class="si">{</span><span class="n">batch_idx</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
         <span class="n">y_hat</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 
@@ -433,32 +437,38 @@
         <span class="p">}</span></div>
 
 <div class="viewcode-block" id="UnetModel.test_step"><a class="viewcode-back" href="../../../serotiny.models.html#serotiny.models.unet.UnetModel.test_step">[docs]</a>    <span class="k">def</span> <span class="nf">test_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;In unet test step (batch_idx = </span><span class="si">{</span><span class="n">batch_idx</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;In unet test step (batch_idx = </span><span class="si">{</span><span class="n">batch_idx</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
         <span class="n">y_hat</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 
-        <span class="c1">#print(f&quot;y_hat dimensions {y_hat.shape}&quot;)</span>
-        <span class="c1">#print(f&quot;saving images to {self.test_image_output}&quot;)</span>
-        <span class="c1">#print(f&quot;ids = {ids}&quot;)</span>
-        
+        <span class="c1"># print(f&quot;y_hat dimensions {y_hat.shape}&quot;)</span>
+        <span class="c1"># print(f&quot;saving images to {self.test_image_output}&quot;)</span>
+        <span class="c1"># print(f&quot;ids = {ids}&quot;)</span>
+
         <span class="c1"># Convert each nested list from tensor to list</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">ids_lists_all</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">ids</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>  <span class="c1"># Real datamodule returns ids as a tensor list</span>
+            <span class="n">ids_lists_all</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="n">field</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">ids</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="p">)</span>  <span class="c1"># Real datamodule returns ids as a tensor list</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="n">ids_lists_all</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">field</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">ids</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>  <span class="c1"># Dummy datamodule returns ids as a regular list</span>
-            
-        <span class="c1">#print(f&quot;ids_list_all = {ids_lists_all}&quot;)</span>
-        
+            <span class="n">ids_lists_all</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="n">field</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">ids</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="p">)</span>  <span class="c1"># Dummy datamodule returns ids as a regular list</span>
+
+        <span class="c1"># print(f&quot;ids_list_all = {ids_lists_all}&quot;)</span>
+
         <span class="c1"># print(f&quot;ids: {ids} - y_hat dimensions: {y_hat.shape}&quot;)</span>
         <span class="c1"># print(f&quot;saving images to {self.test_image_output}&quot;)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">test_image_output</span><span class="p">:</span>
-            <span class="n">test_images</span> <span class="o">=</span> <span class="n">y_hat</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>  <span class="c1"># TODO: Maybe change this to uint16? Caleb</span>
-            <span class="c1">#for id, y_slice in zip(ids, test_images):</span>
+            <span class="n">test_images</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">y_hat</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="p">)</span>  <span class="c1"># TODO: Maybe change this to uint16? Caleb</span>
+            <span class="c1"># for id, y_slice in zip(ids, test_images):</span>
             <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">y_slice</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">test_images</span><span class="p">):</span>
                 <span class="n">unique_id_list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">ids_list</span><span class="p">[</span><span class="n">index</span><span class="p">])</span> <span class="k">for</span> <span class="n">ids_list</span> <span class="ow">in</span> <span class="n">ids_lists_all</span><span class="p">]</span>
-                <span class="n">image_path</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">unique_id_list</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.ome.tiff&quot;</span>
+                <span class="n">image_path</span> <span class="o">=</span> <span class="s2">&quot;-&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">unique_id_list</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.ome.tiff&quot;</span>
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;image_path = </span><span class="si">{</span><span class="n">image_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                
+
                 <span class="n">output_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">test_image_output</span><span class="p">)</span> <span class="o">/</span> <span class="n">image_path</span>
                 <span class="c1"># print(f&quot;id: {id}, y_slice.shape: {y_slice.shape}&quot;)</span>
                 <span class="c1"># print(f&quot;saving test file: {output_path}&quot;)</span>
@@ -466,7 +476,9 @@
                     <span class="n">tiff_writer</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
                         <span class="n">data</span><span class="o">=</span><span class="n">y_slice</span><span class="p">,</span>
                         <span class="n">channel_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">output_channels</span><span class="p">,</span>
-                        <span class="n">dimension_order</span><span class="o">=</span><span class="s2">&quot;STCZYX&quot;</span><span class="p">)</span>  <span class="c1"># TODO: Maybe change this to CZYX since we don&#39;t have S and T? Caleb</span>
+                        <span class="n">dimension_order</span><span class="o">=</span><span class="s2">&quot;STCZYX&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>  <span class="c1"># TODO: Maybe change this to </span>
+                    <span class="c1"># CZYX since we don&#39;t have S and T? Caleb</span>
 
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;test_loss&quot;</span><span class="p">:</span> <span class="n">loss</span><span class="p">,</span>

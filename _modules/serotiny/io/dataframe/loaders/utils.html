@@ -191,6 +191,7 @@
 <span></span><span class="kn">from</span> <span class="nn">torchvision</span> <span class="kn">import</span> <span class="n">transforms</span>
 <span class="kn">from</span> <span class="nn">serotiny.utils</span> <span class="kn">import</span> <span class="n">load_multiple</span>
 
+
 <div class="viewcode-block" id="load_transforms"><a class="viewcode-back" href="../../../../../serotiny.io.dataframe.loaders.html#serotiny.io.dataframe.loaders.utils.load_transforms">[docs]</a><span class="k">def</span> <span class="nf">load_transforms</span><span class="p">(</span><span class="n">transforms_config</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transforms_config</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
         <span class="n">invocations</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">load_multiple</span><span class="p">(</span><span class="n">transforms_config</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
@@ -199,7 +200,9 @@
     <span class="k">elif</span> <span class="n">transforms_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">invocations</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Can only load transforms from dicts or iterables, not </span><span class="si">{</span><span class="n">transforms_config</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Can only load transforms from dicts or iterables, not </span><span class="si">{</span><span class="n">transforms_config</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">invocations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">(</span><span class="n">invocations</span><span class="p">)</span></div>

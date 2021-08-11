@@ -188,21 +188,20 @@
            <div itemprop="articleBody">
             
   <h1>Source code for serotiny.utils.dynamic_imports</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
-
+<span></span>
 <span class="kn">import</span> <span class="nn">importlib</span>
-<span class="kn">from</span> <span class="nn">inspect</span> <span class="kn">import</span> <span class="n">isfunction</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 
-<span class="n">INVOKE_KEY</span> <span class="o">=</span> <span class="s1">&#39;^invoke&#39;</span>
-<span class="n">BIND_KEY</span> <span class="o">=</span> <span class="s1">&#39;^bind&#39;</span>
-<span class="n">INIT_KEY</span> <span class="o">=</span> <span class="s1">&#39;^init&#39;</span>
+<span class="n">INVOKE_KEY</span> <span class="o">=</span> <span class="s2">&quot;^invoke&quot;</span>
+<span class="n">BIND_KEY</span> <span class="o">=</span> <span class="s2">&quot;^bind&quot;</span>
+<span class="n">INIT_KEY</span> <span class="o">=</span> <span class="s2">&quot;^init&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">_bind</span><span class="p">(</span><span class="n">partial</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An improved version of partial which accepts Ellipsis (...) as a placeholder</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">keywords</span><span class="p">):</span>
         <span class="n">keywords</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="p">,</span> <span class="o">**</span><span class="n">keywords</span><span class="p">}</span>
         <span class="n">iargs</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
@@ -261,9 +260,8 @@
 <div class="viewcode-block" id="get_name_and_arguments"><a class="viewcode-back" href="../../../serotiny.utils.html#serotiny.utils.dynamic_imports.get_name_and_arguments">[docs]</a><span class="k">def</span> <span class="nf">get_name_and_arguments</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
     <span class="n">path</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
     <span class="n">name</span> <span class="o">=</span> <span class="n">get_name_from_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="n">arguments</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="n">key</span><span class="p">}</span>
+    <span class="n">arguments</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="n">key</span><span class="p">}</span>
     <span class="k">return</span> <span class="n">name</span><span class="p">,</span> <span class="n">arguments</span></div>
-
 
 
 <div class="viewcode-block" id="invoke"><a class="viewcode-back" href="../../../serotiny.utils.html#serotiny.utils.dynamic_imports.invoke">[docs]</a><span class="k">def</span> <span class="nf">invoke</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
@@ -283,8 +281,9 @@
     <span class="n">to_init</span><span class="p">,</span> <span class="n">arguments</span> <span class="o">=</span> <span class="n">get_name_and_arguments</span><span class="p">(</span><span class="n">INIT_KEY</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">to_init</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">to_init</span><span class="si">}</span><span class="s2"> to be a class, but it is &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">to_init</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">to_init</span><span class="si">}</span><span class="s2"> to be a class, but it is &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">to_init</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
 
     <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">arguments</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
@@ -318,24 +317,21 @@
     <span class="k">elif</span> <span class="n">INVOKE_KEY</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">invoke</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;None of [</span><span class="si">{</span><span class="n">BIND_KEY</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">INVOKE_KEY</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">INIT_KEY</span><span class="si">}</span><span class="s2">] found &quot;</span>
-                       <span class="sa">f</span><span class="s2">&quot;in config.&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;None of [</span><span class="si">{</span><span class="n">BIND_KEY</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">INVOKE_KEY</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">INIT_KEY</span><span class="si">}</span><span class="s2">] found &quot;</span> <span class="sa">f</span><span class="s2">&quot;in config.&quot;</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="load_multiple"><a class="viewcode-back" href="../../../serotiny.utils.html#serotiny.utils.dynamic_imports.load_multiple">[docs]</a><span class="k">def</span> <span class="nf">load_multiple</span><span class="p">(</span><span class="n">configs</span><span class="p">):</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">configs</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="n">key</span><span class="p">:</span> <span class="n">load_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">configs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-        <span class="p">}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">load_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">configs</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
     <span class="k">elif</span> <span class="nb">iter</span><span class="p">(</span><span class="n">configs</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span>
-            <span class="n">load_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">configs</span>
-        <span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">load_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span> <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">configs</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;can only bind/invoke/init paths from a dict or an &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;iterable, not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">configs</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;can only bind/invoke/init paths from a dict or an &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;iterable, not </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">configs</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span></div>
 </pre></div>
 
            </div>

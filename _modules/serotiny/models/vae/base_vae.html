@@ -226,35 +226,38 @@
         <span class="n">learn_prior_logvar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Instantiate a basic VAE model</span>
+<span class="sd">                Instantiate a basic VAE model</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        encoder: Union[nn.Module, dict]</span>
-<span class="sd">`           Encoder network. If `dict`, expects a class dict, to be used for</span>
-<span class="sd">            instantiating the given class.</span>
-<span class="sd">        decoder: Union[nn.Module, str]</span>
-<span class="sd">            Decoder network. If `dict`, expects a class dict, to be used for</span>
-<span class="sd">            instantiating the given class.</span>
-<span class="sd">        optimizer: str</span>
-<span class="sd">            Optimizer to use</span>
-<span class="sd">        lr: float</span>
-<span class="sd">            Learning rate for training</span>
-<span class="sd">        beta: float</span>
-<span class="sd">            Beta parameter - the weight of the KLD term in the loss function</span>
-<span class="sd">        x_label: str</span>
-<span class="sd">            String label used to retrieve X from the batches</span>
-<span class="sd">        recon_loss: Loss</span>
-<span class="sd">            Loss to be used for reconstruction. Can be a PyTorch loss or a class</span>
-<span class="sd">            that respects the same interface, i.e. subclasses torch.nn.modules._Loss</span>
-<span class="sd">        prior_mode: str</span>
-<span class="sd">            String to determine which type of prior to use. (Only &quot;isotropic&quot; and</span>
-<span class="sd">            &quot;anisotropic&quot; currently supported)</span>
-<span class="sd">        prior_logvar: Optional[Array]</span>
-<span class="sd">            Array of values to be used as either the fixed value or initialization</span>
-<span class="sd">            value for the diagonal of the prior covariance matrix</span>
-<span class="sd">        learn_prior_logvar: bool</span>
-<span class="sd">            Boolean flag to determine whether to learn the prior log-variances</span>
+<span class="sd">                Parameters</span>
+<span class="sd">                ----------</span>
+<span class="sd">                encoder: Union[nn.Module, dict]</span>
+<span class="sd">        `           Encoder network. If `dict`, expects a class dict, to be used for</span>
+<span class="sd">                    instantiating the given class.</span>
+<span class="sd">                decoder: Union[nn.Module, str]</span>
+<span class="sd">                    Decoder network. If `dict`, expects a class dict, to be used for</span>
+<span class="sd">                    instantiating the given class.</span>
+<span class="sd">                optimizer: str</span>
+<span class="sd">                    Optimizer to use</span>
+<span class="sd">                lr: float</span>
+<span class="sd">                    Learning rate for training</span>
+<span class="sd">                beta: float</span>
+<span class="sd">                    Beta parameter - the weight of the KLD term in the loss function</span>
+<span class="sd">                x_label: str</span>
+<span class="sd">                    String label used to retrieve X from the batches</span>
+<span class="sd">                recon_loss: Loss</span>
+<span class="sd">                    Loss to be used for reconstruction. Can be a PyTorch loss or a class</span>
+<span class="sd">                    that respects the same interface,</span>
+<span class="sd">                    i.e. subclasses torch.nn.modules._Loss</span>
+<span class="sd">                prior_mode: str</span>
+<span class="sd">                    String to determine which type of prior to use.</span>
+<span class="sd">                    (Only &quot;isotropic&quot; and</span>
+<span class="sd">                    &quot;anisotropic&quot; currently supported)</span>
+<span class="sd">                prior_logvar: Optional[Array]</span>
+<span class="sd">                    Array of values to be used as either the fixed value or</span>
+<span class="sd">                    initialization</span>
+<span class="sd">                    value for the diagonal of the prior covariance matrix</span>
+<span class="sd">                learn_prior_logvar: bool</span>
+<span class="sd">                    Boolean flag to determine whether to learn the prior log-variances</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
@@ -297,9 +300,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">prior_logvar</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">prior_logvar</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">learn_prior_logvar</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">prior_logvar</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">prior_logvar</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span>
-                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">prior_logvar</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Parameter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_logvar</span><span class="p">,</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">prior_logvar</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">False</span>
 
@@ -315,19 +316,26 @@
         <span class="k">return</span> <span class="n">eps</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="n">std</span><span class="p">)</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BaseVAE.forward"><a class="viewcode-back" href="../../../../serotiny.models.vae.html#serotiny.models.vae.base_vae.BaseVAE.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">mu_logvar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-                                       <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_args</span><span class="p">})</span>
+        <span class="n">mu_logvar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span>
+            <span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_args</span><span class="p">}</span>
+        <span class="p">)</span>
 
         <span class="n">mu</span><span class="p">,</span> <span class="n">logvar</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">mu_logvar</span><span class="p">,</span> <span class="n">mu_logvar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">mu</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">logvar</span><span class="o">.</span><span class="n">shape</span>
 
         <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_z</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">logvar</span><span class="p">)</span>
 
-        <span class="n">x_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-                                   <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_args</span><span class="p">})</span>
+        <span class="n">x_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span>
+            <span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_args</span><span class="p">}</span>
+        <span class="p">)</span>
 
-        <span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">recon_loss</span><span class="p">,</span> <span class="n">kld_loss</span><span class="p">,</span>
-         <span class="n">rcl_per_input_dimension</span><span class="p">,</span> <span class="n">kld_per_latent_dimension</span><span class="p">)</span> <span class="o">=</span> <span class="n">calculate_elbo</span><span class="p">(</span>
+        <span class="p">(</span>
+            <span class="n">loss</span><span class="p">,</span>
+            <span class="n">recon_loss</span><span class="p">,</span>
+            <span class="n">kld_loss</span><span class="p">,</span>
+            <span class="n">rcl_per_input_dimension</span><span class="p">,</span>
+            <span class="n">kld_per_latent_dimension</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="n">calculate_elbo</span><span class="p">(</span>
             <span class="n">x</span><span class="p">,</span>
             <span class="n">x_hat</span><span class="p">,</span>
             <span class="n">mu</span><span class="p">,</span>
@@ -349,7 +357,7 @@
             <span class="n">recon_loss</span> <span class="o">/</span> <span class="n">batch_size</span><span class="p">,</span>
             <span class="n">kld_loss</span> <span class="o">/</span> <span class="n">batch_size</span><span class="p">,</span>
             <span class="n">rcl_per_input_dimension</span><span class="p">,</span>
-            <span class="n">kld_per_latent_dimension</span>
+            <span class="n">kld_per_latent_dimension</span><span class="p">,</span>
         <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
@@ -359,9 +367,16 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">forward_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
-        <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">recon_loss</span><span class="p">,</span> <span class="n">kld_loss</span><span class="p">,</span>
-         <span class="n">rcl_per_input_dimension</span><span class="p">,</span>
-         <span class="n">kld_per_latent_dimension</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="n">forward_kwargs</span><span class="p">)</span>
+        <span class="p">(</span>
+            <span class="n">_</span><span class="p">,</span>
+            <span class="n">mu</span><span class="p">,</span>
+            <span class="n">_</span><span class="p">,</span>
+            <span class="n">loss</span><span class="p">,</span>
+            <span class="n">recon_loss</span><span class="p">,</span>
+            <span class="n">kld_loss</span><span class="p">,</span>
+            <span class="n">rcl_per_input_dimension</span><span class="p">,</span>
+            <span class="n">kld_per_lt_dimension</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="n">forward_kwargs</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2"> reconstruction loss&quot;</span><span class="p">,</span> <span class="n">recon_loss</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2"> kld loss&quot;</span><span class="p">,</span> <span class="n">kld_loss</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span>
@@ -376,11 +391,13 @@
         <span class="p">}</span>
 
         <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;test&quot;</span><span class="p">:</span>
-            <span class="n">results</span><span class="o">.</span><span class="n">update</span><span class="p">({</span>
-                <span class="s2">&quot;mu&quot;</span><span class="p">:</span> <span class="n">mu</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span>
-                <span class="s2">&quot;kld_per_latent_dimension&quot;</span><span class="p">:</span> <span class="n">kld_per_latent_dimension</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span class="p">(),</span>
-                <span class="s2">&quot;rcl_per_input_dimension&quot;</span><span class="p">:</span> <span class="n">rcl_per_input_dimension</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span class="p">(),</span>
-            <span class="p">})</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;mu&quot;</span><span class="p">:</span> <span class="n">mu</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span>
+                    <span class="s2">&quot;kld_per_latent_dimension&quot;</span><span class="p">:</span> <span class="n">kld_per_lt_dimension</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span class="p">(),</span>
+                    <span class="s2">&quot;rcl_per_input_dimension&quot;</span><span class="p">:</span> <span class="n">rcl_per_input_dimension</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span class="p">(),</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">results</span>
 
@@ -404,7 +421,6 @@
             <span class="s2">&quot;frequency&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
             <span class="s2">&quot;strict&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
         <span class="p">}</span></div></div>
-
 </pre></div>
 
            </div>

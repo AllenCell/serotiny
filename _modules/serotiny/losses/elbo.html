@@ -191,18 +191,21 @@
 <span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torch.nn.modules.loss</span> <span class="kn">import</span> <span class="n">_Loss</span> <span class="k">as</span> <span class="n">Loss</span>
 
+
 <div class="viewcode-block" id="diagonal_gaussian_kl"><a class="viewcode-back" href="../../../serotiny.losses.html#serotiny.losses.elbo.diagonal_gaussian_kl">[docs]</a><span class="k">def</span> <span class="nf">diagonal_gaussian_kl</span><span class="p">(</span><span class="n">mu1</span><span class="p">,</span> <span class="n">mu2</span><span class="p">,</span> <span class="n">logvar1</span><span class="p">,</span> <span class="n">logvar2</span><span class="p">):</span>
     <span class="n">mu_diff</span> <span class="o">=</span> <span class="n">mu2</span> <span class="o">-</span> <span class="n">mu1</span>
 
     <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span>
-        <span class="p">(</span><span class="n">logvar2</span> <span class="o">-</span> <span class="n">logvar1</span><span class="p">)</span> <span class="o">+</span>
-        <span class="p">(</span><span class="n">logvar1</span> <span class="o">-</span> <span class="n">logvar2</span><span class="p">)</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span> <span class="o">+</span>
-        <span class="p">(</span><span class="n">mu_diff</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">logvar2</span><span class="o">.</span><span class="n">exp</span><span class="p">())</span> <span class="o">+</span>
-        <span class="o">-</span><span class="mi">1</span>
+        <span class="p">(</span><span class="n">logvar2</span> <span class="o">-</span> <span class="n">logvar1</span><span class="p">)</span>
+        <span class="o">+</span> <span class="p">(</span><span class="n">logvar1</span> <span class="o">-</span> <span class="n">logvar2</span><span class="p">)</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span>
+        <span class="o">+</span> <span class="p">(</span><span class="n">mu_diff</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">logvar2</span><span class="o">.</span><span class="n">exp</span><span class="p">())</span>
+        <span class="o">+</span> <span class="o">-</span><span class="mi">1</span>
     <span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="isotropic_gaussian_kl"><a class="viewcode-back" href="../../../serotiny.losses.html#serotiny.losses.elbo.isotropic_gaussian_kl">[docs]</a><span class="k">def</span> <span class="nf">isotropic_gaussian_kl</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">log_var</span><span class="p">):</span>
     <span class="k">return</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">log_var</span> <span class="o">-</span> <span class="n">mean</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">log_var</span><span class="o">.</span><span class="n">exp</span><span class="p">())</span></div>
+
 
 <div class="viewcode-block" id="calculate_elbo"><a class="viewcode-back" href="../../../serotiny.losses.html#serotiny.losses.elbo.calculate_elbo">[docs]</a><span class="k">def</span> <span class="nf">calculate_elbo</span><span class="p">(</span>
     <span class="n">x</span><span class="p">,</span>

@@ -188,26 +188,21 @@
            <div itemprop="articleBody">
             
   <h1>Source code for serotiny.io.dataframe.utils</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">torch</span>
 
 <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">OneHotEncoder</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">WeightedRandomSampler</span>
-<span class="kn">from</span> <span class="nn">.dataframe_dataset</span> <span class="kn">import</span> <span class="n">DataframeDataset</span>
 
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">from</span> <span class="nn">actk.utils</span> <span class="kn">import</span> <span class="n">dataset_utils</span>
-
 
 <div class="viewcode-block" id="load_csv"><a class="viewcode-back" href="../../../../serotiny.io.dataframe.html#serotiny.io.dataframe.utils.load_csv">[docs]</a><span class="k">def</span> <span class="nf">load_csv</span><span class="p">(</span>
-        <span class="n">dataset</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
-        <span class="n">required_fields</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">dataset</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="n">required_fields</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Read dataframe from either a path or an existing pd.DataFrame, checking</span>
 <span class="sd">    the fields given by `required` are present</span>
@@ -225,8 +220,10 @@
     <span class="c1"># Check that all columns provided as required are in the dataset</span>
     <span class="n">missing_fields</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">required_fields</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_fields</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Some or all of the required fields were not &quot;</span>
-                         <span class="sa">f</span><span class="s2">&quot;found on the given dataframe:</span><span class="se">\n</span><span class="si">{</span><span class="n">missing_fields</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Some or all of the required fields were not &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;found on the given dataframe:</span><span class="se">\n</span><span class="si">{</span><span class="n">missing_fields</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">dataset</span></div>
 
@@ -297,8 +294,14 @@
     <span class="k">return</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">one_hot</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="filter_columns"><a class="viewcode-back" href="../../../../serotiny.io.dataframe.html#serotiny.io.dataframe.utils.filter_columns">[docs]</a><span class="k">def</span> <span class="nf">filter_columns</span><span class="p">(</span><span class="n">cols_to_filter</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">startswith</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">endswith</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                   <span class="n">contains</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">excludes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="filter_columns"><a class="viewcode-back" href="../../../../serotiny.io.dataframe.html#serotiny.io.dataframe.utils.filter_columns">[docs]</a><span class="k">def</span> <span class="nf">filter_columns</span><span class="p">(</span>
+    <span class="n">cols_to_filter</span><span class="p">,</span>
+    <span class="n">regex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">startswith</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">endswith</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">contains</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">excludes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
     <span class="k">if</span> <span class="n">regex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols_to_filter</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">col</span><span class="p">)]</span>
 
@@ -309,14 +312,11 @@
         <span class="k">if</span> <span class="n">endswith</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">keep</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="nb">str</span><span class="p">(</span><span class="n">cols_to_filter</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">endswith</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">contains</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">keep</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="p">(</span><span class="n">contains</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">cols_to_filter</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+            <span class="n">keep</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="n">contains</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">cols_to_filter</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">excludes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">keep</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="p">(</span><span class="n">excludes</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">cols_to_filter</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+            <span class="n">keep</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="n">excludes</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">cols_to_filter</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 
-    <span class="k">return</span> <span class="p">[</span>
-        <span class="n">col</span> <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">keep_col</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cols_to_filter</span><span class="p">,</span> <span class="n">keep</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">keep_col</span>
-    <span class="p">]</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">keep_col</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cols_to_filter</span><span class="p">,</span> <span class="n">keep</span><span class="p">)</span> <span class="k">if</span> <span class="n">keep_col</span><span class="p">]</span></div>
 </pre></div>
 
            </div>

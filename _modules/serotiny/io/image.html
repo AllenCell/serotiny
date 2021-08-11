@@ -318,7 +318,7 @@
     <span class="n">data</span> <span class="o">=</span> <span class="n">aicsimg</span><span class="o">.</span><span class="n">get_image_data</span><span class="p">(</span><span class="s2">&quot;CZYX&quot;</span><span class="p">,</span> <span class="n">S</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
     <span class="n">mask_keys</span> <span class="o">=</span> <span class="n">channel_masks</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">channel_masks</span> <span class="k">else</span> <span class="p">{}</span>
-    
+
     <span class="k">if</span> <span class="n">select_channels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">select_channels</span> <span class="o">=</span> <span class="n">channel_names</span>
 
@@ -454,8 +454,7 @@
 
     <span class="c1"># Write output image</span>
     <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
-        <span class="n">data</span><span class="o">=</span><span class="n">img</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">channel_names</span><span class="o">=</span><span class="n">channels</span><span class="p">,</span>
-        <span class="n">dimension_order</span><span class="o">=</span><span class="s2">&quot;STCZYX&quot;</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">img</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">channel_names</span><span class="o">=</span><span class="n">channels</span><span class="p">,</span> <span class="n">dimension_order</span><span class="o">=</span><span class="s2">&quot;STCZYX&quot;</span>
     <span class="p">)</span></div>
 
 
@@ -517,8 +516,10 @@
 
     <span class="c1"># Write output image</span>
     <span class="n">OmeTiffWriter</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
-        <span class="n">data</span><span class="o">=</span><span class="n">data_new</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="n">path_out</span><span class="p">,</span> <span class="n">channel_names</span><span class="o">=</span><span class="n">channel_names</span><span class="p">,</span>
-        <span class="n">dimension_order</span><span class="o">=</span><span class="s2">&quot;STCZYX&quot;</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">data_new</span><span class="p">,</span>
+        <span class="n">uri</span><span class="o">=</span><span class="n">path_out</span><span class="p">,</span>
+        <span class="n">channel_names</span><span class="o">=</span><span class="n">channel_names</span><span class="p">,</span>
+        <span class="n">dimension_order</span><span class="o">=</span><span class="s2">&quot;STCZYX&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">data_new</span><span class="o">.</span><span class="n">shape</span></div>
