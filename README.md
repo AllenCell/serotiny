@@ -6,7 +6,7 @@
 
 Library and commands for pytorch/lightning deep-learning workflows
 
----
+----
 
 Serotiny is essentially two things:
 
