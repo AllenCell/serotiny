@@ -121,7 +121,7 @@ def tile_prediction(
     )
     # tifffile.imsave('debug/ar_sum.tif', ar_out)
     mask = ar_weight > 0.0
-    ar_out[mask] = ar_out[mask] / ar_weight[mask]
+    # ar_out[mask] = ar_out[mask] / ar_weight[mask]
     # tifffile.imsave('debug/ar_weight.tif', ar_weight)
     # tifffile.imsave('debug/ar_out.tif', ar_out)
     return torch.tensor(ar_out).to(device)
