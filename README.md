@@ -60,6 +60,26 @@ datamodule = create_datamodule(**datamodule_config)
 datamodule.setup()
 ``` 
 
+### To restart training/testing
+
+```python
+trainer.model = model
+trainer.datamodule = datamodule
+trainer.logger = loggers
+trainer.test_dataloaders = [datamodule.test_dataloader()]
+trainer.train_dataloader = datamodule.train_dataloader()
+trainer.val_dataloaders = [datamodule.val_dataloader()]
+trainer.fit()
+trainer.test()
+``` 
+
+### To run a callback after testing
+
+```python
+callback = CustomCallback()
+callback.on_test_epoch_end(trainer, model)
+``` 
+
 
 <!-- ### To change the resolution of input images:
 
