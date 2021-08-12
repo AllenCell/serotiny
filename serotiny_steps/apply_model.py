@@ -42,7 +42,7 @@ def apply_model(
     callbacks = path_invocations(callbacks_config)
     trainer = pl.Trainer(
         **trainer_config,
-        loggers=loggers,
+        logger=loggers,
         callbacks=callbacks,
         gpus=num_gpus,
     )
