@@ -9,15 +9,13 @@ class LoadColumn(Loader):
 
     def __init__(
             self,
-            column='index',
-            dtype="float"):
+            column='index'):
         super().__init__()
 
         self.column = column
-        self.dtype = dtype
 
     def __call__(self, row):
-        return row[self.column].astype(self.dtype)
+        return row[self.column]
 
 
 class LoadColumns(Loader):

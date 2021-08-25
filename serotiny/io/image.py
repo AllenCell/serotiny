@@ -263,9 +263,11 @@ def tiff_writer(
         raise ValueError(f"Unexpected image shape {img.shape}")
 
     # Write output image
+    if channels is not None:
+        channels = [channels]
     OmeTiffWriter.save(
         data=img, uri=path, channel_names=channels,
-        dimension_order="STCZYX"
+        dim_order=dims
     )
 
 

@@ -13,7 +13,9 @@ from pytorch_lightning.utilities.parsing import get_init_args
 
 from serotiny.losses.elbo import calculate_elbo
 from serotiny.models._utils import find_optimizer
-from serotiny.utils import init
+from serotiny.utils import load_config
+from serotiny.utils.dynamic_imports import _bind
+
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]
 logger = logging.getLogger("lightning")
@@ -27,10 +29,12 @@ class BaseVAE(pl.LightningModule):
         decoder: Union[nn.Module, Dict],
         latent_dim: Union[int, Sequence[int]],
         optimizer: str,
-        lr: float,
         beta: float,
         x_label: str,
-        recon_loss: Union[Loss, Dict] = nn.MSELoss,
+        lr: float = 1e-3,
+        loss_mask_label: Optional[str] = None,
+        recon_loss: Union[Loss, Dict] = nn.MSELoss(reduction="none"),
+        recon_reduce: str = "mean",
         prior_mode: str = "isotropic",
         prior_logvar: Optional[Array] = None,
         learn_prior_logvar: bool = False,
@@ -77,11 +81,13 @@ class BaseVAE(pl.LightningModule):
         )
 
         if isinstance(recon_loss, dict):
-            recon_loss = init(recon_loss)
+            recon_loss = load_config(recon_loss)
         if isinstance(encoder, dict):
-            encoder = init(encoder)
+            encoder = load_config(encoder)
         if isinstance(decoder, str):
-            decoder = init(decoder)
+            decoder = load_config(decoder)
+
+        self.recon_reduce = recon_reduce
 
         self.recon_loss = recon_loss
         self.encoder = encoder
@@ -117,18 +123,24 @@ class BaseVAE(pl.LightningModule):
         self.decoder_args = inspect.getfullargspec(self.decoder.forward).args
 
     def parse_batch(self, batch):
-        return batch[self.hparams.x_label].float()
+        if self.hparams.loss_mask_label is not None:
+            mask = batch[self.hparams.loss_mask_label].float()
+        else:
+            mask = None
+        return batch[self.hparams.x_label].float(), dict(mask=mask)
+
 
     def sample_z(self, mu, log_var):
         std = torch.exp(0.5 * log_var)
         eps = torch.randn_like(std)
         return eps.mul(std).add(mu)
 
-    def forward(self, x, **kwargs):
+    def forward(self, x, mask=None, **kwargs):
         mu_logvar = self.encoder(x, **{k:v for k,v in kwargs.items()
                                        if k in self.encoder_args})
 
         mu, logvar = torch.split(mu_logvar, mu_logvar.shape[1] // 2, dim=1)
+        logvar = logvar.clamp(min=0, max=50)
         assert mu.shape == logvar.shape
 
         z = self.sample_z(mu, logvar)
@@ -138,16 +150,18 @@ class BaseVAE(pl.LightningModule):
 
         (loss, recon_loss, kld_loss,
          rcl_per_input_dimension, kld_per_latent_dimension) = calculate_elbo(
-            x,
-            x_hat,
-            mu,
-            logvar,
-            self.beta,
-            recon_loss=self.recon_loss,
-            mode=self.prior_mode,
-            prior_mu=(None if self.prior_mean is None else self.prior_mean.type_as(mu)),
-            prior_logvar=self.prior_logvar,
-        )
+             x,
+             x_hat,
+             mu,
+             logvar,
+             self.beta,
+             recon_loss=self.recon_loss,
+             recon_reduce=self.recon_reduce,
+             mask=mask,
+             mode=self.prior_mode,
+             prior_mu=(None if self.prior_mean is None else self.prior_mean.type_as(mu)),
+             prior_logvar=self.prior_logvar,
+         )
 
         batch_size = x.shape[0]
 
@@ -164,6 +178,7 @@ class BaseVAE(pl.LightningModule):
 
     def _step(self, stage, batch, batch_idx, logger):
         x = self.parse_batch(batch)
+
         if isinstance(x, tuple):
             x, forward_kwargs = x
         else:
@@ -185,7 +200,7 @@ class BaseVAE(pl.LightningModule):
             "batch_idx": batch_idx,
         }
 
-        if stage == "test":
+        if stage in ("test", "val"):
             results.update({
                 "mu": mu.detach(),
                 "kld_per_latent_dimension": kld_per_latent_dimension.detach().float(),
@@ -204,8 +219,17 @@ class BaseVAE(pl.LightningModule):
         return self._step("test", batch, batch_idx, logger=False)
 
     def configure_optimizers(self):
-        optimizer_class = find_optimizer(self.hparams.optimizer)
-        optimizer = optimizer_class(self.parameters(), lr=self.hparams.lr)
+        if isinstance(self.hparams.optimizer, str):
+            optimizer_class = find_optimizer(self.hparams.optimizer)
+            optimizer = optimizer_class(self.parameters(), lr=self.hparams.lr)
+        elif isinstance(self.hparams.optimizer, dict):
+            optimizer = load_config(self.hparams.optimizer)
+            optimizer = optimizer(self.parameters())
+        elif isinstance(self.hparams.optimizer, _bind):
+            optimizer = self.hparams.optimizer(self.parameters())
+
+        else:
+            raise TypeError
 
         return {
             "optimizer": optimizer,

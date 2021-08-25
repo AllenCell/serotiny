@@ -47,7 +47,9 @@ class PadTo:
         self.value = value
 
     def __call__(self, img):
-        img = torch.tensor(img)
+        if not isinstance(img, torch.Tensor):
+            img = torch.tensor(img)
+
         pad = []
         for i, dim in enumerate(self.target_dims):
             pad_dim = (dim - img.shape[i + 1]) / 2
@@ -65,16 +67,22 @@ class PadTo:
 
 
 class MinMaxNormalize:
-    def __init__(self, clip_min=None, clip_max=None):
+    def __init__(self, clip_min=None, clip_max=None, clip_quantile=False):
         self.clip_min = clip_min
         self.clip_max = clip_max
+        self.clip_quantile = clip_quantile
 
     def __call__(self, img):
-        img = torch.tensor(img)
+        if not isinstance(img, torch.Tensor):
+            img = torch.tensor(img)
 
         if self.clip_min is not None:
             if isinstance(self.clip_min, (int, float)):
-                clip_min = [self.clip_min] * img.shape[0]
+                if not self.clip_quantile:
+                    clip_min = [self.clip_min] * img.shape[0]
+                else:
+                    clip_min = [img[ch].quantile(self.clip_min).item()
+                                for ch in range(img.shape[0])]
             else:
                 clip_min = self.clip_min
         else:
@@ -83,7 +91,11 @@ class MinMaxNormalize:
 
         if self.clip_max is not None:
             if isinstance(self.clip_max, (int, float)):
-                clip_max = [self.clip_max] * img.shape[0]
+                if not self.clip_quantile:
+                    clip_max = [self.clip_max] * img.shape[0]
+                else:
+                    clip_max = [img[ch].quantile(self.clip_max).item()
+                                for ch in range(img.shape[0])]
             else:
                 clip_max = self.clip_max
         else:
@@ -109,12 +121,15 @@ class MinMaxNormalize:
 
 
 class CropCenter:
-    def __init__(self, cropz, cropx, cropy, pad=2, center_of_mass=None):
-        self.cropz = cropz
-        self.cropx = cropx
-        self.cropy = cropy
+    def __init__(self, cropz, cropx, cropy, pad=0, center_of_mass=None,
+                 force_size=True):
+        self.cropz = cropz + (cropz % 2 != 0)
+        self.cropx = cropx + (cropx % 2 != 0)
+        self.cropy = cropy + (cropy % 2 != 0)
+
         self.pad = pad
         self.center_of_mass = center_of_mass
+        self.force_size = force_size
 
     def __call__(self, img):
         c,z,x,y = img.shape
@@ -136,4 +151,9 @@ class CropCenter:
                   startz: endz,
                   startx: endx,
                   starty: endy]
+
+        if self.force_size:
+            pad_to = PadTo(target_dims=[self.cropz, self.cropx, self.cropy])
+            img = pad_to(img)
+
         return img

@@ -3,10 +3,34 @@ import os
 import omegaconf
 import yaml
 
+from collections import OrderedDict
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
 import serotiny.models as models
 from serotiny.utils import load_multiple, module_or_path
+
+
+def ordered_dump(data, stream=None, Dumper=yaml.SafeDumper, **kwds):
+    class OrderedDumper(Dumper):
+        pass
+    def _dict_representer(dumper, data):
+        return dumper.represent_mapping(
+            yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+            data.items())
+    OrderedDumper.add_representer(OrderedDict, _dict_representer)
+    return yaml.dump(data, stream, OrderedDumper, **kwds)
+
+
+def ordered_load(stream, Loader=yaml.SafeLoader, object_pairs_hook=OrderedDict):
+    class OrderedLoader(Loader):
+        pass
+    def construct_mapping(loader, node):
+        loader.flatten_mapping(node)
+        return object_pairs_hook(loader.construct_pairs(node))
+    OrderedLoader.add_constructor(
+        yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+        construct_mapping)
+    return yaml.load(stream, OrderedLoader)
 
 
 def get_root(model_root=None):
@@ -32,7 +56,7 @@ def _get_checkpoint(model_path, model_root):
     model_path = (model_root / model_class_name) / model_id
 
     with open(str(model_path) + ".yaml") as f:
-        config = yaml.load(f, Loader=yaml.FullLoader)
+        config = yaml.load(f, Loader=yaml.UnsafeLoader)
 
     ckpt_path = list(model_path.glob("*.ckpt"))[0]
 
@@ -130,16 +154,6 @@ def get_checkpoint_callback(
     )
 
 
-def _normalize_dict(d):
-    _new_d = {}
-    for k,v in d.items():
-        if isinstance(v, dict):
-            _new_d[k] = _normalize_dict(v)
-        else:
-            _new_d[k] = v
-    return _new_d
-
-
 def store_metadata(metadata, model_class, model_id, model_root=None):
     model_root = get_root(model_root)
 
@@ -152,7 +166,10 @@ def store_metadata(metadata, model_class, model_id, model_root=None):
 
     model_id = model_id if ".yaml" in model_id else model_id + ".yaml"
 
-    model_path = model_path / model_id
+    model_path = model_path / model_id.replace("/", "_")
 
-    omegaconf.OmegaConf.save(_normalize_dict(metadata), model_path,
-                             resolve=True)
+    if isinstance(metadata, omegaconf.DictConfig):
+        omegaconf.OmegaConf.save(metadata, model_path, resolve=True)
+    else:
+        with open(model_path, "w") as f:
+            yaml.dump(metadata, f)

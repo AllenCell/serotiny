@@ -82,7 +82,6 @@ class ManifestDatamodule(pl.LightningDataModule):
         drop_last: bool = False,
         metadata: Dict = {},
         subset_train: float = 1.0,
-        fms: bool = False
     ):
 
         super().__init__()
@@ -100,6 +99,13 @@ class ManifestDatamodule(pl.LightningDataModule):
         self.length = len(self.dataframe)
         indices = list(range(self.length))
 
+        loaders["train"] = load_multiple(loaders["train"])
+        for split in ["validation", "test"]:
+            if split in loaders:
+                loaders[split] = load_multiple(loaders[split])
+            else:
+                loaders[split] = loaders["train"]
+
         indices = {}
         if split_col is not None:
             assert self.dataframe.dtypes[split_col] == np.dtype("O")
@@ -112,7 +118,7 @@ class ManifestDatamodule(pl.LightningDataModule):
                     self.dataframe[split_col] == split
                 ].index.tolist()
         else:
-            indices['train'] = indices
+            indices['train'] = self.dataframe.index.tolist()
             indices['validation'] = [0] * self.batch_size
             indices['test'] = [0] * self.batch_size
 

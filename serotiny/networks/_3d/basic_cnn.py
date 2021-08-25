@@ -1,4 +1,4 @@
-from typing import Sequence, Optional
+from typing import Sequence, Optional, Dict, Union
 import logging
 
 import numpy as np
@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 
 from serotiny.networks.layers.spatial_pyramid_pool import spatial_pyramid_pool
+from serotiny.utils.dynamic_imports import load_config
 
 log = logging.getLogger(__name__)
 
@@ -14,7 +15,8 @@ def _conv_layer(
     out_c: int,
     kernel_size: Sequence[int] = (3, 3, 3),
     padding: int = 0,
-    up_conv: bool = False
+    up_conv: bool = False,
+    non_linearity=nn.ReLU,
 ):
     """
     Util function to instantiate a convolutional block.
@@ -34,7 +36,7 @@ def _conv_layer(
 
     return nn.Sequential(
         conv(in_c, out_c, kernel_size=kernel_size, padding=padding),
-        nn.ReLU(),
+        non_linearity(),
         nn.BatchNorm3d(out_c),
     )
 
@@ -47,9 +49,11 @@ class BasicCNN(nn.Module):
         hidden_channels: Sequence[int],
         input_dims: Optional[Sequence[int]] = None,
         max_pool_layers: Sequence[int] = [],
+        upsample_layers: Sequence[int] = [],
         pyramid_pool_splits: Optional[Sequence[int]] = None,
         flat_output: bool = True,
-        up_conv: bool = False
+        up_conv: bool = False,
+        non_linearity: Union[type, Dict] = nn.ReLU
     ):
         """
         Instantiate a 3D CNN
@@ -72,8 +76,12 @@ class BasicCNN(nn.Module):
         self.output_dim = output_dim
         self.max_pool = nn.MaxPool3d(kernel_size=2, padding=0)
         self.max_pool_layers = max_pool_layers
+        self.upsample_layers = upsample_layers
         self.pyramid_pool_splits = pyramid_pool_splits
         self.flat_output = flat_output
+
+        if isinstance(non_linearity, dict):
+            non_linearity = load_config(non_linearity)
 
         layers = []
 
@@ -81,7 +89,7 @@ class BasicCNN(nn.Module):
         for out_channels in hidden_channels:
             layers.append(
                 _conv_layer(_in_channels, out_channels, kernel_size=(3, 3, 3),
-                            up_conv=up_conv)
+                            up_conv=up_conv, non_linearity=non_linearity)
             )
             _in_channels = out_channels
 
@@ -105,11 +113,31 @@ class BasicCNN(nn.Module):
         if flat_output:
             self.output = nn.Linear(compressed_size, output_dim)
 
-    def conv_forward(self, x):
+    def conv_forward(self, x, return_sizes=False):
+        if return_sizes:
+            sizes = [None] * len(self.layers)
+
         for i, layer in enumerate(self.layers):
             x = layer(x)
             if i in self.max_pool_layers:
                 x = self.max_pool(x)
+
+            if i in self.upsample_layers:
+                output_size = self.upsample_layers[i]
+                if isinstance(output_size, Sequence):
+                    upsample = nn.Upsample(size=output_size)
+                elif isinstance(output_size, (float, int)):
+                    upsample = nn.Upsample(scale_factor=output_size)
+                else:
+                    raise TypeError
+
+                x = upsample(x)
+
+            if return_sizes:
+                sizes[i] = x.shape[2:]
+
+        if return_sizes:
+            return x, sizes
 
         return x
 

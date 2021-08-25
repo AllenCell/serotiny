@@ -31,6 +31,7 @@ class TabularConditionalVAE(ConditionalVAE):
         x_label: str,
         c_label: Union[str, int, Sequence[int]],
         recon_loss: Union[Loss, str] = torch.nn.MSELoss,
+        loss_mask_label: Optional[str] = None,
         condition_mode: str = "label",
         prior_mode: str = "isotropic",
         prior_logvar: Optional[Array] = None,
@@ -87,9 +88,21 @@ class TabularConditionalVAE(ConditionalVAE):
             hidden_layers=hidden_layers,
         )
 
-        super().__init__(encoder, decoder, latent_dim, optimizer, lr,
-                         beta, x_label, c_label, recon_loss, condition_mode,
-                         prior_mode, prior_logvar, learn_prior_logvar)
+        super().__init__(
+            encoder=encoder,
+            decoder=decoder,
+            latent_dim=latent_dim,
+            optimizer=optimizer,
+            lr=lr,
+            beta=beta,
+            x_label=x_label,
+            loss_mask_label=loss_mask_label,
+            recon_loss=recon_loss,
+            prior_mode=prior_mode,
+            prior_logvar=prior_logvar,
+            learn_prior_logvar=learn_prior_logvar
+        )
+
 
     def parse_batch(self, batch):
         batch = super().parse_batch(batch)

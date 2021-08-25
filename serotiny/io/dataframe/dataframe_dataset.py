@@ -5,6 +5,17 @@ import numpy as np
 from torch.utils.data import Dataset
 from torch.utils.data.dataloader import default_collate as collate
 
+class _Row:
+    def __init__(self, array, cols):
+        self.array = array
+        self.cols = cols
+
+    def __getitem__(self, col):
+        return self.array[self.cols.index(col)]
+
+    def __getattr__(self, col):
+        return self.array[self.cols.index(col)]
+
 
 class DataframeDataset(Dataset):
     """
@@ -22,21 +33,17 @@ class DataframeDataset(Dataset):
         in the dataset.
     """
 
-    def __init__(self, dataframe, loaders=None, iloc=True):
-        self.dataframe = dataframe
-        if iloc:
-            self.dataframe.reset_index(inplace=True)
+    def __init__(self, dataframe, loaders):
+        self.dataframe = dataframe.values
+        self.columns = dataframe.columns.tolist()
 
-        self.iloc = iloc
+        self.loaders = loaders
 
     def __len__(self):
         return len(self.dataframe)
 
     def __getitem__(self, idx):
-        if self.iloc:
-            row = self.dataframe.iloc[idx]
-        else:
-            row = self.dataframe.loc[idx]
+        row = _Row(self.dataframe[idx], self.columns)
 
         return {
             key: loader(row) for key, loader in self.loaders.items()

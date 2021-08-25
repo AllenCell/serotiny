@@ -71,7 +71,6 @@ def train_model(
 
     loggers = load_multiple(loggers_config)
 
-
     if len(model_zoo) > 0:
         model_path = build_model_path(
             model_zoo_path,
@@ -85,10 +84,9 @@ def train_model(
     else:
         checkpoint_callback = None
 
-    if checkpoint_callback:
-        trainer_config['checkpoint_callback'] = checkpoint_callback
-
     callbacks = load_multiple(callbacks_config)
+    if checkpoint_callback:
+        callbacks.append(checkpoint_callback)
 
     trainer = pl.Trainer(
         **trainer_config,

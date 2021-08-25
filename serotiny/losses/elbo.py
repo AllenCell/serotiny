@@ -20,15 +20,33 @@ def calculate_elbo(
     mean,
     log_var,
     beta,
-    recon_loss: Loss = torch.nn.MSELoss,
+    recon_loss: Loss,
+    recon_reduce="mean",
+    mask=None,
     mode="isotropic",
     prior_mu=None,
     prior_logvar=None,
 ):
 
-    recon_loss = recon_loss(reduction="none")
     rcl_per_input_dimension = recon_loss(reconstructed_x, x)
-    rcl = rcl_per_input_dimension.sum(dim=1).mean()
+    if mask is not None:
+        rcl_per_input_dimension = rcl_per_input_dimension * mask
+        normalizer = mask.view(mask.shape[0], -1).sum(dim=1)
+    else:
+        normalizer = sum(x.shape[1:])
+
+    rcl = (
+        rcl_per_input_dimension
+        # flatten
+        .view(rcl_per_input_dimension.shape[0], -1)
+        # and sum per batch element.
+        .sum(dim=1)
+    )
+
+    if recon_reduce == "mean":
+        rcl = rcl / normalizer
+
+    rcl = rcl.mean()
 
     if mode == "isotropic":
         kld_per_dimension = isotropic_gaussian_kl(mean, log_var)

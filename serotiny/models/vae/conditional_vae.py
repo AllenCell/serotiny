@@ -30,6 +30,7 @@ class ConditionalVAE(BaseVAE):
         beta: float,
         x_label: str,
         c_label: Union[str, int, Sequence[int]],
+        loss_mask_label: Optional[str] = None,
         recon_loss: Union[Loss, str] = torch.nn.MSELoss,
         condition_mode: str = "label",
         prior_mode: str = "isotropic",
@@ -75,9 +76,20 @@ class ConditionalVAE(BaseVAE):
             Boolean flag to determine whether to learn the prior log-variances
         """
 
-        super().__init__(encoder, decoder, latent_dim, optimizer, lr,
-                         beta, x_label, recon_loss,
-                         prior_mode, prior_logvar, learn_prior_logvar)
+        super().__init__(
+            encoder=encoder,
+            decoder=decoder,
+            latent_dim=latent_dim,
+            optimizer=optimizer,
+            lr=lr,
+            beta=beta,
+            x_label=x_label,
+            loss_mask_label=loss_mask_label,
+            recon_loss=recon_loss,
+            prior_mode=prior_mode,
+            prior_logvar=prior_logvar,
+            learn_prior_logvar=learn_prior_logvar
+        )
 
         if condition_mode not in ("channel", "label"):
             raise ValueError("`condition_mode` should be "
