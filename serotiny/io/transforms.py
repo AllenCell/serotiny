@@ -32,6 +32,35 @@ class ResizeBy:
         return resize(img, factor, self.method)
 
 
+class Project:
+    def __init__(self, axis, mode="max"):
+        self.axis = axis
+        self.mode = mode
+
+    def __call__(self, img):
+        if not isinstance(img, torch.Tensor):
+            img = torch.tensor(img)
+
+        axis = {
+            "z": -3,
+            "x": -2,
+            "y": -1
+        }
+
+        if self.axis == "z":
+            assert len(img.shape) >= 3
+
+        if self.mode == "max":
+            return img.max(axis=axis[self.axis])
+        elif self.mode == "mean":
+            return img.mean(axis=axis[self.axis])
+        elif self.mode == "median":
+            return img.median(axis=axis[self.axis])
+        else:
+            raise NotImplementedError
+
+
+
 class Permute:
     def __init__(self, target_dims):
         self.target_dims = target_dims
