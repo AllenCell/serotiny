@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - master
-      - gui_docs
+      - dynamic-imports
 
 jobs:
   docs:
@@ -30,6 +30,6 @@ jobs:
       uses: JamesIves/github-pages-deploy-action@releases/v3
       with:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        BASE_BRANCH: gui_docs # The branch the action should deploy from.
+        BASE_BRANCH: dynamic-imports # The branch the action should deploy from.
         BRANCH: gh-pages # The branch the action should deploy to.
         FOLDER: docs/_build/html/ # The folder the action should deploy.
