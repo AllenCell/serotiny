@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class SwapAxes():
+class SwapAxes:
     def __init__(self, first: int, second: int):
         self.first = first
         self.second = second

@@ -9,8 +9,13 @@ from serotiny.networks.layers.spatial_pyramid_pool import spatial_pyramid_pool
 
 log = logging.getLogger(__name__)
 
+
 def _conv_layer(
-    in_c: int, out_c: int, kernel_size: Sequence[int] = (3, 3, 3), padding: int = 0
+    in_c: int,
+    out_c: int,
+    kernel_size: Sequence[int] = (3, 3, 3),
+    padding: int = 0,
+    up_conv: bool = False,
 ):
     """
     Util function to instantiate a convolutional block.
@@ -26,8 +31,10 @@ def _conv_layer(
     padding:
         padding value for the convolution (defaults to 0)
     """
+    conv = nn.ConvTranspose3d if up_conv else nn.Conv3d
+
     return nn.Sequential(
-        nn.Conv3d(in_c, out_c, kernel_size=kernel_size, padding=padding),
+        conv(in_c, out_c, kernel_size=kernel_size, padding=padding),
         nn.ReLU(),
         nn.BatchNorm3d(out_c),
     )
@@ -42,6 +49,8 @@ class BasicCNN(nn.Module):
         input_dims: Optional[Sequence[int]] = None,
         max_pool_layers: Sequence[int] = [],
         pyramid_pool_splits: Optional[Sequence[int]] = None,
+        flat_output: bool = True,
+        up_conv: bool = False,
     ):
         """
         Instantiate a 3D CNN
@@ -65,13 +74,16 @@ class BasicCNN(nn.Module):
         self.max_pool = nn.MaxPool3d(kernel_size=2, padding=0)
         self.max_pool_layers = max_pool_layers
         self.pyramid_pool_splits = pyramid_pool_splits
+        self.flat_output = flat_output
 
         layers = []
 
         _in_channels = in_channels
         for out_channels in hidden_channels:
             layers.append(
-                _conv_layer(_in_channels, out_channels, kernel_size=(3, 3, 3))
+                _conv_layer(
+                    _in_channels, out_channels, kernel_size=(3, 3, 3), up_conv=up_conv
+                )
             )
             _in_channels = out_channels
 
@@ -81,18 +93,25 @@ class BasicCNN(nn.Module):
         # to infer the needed input size of the final fully connected layer
         if pyramid_pool_splits is None:
             assert input_dims is not None
-            dummy_conv_output = self.conv_forward(torch.zeros(1, in_channels, *input_dims))
+            dummy_conv_output = self.conv_forward(
+                torch.zeros(1, in_channels, *input_dims)
+            )
             compressed_size = np.prod(dummy_conv_output.shape[1:])
         else:
             if input_dims is None:
                 input_dims = (200, 200, 200)
-            dummy_conv_output = self.conv_forward(torch.zeros(1, in_channels, *input_dims))
-            dummy_compressed = spatial_pyramid_pool(dummy_conv_output, self.pyramid_pool_splits)
+            dummy_conv_output = self.conv_forward(
+                torch.zeros(1, in_channels, *input_dims)
+            )
+            dummy_compressed = spatial_pyramid_pool(
+                dummy_conv_output, self.pyramid_pool_splits
+            )
             compressed_size = np.prod(dummy_compressed.shape[1:])
 
         log.info(f"Determined 'compressed size': {compressed_size} for CNN")
 
-        self.output = nn.Linear(compressed_size, output_dim)
+        if flat_output:
+            self.output = nn.Linear(compressed_size, output_dim)
 
     def conv_forward(self, x):
         for i, layer in enumerate(self.layers):
@@ -106,4 +125,8 @@ class BasicCNN(nn.Module):
         x = self.conv_forward(x)
         if self.pyramid_pool_splits is not None:
             x = spatial_pyramid_pool(x, self.pyramid_pool_splits)
-        return self.output(x.view(x.shape[0], -1))
+
+        if self.flat_output:
+            x = self.output(x.view(x.shape[0], -1))
+
+        return x

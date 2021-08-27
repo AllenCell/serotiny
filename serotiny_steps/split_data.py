@@ -3,13 +3,6 @@ import logging
 from pathlib import Path
 import fire
 
-from sklearn.model_selection import train_test_split
-
-import pandas as pd
-
-
-from serotiny.io.dataframe import load_csv, append_one_hot
-
 ###############################################################################
 
 log = logging.getLogger(__name__)
@@ -17,11 +10,7 @@ log = logging.getLogger(__name__)
 ###############################################################################
 
 
-def split_data(
-        dataset_path: str,
-        output_path: str,
-        ratios=None,
-        required_fields=None):
+def split_data(dataset_path: str, output_path: str, ratios=None, required_fields=None):
 
     """
     Split the incoming data into N sets of output data, randomly

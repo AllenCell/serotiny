@@ -12,7 +12,6 @@ import numpy as np
 import torch
 from torch import nn
 from torch.nn import functional as F
-import torch.optim as opt
 
 import pytorch_lightning as pl
 
@@ -342,6 +341,7 @@ class ClassificationModel(pl.LightningModule):
                 self.logger[0].experiment.add_histogram(
                     tag=name, values=grads, global_step=self.trainer.global_step
                 )
+
 
 def acc_prec_recall(n_classes):
     """

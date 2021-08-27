@@ -1,6 +1,3 @@
-import logging
-from typing import Optional, List
-
 import fire
 
 import joblib
@@ -18,10 +15,10 @@ def _fit_pca(
 ):
     cols = filter_columns(dataset.columns.tolist(), **filter_options)
     dataset = dataset[cols]
-
     pca = PCA(n_components).fit(dataset)
 
     joblib.dump(pca, output_path, compress=compression)
+
 
 def fit_pca(
     dataset_path: str,

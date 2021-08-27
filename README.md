@@ -6,11 +6,7 @@
 
 Library and commands for pytorch/lightning deep-learning workflows
 
-![SEROTINY](https://github.com/AllenCellModeling/serotiny/blob/master/resources/serotiny.png)
-
-Serotiny (n) - when fire triggers the release of a seed
-
----
+----
 
 Serotiny is essentially two things:
 
@@ -27,16 +23,65 @@ The deep-learning functionality is built on [pytorch](https://github.com/pytorch
   - Apply one-hot encoding to class labels
   - Change resolution of input images
   - Apply 2D projections for 3D input images
-  - Train classifier and autoencoder models
+  - Filter data down to specified columns
+  - Train models
 
 ## Installation
 
 **Stable Release:** `pip install serotiny`<br>
 **Development Head:** `pip install git+https://github.com/AllenCellModeling/serotiny.git`
 
+## Documentation
+
+For full package documentation please visit [AllenCellModeling.github.io/serotiny](https://AllenCellModeling.github.io/serotiny).
+
 ## Quick Start
 
-### To change the resolution of input images:
+### To load a trained model:
+
+```python
+from serotiny.models.zoo import get_model, get_trainer_at_checkpoint, _get_checkpoint
+
+model = get_model(model_path, model_zoo_path)
+trainer = get_trainer_at_checkpoint(model_path, model_zoo_path)
+ckpt_path, _, config  = _get_checkpoint(model_path, model_zoo_path)
+``` 
+
+### To setup a datamodule given the config from a trained model:
+
+```python
+datamodule_name = config["datamodule"]['^init']
+datamodule_config = config["datamodule"]   
+create_datamodule = module_get(datamodules, datamodule_name.split('.')[-1])
+datamodule_config["num_workers"] = 2
+datamodule_config["pin_memory"] = False
+datamodule_config.pop('^init')
+datamodule = create_datamodule(**datamodule_config)
+datamodule.setup()
+``` 
+
+### To restart training/testing
+
+```python
+trainer.model = model
+trainer.datamodule = datamodule
+trainer.logger = loggers
+trainer.test_dataloaders = [datamodule.test_dataloader()]
+trainer.train_dataloader = datamodule.train_dataloader()
+trainer.val_dataloaders = [datamodule.val_dataloader()]
+trainer.fit()
+trainer.test()
+``` 
+
+### To run a callback after testing
+
+```python
+callback = CustomCallback()
+callback.on_test_epoch_end(trainer, model)
+``` 
+
+
+<!-- ### To change the resolution of input images:
 
 ```python
 python -m  serotiny.steps.change_resolution \
@@ -46,9 +91,9 @@ python -m  serotiny.steps.change_resolution \
     --path_3d_resized_column "CellSampledImage3DPath" \
     --path_out "/allen/aics/modeling/spanglry/data/mitotic-classifier/sampled_output/" \
     --resolution [10,20,50]
-```
+``` -->
 
-### To apply 2D projections to 3D images:
+<!-- ### To apply 2D projections to 3D images:
 
 ```python
 python -m serotiny.steps.apply_projection \
@@ -85,14 +130,14 @@ python -m serotiny.steps.train_model \
     --test True \
     --x_label 'projection_image' \
     --y_label 'ChosenMitoticClass'
-```
-
-## Documentation
-
-For full package documentation please visit [AllenCellModeling.github.io/serotiny](https://AllenCellModeling.github.io/serotiny).
+``` -->
 
 ## Development
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for information related to developing the code.
+
+![SEROTINY](https://github.com/AllenCellModeling/serotiny/blob/master/resources/serotiny.png)
+
+Serotiny (n) - when fire triggers the release of a seed
 
 **MIT license**

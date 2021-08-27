@@ -1,34 +1,21 @@
-from typing import Sequence, Tuple, Union
-
 import inspect
-import math
-import random
 import torch
 import torch.nn.functional as F
 import torch.optim as opt
-from torch import device, Tensor
-from pytorch_lightning import LightningModule
-from scipy.stats import multivariate_normal
 
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
 
-from tqdm import trange, tqdm
 
-def to_device(
-    *args
-):
+def to_device(*args):
 
     assert len(args) > 1
     target_device = args[-1]
-    assert isinstance(target_device, (str, device))
+    # assert isinstance(target_device, (str, device))
     args = args[:-1]
 
     if len(args) > 1:
-        return tuple(
-            arg.to(target_device) for arg in args
-        )
+        return tuple(arg.to(target_device) for arg in args)
     else:
         return args[0].to(target_device)
 
@@ -134,7 +121,6 @@ def find_optimizer(optimizer_name):
     return optimizer_class
 
 
-
 def find_lr_scheduler(scheduler_name):
     """
     Given scheduler name, get it from torch.optim.lr_scheduler
@@ -153,4 +139,3 @@ def find_lr_scheduler(scheduler_name):
             f"options are {available_schedulers}"
         )
     return scheduler_class
-

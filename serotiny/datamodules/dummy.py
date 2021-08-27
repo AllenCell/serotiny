@@ -28,7 +28,7 @@ class DummyDataset(Dataset):
     def __init__(self, x_label, y_label, length, x_dims, y_dims=None):
         self.length = length
         self.x_dims = tuple(x_dims)
-        self.y_dims = (tuple(y_dims) if y_dims is not None else None)
+        self.y_dims = tuple(y_dims) if y_dims is not None else None
         self.x_label = x_label
         self.y_label = y_label
 
@@ -47,13 +47,13 @@ class DummyDataset(Dataset):
         }
 
 
-def make_dataloader(x_label, y_label, length, x_dims, batch_size, num_workers,
-                    y_dims=None):
+def make_dataloader(
+    x_label, y_label, length, x_dims, batch_size, num_workers, y_dims=None
+):
     """
     Instantiate dummy dataset and return dataloader
     """
-    dataset = DummyDataset(x_label, y_label, length, x_dims,
-                           y_dims=y_dims)
+    dataset = DummyDataset(x_label, y_label, length, x_dims, y_dims=y_dims)
     return DataLoader(
         dataset,
         batch_size=batch_size,
@@ -116,18 +116,12 @@ class DummyDatamodule(pl.LightningDataModule):
         self.x_dims = x_dims
 
         if self.num_channels > 0:
-            dl_dims = tuple([self.num_channels] + list(x_dims)),
+            dl_dims = (tuple([self.num_channels] + list(x_dims)),)
         else:
             dl_dims = x_dims
 
         self.dataloader = make_dataloader(
-            x_label,
-            y_label,
-            length,
-            dl_dims,
-            batch_size,
-            num_workers,
-            y_dims=y_dims
+            x_label, y_label, length, dl_dims, batch_size, num_workers, y_dims=y_dims
         )
 
     def train_dataloader(self):

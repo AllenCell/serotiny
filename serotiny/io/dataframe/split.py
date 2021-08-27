@@ -1,9 +1,8 @@
 import pandas as pd
+from sklearn.model_selection import train_test_split
 
-DEFAULT_RATIOS = {
-    'train': 0.6,
-    'test': 0.2,
-    'valid': 0.2}
+DEFAULT_RATIOS = {"train": 0.6, "test": 0.2, "valid": 0.2}
+
 
 def split_dataset(dataset, ratios=None):
     if ratios is None:

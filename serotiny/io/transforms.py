@@ -5,6 +5,7 @@ import torch
 import torch.nn.functional as F
 from aicsimageprocessing.resize import resize_to, resize
 
+
 class ResizeTo:
     def __init__(self, target_dims):
         self.target_dims = target_dims
@@ -26,7 +27,7 @@ class ResizeBy:
             n_dims = len(img.shape[1:])
             factor = (1, *(n_dims * [self.factor]))
         else:
-            raise TypeError(f"Unexpected factor, of type {type(factor)}")
+            raise TypeError("Unexpected factor")
 
         return resize(img, factor, self.method)
 
@@ -91,17 +92,49 @@ class MinMaxNormalize:
 
         for chan in range(img.shape[0]):
             if clip_min[chan] is not None:
-                img[chan] = torch.where(img[chan] < clip_min[chan],
-                                        torch.tensor(clip_min[chan], dtype=img.dtype),
-                                        img[chan])
+                img[chan] = torch.where(
+                    img[chan] < clip_min[chan],
+                    torch.tensor(clip_min[chan], dtype=img.dtype),
+                    img[chan],
+                )
 
             if clip_max[chan] is not None:
-                img[chan] = torch.where(img[chan] > clip_max[chan],
-                                        torch.tensor(clip_max[chan], dtype=img.dtype),
-                                        img[chan])
+                img[chan] = torch.where(
+                    img[chan] > clip_max[chan],
+                    torch.tensor(clip_max[chan], dtype=img.dtype),
+                    img[chan],
+                )
 
             m = img[chan].min()
             M = img[chan].max()
             img[chan] = (img[chan] - m) / (M - m)
 
+        return img
+
+
+class CropCenter:
+    def __init__(self, cropz, cropx, cropy, pad=2, center_of_mass=None):
+        self.cropz = cropz
+        self.cropx = cropx
+        self.cropy = cropy
+        self.pad = pad
+        self.center_of_mass = center_of_mass
+
+    def __call__(self, img):
+        c, z, x, y = img.shape
+
+        if self.center_of_mass is None:
+            center_of_mass = (z // 2, x // 2, y // 2)
+        else:
+            center_of_mass = self.center_of_mass
+
+        startz = max(0, center_of_mass[0] - (self.cropz // 2) - self.pad)
+        startx = max(0, center_of_mass[1] - (self.cropx // 2) - self.pad)
+        starty = max(0, center_of_mass[2] - (self.cropy // 2) - self.pad)
+
+        endz = startz + self.cropz + 2 * self.pad
+        endx = startx + self.cropx + 2 * self.pad
+        endy = starty + self.cropy + 2 * self.pad
+
+        img = img[:, startz:endz, startx:endx, starty:endy]
         return img

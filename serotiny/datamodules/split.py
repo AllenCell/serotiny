@@ -1,26 +1,20 @@
 import re
 import logging
-from typing import Union, Optional, Dict
+from typing import Union, Dict
 from pathlib import Path
 
 import multiprocessing as mp
-import numpy as np
-import pandas as pd
 import pytorch_lightning as pl
 
-from torch.utils.data.sampler import SubsetRandomSampler
 from torch.utils.data import DataLoader
 
 from serotiny.io.dataframe import DataframeDataset, load_csv
-from serotiny.utils import path_invocations, invoke_class
+from serotiny.utils import load_multiple, init
 
 log = logging.getLogger(__name__)
 
 
-def make_dataloader(
-        dataset,
-        mode,
-        **kwargs):
+def make_dataloader(dataset, mode, **kwargs):
 
     return ModeDataLoader(
         dataset=dataset,
@@ -75,14 +69,12 @@ class SplitDatamodule(pl.LightningDataModule):
         self.loaders = {}
 
         for mode, loaders_config in loaders.items():
-            self.loaders[mode] = path_invocations(loaders_config)
+            self.loaders[mode] = load_multiple(loaders_config)
 
         for csv in list(split_path.glob("*.csv")):
-            mode = re.findall(r'(.*)\.csv', csv.name)[0]
+            mode = re.findall(r"(.*)\.csv", csv.name)[0]
             dataframe = load_csv(csv)
-            dataset = DataframeDataset(
-                dataframe,
-                loaders=self.loaders[mode])
+            dataset = DataframeDataset(dataframe, loaders=self.loaders[mode])
             self.datasets[mode] = dataset
 
         self.batch_size = batch_size
@@ -92,17 +84,18 @@ class SplitDatamodule(pl.LightningDataModule):
         self.collate = None
 
         if collate is not None:
-            self.collate = invoke_class(collate)
+            self.collate = init(collate)
 
     def generate_args(self):
         args = {
-            'batch_size': self.batch_size,
-            'num_workers': self.num_workers,
-            'pin_memory': self.pin_memory,
-            'drop_last': self.drop_last}
+            "batch_size": self.batch_size,
+            "num_workers": self.num_workers,
+            "pin_memory": self.pin_memory,
+            "drop_last": self.drop_last,
+        }
 
         if self.collate is not None:
-            args['collate_fn'] = self.collate
+            args["collate_fn"] = self.collate
 
         return args
 
@@ -111,15 +104,14 @@ class SplitDatamodule(pl.LightningDataModule):
         return DataLoader(
             dataset=self.datasets[mode],
             multiprocessing_context=mp.get_context("fork"),
-            **args)
+            **args,
+        )
 
     def train_dataloader(self):
-        return self.make_dataloader('train')
+        return self.make_dataloader("train")
 
     def val_dataloader(self):
-        return self.make_dataloader('valid')
+        return self.make_dataloader("valid")
 
     def test_dataloader(self):
-        return self.make_dataloader('test')
-
-
+        return self.make_dataloader("test")
