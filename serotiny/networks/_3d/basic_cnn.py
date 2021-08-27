@@ -13,10 +13,11 @@ log = logging.getLogger(__name__)
 def _conv_layer(
     in_c: int,
     out_c: int,
-    kernel_size: Sequence[int] = (3, 3, 3),
+    kernel_size: int = 3,
     padding: int = 0,
     up_conv: bool = False,
     non_linearity=nn.ReLU,
+    mode: str = "3d"
 ):
     """
     Util function to instantiate a convolutional block.
@@ -32,12 +33,17 @@ def _conv_layer(
     padding:
         padding value for the convolution (defaults to 0)
     """
-    conv = (nn.ConvTranspose3d if up_conv else nn.Conv3d)
+    if mode == "2d":
+        conv = (nn.ConvTranspose2d if up_conv else nn.Conv2d)
+        batch_norm = nn.BatchNorm2d
+    else:
+        conv = (nn.ConvTranspose3d if up_conv else nn.Conv3d)
+        batch_norm = nn.BatchNorm3d
 
     return nn.Sequential(
         conv(in_c, out_c, kernel_size=kernel_size, padding=padding),
         non_linearity(),
-        nn.BatchNorm3d(out_c),
+        batch_norm(out_c),
     )
 
 
@@ -47,13 +53,15 @@ class BasicCNN(nn.Module):
         in_channels: int,
         output_dim: int,
         hidden_channels: Sequence[int],
+        kernel_size: int = 3,
         input_dims: Optional[Sequence[int]] = None,
         max_pool_layers: Sequence[int] = [],
         upsample_layers: Sequence[int] = [],
         pyramid_pool_splits: Optional[Sequence[int]] = None,
         flat_output: bool = True,
         up_conv: bool = False,
-        non_linearity: Union[type, Dict] = nn.ReLU
+        non_linearity: Union[type, Dict] = nn.ReLU,
+        mode: str = "3d"
     ):
         """
         Instantiate a 3D CNN
@@ -74,7 +82,11 @@ class BasicCNN(nn.Module):
         """
         super().__init__()
         self.output_dim = output_dim
-        self.max_pool = nn.MaxPool3d(kernel_size=2, padding=0)
+        self.mode = mode
+        _mode = (3 if mode == "3d" else 2)
+
+        max_pool = (nn.MaxPool3d if mode == "3d" else nn.MaxPool2d)
+        self.max_pool = max_pool(kernel_size=2, padding=0)
         self.max_pool_layers = max_pool_layers
         self.upsample_layers = upsample_layers
         self.pyramid_pool_splits = pyramid_pool_splits
@@ -88,8 +100,9 @@ class BasicCNN(nn.Module):
         _in_channels = in_channels
         for out_channels in hidden_channels:
             layers.append(
-                _conv_layer(_in_channels, out_channels, kernel_size=(3, 3, 3),
-                            up_conv=up_conv, non_linearity=non_linearity)
+                _conv_layer(_in_channels, out_channels, kernel_size=kernel_size,
+                            up_conv=up_conv, non_linearity=non_linearity,
+                            mode=mode)
             )
             _in_channels = out_channels
 
@@ -103,7 +116,9 @@ class BasicCNN(nn.Module):
             compressed_size = np.prod(dummy_conv_output.shape[1:])
         else:
             if input_dims is None:
-                input_dims = (200, 200, 200)
+                log.warn(f"You really should define input_dims..., "
+                         f"I'm assuming {[200]*_mode}")
+                input_dims = [200] * _mode
             dummy_conv_output = self.conv_forward(torch.zeros(1, in_channels, *input_dims))
             dummy_compressed = spatial_pyramid_pool(dummy_conv_output, self.pyramid_pool_splits)
             compressed_size = np.prod(dummy_compressed.shape[1:])
