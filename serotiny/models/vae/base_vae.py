@@ -163,15 +163,13 @@ class BaseVAE(pl.LightningModule):
              prior_logvar=self.prior_logvar,
          )
 
-        batch_size = x.shape[0]
-
         return (
             x_hat,
             mu,
             logvar,
-            loss / batch_size,
-            recon_loss / batch_size,
-            kld_loss / batch_size,
+            loss,
+            recon_loss,
+            kld_loss,
             rcl_per_input_dimension,
             kld_per_latent_dimension
         )
