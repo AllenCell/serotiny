@@ -24,6 +24,7 @@ class _ImageVAEDecoder(nn.Module):
         latent_dim,
         output_dims,
         output_channels,
+        mode
     ):
         super().__init__()
 
@@ -43,6 +44,7 @@ class _ImageVAEDecoder(nn.Module):
             upsample_layers={i:size for (i,size) in enumerate(intermediate_sizes)},
             up_conv=True,
             flat_output=False,
+            mode=mode,
         )
 
     def forward(self, z):
@@ -54,6 +56,7 @@ class _ImageVAEDecoder(nn.Module):
         )
 
         z = self.deconv(z)
+        z = z.clamp(max=50)
 
         return z
 
@@ -77,6 +80,7 @@ class ImageVAE(BaseVAE):
         prior_mode: str = "isotropic",
         prior_logvar: Optional[Array] = None,
         learn_prior_logvar: bool = False,
+        mode: str = "3d",
     ):
 
         encoder = BasicCNN(
@@ -84,10 +88,11 @@ class ImageVAE(BaseVAE):
             input_dims=input_dims,
             output_dim=latent_dim * 2,  # because it has to return mu and sigma
             hidden_channels=hidden_channels,
-            max_pool_layers=max_pool_layers
+            max_pool_layers=max_pool_layers,
+            mode=mode,
         )
         encoder.apply(weight_init)
-        #nn.utils.spectral_norm(encoder.output)
+        nn.utils.spectral_norm(encoder.output)
 
         dummy_out, intermediate_sizes = encoder.conv_forward(
             torch.zeros(1, in_channels, *input_dims),
@@ -106,16 +111,15 @@ class ImageVAE(BaseVAE):
             latent_dim=latent_dim,
             output_dims=input_dims,
             output_channels=in_channels,
+            mode=mode
         )
         decoder.apply(weight_init)
-        #nn.utils.spectral_norm(decoder.linear_decompress)
+        nn.utils.spectral_norm(decoder.linear_decompress)
 
         if decoder_non_linearity is not None:
             if isinstance(decoder_non_linearity, dict):
                 decoder_non_linearity = load_config(decoder_non_linearity)
             decoder = nn.Sequential(decoder, decoder_non_linearity)
-
-
 
         super().__init__(
             encoder=encoder,
