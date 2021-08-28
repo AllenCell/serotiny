@@ -1,18 +1,17 @@
-from typing import Dict
 
 import importlib
-from inspect import isfunction
 from functools import partial
 
-INVOKE_KEY = '^invoke'
-BIND_KEY = '^bind'
-INIT_KEY = '^init'
+INVOKE_KEY = "^invoke"
+BIND_KEY = "^bind"
+INIT_KEY = "^init"
 
 
 class _bind(partial):
     """
     An improved version of partial which accepts Ellipsis (...) as a placeholder
     """
+
     def __call__(self, *args, **keywords):
         keywords = {**self.keywords, **keywords}
         iargs = iter(args)
@@ -71,9 +70,8 @@ def module_or_path(module, key):
 def get_name_and_arguments(key, config):
     path = config[key]
     name = get_name_from_path(path)
-    arguments = {k:v for k,v in config.items() if k != key}
+    arguments = {k: v for k, v in config.items() if k != key}
     return name, arguments
-
 
 
 def invoke(config):
@@ -93,8 +91,9 @@ def init(config):
     to_init, arguments = get_name_and_arguments(INIT_KEY, config)
 
     if not isinstance(to_init, type):
-        raise TypeError(f"Expected {to_init} to be a class, but it is "
-                        f"{type(to_init)}")
+        raise TypeError(
+            f"Expected {to_init} to be a class, but it is " f"{type(to_init)}"
+        )
 
     for key, value in arguments.items():
         if isinstance(value, dict):
@@ -128,21 +127,18 @@ def load_config(config):
     elif INVOKE_KEY in config:
         return invoke(config)
     else:
-        raise KeyError(f"None of [{BIND_KEY}, {INVOKE_KEY}, {INIT_KEY}] found "
-                       f"in config.")
+        raise KeyError(
+            f"None of [{BIND_KEY}, {INVOKE_KEY}, {INIT_KEY}] found " f"in config."
+        )
 
 
 def load_multiple(configs):
     if isinstance(configs, dict):
-        return {
-            key: load_config(config)
-            for key, config in configs.items()
-        }
+        return {key: load_config(config) for key, config in configs.items()}
     elif iter(configs):
-        return [
-            load_config(config)
-            for config in configs
-        ]
+        return [load_config(config) for config in configs]
     else:
-        raise TypeError(f"can only bind/invoke/init paths from a dict or an "
-                        f"iterable, not {type(configs)}")
+        raise TypeError(
+            f"can only bind/invoke/init paths from a dict or an "
+            f"iterable, not {type(configs)}"
+        )

@@ -13,7 +13,7 @@ def _get_weights(shape):
         slicey[idx_d] = slice(None)
         size = shape[idx_d]
         weights = weights * triang(size)[tuple(slicey)]
-    return np.broadcast_to(weights, shape_in) # .astype(np.float32)
+    return np.broadcast_to(weights, shape_in)  # .astype(np.float32)
 
 
 def _tile_prediction_recurse(
@@ -21,13 +21,15 @@ def _tile_prediction_recurse(
     ar_in: torch.Tensor,
     dims_max: Union[int, List[int]],
     overlaps: Union[int, List[int]],
-    device: str = 'cuda',
+    device: str = "cuda",
     **predict_kwargs,
 ):
     """Performs piecewise prediction recursively."""
     # TODO: use pytorch_lightning `as_type` instead of `to`
     if tuple(ar_in.shape[1:]) == tuple(dims_max[1:]):
-        ar_out = predictor(ar_in.to(device), **predict_kwargs).cpu() # .astype(np.float32)
+        ar_out = predictor(
+            ar_in.to(device), **predict_kwargs
+        ).cpu()  # .astype(np.float32)
         ar_weight = _get_weights(ar_out.shape)
         return ar_out * ar_weight, ar_weight
     dim = None
@@ -71,7 +73,7 @@ def tile_prediction(
     tensor_in: torch.Tensor,
     dims_max: Union[int, List[int]] = 64,
     overlaps: Union[int, List[int]] = 0,
-    device: str = 'cuda',
+    device: str = "cuda",
     **predict_kwargs,
 ) -> torch.Tensor:
     """Performs piecewise prediction and combines results.
@@ -117,7 +119,12 @@ def tile_prediction(
     dims_max[0] = None
     overlaps[0] = None
     ar_out, ar_weight = _tile_prediction_recurse(
-        predictor, ar_in, dims_max=dims_max, overlaps=overlaps, device=device, **predict_kwargs
+        predictor,
+        ar_in,
+        dims_max=dims_max,
+        overlaps=overlaps,
+        device=device,
+        **predict_kwargs,
     )
     # tifffile.imsave('debug/ar_sum.tif', ar_out)
     mask = ar_weight > 0.0

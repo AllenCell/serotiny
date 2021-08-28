@@ -2,6 +2,7 @@ import math
 import torch
 import torch.nn as nn
 
+
 def spatial_pyramid_pool(x, out_pool_sizes):
 
     input_dims = x.shape[2:]
@@ -34,6 +35,7 @@ def spatial_pyramid_pool(x, out_pool_sizes):
             spp = torch.cat((spp, out.view(batch_size, -1)), 1)
 
     return spp
+
 
 class SpatialPyramidPool(nn.Module):
     def __init__(self, out_pool_sizes):

@@ -70,8 +70,8 @@ master_doc = "index"
 
 # General information about the project.
 project = u"serotiny"
-copyright = u'2021, Ryan Spangler'
-author = u"Ryan Spangler"
+copyright = u'2021'
+author = u""
 
 # The version info for the project you"re documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -155,7 +155,7 @@ latex_elements = {
 latex_documents = [
     (master_doc, "serotiny.tex",
      u"serotiny Documentation",
-     u"Ryan Spangler", "manual"),
+     u"", "manual"),
 ]
 
 

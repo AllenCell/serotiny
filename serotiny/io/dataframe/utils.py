@@ -1,23 +1,18 @@
-import multiprocessing as mp
 from typing import Sequence, Union, Optional
 
 import re
 import numpy as np
 import pandas as pd
-import torch
 
 from sklearn.preprocessing import OneHotEncoder
-from torch.utils.data import DataLoader, WeightedRandomSampler
-from .dataframe_dataset import DataframeDataset
 
 from pathlib import Path
 
-from actk.utils import dataset_utils
-
 
 def load_csv(
-        dataset: Union[str, Path, pd.DataFrame],
-        required_fields: Optional[Sequence[str]]=None):
+    dataset: Union[str, Path, pd.DataFrame],
+    required_fields: Optional[Sequence[str]] = None,
+):
     """
     Read dataframe from either a path or an existing pd.DataFrame, checking
     the fields given by `required` are present
@@ -35,8 +30,10 @@ def load_csv(
     # Check that all columns provided as required are in the dataset
     missing_fields = set(required_fields) - set(dataset.columns)
     if len(missing_fields) > 0:
-        raise ValueError(f"Some or all of the required fields were not "
-                         f"found on the given dataframe:\n{missing_fields}")
+        raise ValueError(
+            f"Some or all of the required fields were not "
+            f"found on the given dataframe:\n{missing_fields}"
+        )
 
     return dataset
 
@@ -107,8 +104,14 @@ def append_one_hot(dataset: pd.DataFrame, column: str, index: str):
     return dataset, one_hot.shape[-1]
 
 
-def filter_columns(cols_to_filter, regex=None, startswith=None, endswith=None,
-                   contains=None, excludes=None):
+def filter_columns(
+    cols_to_filter,
+    regex=None,
+    startswith=None,
+    endswith=None,
+    contains=None,
+    excludes=None,
+):
     if regex is not None:
         return [col for col in cols_to_filter if re.match(regex, col)]
 
@@ -119,11 +122,8 @@ def filter_columns(cols_to_filter, regex=None, startswith=None, endswith=None,
         if endswith is not None:
             keep[i] &= str(cols_to_filter[i]).endswith(endswith)
         if contains is not None:
-            keep[i] &= (contains in str(cols_to_filter[i]))
+            keep[i] &= contains in str(cols_to_filter[i])
         if excludes is not None:
-            keep[i] &= (excludes not in str(cols_to_filter[i]))
+            keep[i] &= excludes not in str(cols_to_filter[i])
 
-    return [
-        col for col, keep_col in zip(cols_to_filter, keep)
-        if keep_col
-    ]
+    return [col for col, keep_col in zip(cols_to_filter, keep) if keep_col]

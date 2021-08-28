@@ -40,35 +40,38 @@ class BaseVAE(pl.LightningModule):
         learn_prior_logvar: bool = False,
     ):
         """
-        Instantiate a basic VAE model
+                Instantiate a basic VAE model
 
-        Parameters
-        ----------
-        encoder: Union[nn.Module, dict]
-`           Encoder network. If `dict`, expects a class dict, to be used for
-            instantiating the given class.
-        decoder: Union[nn.Module, str]
-            Decoder network. If `dict`, expects a class dict, to be used for
-            instantiating the given class.
-        optimizer: str
-            Optimizer to use
-        lr: float
-            Learning rate for training
-        beta: float
-            Beta parameter - the weight of the KLD term in the loss function
-        x_label: str
-            String label used to retrieve X from the batches
-        recon_loss: Loss
-            Loss to be used for reconstruction. Can be a PyTorch loss or a class
-            that respects the same interface, i.e. subclasses torch.nn.modules._Loss
-        prior_mode: str
-            String to determine which type of prior to use. (Only "isotropic" and
-            "anisotropic" currently supported)
-        prior_logvar: Optional[Array]
-            Array of values to be used as either the fixed value or initialization
-            value for the diagonal of the prior covariance matrix
-        learn_prior_logvar: bool
-            Boolean flag to determine whether to learn the prior log-variances
+                Parameters
+                ----------
+                encoder: Union[nn.Module, dict]
+        `           Encoder network. If `dict`, expects a class dict, to be used for
+                    instantiating the given class.
+                decoder: Union[nn.Module, str]
+                    Decoder network. If `dict`, expects a class dict, to be used for
+                    instantiating the given class.
+                optimizer: str
+                    Optimizer to use
+                lr: float
+                    Learning rate for training
+                beta: float
+                    Beta parameter - the weight of the KLD term in the loss function
+                x_label: str
+                    String label used to retrieve X from the batches
+                recon_loss: Loss
+                    Loss to be used for reconstruction. Can be a PyTorch loss or a class
+                    that respects the same interface,
+                    i.e. subclasses torch.nn.modules._Loss
+                prior_mode: str
+                    String to determine which type of prior to use.
+                    (Only "isotropic" and
+                    "anisotropic" currently supported)
+                prior_logvar: Optional[Array]
+                    Array of values to be used as either the fixed value or
+                    initialization
+                    value for the diagonal of the prior covariance matrix
+                learn_prior_logvar: bool
+                    Boolean flag to determine whether to learn the prior log-variances
         """
         super().__init__()
 
@@ -113,9 +116,7 @@ class BaseVAE(pl.LightningModule):
                 self.prior_logvar = torch.tensor(prior_logvar)
 
             if learn_prior_logvar:
-                self.prior_logvar = nn.Parameter(
-                    self.prior_logvar, requires_grad=True
-                )
+                self.prior_logvar = nn.Parameter(self.prior_logvar, requires_grad=True)
             else:
                 self.prior_logvar.requires_grad = False
 
@@ -135,9 +136,10 @@ class BaseVAE(pl.LightningModule):
         eps = torch.randn_like(std)
         return eps.mul(std).add(mu)
 
-    def forward(self, x, mask=None, **kwargs):
-        mu_logvar = self.encoder(x, **{k:v for k,v in kwargs.items()
-                                       if k in self.encoder_args})
+    def forward(self, x, **kwargs):
+        mu_logvar = self.encoder(
+            x, **{k: v for k, v in kwargs.items() if k in self.encoder_args}
+        )
 
         mu, logvar = torch.split(mu_logvar, mu_logvar.shape[1] // 2, dim=1)
         logvar = logvar.clamp(min=0, max=50)
@@ -145,23 +147,29 @@ class BaseVAE(pl.LightningModule):
 
         z = self.sample_z(mu, logvar)
 
-        x_hat = self.decoder(z, **{k:v for k,v in kwargs.items()
-                                   if k in self.decoder_args})
+        x_hat = self.decoder(
+            z, **{k: v for k, v in kwargs.items() if k in self.decoder_args}
+        )
 
-        (loss, recon_loss, kld_loss,
-         rcl_per_input_dimension, kld_per_latent_dimension) = calculate_elbo(
-             x,
-             x_hat,
-             mu,
-             logvar,
-             self.beta,
-             recon_loss=self.recon_loss,
-             recon_reduce=self.recon_reduce,
-             mask=mask,
-             mode=self.prior_mode,
-             prior_mu=(None if self.prior_mean is None else self.prior_mean.type_as(mu)),
-             prior_logvar=self.prior_logvar,
-         )
+
+        (
+            loss,
+            recon_loss,
+            kld_loss,
+            rcl_per_input_dimension,
+            kld_per_latent_dimension,
+        ) = calculate_elbo(
+            x,
+            x_hat,
+            mu,
+            logvar,
+            self.beta,
+            recon_loss=self.recon_loss,
+            recon_reduce=self.recon_reduce,
+            mode=self.prior_mode,
+            prior_mu=(None if self.prior_mean is None else self.prior_mean.type_as(mu)),
+            prior_logvar=self.prior_logvar,
+        )
 
         return (
             x_hat,
@@ -171,7 +179,7 @@ class BaseVAE(pl.LightningModule):
             recon_loss,
             kld_loss,
             rcl_per_input_dimension,
-            kld_per_latent_dimension
+            kld_per_latent_dimension,
         )
 
     def _step(self, stage, batch, batch_idx, logger):
@@ -182,9 +190,16 @@ class BaseVAE(pl.LightningModule):
         else:
             forward_kwargs = dict()
 
-        (_, mu, _, loss, recon_loss, kld_loss,
-         rcl_per_input_dimension,
-         kld_per_latent_dimension) = self.forward(x, **forward_kwargs)
+        (
+            _,
+            mu,
+            _,
+            loss,
+            recon_loss,
+            kld_loss,
+            rcl_per_input_dimension,
+            kld_per_lt_dimension,
+        ) = self.forward(x, **forward_kwargs)
 
         self.log(f"{stage} reconstruction loss", recon_loss, logger=logger)
         self.log(f"{stage} kld loss", kld_loss, logger=logger)
@@ -236,4 +251,3 @@ class BaseVAE(pl.LightningModule):
             "frequency": 1,
             "strict": True,
         }
-

@@ -1,18 +1,21 @@
 import torch
 from torch.nn.modules.loss import _Loss as Loss
 
+
 def diagonal_gaussian_kl(mu1, mu2, logvar1, logvar2):
     mu_diff = mu2 - mu1
 
     return 0.5 * (
-        (logvar2 - logvar1) +
-        (logvar1 - logvar2).exp() +
-        (mu_diff.pow(2) / logvar2.exp()) +
-        -1
+        (logvar2 - logvar1)
+        + (logvar1 - logvar2).exp()
+        + (mu_diff.pow(2) / logvar2.exp())
+        + -1
     )
+
 
 def isotropic_gaussian_kl(mean, log_var):
     return -0.5 * (1 + log_var - mean.pow(2) - log_var.exp())
+
 
 def calculate_elbo(
     x,

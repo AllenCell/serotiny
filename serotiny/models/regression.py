@@ -2,18 +2,12 @@
 General regression module, implemented as a Pytorch Lightning module
 """
 
-from typing import Optional, Union, Dict
-from pathlib import Path
-import numpy as np
+from typing import Union, Dict
 
-import torch
 import torch.nn as nn
-import torch.nn.functional as F
 from torch.nn.modules.loss import _Loss as Loss
 
 import pytorch_lightning as pl
-from pytorch_lightning.loggers import TensorBoardLogger
-from pytorch_lightning.utilities import rank_zero_only
 
 from serotiny.utils import init
 from serotiny.models._utils import find_optimizer
@@ -134,4 +128,3 @@ class RegressionModel(pl.LightningModule):
                 "strict": True,
             },
         )
-

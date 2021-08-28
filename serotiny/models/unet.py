@@ -7,6 +7,7 @@ from pathlib import Path
 import inspect
 from typing import Sequence, Union, Optional, Dict
 import logging
+
 logger = logging.getLogger("lightning")
 logger.propagate = False
 
@@ -20,7 +21,7 @@ from pytorch_lightning.utilities.parsing import get_init_args
 
 from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
 
-from serotiny.models._utils import index_to_onehot, find_optimizer
+from serotiny.models._utils import find_optimizer
 from serotiny.utils import get_name_from_path
 
 
@@ -66,7 +67,8 @@ class UnetModel(pl.LightningModule):
         input_dims: Sequence[int]
             Dimensions of the input images
         auto_padding: bool = False
-            Whether to apply padding to ensure images from down double conv match up double conv
+            Whether to apply padding to ensure images from down double conv
+            match up double conv
         """
         super().__init__()
 
@@ -95,20 +97,22 @@ class UnetModel(pl.LightningModule):
         if test_image_output:
             self.test_image_output = Path(output_path) / "test_images" / version_string
             self.test_image_output.mkdir(parents=True, exist_ok=True)
-        
+
         if self.hparams.auto_padding:
-            #print(f'self.network.depth = {self.network.depth}')
-            #print(f'self.network.channel_fan = {self.network.channel_fan}')
-            #print(f'self.input_dims = {self.input_dims}')
-            
-            self.padding = self.get_unet_padding(list(self.input_dims), self.network.depth, self.network.channel_fan)
-            
+            # print(f'self.network.depth = {self.network.depth}')
+            # print(f'self.network.channel_fan = {self.network.channel_fan}')
+            # print(f'self.input_dims = {self.input_dims}')
+
+            self.padding = self.get_unet_padding(
+                list(self.input_dims), self.network.depth, self.network.channel_fan
+            )
+
         print(f"this is the file we are running: {__file__}")
 
     def parse_batch(self, batch):
         # TODO: The values of x_label and y_label are used as keys in the batch dictionary.
         #       If they are the same column names, there may be conflict
-        #print(f'batch = {batch}')
+        # print(f'batch = {batch}')
         x = batch[self.hparams.x_label].float()
         y = batch[self.hparams.y_label].float()
         ids = dict()
@@ -119,14 +123,14 @@ class UnetModel(pl.LightningModule):
 
     # Calculate the amount of padding required given an input image dimension,
     # a specific Unet depth and a channel_fan factor
-    
+
     # Issues:
     #   - Padding may introduce a lot of blank space depending on the input
     #     image size and the network depth
     #   - May not be most efficient to do it in the forward pass since the
     #     amount of padding is the same, so we should not need to recalculate
     #     this for each image
-    
+
     def get_unet_padding(self, input_dims, depth, channel_fan):
 
         input_paddings = []
@@ -150,53 +154,53 @@ class UnetModel(pl.LightningModule):
                         new_size = channel_fan * (next_size_float + 1)
                     else:
                         new_size = orig_size
-                        
+
                     # Calculate the image size of the next level down
                     next_size = new_size // channel_fan
-                    
+
                 else:
                     new_size = orig_size
                     next_size = orig_size
 
-                #print(f'{current_depth}: orig_size = {orig_size}, new_size = {new_size}, next_size = {next_size}')
-
             # Calculate the new input image size given the padding, and save the padding
-            # for all the dimensions in a format that is taken by F.pad() (which goes in the
+            # for all the dimensions in a format that is taken by F.pad()
+            # (which goes in the
             # reverse order as the input dimensions)
-            new_input_size = new_size * (channel_fan**depth)
+            new_input_size = new_size * (channel_fan ** depth)
             padding = new_input_size - input_size
             padding_left = padding // 2
             padding_right = padding - padding_left
-
-            # print(f'input_size = {input_size}, new_input_size = {new_input_size}, padding = {padding_left, padding_right}')
 
             input_paddings.insert(0, padding_right)
             input_paddings.insert(0, padding_left)
 
         return tuple(input_paddings)
-    
+
     def forward(self, x, y):
         #####################
         # train unet
         #####################
 
         if self.hparams.auto_padding:
-            #print(f'self.network.depth = {self.network.depth}')
-            #print(f'self.network.channel_fan = {self.network.channel_fan}')
-            #print(f'self.input_dims = {self.input_dims}')
-            
-            #padding = self.get_unet_padding(list(self.input_dims), self.network.depth, self.network.channel_fan)
-            #print(f'auto_padding = {padding}')
-            
+            # print(f'self.network.depth = {self.network.depth}')
+            # print(f'self.network.channel_fan = {self.network.channel_fan}')
+            # print(f'self.input_dims = {self.input_dims}')
+
+            # padding = self.get_unet_padding(
+            # list(self.input_dims), self.network.depth,
+            # self.network.channel_fan
+            # )
+            # print(f'auto_padding = {padding}')
+
             # We need to pad both x and y, otherwise, they will have different sizes.
             # This assumes that x and y have the same sizes to begin with
-            #x = F.pad(x, self.padding, mode="constant", value=0)
-            #y = F.pad(y, self.padding, mode="constant", value=0)
-            
+            # x = F.pad(x, self.padding, mode="constant", value=0)
+            # y = F.pad(y, self.padding, mode="constant", value=0)
+
             pad_mod = nn.ConstantPad3d(self.padding, value=0)
             x = pad_mod(x)
             y = pad_mod(y)
-            
+
         # Forward passes
         y_hat = self.network(x)
         loss = self.loss(y_hat, y)
@@ -204,23 +208,23 @@ class UnetModel(pl.LightningModule):
         return y_hat, loss
 
     # NOTE: Had to remove optimizer_idx if using automatic backprop
-    #def training_step(self, batch, batch_idx, optimizer_idx):
+    # def training_step(self, batch, batch_idx, optimizer_idx):
     def training_step(self, batch, batch_idx):
-        print(f'In unet training step (batch_idx = {batch_idx})')
+        print(f"In unet training step (batch_idx = {batch_idx})")
         x, y, ids = self.parse_batch(batch)
         y_hat, loss = self(x, y)
 
         # NOTE: Nothing needs to be done here with backprop if using
         #       automatic optimization
-        
-        #optimizer = self.hparams.optimizer
-        
-        #opt = self.optimizers()
-        #self.manual_backward(loss, opt)
-        #optimizer.step()
-        #optimizer.zero_grad()
-        #opt.step()
-        #opt.zero_grad()
+
+        # optimizer = self.hparams.optimizer
+
+        # opt = self.optimizers()
+        # self.manual_backward(loss, opt)
+        # optimizer.step()
+        # optimizer.zero_grad()
+        # opt.step()
+        # opt.zero_grad()
 
         # Default logger=False for training_step
         # set it to true to log train loss to all lggers
@@ -228,7 +232,7 @@ class UnetModel(pl.LightningModule):
         return {"loss": loss, "batch_idx": batch_idx}
 
     def validation_step(self, batch, batch_idx):
-        print(f'In unet validation step (batch_idx = {batch_idx})')
+        print(f"In unet validation step (batch_idx = {batch_idx})")
         x, y, ids = self.parse_batch(batch)
         y_hat, loss = self(x, y)
 
@@ -243,32 +247,38 @@ class UnetModel(pl.LightningModule):
         }
 
     def test_step(self, batch, batch_idx):
-        print(f'In unet test step (batch_idx = {batch_idx})')
+        print(f"In unet test step (batch_idx = {batch_idx})")
         x, y, ids = self.parse_batch(batch)
         y_hat, loss = self(x, y)
 
-        #print(f"y_hat dimensions {y_hat.shape}")
-        #print(f"saving images to {self.test_image_output}")
-        #print(f"ids = {ids}")
-        
+        # print(f"y_hat dimensions {y_hat.shape}")
+        # print(f"saving images to {self.test_image_output}")
+        # print(f"ids = {ids}")
+
         # Convert each nested list from tensor to list
         try:
-            ids_lists_all = list(field.tolist() for field in ids.values())  # Real datamodule returns ids as a tensor list
+            ids_lists_all = list(
+                field.tolist() for field in ids.values()
+            )  # Real datamodule returns ids as a tensor list
         except:
-            ids_lists_all = list(field for field in ids.values())  # Dummy datamodule returns ids as a regular list
-            
-        #print(f"ids_list_all = {ids_lists_all}")
-        
+            ids_lists_all = list(
+                field for field in ids.values()
+            )  # Dummy datamodule returns ids as a regular list
+
+        # print(f"ids_list_all = {ids_lists_all}")
+
         # print(f"ids: {ids} - y_hat dimensions: {y_hat.shape}")
         # print(f"saving images to {self.test_image_output}")
         if self.hparams.test_image_output:
-            test_images = y_hat.cpu().numpy().astype(np.float32)  # TODO: Maybe change this to uint16? Caleb
-            #for id, y_slice in zip(ids, test_images):
+            test_images = (
+                y_hat.cpu().numpy().astype(np.float32)
+            )  # TODO: Maybe change this to uint16? Caleb
+            # for id, y_slice in zip(ids, test_images):
             for index, y_slice in enumerate(test_images):
                 unique_id_list = [str(ids_list[index]) for ids_list in ids_lists_all]
-                image_path = '-'.join(unique_id_list) + ".ome.tiff"
+                image_path = "-".join(unique_id_list) + ".ome.tiff"
                 print(f"image_path = {image_path}")
-                
+
                 output_path = Path(self.test_image_output) / image_path
                 # print(f"id: {id}, y_slice.shape: {y_slice.shape}")
                 # print(f"saving test file: {output_path}")
@@ -276,7 +286,9 @@ class UnetModel(pl.LightningModule):
                     tiff_writer.save(
                         data=y_slice,
                         channel_names=self.output_channels,
-                        dimension_order="STCZYX")  # TODO: Maybe change this to CZYX since we don't have S and T? Caleb
+                        dimension_order="STCZYX",
+                    )  # TODO: Maybe change this to 
+                    # CZYX since we don't have S and T? Caleb
 
         return {
             "test_loss": loss,
