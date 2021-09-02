@@ -1,18 +1,18 @@
 import numpy as np
 
 
-class NormalizeAbsolute():
+class NormalizeAbsolute:
     def __init__(self, axis=-1, order=2):
         self.axis = axis
         self.order = order
 
     def __call__(self, a):
-        l2 = np.atleast_1d(np.linalg.norm(a, order, axis))
-        l2[l2==0] = 1
-        return a / np.expand_dims(l2, axis)    
+        l2 = np.atleast_1d(np.linalg.norm(a, self.order, self.axis))
+        l2[l2 == 0] = 1
+        return a / np.expand_dims(l2, self.axis)
 
 
-class NormalizeMean():
+class NormalizeMean:
     def __init__(self, scale=1.0):
         self.scale = scale
 
@@ -56,3 +56,4 @@ class NormalizeMinMax():
         ar = 2*(ar - norm_min) / (norm_max - norm_min)-1
 
         return ar.astype(np.float32)
+

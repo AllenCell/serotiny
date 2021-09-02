@@ -4,9 +4,9 @@ Pytorch Lightning module
 """
 
 from typing import Sequence, Union, Optional, Dict
-import inspect
 
 import logging
+
 logger = logging.getLogger("lightning")
 logger.propagate = False
 
@@ -18,6 +18,7 @@ from torch.nn.modules.loss import _Loss as Loss
 from .base_vae import BaseVAE
 
 Array = Union[torch.Tensor, np.array]
+
 
 class ConditionalVAE(BaseVAE):
     def __init__(
@@ -75,13 +76,22 @@ class ConditionalVAE(BaseVAE):
             Boolean flag to determine whether to learn the prior log-variances
         """
 
-        super().__init__(encoder, decoder, latent_dim, optimizer, lr,
-                         beta, x_label, recon_loss,
-                         prior_mode, prior_logvar, learn_prior_logvar)
+        super().__init__(
+            encoder,
+            decoder,
+            latent_dim,
+            optimizer,
+            lr,
+            beta,
+            x_label,
+            recon_loss,
+            prior_mode,
+            prior_logvar,
+            learn_prior_logvar,
+        )
 
         if condition_mode not in ("channel", "label"):
-            raise ValueError("`condition_mode` should be "
-                             "either 'channel' or 'label")
+            raise ValueError("`condition_mode` should be " "either 'channel' or 'label")
 
         self.c_label = c_label
         if condition_mode == "channel":
@@ -98,8 +108,9 @@ class ConditionalVAE(BaseVAE):
             condition = batch[self.c_label].float()
         else:
             x = batch[self.hparams.x_label].float()
-            x_channels = [channel for channel in range(x.shape[1])
-                          if channel not in self.c_label]
+            x_channels = [
+                channel for channel in range(x.shape[1]) if channel not in self.c_label
+            ]
 
             x = x[:, x_channels]
             condition = x[:, self.c_label]

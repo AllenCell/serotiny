@@ -180,10 +180,10 @@ class GaussianDataset(Dataset):
             for i in range(k + 1, D):
                 P[k, i] = 2 * np.random.beta(beta, beta) - 1
                 p = P[k, i]
-                for l in reversed(range(k)):
+                for l_ind in reversed(range(k)):
                     p = (
-                        p * np.sqrt((1 - P[l, i] ** 2) * (1 - P[l, k] ** 2))
-                        + P[l, i] * P[l, k]
+                        p * np.sqrt((1 - P[l_ind, i] ** 2) * (1 - P[l_ind, k] ** 2))
+                        + P[l_ind, i] * P[l_ind, k]
                     )
                 S[k, i] = S[i, k] = p
 

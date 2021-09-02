@@ -1,4 +1,4 @@
-from typing import Union, Optional, Sequence, Dict
+from typing import Union, Sequence, Dict
 import logging
 
 import numpy as np
@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 from torch.nn.modules.loss import _Loss as Loss
 
-from serotiny.utils import invoke_class
+from serotiny.utils import init
 from .conditional_vae import ConditionalVAE
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]
@@ -46,7 +46,7 @@ class ConditionalPriorVAE(ConditionalVAE):
         )
 
         if isinstance(prior_encoder, dict):
-            prior_encoder = invoke_class(prior_encoder)
+            prior_encoder = init(prior_encoder)
         self.prior_encoder = prior_encoder
 
     def forward(self, x, condition):

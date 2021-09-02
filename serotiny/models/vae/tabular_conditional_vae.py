@@ -6,6 +6,7 @@ Pytorch Lightning module
 from typing import Sequence, Union, Optional
 
 import logging
+
 logger = logging.getLogger("lightning")
 logger.propagate = False
 
@@ -17,6 +18,7 @@ from serotiny.networks.mlp import MLP
 from .conditional_vae import ConditionalVAE
 
 Array = Union[torch.Tensor, np.array]
+
 
 class TabularConditionalVAE(ConditionalVAE):
     def __init__(
@@ -87,9 +89,21 @@ class TabularConditionalVAE(ConditionalVAE):
             hidden_layers=hidden_layers,
         )
 
-        super().__init__(encoder, decoder, latent_dim, optimizer, lr,
-                         beta, x_label, c_label, recon_loss, condition_mode,
-                         prior_mode, prior_logvar, learn_prior_logvar)
+        super().__init__(
+            encoder,
+            decoder,
+            latent_dim,
+            optimizer,
+            lr,
+            beta,
+            x_label,
+            c_label,
+            recon_loss,
+            condition_mode,
+            prior_mode,
+            prior_logvar,
+            learn_prior_logvar,
+        )
 
     def parse_batch(self, batch):
         batch = super().parse_batch(batch)

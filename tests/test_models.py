@@ -5,10 +5,12 @@ from pathlib import Path
 
 from serotiny_steps.train_model import train_model
 
+
 def test_models():
     with tempfile.TemporaryDirectory() as tmpdirname:
         tmppath = Path(tmpdirname)
-        main_config = yaml.load(f"""
+        main_config = yaml.load(
+            f"""
         training:
           callbacks:
             pytorch_lightning.callbacks.ProgressBar:
@@ -27,7 +29,8 @@ def test_models():
           store_config: True
           checkpoint_monitor: "val_loss"
           checkpoint_mode: "min"
-        """)
+        """
+        )
 
         model_configs_paths = Path("./model_configs").glob("*.yaml")
         for config in model_configs_paths:
@@ -44,6 +47,7 @@ def test_models():
                     model_zoo_config=main_config["model_zoo_config"],
                     **main_config["training"],
                 )
+
 
 if __name__ == "__main__":
     test_models()

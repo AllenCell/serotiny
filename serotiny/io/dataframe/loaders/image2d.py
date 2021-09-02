@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 # from aicsfiles import FileManagementSystem
 
 from serotiny.io.image import png_loader
@@ -13,12 +11,9 @@ class Load2DImage(Loader):
     """
 
     def __init__(
-            self,
-            column='image',
-            num_channels=1,
-            channel_indexes=None,
-            transforms=None):
-            # fms=False):
+        self, column="image", num_channels=1, channel_indexes=None, transforms=None
+    ):
+        # fms=False):
 
         super().__init__()
         self.column = column

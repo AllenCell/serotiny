@@ -72,6 +72,8 @@ requirements = [
     "brokenaxes",
     "torchio",
     "hydra-core",
+    "sphinx",
+    "sphinx-rtd-theme",
 ]
 
 extra_requirements = {

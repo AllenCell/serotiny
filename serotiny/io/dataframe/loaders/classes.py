@@ -1,6 +1,7 @@
 import torch
 from .abstract_loader import Loader
 
+
 class LoadClass(Loader):
     """
     Loader class, used to retrieve class values from the dataframe,

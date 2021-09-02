@@ -10,7 +10,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 
 from serotiny.models.zoo import store_metadata, build_model_path
-from serotiny.utils import PATH_KEY, invoke_class, path_invocations
+from serotiny.utils import INIT_KEY, init, load_multiple
 
 log = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ def _get_kwargs():
     keys, _, _, values = inspect.getargvalues(frame)
     kwargs = {}
     for key in keys:
-        if key != 'self':
+        if key != "self":
             kwargs[key] = values[key]
     return kwargs
 
@@ -33,7 +33,7 @@ def train_model(
     loggers: List[Dict] = [],
     callbacks: List[Dict] = [],
     gpu_ids: List[int] = [0],
-    version_string: str = 'zero',
+    version_string: str = "zero",
     seed: int = 42,
     metadata: Dict = {},
 ):
@@ -49,45 +49,41 @@ def train_model(
     callbacks_config = callbacks
 
     model_zoo_path = model_zoo_config.get("path")
-    checkpoint_config = model_zoo_config.get("checkpoint", {})
+    model_name = model_config.get(INIT_KEY, "UNDEFINED_MODEL_NAME")
+    datamodule_name = datamodule_config.get(INIT_KEY, "UNDEFINED_DATAMODULE_NAME")
 
-    model_name = model_config.get(PATH_KEY, 'UNDEFINED_MODEL_NAME')
-    datamodule_name = datamodule_config.get(PATH_KEY, 'UNDEFINED_DATAMODULE_NAME')
     store_metadata(called_args, model_name, version_string, model_zoo_path)
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
     os.environ["CUDA_VISIBLE_DEVICES"] = ",".join([str(id) for id in gpu_ids])
     num_gpus = len(gpu_ids)
-    num_gpus = (num_gpus if num_gpus != 0 else None)
+    num_gpus = num_gpus if num_gpus != 0 else None
 
-    model = invoke_class(model_config)
+    model = init(model_config)
 
     if version_string is None:
         version_string = "version_" + datetime.now().strftime("%d-%m-%Y--%H-%M-%S")
 
     log.info(f"creating datamodule {datamodule_name} with {datamodule_config}")
 
-    datamodule = invoke_class(datamodule_config)
+    datamodule = init(datamodule_config)
     datamodule.setup()
 
-    loggers = path_invocations(loggers_config)
+    loggers = load_multiple(loggers_config)
 
-    if checkpoint_config:
-        model_path = build_model_path(
-            model_zoo_path,
-            (model_name, version_string))
-        config = {
-            'dirpath': model_path,
-            'filename': "epoch-{epoch:02d}"}
+    if len(model_zoo) > 0:
+        model_path = build_model_path(model_zoo_path, (model_name, version_string))
+        config = {"dirpath": model_path, "filename": "epoch-{epoch:02d}"}
+        checkpoint_config = model_zoo_config.get("checkpoint", {})
         config.update(checkpoint_config)
         checkpoint_callback = ModelCheckpoint(**config)
     else:
         checkpoint_callback = None
 
     if checkpoint_callback:
-        trainer_config['checkpoint_callback'] = checkpoint_callback
+        trainer_config["checkpoint_callback"] = checkpoint_callback
 
-    callbacks = path_invocations(callbacks_config)
+    callbacks = load_multiple(callbacks_config)
     callbacks.append(checkpoint_callback)
 
     trainer = pl.Trainer(
@@ -98,13 +94,8 @@ def train_model(
     )
 
     log.info("Calling trainer.fit")
-    trainer.fit(
-        model,
-        datamodule)
-
-    trainer.test(
-        datamodule=datamodule,
-        ckpt_path=None)
+    trainer.fit(model, datamodule)
+    trainer.test(datamodule=datamodule, ckpt_path=None)
 
 
 if __name__ == "__main__":

@@ -1,27 +1,21 @@
-from typing import Union, Optional, Dict, Sequence
+from typing import Sequence
 from pathlib import Path
 
-import json
-import numpy as np
 import pandas as pd
 import multiprocessing as mp
 import pytorch_lightning as pl
 
 from torch.utils.data import DataLoader
 
-from serotiny.utils import get_classes_from_config, get_class_from_path, path_invocations
+from serotiny.utils.dynamic_imports import load_multiple
 from serotiny.io.buffered_patch_dataset import BufferedPatchDataset
 from serotiny.io.dataframe import DataframeDataset
 
-def make_manifest_dataset(
-        manifest: str,
-        loaders: dict):
+
+def make_manifest_dataset(manifest: str, loaders: dict):
     dataframe = pd.read_csv(manifest)
 
-    return DataframeDataset(
-        dataframe=dataframe,
-        loaders=loaders,
-        iloc=True)
+    return DataframeDataset(dataframe=dataframe, loaders=loaders, iloc=True)
 
 
 class PatchDatamodule(pl.LightningDataModule):
@@ -47,7 +41,7 @@ class PatchDatamodule(pl.LightningDataModule):
         self.loaders = {}
 
         for mode, loaders_config in loaders.items():
-            self.loaders[mode] = path_invocations(loaders_config)
+            self.loaders[mode] = load_multiple(loaders_config)
 
         self.batch_size = batch_size
         self.num_workers = num_workers
@@ -60,9 +54,9 @@ class PatchDatamodule(pl.LightningDataModule):
         self.buffer_switch_interval = buffer_switch_interval
         self.shuffle_images = shuffle_images
 
-        self.train = self.load_patch_manifest('train')
-        self.valid = self.load_patch_manifest('valid')
-        self.test = self.load_patch_manifest('test')
+        self.train = self.load_patch_manifest("train")
+        self.valid = self.load_patch_manifest("valid")
+        self.test = self.load_patch_manifest("test")
 
     def make_patch_dataset(self, dataset):
         return BufferedPatchDataset(
@@ -71,12 +65,13 @@ class PatchDatamodule(pl.LightningDataModule):
             patch_shape=self.patch_shape,
             buffer_size=self.buffer_size,
             buffer_switch_interval=self.buffer_switch_interval,
-            shuffle_images=self.shuffle_images)
+            shuffle_images=self.shuffle_images,
+        )
 
     def load_patch_manifest(self, mode):
         manifest = make_manifest_dataset(
-            self.manifest_path / f'{mode}.csv',
-            self.loaders[mode])
+            self.manifest_path / f"{mode}.csv", self.loaders[mode]
+        )
         return self.make_patch_dataset(manifest)
 
     def make_dataloader(self, dataset):
