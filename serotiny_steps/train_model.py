@@ -81,10 +81,11 @@ def train_model(
         checkpoint_callback = None
 
     if checkpoint_callback:
-        trainer_config["checkpoint_callback"] = checkpoint_callback
+        trainer_config["checkpoint_callback"] = True
 
     callbacks = load_multiple(callbacks_config)
-    callbacks.append(checkpoint_callback)
+    if checkpoint_callback is not None:
+        callbacks.append(checkpoint_callback)
 
     trainer = pl.Trainer(
         **trainer_config,
