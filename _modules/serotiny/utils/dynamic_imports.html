@@ -295,6 +295,16 @@
     <span class="k">return</span> <span class="n">to_init</span><span class="p">(</span><span class="o">**</span><span class="n">arguments</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="init_or_invoke"><a class="viewcode-back" href="../../../serotiny.utils.html#serotiny.utils.dynamic_imports.init_or_invoke">[docs]</a><span class="k">def</span> <span class="nf">init_or_invoke</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">INIT_KEY</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">init</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">INVOKE_KEY</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">invoke</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;neither </span><span class="si">{</span><span class="n">INIT_KEY</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="n">INVOKE_KEY</span><span class="si">}</span><span class="s2"> in config </span><span class="si">{</span><span class="n">config</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="bind"><a class="viewcode-back" href="../../../serotiny.utils.html#serotiny.utils.dynamic_imports.bind">[docs]</a><span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
     <span class="n">to_bind</span><span class="p">,</span> <span class="n">arguments</span> <span class="o">=</span> <span class="n">get_name_and_arguments</span><span class="p">(</span><span class="n">BIND_KEY</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
 
