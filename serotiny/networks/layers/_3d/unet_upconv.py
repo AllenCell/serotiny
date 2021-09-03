@@ -38,10 +38,10 @@ class UpConvolution(nn.Module):
 
     def forward(self, x, x_doubleconv_down):
 
-        #print(f' x.shape = {x.shape}')
+        print(f' x.shape = {x.shape}')
         
         x_upconv_up = self.up_conv(x)
-        #print(f' x_upconv_up = {x_upconv_up.shape}, x_doubleconv_down = {x_doubleconv_down.shape}')
+        print(f' x_upconv_up = {x_upconv_up.shape}, x_doubleconv_down = {x_doubleconv_down.shape}')
         
         # TODO: For most cases there is only a 1-pixel mismatch between x_upconv_up and
         #       x_doubleconv_down. How to padd assymetrically so that the two images are
@@ -49,12 +49,12 @@ class UpConvolution(nn.Module):
         x_doubleconv_up = self.double_conv(
             torch.cat((x_upconv_up, x_doubleconv_down), 1)
         )
-        #print(f' x_doubleconv_up = {x_doubleconv_up.shape}')
+        print(f' x_doubleconv_up = {x_doubleconv_up.shape}')
         
         x_batchnorm_up = self.batch_norm(x_doubleconv_up)
-        #print(f' x_batchnorm_up = {x_batchnorm_up.shape}')
+        print(f' x_batchnorm_up = {x_batchnorm_up.shape}')
         
         x_activation_up = self.activation(x_batchnorm_up)
-        #print(f' x_activation_up = {x_activation_up.shape}')
+        print(f' x_activation_up = {x_activation_up.shape}')
 
         return x_activation_up

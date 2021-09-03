@@ -196,7 +196,7 @@ class Unet(nn.Module):
         doubleconv_down_out = {}
 
         for current_depth in network_layers_down:
-            # print(f"Level = {current_depth}")
+            print(f"Level = {current_depth}")
 
             x_previous_layer, x_doubleconv_down = self.networks_down[
                 str(current_depth)
@@ -207,7 +207,7 @@ class Unet(nn.Module):
             ] = x_doubleconv_down  # Save the double conv output for concatenation
 
         for current_depth in network_layers_up:
-            # print(f"Level = {current_depth}")
+            print(f"Level = {current_depth}")
 
             x_previous_layer = self.networks_up[str(current_depth)]["subnet"](
                 x_previous_layer, doubleconv_down_out[current_depth]
