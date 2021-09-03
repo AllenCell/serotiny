@@ -5,6 +5,7 @@ from .dynamic_imports import (
     invoke,
     bind,
     init,
+    init_or_invoke,
     load_config,
     load_multiple,
     INVOKE_KEY,
