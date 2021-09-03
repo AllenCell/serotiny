@@ -13,7 +13,7 @@ from torch.utils.data import DataLoader
 from serotiny.io.dataframe import DataframeDataset
 from serotiny.utils import load_multiple
 
-from aicsfiles import FileManagementSystem
+# from aicsfiles import FileManagementSystem
 
 log = logging.getLogger(__name__)
 
@@ -25,10 +25,11 @@ def make_manifest_dataset(
     fms: bool = False,
     iloc: bool = False,
 ):
-    if fms:
-        manifest = Path(FileManagementSystem().get_file_by_id(manifest).path)
-    else:
-        manifest = Path(manifest)
+    manifest = Path(manifest)
+    # if fms:
+    #     manifest = Path(FileManagementSystem().get_file_by_id(manifest).path)
+    # else:
+    #     manifest = Path(manifest)
 
     if not manifest.is_file():
         raise FileNotFoundError("Manifest file not found at given path")
