@@ -51,7 +51,9 @@ def _get_checkpoint(model_path, model_root):
     if not model_root.exists():
         raise FileNotFoundError("Given model_root does not exists.")
 
-    model_class_name, model_id = model_path.split("/")
+    _split = model_path.split("/")
+    model_class_name = _split[0]
+    model_id = "_".join(_split[1:])
 
     model_path = (model_root / model_class_name) / model_id
 
