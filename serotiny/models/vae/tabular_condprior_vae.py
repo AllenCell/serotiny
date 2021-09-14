@@ -3,7 +3,7 @@ Tabular conditional variational autoencoder module, implemented as a
 Pytorch Lightning module
 """
 
-from typing import Sequence, Union
+from typing import Sequence, Union, Optional
 
 import logging
 
