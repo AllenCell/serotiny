@@ -198,7 +198,7 @@ class BaseVAE(pl.LightningModule):
             recon_loss,
             kld_loss,
             rcl_per_input_dimension,
-            kld_per_lt_dimension,
+            kld_per_latent_dimension,
         ) = self.forward(x, **forward_kwargs)
 
         self.log(f"{stage} reconstruction loss", recon_loss, logger=logger)
