@@ -14,8 +14,8 @@ def apply_model(
     datamodule: Dict,
     trainer: Dict,
     model_zoo: Dict,
-    callbacks: Dict,
-    gpu_ids: List[int],
+    callbacks: List[Dict] = [],  # Dict,
+    gpu_ids: List[int] = [0],  # List[int],
     loggers: List[Dict] = [],
 ):
 
@@ -40,10 +40,7 @@ def apply_model(
     callbacks = load_multiple(callbacks_config)
 
     trainer = pl.Trainer(
-        **trainer_config,
-        logger=loggers,
-        callbacks=callbacks,
-        gpus=num_gpus,
+        **trainer_config, logger=loggers, callbacks=callbacks, gpus=num_gpus,
     )
 
     trainer.test(model=model, datamodule=datamodule)
