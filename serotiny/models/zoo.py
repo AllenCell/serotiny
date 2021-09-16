@@ -82,14 +82,14 @@ def get_trainer_at_checkpoint(
 
     ckpt_path, model_class_name, config = _get_checkpoint(model_path, model_root)
 
-    trainer_config = config["trainer_config"]
+    trainer_config = config["trainer"]
 
-    model_zoo_config = config["model_zoo_config"]
+    model_zoo_config = config["model_zoo"]
     checkpoint_callback = get_checkpoint_callback(
         model_class_name,
         model_path.split("/")[1].split('.ckpt')[0],
         model_zoo_config.get("checkpoint_monitor"),
-        model_zoo_config.get("checkpoint_mode"),
+        model_zoo_config.get("checkpoint_mode", "min"),
         model_root,
     )
 
@@ -143,7 +143,7 @@ def get_checkpoint_callback(
         model_class,
         model_id,
         checkpoint_monitor,
-        checkpoint_mode,
+        checkpoint_mode="min",
         model_root=None):
 
     model_path = build_model_path(model_root, (model_class, model_id))
