@@ -1,6 +1,7 @@
 import math
 import numpy as np
 import torch
+import torch.nn.functional as F
 
 
 def split_number(n):
@@ -79,3 +80,29 @@ class ExpandColumns:
     def __call__(self, rows):
 
         return expand_columns(rows, self.columns, self.dimensions, self.pad)
+
+
+class PadTo:
+    def __init__(self, target_dims, mode="constant", value=0):
+        self.target_dims = target_dims
+        self.mode = mode
+        self.value = value
+
+    def __call__(self, img):
+        if not isinstance(img, torch.Tensor):
+            img = torch.tensor(img)
+
+        pad = []
+        for i, dim in enumerate(self.target_dims):
+            pad_dim = (dim - img.shape[i + 1]) / 2
+
+            # when 2 * pad_dim is even, this doesn't change the result.
+            # when 2 * pad_dim is odd, this makes padding amount one pixel/voxel
+            # bigger on one side
+            pad.append(math.floor(pad_dim))
+            pad.append(math.ceil(pad_dim))
+
+        # pytorch pad function expects padding amount in reverse order
+        pad = pad[::-1]
+
+        return F.pad(img, pad, mode=self.mode, value=self.value)
