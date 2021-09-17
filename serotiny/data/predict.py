@@ -127,6 +127,7 @@ def tile_prediction(
         **predict_kwargs,
     )
     # tifffile.imsave('debug/ar_sum.tif', ar_out)
+    ar_weight = torch.Tensor(ar_weight)
     mask = ar_weight > 0.0
     ar_out[mask] = ar_out[mask] / ar_weight[mask]
     # tifffile.imsave('debug/ar_weight.tif', ar_weight)

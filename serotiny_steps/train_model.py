@@ -10,7 +10,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 
 from serotiny.models.zoo import store_metadata, build_model_path
-from serotiny.utils import INIT_KEY, init, load_multiple
+from serotiny.utils import INIT_KEY, init_or_invoke, load_multiple
 
 log = logging.getLogger(__name__)
 
@@ -59,14 +59,14 @@ def train_model(
     num_gpus = len(gpu_ids)
     num_gpus = num_gpus if num_gpus != 0 else None
 
-    model = init(model_config)
+    model = init_or_invoke(model_config)
 
     if version_string is None:
         version_string = "version_" + datetime.now().strftime("%d-%m-%Y--%H-%M-%S")
 
     log.info(f"creating datamodule {datamodule_name} with {datamodule_config}")
 
-    datamodule = init(datamodule_config)
+    datamodule = init_or_invoke(datamodule_config)
     datamodule.setup()
 
     loggers = load_multiple(loggers_config)
@@ -81,7 +81,7 @@ def train_model(
         checkpoint_callback = None
 
     callbacks = load_multiple(callbacks_config)
-    if checkpoint_callback:
+    if checkpoint_callback is not None:
         callbacks.append(checkpoint_callback)
 
     trainer = pl.Trainer(

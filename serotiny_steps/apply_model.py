@@ -16,6 +16,7 @@ def apply_model(
     model_zoo: Dict,
     callbacks: Dict,
     gpu_ids: List[int],
+    loggers: List[Dict] = [],
 ):
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
@@ -27,6 +28,7 @@ def apply_model(
     trainer_config = trainer
     model_zoo_config = model_zoo
     callbacks_config = callbacks
+    loggers_config = loggers
 
     model_zoo_path = model_zoo_config.get("path")
     model = get_model(model_path, model_zoo_path)
@@ -34,9 +36,12 @@ def apply_model(
     datamodule = init(datamodule_config)
     datamodule.setup()
 
+    loggers = path_invocations(loggers_config)
     callbacks = load_multiple(callbacks_config)
+
     trainer = pl.Trainer(
         **trainer_config,
+        logger=loggers,
         callbacks=callbacks,
         gpus=num_gpus,
     )

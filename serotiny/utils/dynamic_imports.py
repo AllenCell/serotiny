@@ -105,6 +105,16 @@ def init(config):
     return to_init(**arguments)
 
 
+def init_or_invoke(config):
+    if INIT_KEY in config:
+        return init(config)
+    elif INVOKE_KEY in config:
+        return invoke(config)
+    else:
+        raise TypeError(
+            f"neither {INIT_KEY} or {INVOKE_KEY} in config {config}")
+
+
 def bind(config):
     to_bind, arguments = get_name_and_arguments(BIND_KEY, config)
 
