@@ -3,6 +3,7 @@ from typing import Union
 import numpy as np
 import torch
 
+
 def pearson_correlation(
     a: Union[np.ndarray, torch.Tensor], b: Union[np.ndarray, torch.Tensor]
 ) -> float:
