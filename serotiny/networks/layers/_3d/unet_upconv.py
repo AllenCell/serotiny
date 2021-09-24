@@ -10,14 +10,12 @@ class UpConvolution(nn.Module):
         current_depth: int,
         n_in: int,
         n_out: int,
-        
-        kernel_size_upconv: int = 2,      # Original paper = 2
-        stride_upconv: int = 2,           # Original paper = no mention, label-free = 2
-        padding_upconv: int = 0,          # Original paper = no mention, label-free = default
-        
+        kernel_size_upconv: int = 2,  # Original paper = 2
+        stride_upconv: int = 2,  # Original paper = no mention, label-free = 2
+        padding_upconv: int = 0,  # Original paper = no mention, label-free = default
         kernel_size_doubleconv: int = 3,  # Original paper = 3
-        stride_doubleconv: int = 1,       # Original paper = no mention, label-free = default
-        padding_doubleconv: int = 1,      # Original paper = 0, label-free = 1
+        stride_doubleconv: int = 1,  # Original paper = no mention, label-free = default
+        padding_doubleconv: int = 1,  # Original paper = 0, label-free = 1
     ):
         super().__init__()
 
@@ -28,33 +26,41 @@ class UpConvolution(nn.Module):
             pass
         else:
             self.up_conv = nn.ConvTranspose3d(
-                n_in, n_out, kernel_size=kernel_size_upconv, stride=stride_upconv, padding=padding_upconv
+                n_in,
+                n_out,
+                kernel_size=kernel_size_upconv,
+                stride=stride_upconv,
+                padding=padding_upconv,
             )
             self.double_conv = DoubleConvolution(
-                n_in, n_out, kernel_size=kernel_size_doubleconv, stride=stride_doubleconv, padding=padding_doubleconv
+                n_in,
+                n_out,
+                kernel_size=kernel_size_doubleconv,
+                stride=stride_doubleconv,
+                padding=padding_doubleconv,
             )
             self.batch_norm = nn.BatchNorm3d(n_out)
             self.activation = nn.ReLU()
 
     def forward(self, x, x_doubleconv_down):
 
-        #print(f' x.shape = {x.shape}')
-        
+        # print(f' x.shape = {x.shape}')
+
         x_upconv_up = self.up_conv(x)
-        #print(f' x_upconv_up = {x_upconv_up.shape}, x_doubleconv_down = {x_doubleconv_down.shape}')
-        
+        # print(f' x_upconv_up = {x_upconv_up.shape}, x_doubleconv_down = {x_doubleconv_down.shape}')
+
         # TODO: For most cases there is only a 1-pixel mismatch between x_upconv_up and
         #       x_doubleconv_down. How to padd assymetrically so that the two images are
         #       not shifted over by 1 pixel?
         x_doubleconv_up = self.double_conv(
             torch.cat((x_upconv_up, x_doubleconv_down), 1)
         )
-        #print(f' x_doubleconv_up = {x_doubleconv_up.shape}')
-        
+        # print(f' x_doubleconv_up = {x_doubleconv_up.shape}')
+
         x_batchnorm_up = self.batch_norm(x_doubleconv_up)
-        #print(f' x_batchnorm_up = {x_batchnorm_up.shape}')
-        
+        # print(f' x_batchnorm_up = {x_batchnorm_up.shape}')
+
         x_activation_up = self.activation(x_batchnorm_up)
-        #print(f' x_activation_up = {x_activation_up.shape}')
+        # print(f' x_activation_up = {x_activation_up.shape}')
 
         return x_activation_up
