@@ -1,5 +1,6 @@
 import torch
 
+
 class Project:
     def __init__(self, axis, mode="max"):
         self.axis = axis
@@ -9,11 +10,7 @@ class Project:
         if not isinstance(img, torch.Tensor):
             img = torch.tensor(img)
 
-        axis = {
-            "z": -3,
-            "x": -2,
-            "y": -1
-        }
+        axis = {"z": -3, "x": -2, "y": -1}
 
         if self.axis == "z":
             assert len(img.shape) >= 3

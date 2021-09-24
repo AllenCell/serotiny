@@ -35,8 +35,9 @@ class ResizeBy:
 
 
 class CropCenter:
-    def __init__(self, cropz, cropx, cropy, pad=0, center_of_mass=None,
-                 force_size=True):
+    def __init__(
+        self, cropz, cropx, cropy, pad=0, center_of_mass=None, force_size=True
+    ):
         self.cropz = cropz + (cropz % 2 != 0)
         self.cropx = cropx + (cropx % 2 != 0)
         self.cropy = cropy + (cropy % 2 != 0)
@@ -46,7 +47,7 @@ class CropCenter:
         self.force_size = force_size
 
     def __call__(self, img):
-        c,z,x,y = img.shape
+        c, z, x, y = img.shape
 
         if self.center_of_mass is None:
             center_of_mass = (z // 2, x // 2, y // 2)
@@ -61,10 +62,7 @@ class CropCenter:
         endx = startx + self.cropx + 2 * self.pad
         endy = starty + self.cropy + 2 * self.pad
 
-        img = img[:,
-                  startz: endz,
-                  startx: endx,
-                  starty: endy]
+        img = img[:, startz:endz, startx:endx, starty:endy]
 
         if self.force_size:
             pad_to = PadTo(target_dims=[self.cropz, self.cropx, self.cropy])

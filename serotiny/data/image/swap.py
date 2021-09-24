@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 
+
 class SwapAxes:
     def __init__(self, first: int, second: int):
         self.first = first

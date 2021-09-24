@@ -48,8 +48,10 @@ class MinMaxNormalize:
                 if not self.clip_quantile:
                     clip_min = [self.clip_min] * img.shape[0]
                 else:
-                    clip_min = [img[ch].quantile(self.clip_min).item()
-                                for ch in range(img.shape[0])]
+                    clip_min = [
+                        img[ch].quantile(self.clip_min).item()
+                        for ch in range(img.shape[0])
+                    ]
             else:
                 clip_min = self.clip_min
         else:
@@ -61,8 +63,10 @@ class MinMaxNormalize:
                 if not self.clip_quantile:
                     clip_max = [self.clip_max] * img.shape[0]
                 else:
-                    clip_max = [img[ch].quantile(self.clip_max).item()
-                                for ch in range(img.shape[0])]
+                    clip_max = [
+                        img[ch].quantile(self.clip_max).item()
+                        for ch in range(img.shape[0])
+                    ]
             else:
                 clip_max = self.clip_max
         else:
@@ -71,14 +75,18 @@ class MinMaxNormalize:
 
         for chan in range(img.shape[0]):
             if clip_min[chan] is not None:
-                img[chan] = torch.where(img[chan] < clip_min[chan],
-                                        torch.tensor(clip_min[chan], dtype=img.dtype),
-                                        img[chan])
+                img[chan] = torch.where(
+                    img[chan] < clip_min[chan],
+                    torch.tensor(clip_min[chan], dtype=img.dtype),
+                    img[chan],
+                )
 
             if clip_max[chan] is not None:
-                img[chan] = torch.where(img[chan] > clip_max[chan],
-                                        torch.tensor(clip_max[chan], dtype=img.dtype),
-                                        img[chan])
+                img[chan] = torch.where(
+                    img[chan] > clip_max[chan],
+                    torch.tensor(clip_max[chan], dtype=img.dtype),
+                    img[chan],
+                )
 
             m = img[chan].min()
             M = img[chan].max()
