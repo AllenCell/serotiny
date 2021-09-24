@@ -1,4 +1,3 @@
-
 import importlib
 from functools import partial
 
@@ -74,20 +73,21 @@ def get_name_and_arguments(key, config):
     return name, arguments
 
 
-def invoke(config):
+def invoke(config, recurrent=True):
     to_invoke, arguments = get_name_and_arguments(INVOKE_KEY, config)
 
-    for key, value in arguments.items():
-        if isinstance(value, dict):
-            try:
-                arguments[key] = load_config(value)
-            except:
-                pass
+    if recurrent:
+        for key, value in arguments.items():
+            if isinstance(value, dict):
+                try:
+                    arguments[key] = load_config(value)
+                except:
+                    pass
 
     return to_invoke(**arguments)
 
 
-def init(config):
+def init(config, recurrent=True):
     to_init, arguments = get_name_and_arguments(INIT_KEY, config)
 
     if not isinstance(to_init, type):
@@ -95,58 +95,49 @@ def init(config):
             f"Expected {to_init} to be a class, but it is " f"{type(to_init)}"
         )
 
-    for key, value in arguments.items():
-        if isinstance(value, dict):
-            try:
-                arguments[key] = load_config(value)
-            except:
-                pass
+    if recurrent:
+        for key, value in arguments.items():
+            if isinstance(value, dict):
+                try:
+                    arguments[key] = load_config(value)
+                except:
+                    pass
 
     return to_init(**arguments)
 
 
-def init_or_invoke(config):
-    if INIT_KEY in config:
-        return init(config)
-    elif INVOKE_KEY in config:
-        return invoke(config)
-    else:
-        raise TypeError(
-            f"neither {INIT_KEY} or {INVOKE_KEY} in config {config}")
-
-
-def bind(config):
+def bind(config, recurrent=True):
     to_bind, arguments = get_name_and_arguments(BIND_KEY, config)
 
-    for key, value in arguments.items():
-        if isinstance(value, dict):
-            try:
-                arguments[key] = load_config(value)
-            except:
-                pass
+    if recurrent:
+        for key, value in arguments.items():
+            if isinstance(value, dict):
+                try:
+                    arguments[key] = load_config(value)
+                except:
+                    pass
 
     return _bind(to_bind, **arguments)
 
 
-def load_config(config):
-
+def load_config(config, recurrent=True):
     if BIND_KEY in config:
-        return bind(config)
+        return bind(config, recurrent)
     elif INIT_KEY in config:
-        return init(config)
+        return init(config, recurrent)
     elif INVOKE_KEY in config:
-        return invoke(config)
+        return invoke(config, recurrent)
     else:
         raise KeyError(
             f"None of [{BIND_KEY}, {INVOKE_KEY}, {INIT_KEY}] found " f"in config."
         )
 
 
-def load_multiple(configs):
+def load_multiple(configs, recurrent=True):
     if isinstance(configs, dict):
-        return {key: load_config(config) for key, config in configs.items()}
+        return {key: load_config(config, recurrent) for key, config in configs.items()}
     elif iter(configs):
-        return [load_config(config) for config in configs]
+        return [load_config(config, recurrent) for config in configs]
     else:
         raise TypeError(
             f"can only bind/invoke/init paths from a dict or an "
