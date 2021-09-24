@@ -111,7 +111,11 @@ def filter_columns(
     endswith=None,
     contains=None,
     excludes=None,
+    column_list=None,
 ):
+    if column_list is not None:
+        return column_list
+        
     if regex is not None:
         return [col for col in cols_to_filter if re.match(regex, col)]
 
