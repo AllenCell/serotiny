@@ -1,11 +1,12 @@
-from collections.abc import Iterable
-
-import numpy as np
-
 from torch.utils.data import Dataset
 from torch.utils.data.dataloader import default_collate as collate
 
+
 class _Row:
+    """
+    Helper class to enable string indexing of numpy arrays
+    """
+
     def __init__(self, array, cols):
         self.array = array
         self.cols = cols
@@ -28,12 +29,18 @@ class DataframeDataset(Dataset):
     ----------
     dataframe: pd.DataFrame
         The file which points to or contains the data to be loaded
+
     loaders: dict
         A dict which contains methods to appropriately load data from columns
         in the dataset.
     """
 
     def __init__(self, dataframe, loaders):
+
+        # store only the numpy array containing all the values. this is because
+        # in multiprocessing settings, having a pandas dataframe here can incur
+        # in excessive memory use, because of copy-on-write memory sharing mechanisms,
+        # triggered by pandas' inner workings
         self.dataframe = dataframe.values
         self.columns = dataframe.columns.tolist()
 
@@ -45,6 +52,4 @@ class DataframeDataset(Dataset):
     def __getitem__(self, idx):
         row = _Row(self.dataframe[idx], self.columns)
 
-        return {
-            key: loader(row) for key, loader in self.loaders.items()
-        }
+        return {key: loader(row) for key, loader in self.loaders.items()}

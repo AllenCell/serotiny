@@ -12,19 +12,24 @@ ArrayLike = Union[np.ndarray, torch.Tensor]
 
 
 class BufferedPatchDataset(Dataset):
-    """Provides patches from items of a dataset.
+    """
+    Provides patches from items of a dataset.
 
     Parameters
     ----------
     dataset
         Dataset object.
+
     patch_shape
         Shape of patch to be extracted from dataset items.
+
     buffer_size
         Size of buffer.
+
     buffer_switch_interval
         Number of patches provided between buffer item exchanges. Set to -1 to
         disable exchanges.
+
     shuffle_images
         Set to randomize order of dataset item insertion into buffer.
 

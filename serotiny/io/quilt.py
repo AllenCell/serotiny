@@ -6,7 +6,7 @@ def download_quilt_data(
     package: str,
     bucket: str,
     data_save_loc: str,
-    ignore_warnings=True,
+    ignore_warnings: bool = True,
 ):
     """
     Download a quilt dataset and supress nfs file attribe warnings

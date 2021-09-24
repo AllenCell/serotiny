@@ -1,7 +1,2 @@
-from .image import (
-    png_loader,
-    tiff_loader,
-    project_2d,
-    tiff_writer,
-    infer_dims,
-)
+from .image import image_loader
+from .quilt import download_quilt_data

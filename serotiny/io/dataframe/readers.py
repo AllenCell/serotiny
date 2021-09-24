@@ -1,0 +1,200 @@
+from typing import Sequence, Union, Optional
+from pathlib import Path
+
+import re
+import numpy as np
+import pandas as pd
+import pyarrow.parquet
+
+from sklearn.preprocessing import OneHotEncoder
+
+
+def read_parquet(path, include_columns=None):
+    """
+    Read a dataframe stored in a .parquet file, and optionally include
+    only the columns given by `include_columns`
+
+    Parameters
+    ----------
+
+    path: Union[Path, str]
+        Path to the .parquet file
+    include_columns: Optional[Sequence[str]] = None
+        List of column names and/or regex expressions, used to only include the
+        desired columns in the resulting dataframe.
+
+    Returns
+    -------
+
+    dataframe: pd.DataFrame
+
+    """
+    if include_columns is not None:
+        schema = pyarrow.parquet.read_schema(path, memory_map=True)
+
+        columns = []
+        for filter_ in include_columns:
+            columns += filter_columns(schema.names, regex=filter_)
+    else:
+        columns = None
+
+    return pd.read_parquet(path, columns=columns)
+
+
+def read_csv(path, include_columns=None):
+    """
+    Read a dataframe stored in a .csv file, and optionally include
+    only the columns given by `include_columns`
+
+    Parameters
+    ----------
+
+    path: Union[Path, str]
+        Path to the .csv file
+    include_columns: Optional[Sequence[str]] = None
+        List of column names and/or regex expressions, used to only include the
+        desired columns in the resulting dataframe.
+
+    Returns
+    -------
+
+    dataframe: pd.DataFrame
+
+    """
+
+    dataframe = pd.read_csv(path)
+
+    if include_columns is not None:
+        columns = []
+        for filter_ in include_columns:
+            columns += filter_columns(dataframe.columns.tolist(), regex=filter_)
+
+        dataframe = dataframe[columns]
+
+    return dataframe
+
+
+def read_dataframe(
+    dataframe: Union[Path, str, pd.DataFrame],
+    required_columns: Optional[Sequence[str]] = None,
+    include_columns: Optional[Sequence[str]] = None,
+) -> pd.DataFrame:
+    """
+    Load a dataframe from a .csv or .parquet file, or assert a given pd.DataFrame
+    contains the expected required columns.
+
+    Parameters
+    ----------
+
+    dataframe: Union[Path, str, pd.DataFrame]
+        Either the path to the dataframe to be loaded, or a pd.DataFrame. Supported
+        file types are .csv and .parquet
+
+    required_columns: Optional[Sequence[str]] = None
+        List of columns that the dataframe must contain. If these aren't found,
+        a ValueError is thrown
+
+    include_columns: Optional[Sequence[str]] = None
+        List of column names and/or regex expressions, used to only include the
+        desired columns in the resulting dataframe. For .parquet this also results
+        in slower read latency.
+
+    Returns
+    -------
+
+    dataframe: pd.DataFrame
+    """
+
+    if required_columns is not None and include_columns is not None:
+        include_columns += required_columns
+
+    if isinstance(dataframe, (str, Path)):
+        dataframe = Path(dataframe).expanduser().resolve(strict=True)
+
+        if not dataframe.is_file():
+            raise FileNotFoundError("Manifest file not found at given path")
+
+        if dataframe.suffix == ".csv":
+            dataframe = read_csv(dataframe, include_columns)
+        elif dataframe.suffix == ".parquet":
+            dataframe = read_parquet(dataframe, include_columns)
+        else:
+            raise TypeError("File type of provided manifest is not .csv " "or .parquet")
+
+    elif isinstance(dataframe, pd.DataFrame):
+        if include_columns is not None:
+            columns = []
+            for filter_ in include_columns:
+                columns += filter_columns(schema.names, regex=filter_)
+
+            dataframe = dataframe[columns]
+
+    else:
+        raise TypeError(
+            f"`dataframe` must be either a pd.DataFrame or a path to "
+            f"a file to load one. You passed {type(dataframe)}"
+        )
+
+    if required_columns is not None:
+        missing_columns = set(required_columns) - set(dataframe.columns)
+        if len(missing_columns) > 0:
+            raise ValueError(
+                f"Some or all of the required columns were not "
+                f"found on the given dataframe:\n{missing_columns}"
+            )
+
+    return dataframe
+
+
+def filter_columns(
+    columns_to_filter: Sequence[str],
+    regex: Optional[str] = None,
+    startswith: Optional[str] = None,
+    endswith: Optional[str] = None,
+    contains: Optional[str] = None,
+    excludes: Optional[str] = None,
+) -> Sequence[str]:
+    """
+    Filter a list of columns, using a combination of different
+    queries, or a `regex` pattern. If `regex` is supplied it
+    takes precedence and the remaining arguments are ignored.
+    Otherwise, the logical AND of the supplied filters is applied,
+    i.e. the columns that respect all of the supplied conditions
+    are returned.
+
+    Parameters
+    ----------
+    columns_to_filter: Sequence[str]
+        List of columns to filter
+
+    regex: Optional[str] = None
+        A string containing a regular expression to be matched
+
+    startswith: Optional[str] = None
+        A substring the matching columns must start with
+
+    endswith: Optional[str] = None
+        A substring the matching columns must end with
+
+    contains: Optional[str] = None
+        A substring the matching columns must contain
+
+    excludes: Optional[str] = None
+        A substring the matching columns must not contain
+
+    """
+    if regex is not None:
+        return [col for col in columns_to_filter if re.match(regex, col)]
+
+    keep = [True] * len(columns_to_filter)
+    for i in range(len(columns_to_filter)):
+        if startswith is not None:
+            keep[i] &= str(columns_to_filter[i]).startswith(startswith)
+        if endswith is not None:
+            keep[i] &= str(columns_to_filter[i]).endswith(endswith)
+        if contains is not None:
+            keep[i] &= contains in str(columns_to_filter[i])
+        if excludes is not None:
+            keep[i] &= excludes not in str(columns_to_filter[i])
+
+    return [col for col, keep_column in zip(columns_to_filter, keep) if keep_column]
