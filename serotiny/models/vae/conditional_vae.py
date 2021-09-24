@@ -7,6 +7,7 @@ from typing import Sequence, Union, Optional, Dict
 import inspect
 
 import logging
+
 logger = logging.getLogger("lightning")
 logger.propagate = False
 
@@ -18,6 +19,7 @@ from torch.nn.modules.loss import _Loss as Loss
 from .base_vae import BaseVAE
 
 Array = Union[torch.Tensor, np.array]
+
 
 class ConditionalVAE(BaseVAE):
     def __init__(
@@ -31,7 +33,7 @@ class ConditionalVAE(BaseVAE):
         x_label: str,
         c_label: Union[str, int, Sequence[int]],
         loss_mask_label: Optional[str] = None,
-        recon_loss: Union[Loss, str] = torch.nn.MSELoss,
+        reconstruction_loss: Union[Loss, str] = torch.nn.MSELoss,
         condition_mode: str = "label",
         prior_mode: str = "isotropic",
         prior_logvar: Optional[Array] = None,
@@ -48,7 +50,7 @@ class ConditionalVAE(BaseVAE):
             Decoder network.
         optimizer: opt.Optimizer
             Optimizer to use
-        recon_loss: Callable
+        reconstruction_loss: Callable
             Loss function for the reconstruction loss term
         lr: float
             Learning rate for training
@@ -85,15 +87,14 @@ class ConditionalVAE(BaseVAE):
             beta=beta,
             x_label=x_label,
             loss_mask_label=loss_mask_label,
-            recon_loss=recon_loss,
+            reconstruction_loss=reconstruction_loss,
             prior_mode=prior_mode,
             prior_logvar=prior_logvar,
-            learn_prior_logvar=learn_prior_logvar
+            learn_prior_logvar=learn_prior_logvar,
         )
 
         if condition_mode not in ("channel", "label"):
-            raise ValueError("`condition_mode` should be "
-                             "either 'channel' or 'label")
+            raise ValueError("`condition_mode` should be " "either 'channel' or 'label")
 
         self.c_label = c_label
         if condition_mode == "channel":
@@ -110,8 +111,9 @@ class ConditionalVAE(BaseVAE):
             condition = batch[self.c_label].float()
         else:
             x = batch[self.hparams.x_label].float()
-            x_channels = [channel for channel in range(x.shape[1])
-                          if channel not in self.c_label]
+            x_channels = [
+                channel for channel in range(x.shape[1]) if channel not in self.c_label
+            ]
 
             x = x[:, x_channels]
             condition = x[:, self.c_label]

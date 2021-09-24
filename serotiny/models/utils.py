@@ -7,19 +7,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def to_device(*args):
-
-    assert len(args) > 1
-    target_device = args[-1]
-    # assert isinstance(target_device, (str, device))
-    args = args[:-1]
-
-    if len(args) > 1:
-        return tuple(arg.to(target_device) for arg in args)
-    else:
-        return args[0].to(target_device)
-
-
 def matplotlib_imshow(img, one_channel=False):
     """
     Plot image via matplotlib's imshow

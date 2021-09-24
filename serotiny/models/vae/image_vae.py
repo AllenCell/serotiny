@@ -25,7 +25,7 @@ class _ImageVAEDecoder(nn.Module):
         latent_dim,
         output_dims,
         output_channels,
-        mode
+        mode,
     ):
         super().__init__()
 
@@ -42,7 +42,7 @@ class _ImageVAEDecoder(nn.Module):
             output_dim=orig_img_size,
             hidden_channels=hidden_channels,
             input_dims=compressed_img_shape,
-            upsample_layers={i:size for (i,size) in enumerate(intermediate_sizes)},
+            upsample_layers={i: size for (i, size) in enumerate(intermediate_sizes)},
             up_conv=True,
             flat_output=False,
             mode=mode,
@@ -76,8 +76,8 @@ class ImageVAE(BaseVAE):
         beta: float = 1.0,
         decoder_non_linearity: Optional[Union[nn.Module, Dict]] = None,
         loss_mask_label: Optional[str] = None,
-        recon_loss: Union[Loss, Dict] = nn.MSELoss,
-        recon_reduce: str = "mean",
+        reconstruction_loss: Union[Loss, Dict] = nn.MSELoss,
+        reconstruction_reduce: str = "mean",
         prior_mode: str = "isotropic",
         prior_logvar: Optional[Array] = None,
         learn_prior_logvar: bool = False,
@@ -96,8 +96,7 @@ class ImageVAE(BaseVAE):
         nn.utils.spectral_norm(encoder.output)
 
         dummy_out, intermediate_sizes = encoder.conv_forward(
-            torch.zeros(1, in_channels, *input_dims),
-            return_sizes=True
+            torch.zeros(1, in_channels, *input_dims), return_sizes=True
         )
 
         compressed_img_shape = dummy_out.shape[2:]
@@ -112,7 +111,7 @@ class ImageVAE(BaseVAE):
             latent_dim=latent_dim,
             output_dims=input_dims,
             output_channels=in_channels,
-            mode=mode
+            mode=mode,
         )
         decoder.apply(weight_init)
         nn.utils.spectral_norm(decoder.linear_decompress)
@@ -131,8 +130,8 @@ class ImageVAE(BaseVAE):
             loss_mask_label=loss_mask_label,
             lr=lr,
             beta=beta,
-            recon_loss=recon_loss,
-            recon_reduce=recon_reduce,
+            reconstruction_loss=reconstruction_loss,
+            reconstruction_reduce=reconstruction_reduce,
             prior_mode=prior_mode,
             prior_logvar=prior_logvar,
             learn_prior_logvar=learn_prior_logvar,

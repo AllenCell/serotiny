@@ -10,7 +10,7 @@ from torch.nn.modules.loss import _Loss as Loss
 import pytorch_lightning as pl
 
 from serotiny.utils import init
-from serotiny.models._utils import find_optimizer
+from serotiny.models.utils import find_optimizer
 from serotiny.networks.weight_init import weight_init
 
 

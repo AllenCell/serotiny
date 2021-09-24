@@ -21,7 +21,7 @@ from pytorch_lightning.utilities.parsing import get_init_args
 
 from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
 
-from serotiny.models._utils import find_optimizer
+from serotiny.models.utils import find_optimizer
 from serotiny.utils import get_name_from_path
 
 
@@ -287,7 +287,7 @@ class UnetModel(pl.LightningModule):
                         data=y_slice,
                         channel_names=self.output_channels,
                         dimension_order="STCZYX",
-                    )  # TODO: Maybe change this to 
+                    )  # TODO: Maybe change this to
                     # CZYX since we don't have S and T? Caleb
 
         return {

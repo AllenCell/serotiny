@@ -15,7 +15,7 @@ from torch.nn import functional as F
 
 import pytorch_lightning as pl
 
-from serotiny.models._utils import (
+from serotiny.models.utils import (
     add_pr_curve_tensorboard,
     find_optimizer,
     find_lr_scheduler,
