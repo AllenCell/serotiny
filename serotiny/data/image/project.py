@@ -10,13 +10,13 @@ class Project:
         if not isinstance(img, torch.Tensor):
             img = torch.tensor(img)
 
-        axis = {"z": -3, "x": -2, "y": -1}
+        axis = {"z": -3, "y": -2, "x": -1}
 
         if self.axis == "z":
             assert len(img.shape) >= 3
 
         if self.mode == "max":
-            return img.max(axis=axis[self.axis])
+            return img.max(axis=axis[self.axis])[0]
         elif self.mode == "mean":
             return img.mean(axis=axis[self.axis])
         elif self.mode == "median":
