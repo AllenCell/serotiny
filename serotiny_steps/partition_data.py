@@ -1,5 +1,4 @@
 import os
-import logging
 from pathlib import Path
 import fire
 
@@ -8,13 +7,7 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 
 
-from serotiny.io.dataframe import load_csv, append_one_hot
-
-###############################################################################
-
-log = logging.getLogger(__name__)
-
-###############################################################################
+from serotiny.io.dataframe import read_dataframe
 
 
 def reset_index(dataset, index):
@@ -46,7 +39,7 @@ def partition_data(
     if required_fields is None:
         required_fields = {}
 
-    dataset = load_csv(dataset_path, required_fields)
+    dataset = read_dataframe(dataset_path, required_fields)
     partition_count = len(dataset) // partition_size
     remaining = len(dataset) % partition_size
     if remaining > 0:

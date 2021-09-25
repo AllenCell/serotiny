@@ -7,7 +7,7 @@ import fire
 
 from aics_dask_utils import DistributedHandler
 
-from serotiny.io.dataframe import load_csv
+from serotiny.io.dataframe import read_dataframe
 from serotiny.image import change_resolution
 
 ###############################################################################
@@ -82,7 +82,7 @@ def apply_resolution(
     # print(f"applying resolution change {resolution_path}")
 
     # Load up data manifest
-    dataset = load_csv(manifest_in, [])
+    dataset = read_dataframe(manifest_in, [])
 
     # Preparing variables for resizing of images
     out_images = []

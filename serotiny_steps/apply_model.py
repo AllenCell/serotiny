@@ -10,7 +10,8 @@ from serotiny.utils import init, load_multiple
 
 
 def apply_model(
-    model_path: str,
+    model_class: str,
+    model_id: str,
     datamodule: Dict,
     trainer: Dict,
     model_zoo: Dict,
@@ -31,12 +32,12 @@ def apply_model(
     loggers_config = loggers
 
     model_zoo_path = model_zoo_config.get("path")
-    model = get_model(model_path, model_zoo_path)
+    model = get_model(model_class, model_id, model_zoo_path)
 
     datamodule = init(datamodule_config)
     datamodule.setup()
 
-    loggers = path_invocations(loggers_config)
+    loggers = load_multiple(loggers_config)
     callbacks = load_multiple(callbacks_config)
 
     trainer = pl.Trainer(

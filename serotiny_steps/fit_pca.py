@@ -3,7 +3,7 @@ import fire
 import joblib
 from sklearn.decomposition import PCA
 
-from serotiny.io.dataframe import load_csv, filter_columns
+from serotiny.io.dataframe import read_dataframe, filter_columns
 
 
 def _fit_pca(
@@ -27,7 +27,7 @@ def fit_pca(
     filter_options: dict,
     compression: int = 3,
 ):
-    dataset = load_csv(dataset_path)
+    dataset = read_dataframe(dataset_path)
     _fit_pca(dataset, output_path, n_components, filter_options, compression)
 
 

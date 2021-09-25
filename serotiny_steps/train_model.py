@@ -9,8 +9,8 @@ import fire
 import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 
-from serotiny.models.zoo import store_metadata, build_model_path
-from serotiny.utils import INIT_KEY, init_or_invoke, load_multiple
+from serotiny.models.zoo import store_metadata, get_checkpoint_callback
+from serotiny.utils import INIT_KEY, load_config, load_multiple
 
 log = logging.getLogger(__name__)
 
@@ -35,7 +35,6 @@ def train_model(
     gpu_ids: List[int] = [0],
     version_string: str = "zero",
     seed: int = 42,
-    metadata: Dict = {},
 ):
     called_args = _get_kwargs()
 
@@ -59,24 +58,26 @@ def train_model(
     num_gpus = len(gpu_ids)
     num_gpus = num_gpus if num_gpus != 0 else None
 
-    model = init_or_invoke(model_config)
+    model = load_config(model_config)
 
     if version_string is None:
         version_string = "version_" + datetime.now().strftime("%d-%m-%Y--%H-%M-%S")
 
     log.info(f"creating datamodule {datamodule_name} with {datamodule_config}")
 
-    datamodule = init_or_invoke(datamodule_config)
+    datamodule = load_config(datamodule_config)
     datamodule.setup()
 
     loggers = load_multiple(loggers_config)
 
     if len(model_zoo) > 0:
-        model_path = build_model_path(model_zoo_path, (model_name, version_string))
-        config = {"dirpath": model_path, "filename": "epoch-{epoch:02d}"}
+        config = {"filename": "epoch-{epoch:02d}"}
         checkpoint_config = model_zoo_config.get("checkpoint", {})
         config.update(checkpoint_config)
-        checkpoint_callback = ModelCheckpoint(**config)
+
+        checkpoint_callback = get_checkpoint_callback(
+            model_name, version_string, model_zoo_path, **config
+        )
     else:
         checkpoint_callback = None
 

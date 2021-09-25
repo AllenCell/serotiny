@@ -13,16 +13,16 @@ from serotiny_steps.fit_pca import fit_pca
 from serotiny_steps.make_aics_mnist_dataset import make_aics_mnist_dataset
 
 
-def dummy(some_config, some_config2, arg1, arg2="abc"):
-    print(some_config)
-    print(some_config2)
+def dummy(model_config, datamodule_config, arg1, arg2="abc"):
+    print(model_config)
+    print(datamodule_config)
     print(arg1)
     print(arg2)
 
 
 class CLI:
     def __init__(self):
-        self.dummy = omegaconf_decorator(dummy, "some_config", "some_config2")
+        self.dummy = omegaconf_decorator(dummy, "model_config", "datamodule_config")
         self.model = {
             "train": omegaconf_decorator(
                 train_model,
