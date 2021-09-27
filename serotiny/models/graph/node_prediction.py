@@ -89,30 +89,31 @@ class GraphNodePredictionModel(pl.LightningModule):
         else:
             y = y.float()
         edge_index = batch.edge_index
+        edge_weight = batch.edge_weight
+        edge_attr = batch.edge_attr
 
-        return x.float(), edge_index, y
+        return x.float(), edge_index, edge_weight, edge_attr, y
 
     def forward(self, x):
         return self.network(x)
 
-    def _step(self, batch):
-        x, edge_index, y = self.parse_batch(batch)
+    def _step(self, yhat, y):
 
-        yhat = self.network(x, edge_index)
-        # loss = F.nll_loss(
-        #     yhat, y, reduction="none", weight=self.weights.type_as(y).float()
-        # )
         loss = F.nll_loss(yhat, y, reduction="none")
         pred = yhat.argmax(dim=-1)
         correct = pred.eq(y)
 
-        return loss, pred, correct, y
+        return loss, pred, correct
 
     def training_step(self, batch, batch_idx):
 
         self.network.set_aggr("add")
 
-        loss, pred, correct, ytrue = self._step(batch)
+        x, edge_index, edge_weight, edge_attr, y = self.parse_batch(batch)
+        edge_weight = batch.edge_norm * edge_weight
+        yhat = self.network(x, edge_index, edge_weight)
+
+        loss, pred, correct = self._step(yhat, y)
 
         # Node norm requires graph saint random walk
         loss = (loss * batch.node_norm)[batch.train_mask].sum()
@@ -121,13 +122,13 @@ class GraphNodePredictionModel(pl.LightningModule):
         for _, mask in batch("train_mask"):
             accs.append(correct[mask].sum().item() / mask.sum().item())
 
-        self.log("train loss", loss.detach(), logger=True)
+        self.log("train_loss", loss.detach(), logger=True)
 
         return {
             "loss": loss,
             "preds": pred,
             "correct": correct,
-            "target": ytrue,
+            "target": y,
             "accuracy": accs,
             "batch_idx": batch_idx,
         }
@@ -144,11 +145,17 @@ class GraphNodePredictionModel(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         self.network.set_aggr("mean")
 
-        loss, pred, correct, ytrue = self._step(batch)
+        x, edge_index, edge_weight, edge_attr, y = self.parse_batch(batch)
+
+        yhat = self.network(x, edge_index)
+
+        loss, pred, correct = self._step(yhat, y)
+
+        # Node norm requires graph saint random walk
         loss = (loss * batch.node_norm)[batch.val_mask].sum()
 
         accs = []
-        for _, mask in batch("train_mask", "val_mask"):
+        for _, mask in batch("train_mask", "val_mask", "test_mask"):
             accs.append(correct[mask].sum().item() / mask.sum().item())
 
         self.log("val_loss", loss.detach(), logger=True)
@@ -157,7 +164,7 @@ class GraphNodePredictionModel(pl.LightningModule):
             "val_loss": loss,
             "preds": pred,
             "correct": correct,
-            "target": ytrue,
+            "target": y,
             "accuracy": accs,
             "batch_idx": batch_idx,
         }
@@ -174,23 +181,26 @@ class GraphNodePredictionModel(pl.LightningModule):
     def test_step(self, batch, batch_idx):
         self.network.set_aggr("mean")
 
-        loss, pred, correct, ytrue = self._step(batch)
+        x, edge_index, edge_weight, edge_attr, y = self.parse_batch(batch)
+
+        yhat = self.network(x, edge_index)
+
+        loss, pred, correct = self._step(yhat, y)
+
+        # Node norm requires graph saint random walk
         loss = (loss * batch.node_norm)[batch.test_mask].sum()
 
         accs = []
-        for name, mask in batch("train_mask", "val_mask", "test_mask"):
+        for _, mask in batch("train_mask", "val_mask", "test_mask"):
             accs.append(correct[mask].sum().item() / mask.sum().item())
-            if name == "test_mask":
-                test_true = ytrue[mask]
-                test_pred = pred[mask]
 
-        self.log("test_loss", loss.detach(), logger=True)
+        self.log("val loss", loss.detach(), logger=True)
 
         return {
             "test_loss": loss,
-            "preds": test_pred,
+            "preds": pred,
             "correct": correct,
-            "target": test_true,
+            "target": y,
             "accuracy": accs,
             "batch_idx": batch_idx,
         }
