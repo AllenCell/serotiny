@@ -3,6 +3,7 @@ from typing import Union, Dict
 from pathlib import Path
 
 import numpy as np
+from numpy.lib.index_tricks import _fill_diagonal_dispatcher
 import pandas as pd
 import pytorch_lightning as pl
 import ast
@@ -11,8 +12,10 @@ from functools import partial
 import tqdm
 import torch
 
-# from torch_geometric.loader import GraphSAINTRandomWalkSampler
-from torch_geometric.data import GraphSAINTRandomWalkSampler
+from torch_geometric.loader import GraphSAINTRandomWalkSampler
+
+# from torch_geometric.data import GraphSAINTRandomWalkSampler
+from torch_geometric.utils import degree
 
 from torch_geometric.data import Data, InMemoryDataset
 from sklearn.model_selection import train_test_split
@@ -25,11 +28,12 @@ log = logging.getLogger(__name__)
 
 
 def parallelize_dataframe(df, func, num_cores, subset=None, groupby_val=None, **kwargs):
-    num_partitions = num_cores  # number of partitions to split dataframe
 
     if subset:
         df = df.loc[df[groupby_val].isin([i for i in range(2)])]
+        num_cores = 1
 
+    num_partitions = num_cores  # number of partitions to split dataframe
     splits = np.array_split(df[groupby_val].unique(), num_partitions)
     func_partial = partial(
         func, df, groupby_val, *[value for key, value in kwargs.items()]
@@ -133,6 +137,7 @@ class GraphDatamodule(pl.LightningDataModule):
         self.num_workers = num_workers
         self.save_dir = save_dir
         self.model_type = model_type
+        self.node_loader = node_loader
 
         assert subset_train <= 1
 
@@ -144,29 +149,21 @@ class GraphDatamodule(pl.LightningDataModule):
             num_cores=num_cores,
         )
 
-        print()
-        print(f"Dataset: {dataset}:")
-        print("======================")
-        print(f"Number of graphs: {len(dataset)}")
-        print(f"Number of features: {dataset.num_features}")
-        print(f"Number of classes: {dataset.num_classes}")
-
         data = dataset[0]  # Get the first graph object.
-
-        print()
-        print(data)
-        print("===========================================================")
-
-        # Gather some statistics about the graph.
-        print(f"Number of nodes: {data.num_nodes}")
-        print(f"Number of edges: {data.num_edges}")
-        print(f"Average node degree: {data.num_edges / data.num_nodes:.2f}")
-        # print(f"Contains isolated nodes: {data.has_isolated_nodes()}")
-        # print(f"Contains self-loops: {data.has_self_loops()}")
-        print(f"Is undirected: {data.is_undirected()}")
+        row, col = data.edge_index
+        data.edge_weight = 1.0 / degree(col, data.num_nodes)[col]
 
         dataset_df = dataset.df
         val_manifest = pd.read_csv(validated_manifest)
+
+        # Do this again in case we load the same dataset
+        # but want to use different node columns
+        self.node_cols = filter_columns(
+            dataset_df.columns.to_list(), **self.node_loader
+        )
+        dataset_df[self.node_cols] = dataset_df[self.node_cols].apply(
+            lambda x: (x - x.min()) / (x.max() - x.min())
+        )
 
         if semi_supervised:
             size = val_manifest.shape[0]
@@ -214,13 +211,13 @@ class GraphDatamodule(pl.LightningDataModule):
             # adding data.x again in case we are using the same dataset
             # but want to change the node cols
             data.x = torch.tensor(
-                main_manifest[[j + "_x" for j in dataset.node_cols]].values,
+                main_manifest[[j + "_x" for j in self.node_cols]].values,
                 dtype=torch.float,
             )
         else:
             main_manifest = dataset_df.copy()
             data.x = torch.tensor(
-                main_manifest[dataset.node_cols].values,
+                main_manifest[self.node_cols].values,
                 dtype=torch.float,
             )
 
@@ -254,6 +251,25 @@ class GraphDatamodule(pl.LightningDataModule):
                 for i in np.unique(np.array(data.y), return_counts=True)[1]
             ]
         )
+
+        print()
+        print(f"Dataset: {dataset}:")
+        print("======================")
+        print(f"Number of graphs: {len(dataset)}")
+        print(f"Number of features: {data.x.shape[1]}")
+        print(f"Number of classes: {dataset.num_classes}")
+
+        print()
+        print(data)
+        print("===========================================================")
+
+        # Gather some statistics about the graph.
+        print(f"Number of nodes: {data.num_nodes}")
+        print(f"Number of edges: {data.num_edges}")
+        print(f"Average node degree: {data.num_edges / data.num_nodes:.2f}")
+        # print(f"Contains isolated nodes: {data.has_isolated_nodes()}")
+        # print(f"Contains self-loops: {data.has_self_loops()}")
+        print(f"Is undirected: {data.is_undirected()}")
 
         # self.dataloader = self.make_dataloader()
 
@@ -508,18 +524,21 @@ class WholeGraph(InMemoryDataset):
 
         node_cols = self.node_cols
 
-        df_col = self.df[
-            [
-                "CellId",
-                "neighbors",
-                "centroid_x",
-                "centroid_y",
-                "centroid_z",
-                "T_index",
-                "track_id",
-            ]
-            + node_cols
-        ].copy()
+        union_cols = list(
+            set(
+                [
+                    "CellId",
+                    "neighbors",
+                    "centroid_x",
+                    "centroid_y",
+                    "centroid_z",
+                    "T_index",
+                    "track_id",
+                ]
+            ).union(set(node_cols))
+        )
+
+        df_col = self.df[union_cols].copy()
 
         print("Computing nodes...")
         all_nodes_list = parallelize_dataframe(
@@ -556,7 +575,7 @@ class WholeGraph(InMemoryDataset):
             df_col,
             get_track_edges,
             num_cores=self.num_cores,
-            subset=False,
+            subset=True,
             groupby_val="track_id",
             node_cols=node_cols,
             flat_list=nodes_list,
