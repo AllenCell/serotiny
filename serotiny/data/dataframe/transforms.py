@@ -65,7 +65,11 @@ def split_dataframe(
     return dataframe
 
 
-def filter_rows(dataframe: pd.DataFrame, column: str, values: Sequence, exclude: bool = False):
+def filter_rows(
+    dataframe: pd.DataFrame,
+    column: str, values:
+    Sequence, exclude: bool = False
+):
     """
     Filter a dataframe, keeping only the rows where a given
     column's value is contained in a list of values

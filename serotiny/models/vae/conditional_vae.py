@@ -4,7 +4,6 @@ Pytorch Lightning module
 """
 
 from typing import Sequence, Union, Optional, Dict
-import inspect
 
 import logging
 

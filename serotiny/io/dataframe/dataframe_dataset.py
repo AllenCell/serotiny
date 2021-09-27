@@ -1,5 +1,4 @@
 from torch.utils.data import Dataset
-from torch.utils.data.dataloader import default_collate as collate
 
 
 class _Row:

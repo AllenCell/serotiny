@@ -1,10 +1,4 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-import torch
 from torch import nn
-
-# from torch.nn import functional as F
 
 from ..layers._3d.unet_downconv import DownConvolution
 from ..layers._3d.unet_upconv import UpConvolution
@@ -39,7 +33,8 @@ class Unet(nn.Module):
     ):
 
         """
-        Implementation of the Unet network architecture https://arxiv.org/pdf/1505.04597.pdf
+        Implementation of the Unet network architecture
+        https://arxiv.org/pdf/1505.04597.pdf
         Just one level for now TODO: add more levels : )
 
         In the original paper:
@@ -52,16 +47,17 @@ class Unet(nn.Module):
             pooling: options are (average, max)
 
         TODO:
-            - Add auto-padding so we don't see mismatches when performing the cross-branch
-              concatenations -> auto-pad at first level depending on depth and other
-              network parameters
+            - Add auto-padding so we don't see mismatches when performing the
+              cross-branch concatenations -> auto-pad at first level depending on depth
+              and other network parameters
 
-            - Separate channel_fan between first layer and the next for double_conv (right
-              now this calculation is entirely done in the unet.py)? Yes, separate into 2
-              parameters
+            - Separate channel_fan between first layer and the next for double_conv
+              (right now this calculation is entirely done in the unet.py)?
+              Yes, separate into 2 parameters
 
-            - Separate kernel_size, stride, and padding for double_conv, pooling, up_conv,
-              UpConv, DownConv, and conv_out? No, just follow original paper
+            - Separate kernel_size, stride, and padding for double_conv, pooling,
+              up_conv, UpConv, DownConv, and conv_out?
+              No, just follow original paper
         """
 
         super().__init__()
@@ -76,21 +72,24 @@ class Unet(nn.Module):
 
         """
         An example of n_in and n_out for a network of depth = 4:
-        
+
           L4: 3 -> 6,     12 -> 6
           L3: 6 -> 12,    24 -> 12
           L2: 12 -> 24,   48 -> 24
           L1: 24 -> 48,   96 -> 48
           L0:       48 -> 96
-          
+
         """
 
-        # Create the down pathway by traversing the downward path, including the bottom-most layer
+        # Create the down pathway by traversing the downward path, including
+        # the bottom-most layer
 
-        # NOTE: To store nn modules, we need to use nn.ModuleDict{} instead of a regular dictionary,
-        #       and the keys (which indicates the network levels) must be strings. Also, we cannot
-        #       store non-module info in nn.ModuleDict{}, such as the n_in and n_out tuples, so we
-        #       need to use separate channels_down{} and channels_up{} dictionaries for that purpose,
+        # NOTE: To store nn modules, we need to use nn.ModuleDict{} instead of a regular
+        #       dictionary, and the keys (which indicates the network levels) must be
+        #       strings.
+        #       Also, we cannot store non-module info in nn.ModuleDict{}, such as
+        #       the n_in and n_out tuples, so we need to use separate channels_down{}
+        #       and channels_up{} dictionaries for that purpose,
         #       and also use their keys (integers) to traverse up and down the network
         self.channels_down = {}
         self.networks_down = nn.ModuleDict({})
@@ -102,7 +101,10 @@ class Unet(nn.Module):
             # At the top layer
             if current_depth == depth:
                 n_in = self.num_input_channels
-                n_out = channel_fan_top  # Similar to original paper and label-free, apply channel_fan_top only in the top layer
+
+                # Similar to original paper and label-free, apply channel_fan_top
+                # only in the top layer
+                n_out = channel_fan_top
 
             else:
                 n_in = self.channels_down[current_depth + 1][1]

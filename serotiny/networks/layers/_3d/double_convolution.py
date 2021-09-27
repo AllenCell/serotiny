@@ -1,7 +1,6 @@
-import torch
 from torch import nn
 
-# In original paper, kernel_size = 3 and padding = 0
+
 class DoubleConvolution(nn.Module):
     def __init__(
         self,
@@ -26,24 +25,11 @@ class DoubleConvolution(nn.Module):
         self.relu2 = nn.ReLU()
 
     def forward(self, x):
-        # print(f"  x.shape = {x.shape}")
-
         x = self.conv1(x)
-        # print(f"  x.shape (conv1) = {x.shape}")
-
         x = self.bn1(x)
-        # print(f"  x.shape (bn1)= {x.shape}")
-
         x = self.relu1(x)
-        # print(f"  x.shape (relu1) = {x.shape}")
-
         x = self.conv2(x)
-        # print(f"  x.shape (conv2) = {x.shape}")
-
         x = self.bn2(x)
-        # print(f"  x.shape (bn2) = {x.shape}")
-
         x = self.relu2(x)
-        # print(f"  x.shape (relu2) = {x.shape}")
 
         return x

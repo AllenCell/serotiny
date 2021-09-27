@@ -3,7 +3,7 @@ import torch.nn.functional as F
 
 import matplotlib.pyplot as plt
 
-from pytorch_lightning import Callback, Trainer, LightningModule
+from pytorch_lightning import Callback
 from pytorch_lightning.loggers import TensorBoardLogger
 
 
@@ -12,11 +12,11 @@ class PlotXHat(Callback):
         self,
         cell_id=None,
         cell_id_label="cell_id",
-        x_label="image_in",
         logits=False,
         mode="3d",
     ):
-        self.cell_id = None
+        self.cell_id = cell_id
+        self.cell_id_label = cell_id_label
         self.logits = logits
         self.mode = mode
 
@@ -27,12 +27,12 @@ class PlotXHat(Callback):
             return
 
         if self.cell_id is None:
-            self.cell_id = batch["cell_id"][0]
+            self.cell_id = batch[self.cell_id_label][0]
         else:
-            if self.cell_id not in batch["cell_id"]:
+            if self.cell_id not in batch[self.cell_id_label]:
                 return
 
-        idx = batch["cell_id"].index(self.cell_id)
+        idx = batch[self.cell_id_label].index(self.cell_id)
 
         logger = None
         for _logger in trainer.logger:
@@ -50,16 +50,7 @@ class PlotXHat(Callback):
             forward_kwargs = dict()
 
         with torch.no_grad():
-            (
-                xhat,
-                mu,
-                _,
-                loss,
-                recon_loss,
-                kld_loss,
-                rcl_per_input_dimension,
-                kld_per_latent_dimension,
-            ) = model.forward(x, **forward_kwargs)
+            xhat = model.forward(x, **forward_kwargs)[0]
 
             if self.logits:
                 xhat = F.sigmoid(xhat)

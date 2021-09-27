@@ -2,11 +2,8 @@ from typing import Sequence, Union, Optional
 from pathlib import Path
 
 import re
-import numpy as np
 import pandas as pd
 import pyarrow.parquet
-
-from sklearn.preprocessing import OneHotEncoder
 
 
 def read_parquet(path, include_columns=None):
@@ -125,7 +122,7 @@ def read_dataframe(
         if include_columns is not None:
             columns = []
             for filter_ in include_columns:
-                columns += filter_columns(schema.names, regex=filter_)
+                columns += filter_columns(dataframe.columns, regex=filter_)
 
             dataframe = dataframe[columns]
 

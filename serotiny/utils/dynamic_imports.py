@@ -69,22 +69,31 @@ def module_or_path(module, key):
 def get_name_and_arguments(key, config):
     path = config[key]
     name = get_name_from_path(path)
-    arguments = {k: v for k, v in config.items() if k != key}
+    arguments = config.copy()
+    del arguments[key]
+
     return name, arguments
+
+
+def _try_load_dict(d):
+    for key, value in d.items():
+        if isinstance(value, dict):
+            try:
+                d[key] = load_config(value)
+            except:
+                pass
+    return d
 
 
 def invoke(config, recurrent=True):
     to_invoke, arguments = get_name_and_arguments(INVOKE_KEY, config)
 
-    if recurrent:
-        for key, value in arguments.items():
-            if isinstance(value, dict):
-                try:
-                    arguments[key] = load_config(value)
-                except:
-                    pass
+    var_args = (arguments.pop("*args") if "*args" in arguments else [])
 
-    return to_invoke(**arguments)
+    if recurrent:
+        arguments = _try_load_dict(arguments)
+
+    return to_invoke(*var_args, **arguments)
 
 
 def init(config, recurrent=True):
@@ -92,32 +101,26 @@ def init(config, recurrent=True):
 
     if not isinstance(to_init, type):
         raise TypeError(
-            f"Expected {to_init} to be a class, but it is " f"{type(to_init)}"
+            f"Expected {to_init} to be a class, but it is {type(to_init)}"
         )
 
-    if recurrent:
-        for key, value in arguments.items():
-            if isinstance(value, dict):
-                try:
-                    arguments[key] = load_config(value)
-                except:
-                    pass
+    var_args = (arguments.pop("*args") if "*args" in arguments else [])
 
-    return to_init(**arguments)
+    if recurrent:
+        arguments = _try_load_dict(arguments)
+
+    return to_init(*var_args, **arguments)
 
 
 def bind(config, recurrent=True):
     to_bind, arguments = get_name_and_arguments(BIND_KEY, config)
 
-    if recurrent:
-        for key, value in arguments.items():
-            if isinstance(value, dict):
-                try:
-                    arguments[key] = load_config(value)
-                except:
-                    pass
+    var_args = (arguments.pop("*args") if "*args" in arguments else [])
 
-    return _bind(to_bind, **arguments)
+    if recurrent:
+        arguments = _try_load_dict(arguments)
+
+    return _bind(to_bind, *var_args, **arguments)
 
 
 def load_config(config, recurrent=True):

@@ -2,7 +2,6 @@ from typing import Sequence
 from pathlib import Path
 
 import pandas as pd
-import multiprocessing as mp
 import pytorch_lightning as pl
 
 from torch.utils.data import DataLoader

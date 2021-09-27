@@ -8,9 +8,6 @@ import inspect
 from typing import Sequence, Union, Optional, Dict
 import logging
 
-logger = logging.getLogger("lightning")
-logger.propagate = False
-
 import numpy as np
 
 import torch.nn as nn
@@ -23,6 +20,9 @@ from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
 
 from serotiny.models.utils import find_optimizer
 from serotiny.utils import get_name_from_path
+
+logger = logging.getLogger("lightning")
+logger.propagate = False
 
 
 class UnetModel(pl.LightningModule):
@@ -110,9 +110,9 @@ class UnetModel(pl.LightningModule):
         print(f"this is the file we are running: {__file__}")
 
     def parse_batch(self, batch):
-        # TODO: The values of x_label and y_label are used as keys in the batch dictionary.
-        #       If they are the same column names, there may be conflict
-        # print(f'batch = {batch}')
+        # TODO: The values of x_label and y_label are used as keys
+        #       in the batch dictionary. If they are the same column names,
+        #       there may be conflict
         x = batch[self.hparams.x_label].float()
         y = batch[self.hparams.y_label].float()
         ids = dict()

@@ -1,9 +1,5 @@
 from typing import Sequence
 
-import math
-import numpy as np
-import torch
-
 from aicsimageprocessing.resize import resize_to, resize
 from .pad import PadTo
 

@@ -6,7 +6,6 @@ import numpy as np
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.exceptions import MisconfigurationException
 
-from torch.utils.data.sampler import SubsetRandomSampler
 from torch.utils.data import DataLoader
 
 from serotiny.io.dataframe import DataframeDataset, read_dataframe

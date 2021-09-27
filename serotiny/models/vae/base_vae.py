@@ -152,7 +152,7 @@ class BaseVAE(pl.LightningModule):
                 mu, prior_mu, logvar, self.prior_logvar
             )
         else:
-            raise NotImplementedError(f"KLD mode '{mode}' not implemented")
+            raise NotImplementedError(f"KLD mode '{self.prior_mode}' not implemented")
 
         kld = kld_per_dimension.sum(dim=1).mean()
 
@@ -245,13 +245,11 @@ class BaseVAE(pl.LightningModule):
         }
 
         if stage in ("test", "val"):
-            results.update(
-                {
-                    "mu": mu.detach(),
-                    "kld_per_latent_dimension": kld_per_latent_dimension.detach().float(),
-                    "rcl_per_input_dimension": rcl_per_input_dimension.detach().float(),
-                }
-            )
+            results.update({
+                "mu": mu.detach(),
+                "kld_per_latent_dimension": kld_per_latent_dimension.detach().float(),
+                "rcl_per_input_dimension": rcl_per_input_dimension.detach().float(),
+            })
 
         return results
 

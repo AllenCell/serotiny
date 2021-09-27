@@ -134,6 +134,8 @@ def get_checkpoint_callback(
     Get an instantiated ModelCheckpoint callback, configured to use
     a specified model zoo
 
+    Parameters
+    ----------
     model_class: str
         A string containing the "import path" to the model class,
         e.g. serotiny.models.RegressionModel
@@ -192,7 +194,7 @@ def get_trainer_at_checkpoint(
         Flag to determine whether to reload the trainer's loggers
     """
 
-    ckpt_path, config = _get_checkpoint(model_path, zoo_root)
+    ckpt_path, config = _get_checkpoint(model_class, model_id, zoo_root)
 
     trainer_config = config["trainer"]
 
