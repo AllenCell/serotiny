@@ -28,18 +28,10 @@ serotiny.io.image module
    :undoc-members:
    :show-inheritance:
 
-serotiny.io.transforms module
------------------------------
-
-.. automodule:: serotiny.io.transforms
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-serotiny.io.utils module
+serotiny.io.quilt module
 ------------------------
 
-.. automodule:: serotiny.io.utils
+.. automodule:: serotiny.io.quilt
    :members:
    :undoc-members:
    :show-inheritance:

@@ -13,7 +13,6 @@ Subpackages
    serotiny.metrics
    serotiny.models
    serotiny.networks
-   serotiny.transform
    serotiny.utils
 
 Module contents

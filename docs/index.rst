@@ -8,11 +8,10 @@ Welcome to serotiny's documentation!
 
    Overview <self>
    installation
+   cli
+   dynamic_imports
    Package modules <modules>
    contributing
-   math
-
-.. mdinclude:: ../README.md
 
 Indices and tables
 ==================

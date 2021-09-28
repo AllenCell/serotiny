@@ -28,6 +28,14 @@ serotiny.metrics.inception module
    :undoc-members:
    :show-inheritance:
 
+serotiny.metrics.pearson module
+-------------------------------
+
+.. automodule:: serotiny.metrics.pearson
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

@@ -36,14 +36,6 @@ serotiny.datamodules.patch module
    :undoc-members:
    :show-inheritance:
 
-serotiny.datamodules.split module
----------------------------------
-
-.. automodule:: serotiny.datamodules.split
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 

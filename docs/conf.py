@@ -52,6 +52,7 @@ napoleon_use_param = False
 
 # Control autodoc
 autoclass_content = "both"  # include init doc with class
+autodoc_inherit_docstrings = False # don't inherit docstrings from parent classes by default
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
