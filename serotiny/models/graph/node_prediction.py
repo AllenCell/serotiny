@@ -7,17 +7,12 @@ from typing import Union, Dict
 import torch.nn as nn
 from torch.nn.modules.loss import _Loss as Loss
 import torch.nn.functional as F
-import numpy as np
 
 import pytorch_lightning as pl
 
 from serotiny.utils import init
 from serotiny.models._utils import find_optimizer
 from serotiny.networks.weight_init import weight_init
-from sklearn.metrics import precision_recall_fscore_support
-import seaborn as sns
-from sklearn.metrics import confusion_matrix
-import matplotlib.pyplot as plt
 
 
 class GraphNodePredictionModel(pl.LightningModule):
@@ -54,7 +49,6 @@ class GraphNodePredictionModel(pl.LightningModule):
     def __init__(
         self,
         network: Union[nn.Module, Dict],
-        weights: list,
         lr: float,
         optimizer: str,
         task: str,
@@ -72,7 +66,6 @@ class GraphNodePredictionModel(pl.LightningModule):
             network = init(network)
 
         self.network = network.apply(weight_init)
-        self.weights = weights
         self.lr = lr
         self.optimizer = optimizer
         self.task = task
@@ -99,7 +92,7 @@ class GraphNodePredictionModel(pl.LightningModule):
 
     def _step(self, yhat, y):
 
-        loss = F.nll_loss(yhat, y, reduction="none")
+        loss = self.loss(yhat, y)
         pred = yhat.argmax(dim=-1)
         correct = pred.eq(y)
 
@@ -114,6 +107,8 @@ class GraphNodePredictionModel(pl.LightningModule):
         yhat = self.network(x, edge_index, edge_weight)
 
         loss, pred, correct = self._step(yhat, y)
+        y = y[batch.train_mask]
+        pred = pred[batch.train_mask]
 
         # Node norm requires graph saint random walk
         loss = (loss * batch.node_norm)[batch.train_mask].sum()
@@ -126,21 +121,13 @@ class GraphNodePredictionModel(pl.LightningModule):
 
         return {
             "loss": loss,
+            "train_loss": loss.detach(),
             "preds": pred,
             "correct": correct,
             "target": y,
-            "accuracy": accs,
+            "train_accuracy": accs[0],
             "batch_idx": batch_idx,
         }
-
-    def training_epoch_end(self, outputs):
-        self._cache["train"] = outputs
-        print(
-            "train loss",
-            np.mean([out["loss"].item() for out in outputs]),
-            "accuracy",
-            np.mean([out["accuracy"][0] for out in outputs]),
-        )
 
     def validation_step(self, batch, batch_idx):
         self.network.set_aggr("mean")
@@ -150,12 +137,14 @@ class GraphNodePredictionModel(pl.LightningModule):
         yhat = self.network(x, edge_index)
 
         loss, pred, correct = self._step(yhat, y)
+        y = y[batch.val_mask]
+        pred = pred[batch.val_mask]
 
         # Node norm requires graph saint random walk
         loss = (loss * batch.node_norm)[batch.val_mask].sum()
 
         accs = []
-        for _, mask in batch("train_mask", "val_mask", "test_mask"):
+        for _, mask in batch("val_mask"):
             accs.append(correct[mask].sum().item() / mask.sum().item())
 
         self.log("val_loss", loss.detach(), logger=True)
@@ -165,18 +154,9 @@ class GraphNodePredictionModel(pl.LightningModule):
             "preds": pred,
             "correct": correct,
             "target": y,
-            "accuracy": accs,
+            "val_accuracy": accs[0],
             "batch_idx": batch_idx,
         }
-
-    def validation_epoch_end(self, outputs):
-        self._cache["val"] = outputs
-        print(
-            "val loss",
-            np.mean([out["val_loss"].item() for out in outputs]),
-            "accuracy",
-            np.mean([out["accuracy"][0] for out in outputs]),
-        )
 
     def test_step(self, batch, batch_idx):
         self.network.set_aggr("mean")
@@ -186,64 +166,29 @@ class GraphNodePredictionModel(pl.LightningModule):
         yhat = self.network(x, edge_index)
 
         loss, pred, correct = self._step(yhat, y)
+        y = y[batch.test_mask]
+        pred = pred[batch.test_mask]
 
         # Node norm requires graph saint random walk
         loss = (loss * batch.node_norm)[batch.test_mask].sum()
 
         accs = []
-        for _, mask in batch("train_mask", "val_mask", "test_mask"):
+        for _, mask in batch("test_mask"):
             accs.append(correct[mask].sum().item() / mask.sum().item())
 
-        self.log("val loss", loss.detach(), logger=True)
+        self.log("test_loss", loss.detach(), logger=True)
 
         return {
             "test_loss": loss,
             "preds": pred,
             "correct": correct,
             "target": y,
-            "accuracy": accs,
+            "test_accuracy": accs[0],
             "batch_idx": batch_idx,
         }
 
     def test_step_end(self, outputs):
         return outputs
-
-    def test_epoch_end(self, outputs):
-        self._cache["test"] = outputs
-
-        print(
-            "Test loss",
-            np.mean([out["test_loss"].item() for out in outputs]),
-            "accuracy",
-            np.mean([out["accuracy"][0] for out in outputs]),
-        )
-
-        precs = []
-        recs = []
-        fscore = []
-        all_true, all_pred = [], []
-        for pred in outputs:
-            this_pred = pred["preds"].detach().cpu().numpy()
-            this_true = pred["target"].detach().cpu().numpy()
-            all_metrics = precision_recall_fscore_support(
-                this_true, this_pred, average="weighted"
-            )
-            precs.append(all_metrics[0])
-            recs.append(all_metrics[1])
-            fscore.append(all_metrics[2])
-            all_true.append(this_true)
-            all_pred.append(this_pred)
-
-        fig, ax = plt.subplots(1, 1, figsize=(7, 7))
-        ax = sns.heatmap(
-            confusion_matrix(this_true, this_pred),
-            cmap="RdBu_r",
-            annot=True,
-            annot_kws={"size": 7},
-        )
-        ax.set_xlabel("Predicted")
-        ax.set_ylabel("True")
-        fig.savefig("confusion.png")
 
     def configure_optimizers(self):
         optimizer_class = find_optimizer(self.optimizer)
