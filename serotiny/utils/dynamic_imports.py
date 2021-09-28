@@ -75,52 +75,53 @@ def get_name_and_arguments(key, config):
     return name, arguments
 
 
-def _try_load_dict(d):
-    for key, value in d.items():
+def _try_load_zipped(zipped_tups, output):
+    for key, value in zipped_tups:
         if isinstance(value, dict):
             try:
-                d[key] = load_config(value)
+                output[key] = load_config(value)
             except:
                 pass
-    return d
+    return output
+
+
+def get_load_method_and_args(key, config, recurrent=True):
+    to_load, arguments = get_name_and_arguments(key, config)
+
+    positional_args = (arguments.pop("^positional_args")
+                       if "^positional_args" in arguments else [])
+    if recurrent:
+        arguments = _try_load_zipped(arguments.items(), arguments)
+        positional_args = _try_load_zipped(enumerate(positional_args), positional_args)
+
+    return to_load, positional_args, arguments
 
 
 def invoke(config, recurrent=True):
-    to_invoke, arguments = get_name_and_arguments(INVOKE_KEY, config)
-
-    var_args = (arguments.pop("*args") if "*args" in arguments else [])
-
-    if recurrent:
-        arguments = _try_load_dict(arguments)
-
-    return to_invoke(*var_args, **arguments)
+    to_invoke, positional_args, arguments = (
+        get_load_method_and_args(INVOKE_KEY, config, recurrent)
+    )
+    return to_invoke(*positional_args, **arguments)
 
 
 def init(config, recurrent=True):
-    to_init, arguments = get_name_and_arguments(INIT_KEY, config)
+    to_init, positional_args, arguments = (
+        get_load_method_and_args(INIT_KEY, config, recurrent)
+    )
 
     if not isinstance(to_init, type):
         raise TypeError(
             f"Expected {to_init} to be a class, but it is {type(to_init)}"
         )
 
-    var_args = (arguments.pop("*args") if "*args" in arguments else [])
-
-    if recurrent:
-        arguments = _try_load_dict(arguments)
-
-    return to_init(*var_args, **arguments)
+    return to_init(*positional_args, **arguments)
 
 
 def bind(config, recurrent=True):
-    to_bind, arguments = get_name_and_arguments(BIND_KEY, config)
-
-    var_args = (arguments.pop("*args") if "*args" in arguments else [])
-
-    if recurrent:
-        arguments = _try_load_dict(arguments)
-
-    return _bind(to_bind, *var_args, **arguments)
+    to_bind, positional_args, arguments = (
+        get_load_method_and_args(BIND_KEY, config, recurrent)
+    )
+    return _bind(to_bind, *positional_args, **arguments)
 
 
 def load_config(config, recurrent=True):
