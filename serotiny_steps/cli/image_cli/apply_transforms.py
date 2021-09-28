@@ -1,4 +1,4 @@
-from typing import Union, Dict, Sequence, Optional
+from typing import Union, Dict, Sequence, Optional, T
 from pathlib import Path
 import traceback
 
@@ -12,6 +12,8 @@ from tqdm import tqdm
 from serotiny.io.image import tiff_writer, image_loader
 from serotiny.utils import load_config
 
+PathLike = Union[str, Path]
+OneOrMany = Union[T, Sequence[T]]
 
 def apply_transforms(
     row: Union[Dict, pd.Series],
@@ -134,7 +136,7 @@ def _transform_from_row(
 
 
 def transform_batch(
-    *input_manifests: Sequence[Union[str, Path]],
+    input_manifests: OneOrMany[PathLike],
     output_path: Union[str, Path],
     output_channel_names: Sequence[str],
     transforms_to_apply: Dict,
@@ -150,7 +152,7 @@ def transform_batch(
 
     Parameters
     ----------
-    input_manifest: Sequence[Union[str, Path]]
+    input_manifest: OneOrMany[PathLike]
         Path(s) to the input manifest(s)
 
     output_path: Union[str, Path]
@@ -179,6 +181,10 @@ def transform_batch(
     """
 
     input_manifest = None
+
+    if isinstance(input_manifests, PathLike):
+        input_manifests = [input_manifests]
+
     if len(input_manifests) > 1:
         assert merge_col is not None
 
