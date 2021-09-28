@@ -3,7 +3,6 @@ from typing import Union, Dict
 from pathlib import Path
 
 import numpy as np
-from numpy.lib.index_tricks import _fill_diagonal_dispatcher
 import pandas as pd
 import pytorch_lightning as pl
 import ast
@@ -241,6 +240,13 @@ class GraphDatamodule(pl.LightningDataModule):
             targets = torch.tensor(main_manifest[target_label], dtype=torch.float)
 
         data.y = targets
+        weights = torch.tensor(
+            [
+                len(data.y) / i
+                for i in np.unique(np.array(data.y), return_counts=True)[1]
+            ]
+        )
+        data.weights = weights
 
         self.dataset = dataset
         self.length = len(dataset)
