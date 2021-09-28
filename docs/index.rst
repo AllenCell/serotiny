@@ -10,6 +10,9 @@ Welcome to serotiny's documentation!
    installation
    cli
    dynamic_imports
+   image_transforms
+   dataframe_transforms
+   example_workflows
    Package modules <modules>
    contributing
 
