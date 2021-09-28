@@ -1,6 +1,7 @@
 from inspect import Parameter, signature
 from makefun import wraps
-from omegaconf import OmegaConf
+from omegaconf import OmegaConf, ListConfig
+from omegaconf._utils import split_key
 
 
 def omegaconf_decorator(func, *config_args):
@@ -32,7 +33,18 @@ def omegaconf_decorator(func, *config_args):
 
         for config in config_args:
             if isinstance(base_conf[config], str):
-                base_conf[config] = OmegaConf.load(base_conf[config])
+                config_path = base_conf[config]
+                dotstring = None
+                if ":" in config_path:
+                    config_path, dotstring = config_path.split(":")
+
+                _this_config = OmegaConf.load(config_path)
+                if dotstring is not None:
+                    for field in split_key(dotstring):
+                        if isinstance(_this_config, ListConfig):
+                            field = int(field)
+                        _this_config = _this_config[field]
+                base_conf[config] = _this_config
 
         override_conf = OmegaConf.from_dotlist(args[len(func_arg_names) :])
 
