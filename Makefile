@@ -52,8 +52,10 @@ gen-docs: ## generate Sphinx HTML documentation, including API docs
 	rm -f docs/serotiny*.rst
 	rm -f docs/modules.rst
 	sphinx-apidoc -o docs/ serotiny **/tests/
+
+_docs:
 	$(MAKE) -C docs html
 
 docs: ## generate Sphinx HTML documentation, including API docs, and serve to browser
-	make gen-docs
+	make _docs
 	$(BROWSER) docs/_build/html/index.html
