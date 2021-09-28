@@ -2,8 +2,6 @@ import os
 from pathlib import Path
 import fire
 
-from sklearn.model_selection import train_test_split
-
 import pandas as pd
 
 
@@ -29,7 +27,6 @@ def partition_data(
     partition_prefix="partition",
     required_fields=None,
 ):
-
     """
     Split the incoming data into N sets of output data, where
     each set has `partition_size` elements, generating filenames

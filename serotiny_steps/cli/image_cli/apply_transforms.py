@@ -2,6 +2,7 @@ from typing import Union, Dict, Sequence, Optional
 from pathlib import Path
 import traceback
 
+from functools import partial
 import json
 import pandas as pd
 import multiprocessing_on_dill as mp
@@ -96,7 +97,7 @@ def apply_transforms(
     return result_imgs[output_key][0]
 
 
-def transform_from_row(
+def _transform_from_row(
     row: Union[pd.Series, Dict],
     transforms_to_apply: Dict,
     output_channel_names: Sequence[str],
@@ -126,7 +127,7 @@ def transform_from_row(
         img = apply_transforms(row, transforms_to_apply)
         tiff_writer(img, output_path, channel_names=output_channel_names)
         result["errors"] = ""
-    except Exception as e:
+    except Exception:
         result["errors"] = traceback.format_exc()
 
     return result
@@ -197,11 +198,11 @@ def transform_batch(
         output_path.mkdir(parents=True)
 
     # make helper function with pre attributed params except df row
-    apply_transf = lambda row: transform_from_row(
-        row,
-        transforms_to_apply,
-        output_channel_names,
-        output_path,
+    apply_transform = partial(
+        _transform_from_row,
+        transforms_to_apply=transforms_to_apply,
+        output_channel_names=output_channel_names,
+        output_path=output_path,
         index_col=index_col,
         include_cols=include_cols,
     )
@@ -209,13 +210,13 @@ def transform_batch(
 
     if n_workers > 1:
         with mp.Pool(n_workers) as pool:
-            jobs = pool.imap_unordered(apply_transf, iter_rows)
+            jobs = pool.imap_unordered(apply_transform, iter_rows)
             if verbose:
                 jobs = tqdm(jobs, total=len(input_manifest))
             success = pd.DataFrame.from_records(list(jobs))
     else:
         if verbose:
             iter_rows = tqdm(iter_rows, total=len(input_manifest))
-        success = pd.DataFrame.from_records([apply_transf(row) for row in iter_rows])
+        success = pd.DataFrame.from_records([apply_transform(row) for row in iter_rows])
 
     success.to_csv(output_path / "manifest.csv")

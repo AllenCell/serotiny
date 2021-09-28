@@ -7,7 +7,6 @@ from datetime import datetime
 
 import fire
 import pytorch_lightning as pl
-from pytorch_lightning.callbacks import ModelCheckpoint
 
 from serotiny.models.zoo import store_metadata, get_checkpoint_callback
 from serotiny.utils import INIT_KEY, load_config, load_multiple

@@ -1,10 +1,9 @@
-from typing import Sequence, Dict
+from typing import Dict
 from pathlib import Path
 
-from inspect import Parameter, signature
+import logging
 from makefun import wraps
 
-import logging
 import joblib
 
 import pandas as pd
@@ -39,7 +38,6 @@ class TransformDataframeCLI:
             else:
                 kwargs["dataframe"] = read_dataframe(kwargs["dataframe"])
 
-            import pdb; pdb.set_trace()
             self._result = func(**kwargs)
             return self
 
@@ -89,5 +87,6 @@ class TransformDataframeCLI:
             else:
                 if self._output_path.suffix == "":
                     self._output_path = self._output_path.with_suffix(self._suffix)
+            joblib.dump(self._result, self._output_path)
 
         return ""
