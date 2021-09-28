@@ -1,114 +1,223 @@
-<!DOCTYPE html>
-<html class="writer-html5" lang="en" >
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>serotiny.models.zoo &mdash; serotiny 0.0.1 documentation</title>
-      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <!--[if lt IE 9]>
-    <script src="../../../_static/js/html5shiv.min.js"></script>
-  <![endif]-->
-  
-        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
-        <script src="../../../_static/jquery.js"></script>
-        <script src="../../../_static/underscore.js"></script>
-        <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/js/theme.js"></script>
-    <link rel="index" title="Index" href="../../../genindex.html" />
-    <link rel="search" title="Search" href="../../../search.html" /> 
-</head>
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-<body class="wy-body-for-nav"> 
-  <div class="wy-grid-for-nav">
-    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
-            <a href="../../../index.html" class="icon icon-home"> serotiny
-          </a>
-              <div class="version">
-                0.0.1
-              </div>
-<div role="search">
-  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
-    <input type="hidden" name="check_keywords" value="yes" />
-    <input type="hidden" name="area" value="default" />
-  </form>
-</div>
-        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+    <meta name="generator" content="sphinx-4.2.0, furo 2021.09.22"/>
+        <title>serotiny.models.zoo - serotiny 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=150e365fa939648e89c22f6d7d13c72a1657915a" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #eeffcc;
+  --color-code-foreground: black;
+  
+  }
+  body[data-theme="dark"] {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+</style></head>
+  <body>
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" />
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">serotiny 0.0.1 documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
+  
+  
+  <span class="sidebar-brand-text">serotiny 0.0.1 documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#stable-release">Stable release</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../installation.html#from-sources">From sources</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">serotiny CLI</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../cli.html#passing-config-dicts-in-cli">Passing config dicts in CLI</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../../../dynamic_imports.html">Dynamic imports</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../dynamic_imports.html#init"><code class="code docutils literal notranslate"><span class="pre">^init</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../dynamic_imports.html#invoke"><code class="code docutils literal notranslate"><span class="pre">^invoke</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../dynamic_imports.html#bind"><code class="code docutils literal notranslate"><span class="pre">^bind</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../dynamic_imports.html#positional-args"><code class="code docutils literal notranslate"><span class="pre">^positional_args</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">serotiny CLI</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamic_imports.html">Dynamic imports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../image_transforms.html">Applying image transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../dataframe_transforms.html">Dataframe wrangling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../example_workflows.html">Example workflows</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Package modules</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../serotiny.html">serotiny package</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../serotiny.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.datamodules.html">serotiny.datamodules package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.io.html">serotiny.io package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.losses.html">serotiny.losses package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.metrics.html">serotiny.metrics package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.models.html">serotiny.models package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.networks.html">serotiny.networks package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.utils.html">serotiny.utils package</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="../../../serotiny.html#module-serotiny">Module contents</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../modules.html">Package modules</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../serotiny.html">serotiny package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../serotiny.datamodules.html">serotiny.datamodules package</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../serotiny.io.html">serotiny.io package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../../serotiny.io.dataframe.html">serotiny.io.dataframe package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../../serotiny.io.dataframe.loaders.html">serotiny.io.dataframe.loaders package</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../contributing.html#get-started">Get Started!</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../contributing.html#deploying">Deploying</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../serotiny.losses.html">serotiny.losses package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../serotiny.metrics.html">serotiny.metrics package</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../serotiny.models.html">serotiny.models</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.models.callbacks.html">serotiny.models.callbacks package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.models.vae.html">serotiny.models.vae package</a></li>
 </ul>
 </li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../../serotiny.networks.html">serotiny.networks package</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.networks.classification.html">serotiny.networks.classification package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.networks.layers.html">serotiny.networks.layers package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../serotiny.utils.html">serotiny.utils package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
 </ul>
 
-        </div>
-      </div>
-    </nav>
-
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
-          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../../index.html">serotiny</a>
-      </nav>
-
-      <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="Page navigation">
-  <ul class="wy-breadcrumbs">
-      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-          <li><a href="../../index.html">Module code</a> &raquo;</li>
-          <li><a href="../../serotiny.html">serotiny</a> &raquo;</li>
-      <li>serotiny.models.zoo</li>
-      <li class="wy-breadcrumbs-aside">
-      </li>
-  </ul>
-  <hr/>
 </div>
-          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
-           <div itemprop="articleBody">
-             
-  <h1>Source code for serotiny.models.zoo</h1><div class="highlight"><pre>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <h1>Source code for serotiny.models.zoo</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Dict</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">os</span>
@@ -123,10 +232,10 @@
 
 
 <div class="viewcode-block" id="get_root"><a class="viewcode-back" href="../../../serotiny.models.html#serotiny.models.zoo.get_root">[docs]</a><span class="k">def</span> <span class="nf">get_root</span><span class="p">(</span><span class="n">zoo_root</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">"""</span>
 <span class="sd">    Retrieve the model zoo root. If a path is specified, that is</span>
 <span class="sd">    the used model zoo root. Otherwise, the environment variable</span>
-<span class="sd">    SEROTINY_ZOO_ROOT is checked. If it doesn&#39;t exist and the</span>
+<span class="sd">    SEROTINY_ZOO_ROOT is checked. If it doesn't exist and the</span>
 <span class="sd">    user has a .cache folder in their folder, the model zoo root</span>
 <span class="sd">    is set to ~/.cache/serotiny/zoo</span>
 
@@ -134,15 +243,15 @@
 <span class="sd">    ----------</span>
 <span class="sd">    zoo_root: Optional[Union[str, Path]]</span>
 <span class="sd">        Path to override the model zoo root</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">zoo_root</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">zoo_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">zoo_root</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="s2">&quot;SEROTINY_ZOO_ROOT&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
-        <span class="n">zoo_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SEROTINY_ZOO_ROOT&quot;</span><span class="p">])</span>
-    <span class="k">elif</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;~/.cache&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-        <span class="n">zoo_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;~/.cache&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;serotiny/zoo&quot;</span>
+    <span class="k">elif</span> <span class="s2">"SEROTINY_ZOO_ROOT"</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="n">zoo_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">"SEROTINY_ZOO_ROOT"</span><span class="p">])</span>
+    <span class="k">elif</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"~/.cache"</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">zoo_root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">"~/.cache"</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span> <span class="o">/</span> <span class="s2">"serotiny/zoo"</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No valid model zoo root&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"No valid model zoo root"</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">zoo_root</span></div>
 
@@ -155,16 +264,16 @@
     <span class="n">zoo_root</span> <span class="o">=</span> <span class="n">get_root</span><span class="p">(</span><span class="n">zoo_root</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">zoo_root</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Given zoo_root does not exists.&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">"Given zoo_root does not exists."</span><span class="p">)</span>
 
-    <span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+    <span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span>
 
     <span class="n">model_path</span> <span class="o">=</span> <span class="p">(</span><span class="n">zoo_root</span> <span class="o">/</span> <span class="n">model_class</span><span class="p">)</span> <span class="o">/</span> <span class="n">model_id</span>
 
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.yaml&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span> <span class="o">+</span> <span class="s2">".yaml"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">UnsafeLoader</span><span class="p">)</span>
 
-    <span class="n">ckpt_path</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">model_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.ckpt&quot;</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">ckpt_path</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">model_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.ckpt"</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">ckpt_path</span><span class="p">,</span> <span class="n">config</span>
 
@@ -174,13 +283,13 @@
     <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">zoo_root</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">"""</span>
 <span class="sd">    Retrieve a model stored in disk, inside a model zoo.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    model_class: str</span>
-<span class="sd">        The &quot;import path&quot; to the model class, e.g.</span>
+<span class="sd">        The "import path" to the model class, e.g.</span>
 <span class="sd">        serotiny.models.RegressionModel</span>
 
 <span class="sd">    model_id:</span>
@@ -189,18 +298,18 @@
 
 <span class="sd">    zoo_root: Optional[Union[str, Path]] = None</span>
 <span class="sd">        (Optional) path to the model zoo root</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">ckpt_path</span><span class="p">,</span> <span class="n">config</span> <span class="o">=</span> <span class="n">_get_checkpoint</span><span class="p">(</span><span class="n">model_class</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">zoo_root</span><span class="p">)</span>
     <span class="n">model_class</span> <span class="o">=</span> <span class="n">module_or_path</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="n">model_class</span><span class="p">)</span>
 
-    <span class="n">model_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">]</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">"model"</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">model_class</span><span class="o">.</span><span class="n">load_from_checkpoint</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="o">=</span><span class="n">ckpt_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_config</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="store_model"><a class="viewcode-back" href="../../../serotiny.models.html#serotiny.models.zoo.store_model">[docs]</a><span class="k">def</span> <span class="nf">store_model</span><span class="p">(</span><span class="n">trainer</span><span class="p">,</span> <span class="n">model_class</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">zoo_root</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">"""</span>
 <span class="sd">    Stored a model in disk, inside a model zoo.</span>
 
 <span class="sd">    Parameters</span>
@@ -209,7 +318,7 @@
 <span class="sd">        A Pytorch Lightning Trainer instance which has trained the model</span>
 
 <span class="sd">    model_class: str</span>
-<span class="sd">        A string containing the &quot;import path&quot; to the model class,</span>
+<span class="sd">        A string containing the "import path" to the model class,</span>
 <span class="sd">        e.g. serotiny.models.RegressionModel</span>
 
 <span class="sd">    model_id: str</span>
@@ -218,7 +327,7 @@
 
 <span class="sd">    zoo_root: Optional[Union[str, Path]] = None</span>
 <span class="sd">        (Optional) path to the model zoo root</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">zoo_root</span> <span class="o">=</span> <span class="n">get_root</span><span class="p">(</span><span class="n">zoo_root</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">zoo_root</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
@@ -228,8 +337,8 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">model_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="n">model_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span> <span class="k">if</span> <span class="s2">&quot;.ckpt&quot;</span> <span class="ow">in</span> <span class="n">model_id</span> <span class="k">else</span> <span class="n">model_id</span> <span class="o">+</span> <span class="s2">&quot;.ckpt&quot;</span>
-    <span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+    <span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span> <span class="k">if</span> <span class="s2">".ckpt"</span> <span class="ow">in</span> <span class="n">model_id</span> <span class="k">else</span> <span class="n">model_id</span> <span class="o">+</span> <span class="s2">".ckpt"</span>
+    <span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span>
 
     <span class="n">model_path</span> <span class="o">=</span> <span class="n">model_path</span> <span class="o">/</span> <span class="n">model_id</span>
     <span class="n">trainer</span><span class="o">.</span><span class="n">save_checkpoint</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span></div>
@@ -241,14 +350,14 @@
     <span class="n">zoo_root</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">checkpoint_callback_kwargs</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">"""</span>
 <span class="sd">    Get an instantiated ModelCheckpoint callback, configured to use</span>
 <span class="sd">    a specified model zoo</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    model_class: str</span>
-<span class="sd">        A string containing the &quot;import path&quot; to the model class,</span>
+<span class="sd">        A string containing the "import path" to the model class,</span>
 <span class="sd">        e.g. serotiny.models.RegressionModel</span>
 
 <span class="sd">    model_id: str</span>
@@ -262,15 +371,15 @@
 <span class="sd">        Additional arguments to ModelCheckpoint. See Pytorch Lightning docs</span>
 <span class="sd">        here: https://pytorch-lightning.readthedocs.io/en/stable/api/pytorch_lightning.callbacks.model_checkpoint.html</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">zoo_root</span> <span class="o">=</span> <span class="n">get_root</span><span class="p">(</span><span class="n">zoo_root</span><span class="p">)</span>
-    <span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+    <span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span>
     <span class="n">model_path</span> <span class="o">=</span> <span class="p">(</span><span class="n">zoo_root</span> <span class="o">/</span> <span class="n">model_class</span><span class="p">)</span> <span class="o">/</span> <span class="n">model_id</span>
     <span class="n">model_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">ModelCheckpoint</span><span class="p">(</span>
-        <span class="n">dirpath</span><span class="o">=</span><span class="n">model_path</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">&quot;epoch</span><span class="si">{epoch:02d}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">checkpoint_callback_kwargs</span>
+        <span class="n">dirpath</span><span class="o">=</span><span class="n">model_path</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="s2">"epoch</span><span class="si">{epoch:02d}</span><span class="s2">"</span><span class="p">,</span> <span class="o">**</span><span class="n">checkpoint_callback_kwargs</span>
     <span class="p">)</span></div>
 
 
@@ -281,14 +390,14 @@
     <span class="n">reload_callbacks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">reload_loggers</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Retrieve a pytorch lightning trainer&#39;s state stored in disk,</span>
+    <span class="sd">"""</span>
+<span class="sd">    Retrieve a pytorch lightning trainer's state stored in disk,</span>
 <span class="sd">    inside a model zoo.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    model_class: str</span>
-<span class="sd">        A string containing the &quot;import path&quot; to the model class,</span>
+<span class="sd">        A string containing the "import path" to the model class,</span>
 <span class="sd">        e.g. serotiny.models.RegressionModel</span>
 
 <span class="sd">    model_id: str</span>
@@ -299,31 +408,31 @@
 <span class="sd">        (Optional) path to the model zoo root</span>
 
 <span class="sd">    reload_callbacks: bool = False</span>
-<span class="sd">        Flag to determine whether to reload the trainer&#39;s callbacks</span>
+<span class="sd">        Flag to determine whether to reload the trainer's callbacks</span>
 
 <span class="sd">    reload_loggers: bool = False</span>
-<span class="sd">        Flag to determine whether to reload the trainer&#39;s loggers</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        Flag to determine whether to reload the trainer's loggers</span>
+<span class="sd">    """</span>
 
     <span class="n">ckpt_path</span><span class="p">,</span> <span class="n">config</span> <span class="o">=</span> <span class="n">_get_checkpoint</span><span class="p">(</span><span class="n">model_class</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">zoo_root</span><span class="p">)</span>
 
-    <span class="n">trainer_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;trainer&quot;</span><span class="p">]</span>
+    <span class="n">trainer_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">"trainer"</span><span class="p">]</span>
 
-    <span class="n">model_zoo_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;model_zoo&quot;</span><span class="p">]</span>
+    <span class="n">model_zoo_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">"model_zoo"</span><span class="p">]</span>
     <span class="n">checkpoint_callback</span> <span class="o">=</span> <span class="n">get_checkpoint_callback</span><span class="p">(</span>
         <span class="n">model_class</span><span class="p">,</span>
         <span class="n">model_id</span><span class="p">,</span>
-        <span class="n">model_zoo_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;checkpoint_monitor&quot;</span><span class="p">),</span>
-        <span class="n">model_zoo_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;checkpoint_mode&quot;</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">),</span>
+        <span class="n">model_zoo_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"checkpoint_monitor"</span><span class="p">),</span>
+        <span class="n">model_zoo_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"checkpoint_mode"</span><span class="p">,</span> <span class="s2">"min"</span><span class="p">),</span>
         <span class="n">zoo_root</span><span class="p">,</span>
     <span class="p">)</span>
 
     <span class="n">checkpoint_callback</span><span class="o">.</span><span class="n">best_model_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">ckpt_path</span><span class="p">)</span>
-    <span class="n">loggers</span> <span class="o">=</span> <span class="n">load_multiple</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;loggers&quot;</span><span class="p">])</span> <span class="k">if</span> <span class="n">reload_loggers</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="n">loggers</span> <span class="o">=</span> <span class="n">load_multiple</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">"loggers"</span><span class="p">])</span> <span class="k">if</span> <span class="n">reload_loggers</span> <span class="k">else</span> <span class="kc">None</span>
 
     <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">checkpoint_callback</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">reload_callbacks</span><span class="p">:</span>
-        <span class="n">callbacks</span> <span class="o">+=</span> <span class="n">load_multiple</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">&quot;callbacks&quot;</span><span class="p">])</span>
+        <span class="n">callbacks</span> <span class="o">+=</span> <span class="n">load_multiple</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s2">"callbacks"</span><span class="p">])</span>
 
     <span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span>
         <span class="n">resume_from_checkpoint</span><span class="o">=</span><span class="n">ckpt_path</span><span class="p">,</span>
@@ -336,7 +445,7 @@
 
 
 <div class="viewcode-block" id="store_metadata"><a class="viewcode-back" href="../../../serotiny.models.html#serotiny.models.zoo.store_metadata">[docs]</a><span class="k">def</span> <span class="nf">store_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">model_class</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">zoo_root</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">"""</span>
 <span class="sd">    Store metadata associated with a training run of a model</span>
 
 <span class="sd">    Parameters</span>
@@ -345,7 +454,7 @@
 <span class="sd">        Metadata to be stored in a yaml</span>
 
 <span class="sd">    model_class: str</span>
-<span class="sd">        The &quot;import path&quot; to the model class, e.g.</span>
+<span class="sd">        The "import path" to the model class, e.g.</span>
 <span class="sd">        serotiny.models.RegressionModel</span>
 
 <span class="sd">    model_id:</span>
@@ -355,9 +464,9 @@
 <span class="sd">    zoo_root: Optional[Union[str, Path]] = None</span>
 <span class="sd">        (Optional) path to the model zoo root</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
+    <span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span>
     <span class="n">zoo_root</span> <span class="o">=</span> <span class="n">get_root</span><span class="p">(</span><span class="n">zoo_root</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">zoo_root</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
@@ -367,42 +476,45 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">model_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="n">model_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span> <span class="k">if</span> <span class="s2">&quot;.yaml&quot;</span> <span class="ow">in</span> <span class="n">model_id</span> <span class="k">else</span> <span class="n">model_id</span> <span class="o">+</span> <span class="s2">&quot;.yaml&quot;</span>
+    <span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span> <span class="k">if</span> <span class="s2">".yaml"</span> <span class="ow">in</span> <span class="n">model_id</span> <span class="k">else</span> <span class="n">model_id</span> <span class="o">+</span> <span class="s2">".yaml"</span>
 
     <span class="n">model_path</span> <span class="o">=</span> <span class="n">model_path</span> <span class="o">/</span> <span class="n">model_id</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">omegaconf</span><span class="o">.</span><span class="n">DictConfig</span><span class="p">):</span>
         <span class="n">omegaconf</span><span class="o">.</span><span class="n">OmegaConf</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">model_path</span><span class="p">,</span> <span class="n">resolve</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
 </pre></div>
-
-           </div>
-          </div>
-          <footer>
-
-  <hr/>
-
-  <div role="contentinfo">
-    <p>&#169; Copyright 2021.</p>
-  </div>
-
-  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
-   
-
-</footer>
-        </div>
+        </article>
       </div>
-    </section>
-  </div>
-  <script>
-      jQuery(function () {
-          SphinxRtdTheme.Navigation.enable(true);
-      });
-  </script> 
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
 
-</body>
+        <div class="related-information">
+              Copyright &#169; 2021 |
+            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+              and
+              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+              <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/scripts/main.js"></script>
+    </body>
 </html>

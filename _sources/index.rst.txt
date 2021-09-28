@@ -8,6 +8,7 @@ Welcome to serotiny's documentation!
 
    Overview <self>
    installation
+   quickstart
    cli
    dynamic_imports
    image_transforms
