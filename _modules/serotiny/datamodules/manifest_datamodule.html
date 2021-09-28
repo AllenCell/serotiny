@@ -1,75 +1,34 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>serotiny.datamodules.manifest_datamodule &mdash; serotiny 0.0.1 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
         <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-
-    
+    <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../../index.html" class="icon icon-home"> serotiny
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
                 0.0.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -77,18 +36,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Overview</a></li>
@@ -97,6 +45,20 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../installation.html#from-sources">From sources</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">serotiny CLI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../cli.html#passing-config-dicts-in-cli">Passing config dicts in CLI</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dynamic_imports.html">Dynamic imports</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../dynamic_imports.html#init"><code class="code docutils literal notranslate"><span class="pre">^init</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../dynamic_imports.html#invoke"><code class="code docutils literal notranslate"><span class="pre">^invoke</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../dynamic_imports.html#bind"><code class="code docutils literal notranslate"><span class="pre">^bind</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../dynamic_imports.html#positional-args"><code class="code docutils literal notranslate"><span class="pre">^positional_args</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../image_transforms.html">Applying image transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dataframe_transforms.html">Dataframe wrangling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../example_workflows.html">Example workflows</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../modules.html">Package modules</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../serotiny.html">serotiny package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../serotiny.html#subpackages">Subpackages</a><ul>
@@ -106,7 +68,6 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../serotiny.metrics.html">serotiny.metrics package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../serotiny.models.html">serotiny.models package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../serotiny.networks.html">serotiny.networks package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.transform.html">serotiny.transform package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../serotiny.utils.html">serotiny.utils package</a></li>
 </ul>
 </li>
@@ -122,231 +83,177 @@
 </li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">serotiny</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../../index.html">Module code</a> &raquo;</li>
-        
           <li><a href="../../serotiny.html">serotiny</a> &raquo;</li>
-        
       <li>serotiny.datamodules.manifest_datamodule</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for serotiny.datamodules.manifest_datamodule</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Sequence</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">from</span> <span class="nn">pytorch_lightning.utilities.exceptions</span> <span class="kn">import</span> <span class="n">MisconfigurationException</span>
 
-<span class="kn">from</span> <span class="nn">torch.utils.data.sampler</span> <span class="kn">import</span> <span class="n">SubsetRandomSampler</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
 
-<span class="kn">from</span> <span class="nn">serotiny.io.dataframe</span> <span class="kn">import</span> <span class="n">DataframeDataset</span>
-<span class="kn">from</span> <span class="nn">serotiny.utils</span> <span class="kn">import</span> <span class="n">load_multiple</span>
-
-<span class="c1"># from aicsfiles import FileManagementSystem</span>
-
-<span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">serotiny.io.dataframe</span> <span class="kn">import</span> <span class="n">DataframeDataset</span><span class="p">,</span> <span class="n">read_dataframe</span>
+<span class="kn">from</span> <span class="nn">serotiny.utils</span> <span class="kn">import</span> <span class="n">load_multiple</span><span class="p">,</span> <span class="n">load_config</span>
 
 
-<div class="viewcode-block" id="make_manifest_dataset"><a class="viewcode-back" href="../../../serotiny.datamodules.html#serotiny.datamodules.manifest_datamodule.make_manifest_dataset">[docs]</a><span class="k">def</span> <span class="nf">make_manifest_dataset</span><span class="p">(</span>
-    <span class="n">manifest</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
-    <span class="n">loaders</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
-    <span class="n">columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">fms</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">iloc</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<span class="p">):</span>
-    <span class="n">manifest</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">manifest</span><span class="p">)</span>
-    <span class="c1"># if fms:</span>
-    <span class="c1">#     manifest = Path(FileManagementSystem().get_file_by_id(manifest).path)</span>
-    <span class="c1"># else:</span>
-    <span class="c1">#     manifest = Path(manifest)</span>
+<span class="k">def</span> <span class="nf">_make_single_manifest_splits</span><span class="p">(</span><span class="n">manifest_path</span><span class="p">,</span> <span class="n">loaders</span><span class="p">,</span> <span class="n">split_column</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">dataframe</span> <span class="o">=</span> <span class="n">read_dataframe</span><span class="p">(</span><span class="n">manifest_path</span><span class="p">,</span> <span class="n">columns</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">dtypes</span><span class="p">[</span><span class="n">split_column</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">manifest</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Manifest file not found at given path&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">manifest</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;.csv&quot;</span><span class="p">:</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">manifest</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span>
-    <span class="k">elif</span> <span class="n">manifest</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;.parquet&quot;</span><span class="p">:</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">manifest</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;File type of provided manifest is not .csv&quot;</span><span class="p">)</span>
+    <span class="n">split_names</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">split_column</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">split_names</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">({</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="s2">&quot;valid&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">})</span>
 
-    <span class="n">loaders</span> <span class="o">=</span> <span class="n">load_multiple</span><span class="p">(</span><span class="n">loaders</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="n">split</span><span class="p">:</span> <span class="n">DataframeDataset</span><span class="p">(</span>
+            <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dataframe</span><span class="p">[</span><span class="n">split_column</span><span class="p">]</span> <span class="o">==</span> <span class="n">split</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">loaders</span><span class="p">[</span><span class="n">split</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="s2">&quot;valid&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">]</span>
+    <span class="p">}</span>
 
-    <span class="k">return</span> <span class="n">DataframeDataset</span><span class="p">(</span><span class="n">dataframe</span><span class="o">=</span><span class="n">df</span><span class="p">,</span> <span class="n">loaders</span><span class="o">=</span><span class="n">loaders</span><span class="p">,</span> <span class="n">iloc</span><span class="o">=</span><span class="n">iloc</span><span class="p">)</span></div>
+
+<span class="k">def</span> <span class="nf">_make_multiple_manifest_splits</span><span class="p">(</span><span class="n">split_path</span><span class="p">,</span> <span class="n">loaders</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">split_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">split_path</span><span class="p">)</span>
+    <span class="n">datasets</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">fpath</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">split_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.csv&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">split_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.parquet&quot;</span><span class="p">)):</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(.*)\.(csv|parquet)&quot;</span><span class="p">,</span> <span class="n">fpath</span><span class="o">.</span><span class="n">name</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">dataframe</span> <span class="o">=</span> <span class="n">read_dataframe</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">required_columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">DataframeDataset</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">loaders</span><span class="o">=</span><span class="n">loaders</span><span class="p">[</span><span class="n">mode</span><span class="p">])</span>
+        <span class="n">datasets</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span>
+
+    <span class="k">return</span> <span class="n">datasets</span>
 
 
 <div class="viewcode-block" id="ManifestDatamodule"><a class="viewcode-back" href="../../../serotiny.datamodules.html#serotiny.datamodules.manifest_datamodule.ManifestDatamodule">[docs]</a><span class="k">class</span> <span class="nc">ManifestDatamodule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A pytorch lightning datamodule that handles the logic for iterating over a</span>
-<span class="sd">    folder of files</span>
+<span class="sd">    A pytorch lightning datamodule based on manifest files. It can either use</span>
+<span class="sd">    a single manifest file, which contains a column based on which a train-val-test</span>
+<span class="sd">    split can be made; or it can use three manifest files, one for each fold</span>
+<span class="sd">    (train, val, test)</span>
 
 <span class="sd">    Parameters</span>
-<span class="sd">    -----------</span>
+<span class="sd">    ----------</span>
+
 <span class="sd">    batch_size: int</span>
 <span class="sd">        batch size for dataloader</span>
+
 <span class="sd">    num_workers: int</span>
 <span class="sd">        Number of worker processes for dataloader</span>
+
 <span class="sd">    manifest: Optional[Union[Path, str]] = None</span>
 <span class="sd">        (optional) Path to a manifest file to be merged with the folder, or to</span>
 <span class="sd">        be the core of this dataset, if no path is provided</span>
+
 <span class="sd">    loader_dict: Dict</span>
 <span class="sd">        Dictionary of loader specifications for each given key. When the value</span>
 <span class="sd">        is callable, that is the assumed loader. When the value is a tuple, it</span>
 <span class="sd">        is assumed to be of the form (loader class name, loader class args) and</span>
 <span class="sd">        will be used to instantiate the loader</span>
-<span class="sd">    split_col: Optional[str] = None</span>
+
+<span class="sd">    split_column: Optional[str] = None</span>
 <span class="sd">        Name of a column in the dataset which can be used to create train, val, test</span>
 <span class="sd">        splits.</span>
+
 <span class="sd">    columns: Optional[Sequence[str]] = None</span>
 <span class="sd">        List of columns to load from the dataset, in case it&#39;s a parquet file.</span>
 <span class="sd">        If None, load everything.</span>
+
 <span class="sd">    pin_memory: bool = True</span>
 <span class="sd">        Set to true when using GPU, for better performance</span>
+
 <span class="sd">    drop_last: bool = False</span>
 <span class="sd">        Whether to drop the last batch (in case the given batch size is the only</span>
 <span class="sd">        supported)</span>
+
 <span class="sd">    subset_train: float = 1.0</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">manifest</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
         <span class="n">loaders</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
-        <span class="n">split_col</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">split_column</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">collate</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">pin_memory</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">drop_last</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="p">{},</span>
-        <span class="n">subset_train</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
-        <span class="n">fms</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">):</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
+        <span class="c1"># at least the train loaders have to be specified.</span>
+        <span class="c1"># if only those are specified, the same loaders are</span>
+        <span class="c1"># used for the remaining folds</span>
+
+        <span class="n">loaders</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_multiple</span><span class="p">(</span><span class="n">loaders</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;valid&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">split</span> <span class="ow">in</span> <span class="n">loaders</span><span class="p">:</span>
+                <span class="n">loaders</span><span class="p">[</span><span class="n">split</span><span class="p">]</span> <span class="o">=</span> <span class="n">load_multiple</span><span class="p">(</span><span class="n">loaders</span><span class="p">[</span><span class="n">split</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">loaders</span><span class="p">[</span><span class="n">split</span><span class="p">]</span> <span class="o">=</span> <span class="n">loaders</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span>
+
+        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="c1"># if path is a directory, we assume it is a directory containing multiple</span>
+        <span class="c1"># manifests - one per split. otherwise, we assume it is the path to a single</span>
+        <span class="c1"># manifest file, which is expected to have a</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">_make_multiple_manifest_splits</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">loaders</span><span class="p">,</span> <span class="n">columns</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">split_column</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">MisconfigurationException</span><span class="p">(</span>
+                    <span class="s2">&quot;When using a single manifest file, it must have a &quot;</span>
+                    <span class="s2">&quot;split column, to use for train-val-test splitting.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">_make_single_manifest_splits</span><span class="p">(</span>
+                <span class="n">path</span><span class="p">,</span> <span class="n">loaders</span><span class="p">,</span> <span class="n">split_column</span><span class="p">,</span> <span class="n">columns</span>
+            <span class="p">)</span>
+
+        <span class="c1"># DataLoader arguments</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">pin_memory</span> <span class="o">=</span> <span class="n">pin_memory</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">drop_last</span> <span class="o">=</span> <span class="n">drop_last</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">collate</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">collate</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">load_config</span><span class="p">(</span><span class="n">collate</span><span class="p">)</span>
 
-        <span class="k">assert</span> <span class="n">subset_train</span> <span class="o">&lt;=</span> <span class="mi">1</span>
-
-        <span class="c1"># To delete later, this is only to get length</span>
-        <span class="n">dataset</span> <span class="o">=</span> <span class="n">make_manifest_dataset</span><span class="p">(</span><span class="n">manifest</span><span class="p">,</span> <span class="n">loaders</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">],</span> <span class="n">columns</span><span class="p">,</span> <span class="n">fms</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-        <span class="n">indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length</span><span class="p">))</span>
-
-        <span class="n">index</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">if</span> <span class="n">split_col</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">dataframe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">dataframe</span>
-
-            <span class="k">assert</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">dtypes</span><span class="p">[</span><span class="n">split_col</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">)</span>
-            <span class="n">dataframe</span><span class="p">[</span><span class="n">split_col</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">split_col</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-            <span class="n">split_names</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">split_col</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-            <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">split_names</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">({</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="s2">&quot;validation&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">})</span>
-
-            <span class="n">index_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;train&quot;</span><span class="p">:</span> <span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="s2">&quot;valid&quot;</span><span class="p">:</span> <span class="s2">&quot;validation&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">:</span> <span class="s2">&quot;test&quot;</span><span class="p">}</span>
-            <span class="n">index</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">for</span> <span class="n">mode</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">index_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">index</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
-                    <span class="n">dataframe</span><span class="p">[</span><span class="n">split_col</span><span class="p">]</span> <span class="o">==</span> <span class="n">value</span>
-                <span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">index</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">indices</span>
-            <span class="n">index</span><span class="p">[</span><span class="s2">&quot;valid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span>
-            <span class="n">index</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span>
-
-        <span class="k">if</span> <span class="n">subset_train</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">new_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">subset_train</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]))</span>
-
-            <span class="n">index</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
-                <span class="n">index</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">],</span> <span class="n">replace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">new_size</span>
-            <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">samplers</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="p">{}</span>
-
-        <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="n">index</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">samplers</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="n">SubsetRandomSampler</span><span class="p">(</span><span class="n">index</span><span class="p">[</span><span class="n">mode</span><span class="p">])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="n">make_manifest_dataset</span><span class="p">(</span>
-                <span class="n">manifest</span><span class="p">,</span> <span class="n">loaders</span><span class="p">[</span><span class="n">mode</span><span class="p">],</span> <span class="n">columns</span><span class="p">,</span> <span class="n">fms</span>
-            <span class="p">)</span>
-
-<div class="viewcode-block" id="ManifestDatamodule.make_dataloader"><a class="viewcode-back" href="../../../serotiny.datamodules.html#serotiny.datamodules.manifest_datamodule.ManifestDatamodule.make_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">make_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+<div class="viewcode-block" id="ManifestDatamodule.make_dataloader"><a class="viewcode-back" href="../../../serotiny.datamodules.html#serotiny.datamodules.manifest_datamodule.ManifestDatamodule.make_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">make_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">split</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
-            <span class="n">dataset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">mode</span><span class="p">],</span>
-            <span class="n">sampler</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">samplers</span><span class="p">[</span><span class="n">mode</span><span class="p">],</span>
+            <span class="n">dataset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">split</span><span class="p">],</span>
             <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">,</span>
             <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span><span class="p">,</span>
             <span class="n">pin_memory</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pin_memory</span><span class="p">,</span>
             <span class="n">drop_last</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">drop_last</span><span class="p">,</span>
-            <span class="n">multiprocessing_context</span><span class="o">=</span><span class="n">mp</span><span class="o">.</span><span class="n">get_context</span><span class="p">(</span><span class="s2">&quot;fork&quot;</span><span class="p">),</span>
+            <span class="n">collate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">collate</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="ManifestDatamodule.train_dataloader"><a class="viewcode-back" href="../../../serotiny.datamodules.html#serotiny.datamodules.manifest_datamodule.ManifestDatamodule.train_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -360,46 +267,30 @@
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021.
-
-    </p>
+    <p>&#169; Copyright 2021.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

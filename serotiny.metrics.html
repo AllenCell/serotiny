@@ -1,77 +1,36 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>serotiny.metrics package &mdash; serotiny 0.0.1 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="serotiny.models package" href="serotiny.models.html" />
     <link rel="prev" title="serotiny.losses package" href="serotiny.losses.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> serotiny
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
                 0.0.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -79,18 +38,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
@@ -99,6 +47,20 @@
 <li class="toctree-l2"><a class="reference internal" href="installation.html#from-sources">From sources</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">serotiny CLI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#passing-config-dicts-in-cli">Passing config dicts in CLI</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic_imports.html">Dynamic imports</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dynamic_imports.html#init"><code class="code docutils literal notranslate"><span class="pre">^init</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic_imports.html#invoke"><code class="code docutils literal notranslate"><span class="pre">^invoke</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic_imports.html#bind"><code class="code docutils literal notranslate"><span class="pre">^bind</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic_imports.html#positional-args"><code class="code docutils literal notranslate"><span class="pre">^positional_args</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="image_transforms.html">Applying image transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataframe_transforms.html">Dataframe wrangling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_workflows.html">Example workflows</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">Package modules</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="serotiny.html">serotiny package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="serotiny.html#subpackages">Subpackages</a><ul class="current">
@@ -108,7 +70,6 @@
 <li class="toctree-l4 current"><a class="current reference internal" href="#">serotiny.metrics package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.html">serotiny.models package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.networks.html">serotiny.networks package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.transform.html">serotiny.transform package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.utils.html">serotiny.utils package</a></li>
 </ul>
 </li>
@@ -124,104 +85,55 @@
 </li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">serotiny</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="modules.html">serotiny</a> &raquo;</li>
-        
           <li><a href="serotiny.html">serotiny package</a> &raquo;</li>
-        
       <li>serotiny.metrics package</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/serotiny.metrics.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
-  </ul>
-
-  
-  <div class="rst-breadcrumbs-buttons" role="navigation" aria-label="breadcrumb navigation">
-      
-        <a href="serotiny.models.html" class="btn btn-neutral float-right" title="serotiny.models package" accesskey="n">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-      
-      
+  </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
         <a href="serotiny.losses.html" class="btn btn-neutral float-left" title="serotiny.losses package" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-      
+        <a href="serotiny.models.html" class="btn btn-neutral float-right" title="serotiny.models package" accesskey="n">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
   </div>
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <div class="section" id="serotiny-metrics-package">
-<h1>serotiny.metrics package<a class="headerlink" href="#serotiny-metrics-package" title="Permalink to this headline">¶</a></h1>
+<h1>serotiny.metrics package<a class="headerlink" href="#serotiny-metrics-package" title="Permalink to this headline"></a></h1>
 <div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
 </div>
 <div class="section" id="module-serotiny.metrics.calculate_blur">
-<span id="serotiny-metrics-calculate-blur-module"></span><h2>serotiny.metrics.calculate_blur module<a class="headerlink" href="#module-serotiny.metrics.calculate_blur" title="Permalink to this headline">¶</a></h2>
+<span id="serotiny-metrics-calculate-blur-module"></span><h2>serotiny.metrics.calculate_blur module<a class="headerlink" href="#module-serotiny.metrics.calculate_blur" title="Permalink to this headline"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="serotiny.metrics.calculate_blur.calculate_blur">
-<span class="sig-prename descclassname"><span class="pre">serotiny.metrics.calculate_blur.</span></span><span class="sig-name descname"><span class="pre">calculate_blur</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/metrics/calculate_blur.html#calculate_blur"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.metrics.calculate_blur.calculate_blur" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">serotiny.metrics.calculate_blur.</span></span><span class="sig-name descname"><span class="pre">calculate_blur</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/metrics/calculate_blur.html#calculate_blur"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.metrics.calculate_blur.calculate_blur" title="Permalink to this definition"></a></dt>
 <dd><p><a class="reference external" href="https://github.com/tolstikhin/wae/blob/master/wae.py">https://github.com/tolstikhin/wae/blob/master/wae.py</a> – line 344
 Keep track of the min blurriness / batch for each test loop</p>
 </dd></dl>
 
 </div>
 <div class="section" id="module-serotiny.metrics.calculate_fid">
-<span id="serotiny-metrics-calculate-fid-module"></span><h2>serotiny.metrics.calculate_fid module<a class="headerlink" href="#module-serotiny.metrics.calculate_fid" title="Permalink to this headline">¶</a></h2>
+<span id="serotiny-metrics-calculate-fid-module"></span><h2>serotiny.metrics.calculate_fid module<a class="headerlink" href="#module-serotiny.metrics.calculate_fid" title="Permalink to this headline"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="serotiny.metrics.calculate_fid.calculate_fid">
-<span class="sig-prename descclassname"><span class="pre">serotiny.metrics.calculate_fid.</span></span><span class="sig-name descname"><span class="pre">calculate_fid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/metrics/calculate_fid.html#calculate_fid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.metrics.calculate_fid.calculate_fid" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">serotiny.metrics.calculate_fid.</span></span><span class="sig-name descname"><span class="pre">calculate_fid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/metrics/calculate_fid.html#calculate_fid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.metrics.calculate_fid.calculate_fid" title="Permalink to this definition"></a></dt>
 <dd><p>Numpy implementation of the Frechet Distance.
 The Frechet distance between two multivariate Gaussians X_1 ~ N(mu_1, C_1)
 and X_2 ~ N(mu_2, C_2) is</p>
@@ -250,7 +162,7 @@ for generated samples.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="serotiny.metrics.calculate_fid.get_activations">
-<span class="sig-prename descclassname"><span class="pre">serotiny.metrics.calculate_fid.</span></span><span class="sig-name descname"><span class="pre">get_activations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2048</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cuda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/metrics/calculate_fid.html#get_activations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.metrics.calculate_fid.get_activations" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">serotiny.metrics.calculate_fid.</span></span><span class="sig-name descname"><span class="pre">get_activations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2048</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cuda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/metrics/calculate_fid.html#get_activations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.metrics.calculate_fid.get_activations" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates the activations of the pool_3 layer for all images.
 Params:
 – images      : Numpy array of dimension (n_images, 3, hi, wi). The values</p>
@@ -279,10 +191,10 @@ query tensor.</p>
 
 </div>
 <div class="section" id="module-serotiny.metrics.inception">
-<span id="serotiny-metrics-inception-module"></span><h2>serotiny.metrics.inception module<a class="headerlink" href="#module-serotiny.metrics.inception" title="Permalink to this headline">¶</a></h2>
+<span id="serotiny-metrics-inception-module"></span><h2>serotiny.metrics.inception module<a class="headerlink" href="#module-serotiny.metrics.inception" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="serotiny.metrics.inception.InceptionV3">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.metrics.inception.</span></span><span class="sig-name descname"><span class="pre">InceptionV3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_blocks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[3]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requires_grad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/metrics/inception.html#InceptionV3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.metrics.inception.InceptionV3" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.metrics.inception.</span></span><span class="sig-name descname"><span class="pre">InceptionV3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_blocks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[3]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requires_grad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/metrics/inception.html#InceptionV3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.metrics.inception.InceptionV3" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
 <p>Pretrained InceptionV3 network returning feature maps</p>
 <p>Build pretrained InceptionV3
@@ -312,17 +224,17 @@ for finetuning the network</p></li>
 </div></blockquote>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.metrics.inception.InceptionV3.BLOCK_INDEX_BY_DIM">
-<span class="sig-name descname"><span class="pre">BLOCK_INDEX_BY_DIM</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{64:</span> <span class="pre">0,</span> <span class="pre">192:</span> <span class="pre">1,</span> <span class="pre">768:</span> <span class="pre">2,</span> <span class="pre">2048:</span> <span class="pre">3}</span></em><a class="headerlink" href="#serotiny.metrics.inception.InceptionV3.BLOCK_INDEX_BY_DIM" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">BLOCK_INDEX_BY_DIM</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{64:</span> <span class="pre">0,</span> <span class="pre">192:</span> <span class="pre">1,</span> <span class="pre">768:</span> <span class="pre">2,</span> <span class="pre">2048:</span> <span class="pre">3}</span></em><a class="headerlink" href="#serotiny.metrics.inception.InceptionV3.BLOCK_INDEX_BY_DIM" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.metrics.inception.InceptionV3.DEFAULT_BLOCK_INDEX">
-<span class="sig-name descname"><span class="pre">DEFAULT_BLOCK_INDEX</span></span><em class="property"> <span class="pre">=</span> <span class="pre">3</span></em><a class="headerlink" href="#serotiny.metrics.inception.InceptionV3.DEFAULT_BLOCK_INDEX" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">DEFAULT_BLOCK_INDEX</span></span><em class="property"> <span class="pre">=</span> <span class="pre">3</span></em><a class="headerlink" href="#serotiny.metrics.inception.InceptionV3.DEFAULT_BLOCK_INDEX" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="serotiny.metrics.inception.InceptionV3.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/metrics/inception.html#InceptionV3.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.metrics.inception.InceptionV3.forward" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/metrics/inception.html#InceptionV3.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.metrics.inception.InceptionV3.forward" title="Permalink to this definition"></a></dt>
 <dd><p>Get Inception feature maps
 :Parameters: <strong>inp</strong> (<em>torch.autograd.Variable</em>) – Input tensor of shape Bx3xHxW. Values are expected to be in</p>
 <blockquote>
@@ -341,17 +253,17 @@ for finetuning the network</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.metrics.inception.InceptionV3.training">
-<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.metrics.inception.InceptionV3.training" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.metrics.inception.InceptionV3.training" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </div>
 <div class="section" id="module-serotiny.metrics.pearson">
-<span id="serotiny-metrics-pearson-module"></span><h2>serotiny.metrics.pearson module<a class="headerlink" href="#module-serotiny.metrics.pearson" title="Permalink to this headline">¶</a></h2>
+<span id="serotiny-metrics-pearson-module"></span><h2>serotiny.metrics.pearson module<a class="headerlink" href="#module-serotiny.metrics.pearson" title="Permalink to this headline"></a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="serotiny.metrics.pearson.pearson_correlation">
-<span class="sig-prename descclassname"><span class="pre">serotiny.metrics.pearson.</span></span><span class="sig-name descname"><span class="pre">pearson_correlation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/serotiny/metrics/pearson.html#pearson_correlation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.metrics.pearson.pearson_correlation" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">serotiny.metrics.pearson.</span></span><span class="sig-name descname"><span class="pre">pearson_correlation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="reference internal" href="_modules/serotiny/metrics/pearson.html#pearson_correlation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.metrics.pearson.pearson_correlation" title="Permalink to this definition"></a></dt>
 <dd><p>Calculates the Pearson correlation coefficient between the inputs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -371,10 +283,10 @@ for finetuning the network</p></li>
 
 </div>
 <div class="section" id="module-serotiny.metrics">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-serotiny.metrics" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-serotiny.metrics" title="Permalink to this headline"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="serotiny.metrics.InceptionV3">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.metrics.</span></span><span class="sig-name descname"><span class="pre">InceptionV3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_blocks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[3]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requires_grad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/metrics/inception.html#InceptionV3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.metrics.InceptionV3" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.metrics.</span></span><span class="sig-name descname"><span class="pre">InceptionV3</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_blocks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[3]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resize_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requires_grad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/metrics/inception.html#InceptionV3"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.metrics.InceptionV3" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
 <p>Pretrained InceptionV3 network returning feature maps</p>
 <p>Build pretrained InceptionV3
@@ -404,17 +316,17 @@ for finetuning the network</p></li>
 </div></blockquote>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.metrics.InceptionV3.BLOCK_INDEX_BY_DIM">
-<span class="sig-name descname"><span class="pre">BLOCK_INDEX_BY_DIM</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{64:</span> <span class="pre">0,</span> <span class="pre">192:</span> <span class="pre">1,</span> <span class="pre">768:</span> <span class="pre">2,</span> <span class="pre">2048:</span> <span class="pre">3}</span></em><a class="headerlink" href="#serotiny.metrics.InceptionV3.BLOCK_INDEX_BY_DIM" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">BLOCK_INDEX_BY_DIM</span></span><em class="property"> <span class="pre">=</span> <span class="pre">{64:</span> <span class="pre">0,</span> <span class="pre">192:</span> <span class="pre">1,</span> <span class="pre">768:</span> <span class="pre">2,</span> <span class="pre">2048:</span> <span class="pre">3}</span></em><a class="headerlink" href="#serotiny.metrics.InceptionV3.BLOCK_INDEX_BY_DIM" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.metrics.InceptionV3.DEFAULT_BLOCK_INDEX">
-<span class="sig-name descname"><span class="pre">DEFAULT_BLOCK_INDEX</span></span><em class="property"> <span class="pre">=</span> <span class="pre">3</span></em><a class="headerlink" href="#serotiny.metrics.InceptionV3.DEFAULT_BLOCK_INDEX" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">DEFAULT_BLOCK_INDEX</span></span><em class="property"> <span class="pre">=</span> <span class="pre">3</span></em><a class="headerlink" href="#serotiny.metrics.InceptionV3.DEFAULT_BLOCK_INDEX" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="serotiny.metrics.InceptionV3.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/metrics/inception.html#InceptionV3.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.metrics.InceptionV3.forward" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/metrics/inception.html#InceptionV3.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.metrics.InceptionV3.forward" title="Permalink to this definition"></a></dt>
 <dd><p>Get Inception feature maps
 :Parameters: <strong>inp</strong> (<em>torch.autograd.Variable</em>) – Input tensor of shape Bx3xHxW. Values are expected to be in</p>
 <blockquote>
@@ -433,21 +345,21 @@ for finetuning the network</p></li>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.metrics.InceptionV3.training">
-<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.metrics.InceptionV3.training" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.metrics.InceptionV3.training" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="serotiny.metrics.calculate_blur">
-<span class="sig-prename descclassname"><span class="pre">serotiny.metrics.</span></span><span class="sig-name descname"><span class="pre">calculate_blur</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/metrics/calculate_blur.html#calculate_blur"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.metrics.calculate_blur" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">serotiny.metrics.</span></span><span class="sig-name descname"><span class="pre">calculate_blur</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/metrics/calculate_blur.html#calculate_blur"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.metrics.calculate_blur" title="Permalink to this definition"></a></dt>
 <dd><p><a class="reference external" href="https://github.com/tolstikhin/wae/blob/master/wae.py">https://github.com/tolstikhin/wae/blob/master/wae.py</a> – line 344
 Keep track of the min blurriness / batch for each test loop</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="serotiny.metrics.calculate_fid">
-<span class="sig-prename descclassname"><span class="pre">serotiny.metrics.</span></span><span class="sig-name descname"><span class="pre">calculate_fid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/metrics/calculate_fid.html#calculate_fid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.metrics.calculate_fid" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">serotiny.metrics.</span></span><span class="sig-name descname"><span class="pre">calculate_fid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/metrics/calculate_fid.html#calculate_fid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.metrics.calculate_fid" title="Permalink to this definition"></a></dt>
 <dd><p>Numpy implementation of the Frechet Distance.
 The Frechet distance between two multivariate Gaussians X_1 ~ N(mu_1, C_1)
 and X_2 ~ N(mu_2, C_2) is</p>
@@ -479,46 +391,30 @@ for generated samples.</p>
 
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021.
-
-    </p>
+    <p>&#169; Copyright 2021.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

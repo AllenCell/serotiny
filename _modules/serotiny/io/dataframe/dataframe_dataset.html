@@ -1,75 +1,34 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>serotiny.io.dataframe.dataframe_dataset &mdash; serotiny 0.0.1 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../../../../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
         <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
         <script src="../../../../_static/jquery.js"></script>
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
-
-    
+    <script src="../../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../../genindex.html" />
     <link rel="search" title="Search" href="../../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../../../../index.html" class="icon icon-home"> serotiny
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
                 0.0.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -77,18 +36,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Overview</a></li>
@@ -97,6 +45,20 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../../installation.html#from-sources">From sources</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">serotiny CLI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../cli.html#passing-config-dicts-in-cli">Passing config dicts in CLI</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dynamic_imports.html">Dynamic imports</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../dynamic_imports.html#init"><code class="code docutils literal notranslate"><span class="pre">^init</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../dynamic_imports.html#invoke"><code class="code docutils literal notranslate"><span class="pre">^invoke</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../dynamic_imports.html#bind"><code class="code docutils literal notranslate"><span class="pre">^bind</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../dynamic_imports.html#positional-args"><code class="code docutils literal notranslate"><span class="pre">^positional_args</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../image_transforms.html">Applying image transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dataframe_transforms.html">Dataframe wrangling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../example_workflows.html">Example workflows</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">Package modules</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../../serotiny.html">serotiny package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../serotiny.html#subpackages">Subpackages</a><ul>
@@ -106,7 +68,6 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.metrics.html">serotiny.metrics package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.models.html">serotiny.models package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.networks.html">serotiny.networks package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.transform.html">serotiny.transform package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.utils.html">serotiny.utils package</a></li>
 </ul>
 </li>
@@ -122,73 +83,49 @@
 </li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../../index.html">serotiny</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
-        
           <li><a href="../../../serotiny.html">serotiny</a> &raquo;</li>
-        
       <li>serotiny.io.dataframe.dataframe_dataset</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>Source code for serotiny.io.dataframe.dataframe_dataset</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span>
+
+
+<span class="k">class</span> <span class="nc">_Row</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper class to enable string indexing of numpy arrays</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">array</span><span class="p">,</span> <span class="n">cols</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">array</span> <span class="o">=</span> <span class="n">array</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cols</span> <span class="o">=</span> <span class="n">cols</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">col</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">array</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cols</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">col</span><span class="p">)]</span>
 
 
 <div class="viewcode-block" id="DataframeDataset"><a class="viewcode-back" href="../../../../serotiny.io.dataframe.html#serotiny.io.dataframe.dataframe_dataset.DataframeDataset">[docs]</a><span class="k">class</span> <span class="nc">DataframeDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
@@ -202,72 +139,57 @@
 <span class="sd">    ----------</span>
 <span class="sd">    dataframe: pd.DataFrame</span>
 <span class="sd">        The file which points to or contains the data to be loaded</span>
+
 <span class="sd">    loaders: dict</span>
 <span class="sd">        A dict which contains methods to appropriately load data from columns</span>
 <span class="sd">        in the dataset.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">,</span> <span class="n">loaders</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">iloc</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span>
-        <span class="k">if</span> <span class="n">iloc</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">,</span> <span class="n">loaders</span><span class="p">):</span>
+
+        <span class="c1"># store only the numpy array containing all the values. this is because</span>
+        <span class="c1"># in multiprocessing settings, having a pandas dataframe here can incur</span>
+        <span class="c1"># in excessive memory use, because of copy-on-write memory sharing mechanisms,</span>
+        <span class="c1"># triggered by pandas&#39; inner workings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">loaders</span> <span class="o">=</span> <span class="n">loaders</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">iloc</span> <span class="o">=</span> <span class="n">iloc</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">iloc</span><span class="p">:</span>
-            <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">_Row</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">loader</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">loader</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaders</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span></div>
 </pre></div>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021.
-
-    </p>
+    <p>&#169; Copyright 2021.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

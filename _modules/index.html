@@ -1,75 +1,34 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Overview: module code &mdash; serotiny 0.0.1 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
         <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> serotiny
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
                 0.0.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -77,18 +36,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../index.html">Overview</a></li>
@@ -97,6 +45,20 @@
 <li class="toctree-l2"><a class="reference internal" href="../installation.html#from-sources">From sources</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">serotiny CLI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../cli.html#passing-config-dicts-in-cli">Passing config dicts in CLI</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../dynamic_imports.html">Dynamic imports</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../dynamic_imports.html#init"><code class="code docutils literal notranslate"><span class="pre">^init</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dynamic_imports.html#invoke"><code class="code docutils literal notranslate"><span class="pre">^invoke</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dynamic_imports.html#bind"><code class="code docutils literal notranslate"><span class="pre">^bind</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../dynamic_imports.html#positional-args"><code class="code docutils literal notranslate"><span class="pre">^positional_args</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../image_transforms.html">Applying image transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dataframe_transforms.html">Dataframe wrangling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../example_workflows.html">Example workflows</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modules.html">Package modules</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../serotiny.html">serotiny package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../serotiny.html#subpackages">Subpackages</a><ul>
@@ -106,7 +68,6 @@
 <li class="toctree-l4"><a class="reference internal" href="../serotiny.metrics.html">serotiny.metrics package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../serotiny.models.html">serotiny.models package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../serotiny.networks.html">serotiny.networks package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../serotiny.transform.html">serotiny.transform package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../serotiny.utils.html">serotiny.utils package</a></li>
 </ul>
 </li>
@@ -122,74 +83,35 @@
 </li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">serotiny</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>Overview: module code</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <h1>All modules for which code is available</h1>
 <ul><li><a href="serotiny.html">serotiny</a></li>
 <ul><li><a href="serotiny/datamodules/dummy.html">serotiny.datamodules.dummy</a></li>
 <li><a href="serotiny/datamodules/gaussian.html">serotiny.datamodules.gaussian</a></li>
 <li><a href="serotiny/datamodules/manifest_datamodule.html">serotiny.datamodules.manifest_datamodule</a></li>
 <li><a href="serotiny/datamodules/patch.html">serotiny.datamodules.patch</a></li>
-<li><a href="serotiny/datamodules/split.html">serotiny.datamodules.split</a></li>
 <li><a href="serotiny/io/buffered_patch_dataset.html">serotiny.io.buffered_patch_dataset</a></li>
 <li><a href="serotiny/io/dataframe/dataframe_dataset.html">serotiny.io.dataframe.dataframe_dataset</a></li>
 <li><a href="serotiny/io/dataframe/loaders/abstract_loader.html">serotiny.io.dataframe.loaders.abstract_loader</a></li>
@@ -197,21 +119,20 @@
 <li><a href="serotiny/io/dataframe/loaders/columns.html">serotiny.io.dataframe.loaders.columns</a></li>
 <li><a href="serotiny/io/dataframe/loaders/image2d.html">serotiny.io.dataframe.loaders.image2d</a></li>
 <li><a href="serotiny/io/dataframe/loaders/image3d.html">serotiny.io.dataframe.loaders.image3d</a></li>
-<li><a href="serotiny/io/dataframe/loaders/utils.html">serotiny.io.dataframe.loaders.utils</a></li>
-<li><a href="serotiny/io/dataframe/split.html">serotiny.io.dataframe.split</a></li>
-<li><a href="serotiny/io/dataframe/utils.html">serotiny.io.dataframe.utils</a></li>
+<li><a href="serotiny/io/dataframe/readers.html">serotiny.io.dataframe.readers</a></li>
 <li><a href="serotiny/io/image.html">serotiny.io.image</a></li>
-<li><a href="serotiny/io/transforms.html">serotiny.io.transforms</a></li>
-<li><a href="serotiny/io/utils.html">serotiny.io.utils</a></li>
-<li><a href="serotiny/losses/elbo.html">serotiny.losses.elbo</a></li>
+<li><a href="serotiny/io/quilt.html">serotiny.io.quilt</a></li>
+<li><a href="serotiny/losses/continuous_bernoulli.html">serotiny.losses.continuous_bernoulli</a></li>
+<li><a href="serotiny/losses/kl_divergence.html">serotiny.losses.kl_divergence</a></li>
 <li><a href="serotiny/metrics/calculate_blur.html">serotiny.metrics.calculate_blur</a></li>
 <li><a href="serotiny/metrics/calculate_fid.html">serotiny.metrics.calculate_fid</a></li>
 <li><a href="serotiny/metrics/inception.html">serotiny.metrics.inception</a></li>
 <li><a href="serotiny/metrics/pearson.html">serotiny.metrics.pearson</a></li>
+<li><a href="serotiny/models/callbacks/plot_xhat.html">serotiny.models.callbacks.plot_xhat</a></li>
 <li><a href="serotiny/models/classification.html">serotiny.models.classification</a></li>
-<li><a href="serotiny/models/deprecated/cbvae_mlp.html">serotiny.models.deprecated.cbvae_mlp</a></li>
 <li><a href="serotiny/models/regression.html">serotiny.models.regression</a></li>
 <li><a href="serotiny/models/unet.html">serotiny.models.unet</a></li>
+<li><a href="serotiny/models/utils.html">serotiny.models.utils</a></li>
 <li><a href="serotiny/models/vae/base_vae.html">serotiny.models.vae.base_vae</a></li>
 <li><a href="serotiny/models/vae/conditional_vae.html">serotiny.models.vae.conditional_vae</a></li>
 <li><a href="serotiny/models/vae/condprior_vae.html">serotiny.models.vae.condprior_vae</a></li>
@@ -220,64 +141,40 @@
 <li><a href="serotiny/models/vae/tabular_condprior_vae.html">serotiny.models.vae.tabular_condprior_vae</a></li>
 <li><a href="serotiny/models/vae/tabular_vae.html">serotiny.models.vae.tabular_vae</a></li>
 <li><a href="serotiny/models/zoo.html">serotiny.models.zoo</a></li>
-<li><a href="serotiny/networks/deprecated/cbvae_decoder.html">serotiny.networks.deprecated.cbvae_decoder</a></li>
-<li><a href="serotiny/networks/deprecated/cbvae_decoder_mlp.html">serotiny.networks.deprecated.cbvae_decoder_mlp</a></li>
-<li><a href="serotiny/networks/deprecated/cbvae_encoder.html">serotiny.networks.deprecated.cbvae_encoder</a></li>
-<li><a href="serotiny/networks/deprecated/cbvae_encoder_mlp.html">serotiny.networks.deprecated.cbvae_encoder_mlp</a></li>
 <li><a href="serotiny/networks/layers/activation.html">serotiny.networks.layers.activation</a></li>
 <li><a href="serotiny/networks/layers/pad.html">serotiny.networks.layers.pad</a></li>
 <li><a href="serotiny/networks/layers/spatial_pyramid_pool.html">serotiny.networks.layers.spatial_pyramid_pool</a></li>
 <li><a href="serotiny/networks/mlp.html">serotiny.networks.mlp</a></li>
 <li><a href="serotiny/networks/sequential.html">serotiny.networks.sequential</a></li>
-<li><a href="serotiny/networks/vae/cbvae_decoder_mlp.html">serotiny.networks.vae.cbvae_decoder_mlp</a></li>
-<li><a href="serotiny/networks/vae/cbvae_encoder_mlp.html">serotiny.networks.vae.cbvae_encoder_mlp</a></li>
 <li><a href="serotiny/networks/weight_init.html">serotiny.networks.weight_init</a></li>
-<li><a href="serotiny/transform/pad.html">serotiny.transform.pad</a></li>
-<li><a href="serotiny/transform/swap.html">serotiny.transform.swap</a></li>
 <li><a href="serotiny/utils/dynamic_imports.html">serotiny.utils.dynamic_imports</a></li>
 </ul></ul>
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021.
-
-    </p>
+    <p>&#169; Copyright 2021.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

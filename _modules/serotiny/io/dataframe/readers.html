@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>serotiny.io.dataframe.readers &mdash; serotiny 0.0.1 documentation</title>
+      <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../../index.html" class="icon icon-home"> serotiny
+          </a>
+              <div class="version">
+                0.0.1
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../installation.html#stable-release">Stable release</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../installation.html#from-sources">From sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">serotiny CLI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../cli.html#passing-config-dicts-in-cli">Passing config dicts in CLI</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dynamic_imports.html">Dynamic imports</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../dynamic_imports.html#init"><code class="code docutils literal notranslate"><span class="pre">^init</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../dynamic_imports.html#invoke"><code class="code docutils literal notranslate"><span class="pre">^invoke</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../dynamic_imports.html#bind"><code class="code docutils literal notranslate"><span class="pre">^bind</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../dynamic_imports.html#positional-args"><code class="code docutils literal notranslate"><span class="pre">^positional_args</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../image_transforms.html">Applying image transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../dataframe_transforms.html">Dataframe wrangling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../example_workflows.html">Example workflows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">Package modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../serotiny.html">serotiny package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../serotiny.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.datamodules.html">serotiny.datamodules package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.io.html">serotiny.io package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.losses.html">serotiny.losses package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.metrics.html">serotiny.metrics package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.models.html">serotiny.models package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.networks.html">serotiny.networks package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.utils.html">serotiny.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../serotiny.html#module-serotiny">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../contributing.html#get-started">Get Started!</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../contributing.html#deploying">Deploying</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">serotiny</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+          <li><a href="../../../serotiny.html">serotiny</a> &raquo;</li>
+      <li>serotiny.io.dataframe.readers</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for serotiny.io.dataframe.readers</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">pyarrow.parquet</span>
+
+
+<div class="viewcode-block" id="read_parquet"><a class="viewcode-back" href="../../../../serotiny.io.dataframe.html#serotiny.io.dataframe.readers.read_parquet">[docs]</a><span class="k">def</span> <span class="nf">read_parquet</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">include_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read a dataframe stored in a .parquet file, and optionally include</span>
+<span class="sd">    only the columns given by `include_columns`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    path: Union[Path, str]</span>
+<span class="sd">        Path to the .parquet file</span>
+<span class="sd">    include_columns: Optional[Sequence[str]] = None</span>
+<span class="sd">        List of column names and/or regex expressions, used to only include the</span>
+<span class="sd">        desired columns in the resulting dataframe.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    dataframe: pd.DataFrame</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">include_columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">schema</span> <span class="o">=</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">parquet</span><span class="o">.</span><span class="n">read_schema</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">memory_map</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">columns</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">filter_</span> <span class="ow">in</span> <span class="n">include_columns</span><span class="p">:</span>
+            <span class="n">columns</span> <span class="o">+=</span> <span class="n">filter_columns</span><span class="p">(</span><span class="n">schema</span><span class="o">.</span><span class="n">names</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="n">filter_</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_parquet</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="read_csv"><a class="viewcode-back" href="../../../../serotiny.io.dataframe.html#serotiny.io.dataframe.readers.read_csv">[docs]</a><span class="k">def</span> <span class="nf">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">include_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read a dataframe stored in a .csv file, and optionally include</span>
+<span class="sd">    only the columns given by `include_columns`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    path: Union[Path, str]</span>
+<span class="sd">        Path to the .csv file</span>
+<span class="sd">    include_columns: Optional[Sequence[str]] = None</span>
+<span class="sd">        List of column names and/or regex expressions, used to only include the</span>
+<span class="sd">        desired columns in the resulting dataframe.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    dataframe: pd.DataFrame</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">include_columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">filter_</span> <span class="ow">in</span> <span class="n">include_columns</span><span class="p">:</span>
+            <span class="n">columns</span> <span class="o">+=</span> <span class="n">filter_columns</span><span class="p">(</span><span class="n">dataframe</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">regex</span><span class="o">=</span><span class="n">filter_</span><span class="p">)</span>
+
+        <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">dataframe</span></div>
+
+
+<div class="viewcode-block" id="read_dataframe"><a class="viewcode-back" href="../../../../serotiny.io.dataframe.html#serotiny.io.dataframe.readers.read_dataframe">[docs]</a><span class="k">def</span> <span class="nf">read_dataframe</span><span class="p">(</span>
+    <span class="n">dataframe</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+    <span class="n">required_columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">include_columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load a dataframe from a .csv or .parquet file, or assert a given pd.DataFrame</span>
+<span class="sd">    contains the expected required columns.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    dataframe: Union[Path, str, pd.DataFrame]</span>
+<span class="sd">        Either the path to the dataframe to be loaded, or a pd.DataFrame. Supported</span>
+<span class="sd">        file types are .csv and .parquet</span>
+
+<span class="sd">    required_columns: Optional[Sequence[str]] = None</span>
+<span class="sd">        List of columns that the dataframe must contain. If these aren&#39;t found,</span>
+<span class="sd">        a ValueError is thrown</span>
+
+<span class="sd">    include_columns: Optional[Sequence[str]] = None</span>
+<span class="sd">        List of column names and/or regex expressions, used to only include the</span>
+<span class="sd">        desired columns in the resulting dataframe. For .parquet this also results</span>
+<span class="sd">        in slower read latency.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+
+<span class="sd">    dataframe: pd.DataFrame</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">required_columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">include_columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">include_columns</span> <span class="o">+=</span> <span class="n">required_columns</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">)):</span>
+        <span class="n">dataframe</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Manifest file not found at given path&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;.csv&quot;</span><span class="p">:</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">read_csv</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">include_columns</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;.parquet&quot;</span><span class="p">:</span>
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">read_parquet</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">include_columns</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;File type of provided manifest is not .csv &quot;</span> <span class="s2">&quot;or .parquet&quot;</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">include_columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">filter_</span> <span class="ow">in</span> <span class="n">include_columns</span><span class="p">:</span>
+                <span class="n">columns</span> <span class="o">+=</span> <span class="n">filter_columns</span><span class="p">(</span><span class="n">dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="n">filter_</span><span class="p">)</span>
+
+            <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;`dataframe` must be either a pd.DataFrame or a path to &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;a file to load one. You passed </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">required_columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">missing_columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">required_columns</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_columns</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Some or all of the required columns were not &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;found on the given dataframe:</span><span class="se">\n</span><span class="si">{</span><span class="n">missing_columns</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">dataframe</span></div>
+
+
+<div class="viewcode-block" id="filter_columns"><a class="viewcode-back" href="../../../../serotiny.io.dataframe.html#serotiny.io.dataframe.readers.filter_columns">[docs]</a><span class="k">def</span> <span class="nf">filter_columns</span><span class="p">(</span>
+    <span class="n">columns_to_filter</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">regex</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">startswith</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">endswith</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">contains</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">excludes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Filter a list of columns, using a combination of different</span>
+<span class="sd">    queries, or a `regex` pattern. If `regex` is supplied it</span>
+<span class="sd">    takes precedence and the remaining arguments are ignored.</span>
+<span class="sd">    Otherwise, the logical AND of the supplied filters is applied,</span>
+<span class="sd">    i.e. the columns that respect all of the supplied conditions</span>
+<span class="sd">    are returned.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    columns_to_filter: Sequence[str]</span>
+<span class="sd">        List of columns to filter</span>
+
+<span class="sd">    regex: Optional[str] = None</span>
+<span class="sd">        A string containing a regular expression to be matched</span>
+
+<span class="sd">    startswith: Optional[str] = None</span>
+<span class="sd">        A substring the matching columns must start with</span>
+
+<span class="sd">    endswith: Optional[str] = None</span>
+<span class="sd">        A substring the matching columns must end with</span>
+
+<span class="sd">    contains: Optional[str] = None</span>
+<span class="sd">        A substring the matching columns must contain</span>
+
+<span class="sd">    excludes: Optional[str] = None</span>
+<span class="sd">        A substring the matching columns must not contain</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">regex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns_to_filter</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">col</span><span class="p">)]</span>
+
+    <span class="n">keep</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns_to_filter</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">columns_to_filter</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">startswith</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keep</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="nb">str</span><span class="p">(</span><span class="n">columns_to_filter</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">startswith</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">endswith</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keep</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="nb">str</span><span class="p">(</span><span class="n">columns_to_filter</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">endswith</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">contains</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keep</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="n">contains</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">columns_to_filter</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">excludes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keep</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="n">excludes</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">columns_to_filter</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">keep_column</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">columns_to_filter</span><span class="p">,</span> <span class="n">keep</span><span class="p">)</span> <span class="k">if</span> <span class="n">keep_column</span><span class="p">]</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

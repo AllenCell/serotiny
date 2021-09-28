@@ -1,77 +1,36 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>serotiny package &mdash; serotiny 0.0.1 documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="serotiny.datamodules package" href="serotiny.datamodules.html" />
     <link rel="prev" title="serotiny" href="modules.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> serotiny
-          
-
-          
           </a>
-
-          
-            
-            
               <div class="version">
                 0.0.1
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -79,18 +38,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
@@ -99,6 +47,20 @@
 <li class="toctree-l2"><a class="reference internal" href="installation.html#from-sources">From sources</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">serotiny CLI</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cli.html#passing-config-dicts-in-cli">Passing config dicts in CLI</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic_imports.html">Dynamic imports</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dynamic_imports.html#init"><code class="code docutils literal notranslate"><span class="pre">^init</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic_imports.html#invoke"><code class="code docutils literal notranslate"><span class="pre">^invoke</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic_imports.html#bind"><code class="code docutils literal notranslate"><span class="pre">^bind</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dynamic_imports.html#positional-args"><code class="code docutils literal notranslate"><span class="pre">^positional_args</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="image_transforms.html">Applying image transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataframe_transforms.html">Dataframe wrangling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="example_workflows.html">Example workflows</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">Package modules</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">serotiny package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul>
@@ -108,7 +70,6 @@
 <li class="toctree-l4"><a class="reference internal" href="serotiny.metrics.html">serotiny.metrics package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.html">serotiny.models package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.networks.html">serotiny.networks package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.transform.html">serotiny.transform package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.utils.html">serotiny.utils package</a></li>
 </ul>
 </li>
@@ -124,86 +85,38 @@
 </li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">serotiny</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="modules.html">serotiny</a> &raquo;</li>
-        
       <li>serotiny package</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/serotiny.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
-  </ul>
-
-  
-  <div class="rst-breadcrumbs-buttons" role="navigation" aria-label="breadcrumb navigation">
-      
-        <a href="serotiny.datamodules.html" class="btn btn-neutral float-right" title="serotiny.datamodules package" accesskey="n">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-      
-      
+  </ul><div class="rst-breadcrumbs-buttons" role="navigation" aria-label="Sequential page navigation">
         <a href="modules.html" class="btn btn-neutral float-left" title="serotiny" accesskey="p"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-      
+        <a href="serotiny.datamodules.html" class="btn btn-neutral float-right" title="serotiny.datamodules package" accesskey="n">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
   </div>
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <div class="section" id="serotiny-package">
-<h1>serotiny package<a class="headerlink" href="#serotiny-package" title="Permalink to this headline">¶</a></h1>
+<h1>serotiny package<a class="headerlink" href="#serotiny-package" title="Permalink to this headline"></a></h1>
 <div class="section" id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="serotiny.datamodules.html">serotiny.datamodules package</a><ul>
@@ -212,7 +125,6 @@
 <li class="toctree-l2"><a class="reference internal" href="serotiny.datamodules.html#module-serotiny.datamodules.gaussian">serotiny.datamodules.gaussian module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.datamodules.html#module-serotiny.datamodules.manifest_datamodule">serotiny.datamodules.manifest_datamodule module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.datamodules.html#module-serotiny.datamodules.patch">serotiny.datamodules.patch module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="serotiny.datamodules.html#module-serotiny.datamodules.split">serotiny.datamodules.split module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.datamodules.html#module-serotiny.datamodules">Module contents</a></li>
 </ul>
 </li>
@@ -222,8 +134,7 @@
 <li class="toctree-l4"><a class="reference internal" href="serotiny.io.dataframe.html#subpackages">Subpackages</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.io.dataframe.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.io.dataframe.html#module-serotiny.io.dataframe.dataframe_dataset">serotiny.io.dataframe.dataframe_dataset module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.io.dataframe.html#module-serotiny.io.dataframe.split">serotiny.io.dataframe.split module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.io.dataframe.html#module-serotiny.io.dataframe.utils">serotiny.io.dataframe.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.io.dataframe.html#module-serotiny.io.dataframe.readers">serotiny.io.dataframe.readers module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.io.dataframe.html#module-serotiny.io.dataframe">Module contents</a></li>
 </ul>
 </li>
@@ -232,14 +143,14 @@
 <li class="toctree-l2"><a class="reference internal" href="serotiny.io.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.io.html#module-serotiny.io.buffered_patch_dataset">serotiny.io.buffered_patch_dataset module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.io.html#module-serotiny.io.image">serotiny.io.image module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="serotiny.io.html#module-serotiny.io.transforms">serotiny.io.transforms module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="serotiny.io.html#module-serotiny.io.utils">serotiny.io.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.io.html#module-serotiny.io.quilt">serotiny.io.quilt module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.io.html#module-serotiny.io">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="serotiny.losses.html">serotiny.losses package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.losses.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="serotiny.losses.html#module-serotiny.losses.elbo">serotiny.losses.elbo module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.losses.html#module-serotiny.losses.continuous_bernoulli">serotiny.losses.continuous_bernoulli module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.losses.html#module-serotiny.losses.kl_divergence">serotiny.losses.kl_divergence module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.losses.html#module-serotiny.losses">Module contents</a></li>
 </ul>
 </li>
@@ -255,14 +166,9 @@
 <li class="toctree-l1"><a class="reference internal" href="serotiny.models.html">serotiny.models package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.models.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="serotiny.models.callbacks.html">serotiny.models.callbacks package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.models.callbacks.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.models.callbacks.html#module-serotiny.models.callbacks.plot_xhat">serotiny.models.callbacks.plot_xhat module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.callbacks.html#module-serotiny.models.callbacks">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="serotiny.models.deprecated.html">serotiny.models.deprecated package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.models.deprecated.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.models.deprecated.html#serotiny-models-deprecated-cbvae-module">serotiny.models.deprecated.cbvae module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.models.deprecated.html#module-serotiny.models.deprecated.cbvae_mlp">serotiny.models.deprecated.cbvae_mlp module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.models.deprecated.html#module-serotiny.models.deprecated">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.html">serotiny.models.vae package</a><ul>
@@ -283,6 +189,7 @@
 <li class="toctree-l2"><a class="reference internal" href="serotiny.models.html#module-serotiny.models.classification">serotiny.models.classification module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.models.html#module-serotiny.models.regression">serotiny.models.regression module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.models.html#module-serotiny.models.unet">serotiny.models.unet module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.models.html#module-serotiny.models.utils">serotiny.models.utils module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.models.html#module-serotiny.models.zoo">serotiny.models.zoo module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.models.html#module-serotiny.models">Module contents</a></li>
 </ul>
@@ -290,16 +197,7 @@
 <li class="toctree-l1"><a class="reference internal" href="serotiny.networks.html">serotiny.networks package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.networks.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="serotiny.networks.classification.html">serotiny.networks.classification package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.classification.html#module-contents">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="serotiny.networks.deprecated.html">serotiny.networks.deprecated package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.deprecated.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.deprecated.html#module-serotiny.networks.deprecated.cbvae_decoder">serotiny.networks.deprecated.cbvae_decoder module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.deprecated.html#module-serotiny.networks.deprecated.cbvae_decoder_mlp">serotiny.networks.deprecated.cbvae_decoder_mlp module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.deprecated.html#module-serotiny.networks.deprecated.cbvae_encoder">serotiny.networks.deprecated.cbvae_encoder module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.deprecated.html#module-serotiny.networks.deprecated.cbvae_encoder_mlp">serotiny.networks.deprecated.cbvae_encoder_mlp module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.deprecated.html#module-serotiny.networks.deprecated">Module contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.classification.html#module-serotiny.networks.classification">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="serotiny.networks.layers.html">serotiny.networks.layers package</a><ul>
@@ -310,13 +208,6 @@
 <li class="toctree-l4"><a class="reference internal" href="serotiny.networks.layers.html#module-serotiny.networks.layers">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="serotiny.networks.vae.html">serotiny.networks.vae package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.vae.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.vae.html#module-serotiny.networks.vae.cbvae_decoder_mlp">serotiny.networks.vae.cbvae_decoder_mlp module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.vae.html#module-serotiny.networks.vae.cbvae_encoder_mlp">serotiny.networks.vae.cbvae_encoder_mlp module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.vae.html#module-serotiny.networks.vae">Module contents</a></li>
-</ul>
-</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.networks.html#submodules">Submodules</a></li>
@@ -324,13 +215,6 @@
 <li class="toctree-l2"><a class="reference internal" href="serotiny.networks.html#module-serotiny.networks.sequential">serotiny.networks.sequential module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.networks.html#module-serotiny.networks.weight_init">serotiny.networks.weight_init module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.networks.html#module-serotiny.networks">Module contents</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="serotiny.transform.html">serotiny.transform package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="serotiny.transform.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="serotiny.transform.html#module-serotiny.transform.pad">serotiny.transform.pad module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="serotiny.transform.html#module-serotiny.transform.swap">serotiny.transform.swap module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="serotiny.transform.html#module-serotiny.transform">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="serotiny.utils.html">serotiny.utils package</a><ul>
@@ -343,12 +227,12 @@
 </div>
 </div>
 <div class="section" id="module-serotiny">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-serotiny" title="Permalink to this headline">¶</a></h2>
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-serotiny" title="Permalink to this headline"></a></h2>
 <p>An agglomeration of ML primitives, utils, and complete models, used at AICS, to
 model cell images and data.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="serotiny.get_module_version">
-<span class="sig-prename descclassname"><span class="pre">serotiny.</span></span><span class="sig-name descname"><span class="pre">get_module_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny.html#get_module_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.get_module_version" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">serotiny.</span></span><span class="sig-name descname"><span class="pre">get_module_version</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny.html#get_module_version"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.get_module_version" title="Permalink to this definition"></a></dt>
 <dd><p>simply return the version of this module</p>
 </dd></dl>
 
@@ -357,46 +241,30 @@ model cell images and data.</p>
 
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021.
-
-    </p>
+    <p>&#169; Copyright 2021.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
