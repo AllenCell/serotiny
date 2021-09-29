@@ -1,33 +1,33 @@
 serotiny CLI
 ============
 
-:code:`serotiny` comes with a CLI to make it's use straightforward. The CLI has
-multiple modules, for different functionalities. You can append `--help`
+``serotiny`` comes with a CLI to make it's use straightforward. The CLI has
+multiple modules, for different functionalities. You can append ``--help``
 to any module in the command-line, to obtain more information.
 
-* :code:`serotiny`
+* ``serotiny``
 
-  * :code:`model` : model training and inference
+  * ``model`` : model training and inference
 
-    * :code:`train` : model training
+    * ``train`` : model training
 
-    * :code:`predict` : inference / prediction
+    * ``predict`` : inference / prediction
 
-  * :code:`dataframe` : dataframe wrangling utils
+  * ``dataframe`` : dataframe wrangling utils
 
-    * :code:`transform` : dataframe transform operations
+    * ``transform`` : dataframe transform operations
 
-    * :code:`merge`: merge multiple dataframes
+    * ``merge``: merge multiple dataframes
 
-    * :code:`partition` : break one dataframe into chunks
+    * ``partition`` : break one dataframe into chunks
 
-  * :code:`image`
+  * ``image``
 
-    * :code:`transform` : define and apply image transform pipelines
+    * ``transform`` : define and apply image transform pipelines
 
-    * (Coming soon) :code:`feature_extraction`
+    * (Coming soon) ``feature_extraction``
 
-  * :code:`utils`
+  * ``utils``
 
 
 Passing config dicts in CLI
