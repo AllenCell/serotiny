@@ -46,26 +46,19 @@ class DownConvolution(nn.Module):
 
     def forward(self, x):
         
-        print(f' x.shape = {x.shape}')
-        
         if self.current_depth != 0:
             x_doubleconv_down = self.double_conv(x)
-            print(f' x_doubleconv_down = {x_doubleconv_down.shape}')
             
             x_pool_down = self.pooling(x_doubleconv_down)
-            print(f' x_pool_down = {x_pool_down.shape}')
             
             x_batchnorm_down = self.batch_norm(x_pool_down)
-            print(f' x_batchnorm_down = {x_batchnorm_down.shape}')
             
             x_activation_down = self.activation(x_batchnorm_down)
-            print(f' x_activation_down = {x_activation_down.shape}')
             
             x_return = x_activation_down
             
         else:
             x_doubleconv_down = self.double_conv(x)
-            print(f' x_doubleconv_down = {x_doubleconv_down.shape}')
             
             x_return = x_doubleconv_down
 

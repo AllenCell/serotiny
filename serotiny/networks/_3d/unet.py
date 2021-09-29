@@ -4,8 +4,6 @@
 import torch
 from torch import nn
 
-# from torch.nn import functional as F
-
 from ..layers._3d.unet_downconv import DownConvolution
 from ..layers._3d.unet_upconv import UpConvolution
 
@@ -14,7 +12,7 @@ class Unet(nn.Module):
     def __init__(
         self,
         depth: int = 4,
-        num_input_channels: int = 1,
+        num_input_channels: int = 1,  # change for multi channel input
         num_output_channels: int = 1,
         channel_fan_top: int = 64,  # Original paper = 64
         channel_fan: int = 2,  # Original paper = 2
@@ -35,7 +33,6 @@ class Unet(nn.Module):
         kernel_size_finalconv: int = 3,  # Original paper = 1, label-free = 3
         stride_finalconv: int = 1,  # Original paper = no mention, label-free = default
         padding_finalconv: int = 1,  # Original paper = no mention, label-free = 1
-        # dimensions: tuple, # =(176, 104, 52),
     ):
 
         """
@@ -170,7 +167,6 @@ class Unet(nn.Module):
 
             for level in network_keys:
                 print(f"Level = {level}")
-                # print(f'{network_dict[level]}')
 
                 for key in network_dict[level].keys():
                     print(f"  {key} = {network_dict[level][key]}")
@@ -196,7 +192,6 @@ class Unet(nn.Module):
         doubleconv_down_out = {}
 
         for current_depth in network_layers_down:
-            print(f"Level = {current_depth}")
 
             x_previous_layer, x_doubleconv_down = self.networks_down[
                 str(current_depth)
@@ -207,7 +202,6 @@ class Unet(nn.Module):
             ] = x_doubleconv_down  # Save the double conv output for concatenation
 
         for current_depth in network_layers_up:
-            print(f"Level = {current_depth}")
 
             x_previous_layer = self.networks_up[str(current_depth)]["subnet"](
                 x_previous_layer, doubleconv_down_out[current_depth]

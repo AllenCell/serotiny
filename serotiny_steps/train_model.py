@@ -10,7 +10,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint
 
 from serotiny.models.zoo import store_metadata, build_model_path
-from serotiny.utils import INIT_KEY, init_or_invoke, load_multiple
+from serotiny.utils import INIT_KEY, init_or_invoke, load_multiple, get_dynamic
 
 log = logging.getLogger(__name__)
 
@@ -49,8 +49,8 @@ def train_model(
     callbacks_config = callbacks
 
     model_zoo_path = model_zoo_config.get("path")
-    model_name = model_config.get(INIT_KEY, "UNDEFINED_MODEL_NAME")
-    datamodule_name = datamodule_config.get(INIT_KEY, "UNDEFINED_DATAMODULE_NAME")
+    model_name = get_dynamic(model_config, "UNDEFINED_MODEL_NAME")
+    datamodule_name = get_dynamic(datamodule_config, "UNDEFINED_DATAMODULE_NAME")
 
     store_metadata(called_args, model_name, version_string, model_zoo_path)
 
@@ -73,7 +73,10 @@ def train_model(
 
     if len(model_zoo) > 0:
         model_path = build_model_path(model_zoo_path, (model_name, version_string))
-        config = {"dirpath": model_path, "filename": "epoch-{epoch:02d}"}
+        config = {
+            "dirpath": model_path,
+            "filename": "{epoch:02d}",
+        }
         checkpoint_config = model_zoo_config.get("checkpoint", {})
         config.update(checkpoint_config)
         checkpoint_callback = ModelCheckpoint(**config)
@@ -88,10 +91,7 @@ def train_model(
         callbacks.append(checkpoint_callback)
 
     trainer = pl.Trainer(
-        **trainer_config,
-        logger=loggers,
-        gpus=num_gpus,
-        callbacks=callbacks,
+        **trainer_config, logger=loggers, gpus=num_gpus, callbacks=callbacks,
     )
 
     log.info("Calling trainer.fit")

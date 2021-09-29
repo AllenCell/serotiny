@@ -6,7 +6,7 @@ import fire
 import pytorch_lightning as pl
 
 from serotiny.models.zoo import get_model
-from serotiny.utils import init, load_multiple
+from serotiny.utils import init_or_invoke, load_multiple
 
 
 def apply_model(
@@ -14,8 +14,8 @@ def apply_model(
     datamodule: Dict,
     trainer: Dict,
     model_zoo: Dict,
-    callbacks: List[Dict] = [],  # Dict,
-    gpu_ids: List[int] = [0],  # List[int],
+    callbacks: List[Dict] = [],
+    gpu_ids: List[int] = [0],
     loggers: List[Dict] = [],
 ):
 
@@ -33,10 +33,11 @@ def apply_model(
     model_zoo_path = model_zoo_config.get("path")
     model = get_model(model_path, model_zoo_path)
 
-    datamodule = init(datamodule_config)
+    datamodule = init_or_invoke(datamodule_config)
     datamodule.setup()
 
-    loggers = path_invocations(loggers_config)
+    # loggers = path_invocations(loggers_config)
+    loggers = load_multiple(loggers_config)
     callbacks = load_multiple(callbacks_config)
 
     trainer = pl.Trainer(

@@ -1,10 +1,18 @@
-
 import importlib
 from functools import partial
 
 INVOKE_KEY = "^invoke"
 BIND_KEY = "^bind"
 INIT_KEY = "^init"
+
+
+def get_dynamic(config, default=""):
+    if INIT_KEY in config:
+        return config[INIT_KEY]
+    elif INVOKE_KEY in config:
+        return config[INVOKE_KEY]
+    else:
+        return default
 
 
 class _bind(partial):
@@ -77,13 +85,6 @@ def get_name_and_arguments(key, config):
 def invoke(config):
     to_invoke, arguments = get_name_and_arguments(INVOKE_KEY, config)
 
-    for key, value in arguments.items():
-        if isinstance(value, dict):
-            try:
-                arguments[key] = load_config(value)
-            except:
-                pass
-
     return to_invoke(**arguments)
 
 
@@ -111,8 +112,7 @@ def init_or_invoke(config):
     elif INVOKE_KEY in config:
         return invoke(config)
     else:
-        raise TypeError(
-            f"neither {INIT_KEY} or {INVOKE_KEY} in config {config}")
+        raise TypeError(f"neither {INIT_KEY} or {INVOKE_KEY} in config {config}")
 
 
 def bind(config):

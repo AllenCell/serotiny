@@ -28,14 +28,20 @@ def _get_checkpoint(model_path, model_root):
     if not model_root.exists():
         raise FileNotFoundError("Given model_root does not exists.")
 
-    model_class_name, model_id = model_path.split("/")
+    # modification in case full path is passed in
+    model_class_name, model_id = model_path.split("/")[-2:]
 
     model_path = (model_root / model_class_name) / model_id
-
+    print("HERE:")
+    print("Model Root: " + str(model_root))
+    print("Model Class Name: " + str(model_class_name))
+    print("Model ID: " + str(model_id))
+    print("Model Path: " + str(model_path))
     with open(str(model_path) + ".yaml") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
     ckpt_path = list(model_path.glob("*.ckpt"))[0]
+    print("CHECKPOINT PATH: " + str(ckpt_path))
 
     return ckpt_path, model_class_name, config
 
@@ -45,6 +51,8 @@ def get_model(model_path, model_root=None):
     model_class = module_or_path(models, model_class_name)
 
     model_config = config["model"]
+    print("MODEL CLASS")
+    print(model_class)
 
     return model_class.load_from_checkpoint(checkpoint_path=ckpt_path, **model_config)
 

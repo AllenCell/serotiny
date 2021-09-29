@@ -8,6 +8,7 @@ from .dynamic_imports import (
     init_or_invoke,
     load_config,
     load_multiple,
+    get_dynamic,
     INVOKE_KEY,
     INIT_KEY,
     BIND_KEY,
