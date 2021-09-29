@@ -1,9 +1,5 @@
-serotiny.models
-===============
-
-This module contains classes for models (subclasses of PyTorch
-Lightning's Module class). Note, code for the networks themselves
-is in :py:mod:`serotiny.networks`
+serotiny.models package
+=======================
 
 Subpackages
 -----------
@@ -57,3 +53,10 @@ serotiny.models.zoo module
    :undoc-members:
    :show-inheritance:
 
+Module contents
+---------------
+
+.. automodule:: serotiny.models
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -133,7 +133,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -155,7 +155,7 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">serotiny CLI</a></li>
@@ -175,7 +175,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="serotiny.losses.html">serotiny.losses package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="serotiny.metrics.html">serotiny.metrics package</a></li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.models.html">serotiny.models</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.models.html">serotiny.models package</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.callbacks.html">serotiny.models.callbacks package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.vae.html">serotiny.models.vae package</a></li>
 </ul>
@@ -211,7 +211,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -219,8 +219,110 @@
         <article role="main">
           <div class="section" id="applying-image-transforms">
 <h1>Applying image transforms<a class="headerlink" href="#applying-image-transforms" title="Permalink to this headline">¶</a></h1>
-<p>TODO: explain YAML schema for image transforms and <code class="code docutils literal notranslate"><span class="pre">serotiny</span> <span class="pre">image</span> <span class="pre">transform</span></code>
-portion of the CLI</p>
+<p>A common step in an image-centric workflow is transforming the input images
+(resizing, padding, registering, normalizing, applying dillations and
+other filters…).</p>
+<p>For this, we provide a CLI utility that enables complex and flexible image
+transformations to be applied to a dataset of images. Our starting point is
+a manifest file (e.g. a <code class="docutils literal notranslate"><span class="pre">.csv</span></code> file) which contains (at least) a column
+with paths to the images in the dataset.</p>
+<p>The general structure of the CLI call is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">serotiny</span> <span class="n">image</span> <span class="n">transform</span> \
+    <span class="o">--</span><span class="n">input_manifests</span><span class="o">=</span><span class="n">my_manifest</span><span class="o">.</span><span class="n">csv</span> \ <span class="c1"># note the plural. passing a list of files is also supported</span>
+    <span class="o">--</span><span class="n">output_path</span><span class="o">=</span><span class="n">output_manifest</span><span class="o">.</span><span class="n">csv</span> \
+    <span class="o">--</span><span class="n">output_channel_names</span><span class="o">=</span><span class="s1">'[channel1, channel2, channel3]'</span> \
+    <span class="o">--</span><span class="n">transforms_to_apply</span><span class="o">=</span><span class="n">transforms</span><span class="o">.</span><span class="n">yaml</span> \ <span class="c1"># we will dive into this YAML file ahead</span>
+    <span class="o">--</span><span class="n">index_col</span><span class="o">=</span><span class="s2">"cell_id"</span> <span class="c1"># the index col is used for the image filenames</span>
+    <span class="c1"># --merge_col=... \ # optional. to merge multiple manifests (horizontally)</span>
+    <span class="c1"># --include_cols=... \ # optional. to include other columns in the output manifest</span>
+    <span class="c1"># --n_workers=10 \ # optional. process multiple images in parallel</span>
+    <span class="c1"># --verbose=False \ # optional. produce command line output</span>
+</pre></div>
+</div>
+<div class="section" id="configuring-transforms-to-apply">
+<h2>Configuring <code class="docutils literal notranslate"><span class="pre">transforms_to_apply</span></code><a class="headerlink" href="#configuring-transforms-to-apply" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">transforms_to_apply</span></code> is where the whole transform pipeline is specified.
+It can rely on <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>’s <a class="reference internal" href="dynamic_imports.html"><span class="doc">dynamic import functionality</span></a>
+to provide very flexible transform pipelines. As described in the <a class="reference internal" href="cli.html"><span class="doc">CLI page</span></a>,
+a config can either be provided directly in the command line, or it can be given
+as a YAML file, or part of one. In any of those cases, the <code class="docutils literal notranslate"><span class="pre">transforms_to_apply</span></code>
+config is a list, containing the several steps needed to obtain the output image. Logically,
+the order matters, and the last step describes the final result.</p>
+<p>Each step can either depend on a path column given in the input dataframe (note: your input
+dataframe can input several path columns which can all be used here), or it can depend on the
+result of an intermediate step. To enable this behaviour, each step must be given a name.
+Additionally, each step also contains a <code class="docutils literal notranslate"><span class="pre">transforms</span></code> field, which is the list of transforms
+to be applied in that step, in order.</p>
+<p>A step that depends on a path column must specify:
+* <code class="docutils literal notranslate"><span class="pre">path_col</span></code> - the column that contains the path from which to read the input image
+* <code class="docutils literal notranslate"><span class="pre">channels</span></code> - the list of channels to use</p>
+<p>A step that depends on outputs of previous steps must specify:
+* <code class="docutils literal notranslate"><span class="pre">input_imgs</span></code> - the list of names of previous steps to use</p>
+<p>An additional key <code class="docutils literal notranslate"><span class="pre">unpack</span></code> can be used, in cases where the step depends on
+multiple input images and the underlying function expects multiple input arguments
+(e.g. <code class="docutils literal notranslate"><span class="pre">numpy.concatenate</span></code>). This corresponds to applying the * operator to
+the image list.</p>
+<p>In general, transforms configured equivalently for every input image. However if
+a given transform requires per-image parameters, a special argument <code class="docutils literal notranslate"><span class="pre">^individual_args</span></code>
+can be given, which is a dict containing as keys the function’s required keyword
+arguments, and as values the corresponding columns in the dataframe which contain the
+needed data.</p>
+</div>
+<div class="section" id="example-transform-pipeline-with-comments">
+<h2>Example transform pipeline (with comments)<a class="headerlink" href="#example-transform-pipeline-with-comments" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">segmentation</span>
+  <span class="nt">path_col</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">crop_seg</span> <span class="c1"># dataframe has a column "crop_seg"</span>
+  <span class="nt">channels</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">"crop_seg"</span><span class="p p-Indicator">]</span> <span class="c1"># the images have a "crop_seg" channel</span>
+  <span class="nt">transforms</span><span class="p">:</span>
+    <span class="c1"># a CropCenter transform is instantiated, with cropz, cropx, cropy set to 50,</span>
+    <span class="c1"># and with center_of_mass being retrieved from the dataframe column with the</span>
+    <span class="c1"># same name.</span>
+    <span class="p p-Indicator">-</span> <span class="nt">^init</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">serotiny.io.transforms.CropCenter</span>
+      <span class="nt">cropz</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">50</span>
+      <span class="nt">cropx</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">50</span>
+      <span class="nt">cropy</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">50</span>
+      <span class="nt">^individual_args</span><span class="p">:</span>
+        <span class="nt">center_of_mass</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">center_of_mass</span>
+    <span class="c1"># followed by a binary_dilation operation. note how external functions</span>
+    <span class="c1"># are entirely usable here.</span>
+    <span class="p p-Indicator">-</span> <span class="nt">^bind</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">scipy.ndimage.morphology.binary_dilation</span>
+      <span class="nt">structure</span><span class="p">:</span>
+        <span class="nt">^invoke</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">numpy.ones</span>
+        <span class="nt">shape</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="nv">8</span><span class="p p-Indicator">,</span><span class="nv">8</span><span class="p p-Indicator">,</span><span class="nv">8</span><span class="p p-Indicator">]</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">raw</span>
+  <span class="nt">path_col</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">crop_raw</span>
+  <span class="nt">channels</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="s">"crop_raw"</span><span class="p p-Indicator">]</span>
+  <span class="nt">transforms</span><span class="p">:</span>
+    <span class="c1"># same CropCenter transform as above</span>
+    <span class="p p-Indicator">-</span> <span class="nt">^init</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">serotiny.io.transforms.CropCenter</span>
+      <span class="nt">cropz</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">50</span>
+      <span class="nt">cropx</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">50</span>
+      <span class="nt">cropy</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">50</span>
+      <span class="nt">^individual_args</span><span class="p">:</span>
+        <span class="nt">center_of_mass</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">center_of_mass</span>
+    <span class="c1"># followed by a quantile normalization transform</span>
+    <span class="p p-Indicator">-</span> <span class="nt">^init</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">serotiny.io.transforms.MinMaxNormalize</span>
+      <span class="nt">clip_min</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.05</span>
+      <span class="nt">clip_max</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0.95</span>
+      <span class="nt">clip_quantile</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span>
+
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">masked</span>
+  <span class="nt">input_imgs</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">raw</span><span class="p p-Indicator">,</span> <span class="nv">segmentation</span><span class="p p-Indicator">]</span> <span class="c1"># this step depends on the outputs of the previous two steps</span>
+  <span class="nt">unpack</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">True</span> <span class="c1"># use unpack because the underlying function expects multiple inputs</span>
+  <span class="nt">transforms</span><span class="p">:</span>
+    <span class="c1"># simply multiplication of the inputs</span>
+    <span class="p p-Indicator">-</span> <span class="nt">^bind</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">numpy.multiply</span>
+
+<span class="c1"># this is the final step, so its result will be the output</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">concated</span>
+  <span class="nt">input_imgs</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">masked</span><span class="p p-Indicator">,</span> <span class="nv">segmentation</span><span class="p p-Indicator">]</span> <span class="c1"># another step which depends on previous ones</span>
+  <span class="nt">transforms</span><span class="p">:</span>
+    <span class="p p-Indicator">-</span> <span class="nt">^bind</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">numpy.concatenate</span>
+      <span class="nt">axis</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">0</span>
+</pre></div>
+</div>
+</div>
 </div>
 
         </article>
@@ -264,8 +366,28 @@ portion of the CLI</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Applying image transforms</a><ul>
+<li><a class="reference internal" href="#configuring-transforms-to-apply">Configuring <code class="docutils literal notranslate"><span class="pre">transforms_to_apply</span></code></a></li>
+<li><a class="reference internal" href="#example-transform-pipeline-with-comments">Example transform pipeline (with comments)</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

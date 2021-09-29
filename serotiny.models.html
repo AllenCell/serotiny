@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny.models.callbacks package" href="serotiny.models.callbacks.html" /><link rel="prev" title="serotiny.metrics package" href="serotiny.metrics.html" />
 
     <meta name="generator" content="sphinx-4.2.0, furo 2021.09.22"/>
-        <title>serotiny.models - serotiny 0.0.1 documentation</title>
+        <title>serotiny.models package - serotiny 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=150e365fa939648e89c22f6d7d13c72a1657915a" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
@@ -155,7 +155,7 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">serotiny CLI</a></li>
@@ -175,7 +175,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="serotiny.losses.html">serotiny.losses package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="serotiny.metrics.html">serotiny.metrics package</a></li>
-<li class="toctree-l3 current has-children current-page"><a class="current reference internal" href="#">serotiny.models</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3 current has-children current-page"><a class="current reference internal" href="#">serotiny.models package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.callbacks.html">serotiny.models.callbacks package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.vae.html">serotiny.models.vae package</a></li>
 </ul>
@@ -217,11 +217,8 @@
           </label>
         </div>
         <article role="main">
-          <div class="section" id="serotiny-models">
-<h1>serotiny.models<a class="headerlink" href="#serotiny-models" title="Permalink to this headline">¶</a></h1>
-<p>This module contains classes for models (subclasses of PyTorch
-Lightning’s Module class). Note, code for the networks themselves
-is in <a class="reference internal" href="serotiny.networks.html#module-serotiny.networks" title="serotiny.networks"><code class="xref py py-mod docutils literal notranslate"><span class="pre">serotiny.networks</span></code></a></p>
+          <div class="section" id="serotiny-models-package">
+<h1>serotiny.models package<a class="headerlink" href="#serotiny-models-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
@@ -621,6 +618,332 @@ zoo.</p></li>
 </dl>
 </dd></dl>
 </div>
+<div class="section" id="module-serotiny.models">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-serotiny.models" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="serotiny.models.ClassificationModel">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.models.</span></span><span class="sig-name descname"><span class="pre">ClassificationModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_channels</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">tuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_scheduler</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimensions</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">,</span> </span><span class="pre">list</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/classification.html#ClassificationModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.ClassificationModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytorch_lightning.core.lightning.LightningModule</span></code></p>
+<p>Pytorch lightning module that implements classification model logic</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>network</strong> – Instantiated neural network for training a classification problem</p></li>
+<li><p><strong>x_label</strong> (<em>str</em>) – Key for loading input image
+Example: “projection_image”</p></li>
+<li><p><strong>y_label</strong> (<em>str</em>) – Key for loading image label
+Example: “mitotic_class”</p></li>
+<li><p><strong>in_channels</strong> (<em>int</em>) – Number of input channels in the image
+Example: 3</p></li>
+<li><p><strong>classes</strong> (<em>tuple</em>) – all available classes in the given class column
+Example: (“M0”, “M1/M2”, “M3”, “M4/M5”, “M6/M7”)</p></li>
+<li><p><strong>lr</strong> (<em>float</em>) – Learning rate for the optimizer. Example: 1e-3</p></li>
+<li><p><strong>optimizer</strong> (<em>str</em>) – str key to instantiate optimizer. Example: “Adam”</p></li>
+<li><p><strong>lr_scheduler</strong> (<em>str</em>) – str key to instantiate learning rate scheduler</p></li>
+<li><p><strong>dimensions</strong> (<em>Optional[tuple, list]:</em>) – Dimensions of each image channel. Only used for printing
+out the network/model to the command line. Set to None
+if this is not wanted</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.ClassificationModel.configure_optimizers">
+<span class="sig-name descname"><span class="pre">configure_optimizers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/classification.html#ClassificationModel.configure_optimizers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.ClassificationModel.configure_optimizers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.ClassificationModel.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/classification.html#ClassificationModel.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.ClassificationModel.forward" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.ClassificationModel.on_after_backward">
+<span class="sig-name descname"><span class="pre">on_after_backward</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/classification.html#ClassificationModel.on_after_backward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.ClassificationModel.on_after_backward" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.ClassificationModel.parse_batch">
+<span class="sig-name descname"><span class="pre">parse_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/classification.html#ClassificationModel.parse_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.ClassificationModel.parse_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve x and y from batch</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.ClassificationModel.precision">
+<span class="sig-name descname"><span class="pre">precision</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#serotiny.models.ClassificationModel.precision" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.ClassificationModel.test_epoch_end">
+<span class="sig-name descname"><span class="pre">test_epoch_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/classification.html#ClassificationModel.test_epoch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.ClassificationModel.test_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.ClassificationModel.test_step">
+<span class="sig-name descname"><span class="pre">test_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/classification.html#ClassificationModel.test_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.ClassificationModel.test_step" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.ClassificationModel.test_step_end">
+<span class="sig-name descname"><span class="pre">test_step_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/classification.html#ClassificationModel.test_step_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.ClassificationModel.test_step_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.ClassificationModel.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.ClassificationModel.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.ClassificationModel.training_step">
+<span class="sig-name descname"><span class="pre">training_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/classification.html#ClassificationModel.training_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.ClassificationModel.training_step" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.ClassificationModel.training_step_end">
+<span class="sig-name descname"><span class="pre">training_step_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/classification.html#ClassificationModel.training_step_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.ClassificationModel.training_step_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.ClassificationModel.use_amp">
+<span class="sig-name descname"><span class="pre">use_amp</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.ClassificationModel.use_amp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.ClassificationModel.validation_epoch_end">
+<span class="sig-name descname"><span class="pre">validation_epoch_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/classification.html#ClassificationModel.validation_epoch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.ClassificationModel.validation_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.ClassificationModel.validation_step">
+<span class="sig-name descname"><span class="pre">validation_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/classification.html#ClassificationModel.validation_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.ClassificationModel.validation_step" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.ClassificationModel.validation_step_end">
+<span class="sig-name descname"><span class="pre">validation_step_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/classification.html#ClassificationModel.validation_step_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.ClassificationModel.validation_step_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="serotiny.models.ImageVAE">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.models.</span></span><span class="sig-name descname"><span class="pre">ImageVAE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">latent_dim:</span> <span class="pre">Union[int,</span> <span class="pre">Sequence[int]],</span> <span class="pre">in_channels:</span> <span class="pre">int,</span> <span class="pre">hidden_channels:</span> <span class="pre">Sequence[int],</span> <span class="pre">max_pool_layers:</span> <span class="pre">Sequence[int],</span> <span class="pre">input_dims:</span> <span class="pre">Sequence[int],</span> <span class="pre">x_label:</span> <span class="pre">str,</span> <span class="pre">optimizer:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'Adam',</span> <span class="pre">lr:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.001,</span> <span class="pre">beta:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.0,</span> <span class="pre">decoder_non_linearity:</span> <span class="pre">Optional[Union[torch.nn.modules.module.Module,</span> <span class="pre">Dict]]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">loss_mask_label:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">reconstruction_loss:</span> <span class="pre">Union[torch.nn.modules.loss._Loss,</span> <span class="pre">Dict]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'torch.nn.modules.loss.MSELoss'&gt;,</span> <span class="pre">reconstruction_reduce:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'mean',</span> <span class="pre">prior_mode:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'isotropic',</span> <span class="pre">prior_logvar:</span> <span class="pre">Optional[Union[torch.Tensor,</span> <span class="pre">numpy.array,</span> <span class="pre">Sequence[float]]]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">learn_prior_logvar:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">mode:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'3d'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/image_vae.html#ImageVAE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.ImageVAE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="serotiny.models.vae.html#serotiny.models.vae.base_vae.BaseVAE" title="serotiny.models.vae.base_vae.BaseVAE"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.models.vae.base_vae.BaseVAE</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.ImageVAE.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.ImageVAE.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="serotiny.models.RegressionModel">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.models.</span></span><span class="sig-name descname"><span class="pre">RegressionModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.nn.modules.module.Module</span><span class="p"><span class="pre">,</span> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.nn.modules.loss._Loss</span><span class="p"><span class="pre">,</span> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">MSELoss()</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/regression.html#RegressionModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.RegressionModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytorch_lightning.core.lightning.LightningModule</span></code></p>
+<p>Pytorch lightning module that implements regression model logic</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>network</strong> – Neural network for training a regression problem</p></li>
+<li><p><strong>x_label</strong> (<em>str</em>) – Key for loading input image
+Example: “projection_image”</p></li>
+<li><p><strong>y_label</strong> (<em>str</em>) – Key for loading image label</p></li>
+<li><p><strong>in_channels</strong> (<em>int</em>) – Number of input channels in the image
+Example: 3</p></li>
+<li><p><strong>lr</strong> (<em>float</em>) – Learning rate for the optimizer. Example: 1e-3</p></li>
+<li><p><strong>optimizer</strong> (<em>str</em>) – str key to instantiate optimizer. Example: “Adam”</p></li>
+<li><p><strong>lr_scheduler</strong> (<em>str</em>) – str key to instantiate learning rate scheduler</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.RegressionModel.configure_optimizers">
+<span class="sig-name descname"><span class="pre">configure_optimizers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/regression.html#RegressionModel.configure_optimizers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.RegressionModel.configure_optimizers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.RegressionModel.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/regression.html#RegressionModel.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.RegressionModel.forward" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.RegressionModel.parse_batch">
+<span class="sig-name descname"><span class="pre">parse_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/regression.html#RegressionModel.parse_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.RegressionModel.parse_batch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve x and y from batch</p>
+</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.RegressionModel.precision">
+<span class="sig-name descname"><span class="pre">precision</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#serotiny.models.RegressionModel.precision" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.RegressionModel.test_epoch_end">
+<span class="sig-name descname"><span class="pre">test_epoch_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/regression.html#RegressionModel.test_epoch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.RegressionModel.test_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.RegressionModel.test_step">
+<span class="sig-name descname"><span class="pre">test_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/regression.html#RegressionModel.test_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.RegressionModel.test_step" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.RegressionModel.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.RegressionModel.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.RegressionModel.training_epoch_end">
+<span class="sig-name descname"><span class="pre">training_epoch_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/regression.html#RegressionModel.training_epoch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.RegressionModel.training_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.RegressionModel.training_step">
+<span class="sig-name descname"><span class="pre">training_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/regression.html#RegressionModel.training_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.RegressionModel.training_step" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.RegressionModel.use_amp">
+<span class="sig-name descname"><span class="pre">use_amp</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.RegressionModel.use_amp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.RegressionModel.validation_epoch_end">
+<span class="sig-name descname"><span class="pre">validation_epoch_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/regression.html#RegressionModel.validation_epoch_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.RegressionModel.validation_epoch_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.RegressionModel.validation_step">
+<span class="sig-name descname"><span class="pre">validation_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/regression.html#RegressionModel.validation_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.RegressionModel.validation_step" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="serotiny.models.TabularConditionalPriorVAE">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.models.</span></span><span class="sig-name descname"><span class="pre">TabularConditionalPriorVAE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">x_dim:</span> <span class="pre">int,</span> <span class="pre">c_dim:</span> <span class="pre">int,</span> <span class="pre">latent_dim:</span> <span class="pre">int,</span> <span class="pre">hidden_layers:</span> <span class="pre">Sequence[int],</span> <span class="pre">prior_encoder_hidden_layers:</span> <span class="pre">Sequence[int],</span> <span class="pre">optimizer:</span> <span class="pre">str,</span> <span class="pre">lr:</span> <span class="pre">float,</span> <span class="pre">x_label:</span> <span class="pre">str,</span> <span class="pre">c_label:</span> <span class="pre">Union[str,</span> <span class="pre">int,</span> <span class="pre">Sequence[int]],</span> <span class="pre">loss_mask_label:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">reconstruction_loss:</span> <span class="pre">Union[torch.nn.modules.loss._Loss,</span> <span class="pre">str]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'torch.nn.modules.loss.MSELoss'&gt;,</span> <span class="pre">condition_mode:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'label'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/tabular_condprior_vae.html#TabularConditionalPriorVAE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.TabularConditionalPriorVAE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="serotiny.models.vae.html#serotiny.models.vae.condprior_vae.ConditionalPriorVAE" title="serotiny.models.vae.condprior_vae.ConditionalPriorVAE"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.models.vae.condprior_vae.ConditionalPriorVAE</span></code></a></p>
+<p>Instantiate a conditional VAE model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>encoder</strong> (<em>nn.Module</em>) – Encoder network.</p></li>
+<li><p><strong>decoder</strong> (<em>nn.Module</em>) – Decoder network.</p></li>
+<li><p><strong>optimizer</strong> (<em>opt.Optimizer</em>) – Optimizer to use</p></li>
+<li><p><strong>reconstruction_loss</strong> (<em>Callable</em>) – Loss function for the reconstruction loss term</p></li>
+<li><p><strong>lr</strong> (<em>float</em>) – Learning rate for training</p></li>
+<li><p><strong>beta</strong> (<em>float</em>) – Beta parameter - the weight of the KLD term in the loss function</p></li>
+<li><p><strong>x_label</strong> (<em>str</em>) – String label used to retrieve X from the batches</p></li>
+<li><p><strong>c_label</strong> (<em>str</em>) – String label used to retrieve conditioning input from the batches</p></li>
+<li><p><strong>condition_mode</strong> (<em>str</em>) – String describing the type of conditioning to use.
+If <cite>condition_mode</cite> is “channel”,
+it expects c_label to be an integers or list of integers, and the input
+x to be at least 2D. In that case, c_label selects the channel or
+channels to be used as conditioning input.
+If <cite>condition_mode</cite> is “label”, it expects c_label to be a string,
+used to retrieve the conditioning input from a given batch</p></li>
+<li><p><strong>prior_mode</strong> (<em>str</em>) – String describing which type of prior to use. (Only “isotropic” and
+“anisotropic” currently supported)</p></li>
+<li><p><strong>prior_logvar</strong> (<em>Optional[Array]</em>) – Array of values to be used as either the fixed value or initialization
+value for the diagonal of the prior covariance matrix</p></li>
+<li><p><strong>learn_prior_logvar</strong> (<em>bool</em>) – Boolean flag to determine whether to learn the prior log-variances</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.TabularConditionalPriorVAE.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.TabularConditionalPriorVAE.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="serotiny.models.TabularConditionalVAE">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.models.</span></span><span class="sig-name descname"><span class="pre">TabularConditionalVAE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">x_dim:</span> <span class="pre">int,</span> <span class="pre">latent_dim:</span> <span class="pre">int,</span> <span class="pre">c_dim:</span> <span class="pre">int,</span> <span class="pre">hidden_layers:</span> <span class="pre">Sequence[int],</span> <span class="pre">optimizer:</span> <span class="pre">str,</span> <span class="pre">lr:</span> <span class="pre">float,</span> <span class="pre">beta:</span> <span class="pre">float,</span> <span class="pre">x_label:</span> <span class="pre">str,</span> <span class="pre">c_label:</span> <span class="pre">Union[str,</span> <span class="pre">int,</span> <span class="pre">Sequence[int]],</span> <span class="pre">reconstruction_loss:</span> <span class="pre">Union[torch.nn.modules.loss._Loss,</span> <span class="pre">str]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'torch.nn.modules.loss.MSELoss'&gt;,</span> <span class="pre">loss_mask_label:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">condition_mode:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'label',</span> <span class="pre">prior_mode:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'isotropic',</span> <span class="pre">prior_logvar:</span> <span class="pre">Optional[Union[torch.Tensor,</span> <span class="pre">numpy.array]]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">learn_prior_logvar:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/tabular_conditional_vae.html#TabularConditionalVAE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.TabularConditionalVAE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="serotiny.models.vae.html#serotiny.models.vae.conditional_vae.ConditionalVAE" title="serotiny.models.vae.conditional_vae.ConditionalVAE"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.models.vae.conditional_vae.ConditionalVAE</span></code></a></p>
+<p>Instantiate a conditional VAE model</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>encoder</strong> (<em>nn.Module</em>) – Encoder network.</p></li>
+<li><p><strong>decoder</strong> (<em>nn.Module</em>) – Decoder network.</p></li>
+<li><p><strong>optimizer</strong> (<em>opt.Optimizer</em>) – Optimizer to use</p></li>
+<li><p><strong>reconstruction_loss</strong> (<em>Callable</em>) – Loss function for the reconstruction loss term</p></li>
+<li><p><strong>lr</strong> (<em>float</em>) – Learning rate for training</p></li>
+<li><p><strong>beta</strong> (<em>float</em>) – Beta parameter - the weight of the KLD term in the loss function</p></li>
+<li><p><strong>x_label</strong> (<em>str</em>) – String label used to retrieve X from the batches</p></li>
+<li><p><strong>c_label</strong> (<em>str</em>) – String label used to retrieve conditioning input from the batches</p></li>
+<li><p><strong>condition_mode</strong> (<em>str</em>) – String describing the type of conditioning to use.
+If <cite>condition_mode</cite> is “channel”,
+it expects c_label to be an integers or list of integers, and the input
+x to be at least 2D. In that case, c_label selects the channel or
+channels to be used as conditioning input.
+If <cite>condition_mode</cite> is “label”, it expects c_label to be a string,
+used to retrieve the conditioning input from a given batch</p></li>
+<li><p><strong>prior_mode</strong> (<em>str</em>) – String describing which type of prior to use. (Only “isotropic” and
+“anisotropic” currently supported)</p></li>
+<li><p><strong>prior_logvar</strong> (<em>Optional[Array]</em>) – Array of values to be used as either the fixed value or initialization
+value for the diagonal of the prior covariance matrix</p></li>
+<li><p><strong>learn_prior_logvar</strong> (<em>bool</em>) – Boolean flag to determine whether to learn the prior log-variances</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.TabularConditionalVAE.parse_batch">
+<span class="sig-name descname"><span class="pre">parse_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/tabular_conditional_vae.html#TabularConditionalVAE.parse_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.TabularConditionalVAE.parse_batch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.TabularConditionalVAE.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.TabularConditionalVAE.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="serotiny.models.TabularVAE">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.models.</span></span><span class="sig-name descname"><span class="pre">TabularVAE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_dim</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_layers</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_mask_label</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'Adam'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_mode</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'isotropic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_logvar</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span> </span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learn_prior_logvar</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/tabular_vae.html#TabularVAE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.TabularVAE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="serotiny.models.vae.html#serotiny.models.vae.base_vae.BaseVAE" title="serotiny.models.vae.base_vae.BaseVAE"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.models.vae.base_vae.BaseVAE</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.TabularVAE.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.TabularVAE.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="serotiny.models.UnetModel">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.models.</span></span><span class="sig-name descname"><span class="pre">UnetModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.nn.modules.module.Module</span><span class="p"><span class="pre">,</span> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.nn.modules.loss._Loss</span><span class="p"><span class="pre">,</span> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_dims</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_channels</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_channels</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_padding</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version_string</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_image_output</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network_config</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/unet.html#UnetModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.UnetModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytorch_lightning.core.lightning.LightningModule</span></code></p>
+<p>Instantiate a UnetModel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>network</strong> (<em>nn.Module</em>) – Unet network.</p></li>
+<li><p><strong>optimizer</strong> (<em>opt.Optimizer</em>) – Optimizer for the network</p></li>
+<li><p><strong>loss</strong> (<em>nn.Module</em>) – Loss function for the recognition loss term</p></li>
+<li><p><strong>x_label</strong> (<em>str</em>) – Label for the input image, to retrieve it from the batches</p></li>
+<li><p><strong>y_label</strong> (<em>str</em>) – Label for the output image, to retrieve it from the batches</p></li>
+<li><p><strong>input_channels</strong> (<em>Sequence[int]</em>) – Which channel (indices) to use as input</p></li>
+<li><p><strong>output_channels</strong> (<em>Sequence[int]</em>) – Which channel (indices) to use as output</p></li>
+<li><p><strong>lr</strong> (<em>float</em>) – Learning rate for training</p></li>
+<li><p><strong>input_dims</strong> (<em>Sequence[int]</em>) – Dimensions of the input images</p></li>
+<li><p><strong>auto_padding</strong> (<em>bool = False</em>) – Whether to apply padding to ensure images from down double conv
+match up double conv</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.UnetModel.configure_optimizers">
+<span class="sig-name descname"><span class="pre">configure_optimizers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/unet.html#UnetModel.configure_optimizers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.UnetModel.configure_optimizers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.UnetModel.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/unet.html#UnetModel.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.UnetModel.forward" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.UnetModel.get_unet_padding">
+<span class="sig-name descname"><span class="pre">get_unet_padding</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_fan</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/unet.html#UnetModel.get_unet_padding"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.UnetModel.get_unet_padding" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.UnetModel.on_after_backward">
+<span class="sig-name descname"><span class="pre">on_after_backward</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/unet.html#UnetModel.on_after_backward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.UnetModel.on_after_backward" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.UnetModel.parse_batch">
+<span class="sig-name descname"><span class="pre">parse_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/unet.html#UnetModel.parse_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.UnetModel.parse_batch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.UnetModel.precision">
+<span class="sig-name descname"><span class="pre">precision</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#serotiny.models.UnetModel.precision" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.UnetModel.test_step">
+<span class="sig-name descname"><span class="pre">test_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/unet.html#UnetModel.test_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.UnetModel.test_step" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.UnetModel.test_step_end">
+<span class="sig-name descname"><span class="pre">test_step_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/unet.html#UnetModel.test_step_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.UnetModel.test_step_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.UnetModel.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.UnetModel.training" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.UnetModel.training_step">
+<span class="sig-name descname"><span class="pre">training_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/unet.html#UnetModel.training_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.UnetModel.training_step" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.UnetModel.use_amp">
+<span class="sig-name descname"><span class="pre">use_amp</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.UnetModel.use_amp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="serotiny.models.UnetModel.validation_step">
+<span class="sig-name descname"><span class="pre">validation_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/unet.html#UnetModel.validation_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.UnetModel.validation_step" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+</dd></dl>
+</div>
 </div>
 
         </article>
@@ -676,7 +999,7 @@ zoo.</p></li>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">serotiny.models</a><ul>
+<li><a class="reference internal" href="#">serotiny.models package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-serotiny.models.classification">serotiny.models.classification module</a></li>
@@ -684,6 +1007,7 @@ zoo.</p></li>
 <li><a class="reference internal" href="#module-serotiny.models.unet">serotiny.models.unet module</a></li>
 <li><a class="reference internal" href="#module-serotiny.models.utils">serotiny.models.utils module</a></li>
 <li><a class="reference internal" href="#module-serotiny.models.zoo">serotiny.models.zoo module</a></li>
+<li><a class="reference internal" href="#module-serotiny.models">Module contents</a></li>
 </ul>
 </li>
 </ul>
