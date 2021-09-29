@@ -1,12 +1,12 @@
-Welcome to serotiny's documentation!
-======================================
+serotiny
+========
 
 .. toctree::
    :hidden:
    :maxdepth: 1
    :caption: Contents:
 
-   Overview <self>
+   Home <self>
    installation
    quickstart
    cli
