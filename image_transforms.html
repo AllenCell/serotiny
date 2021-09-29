@@ -253,11 +253,15 @@ dataframe can input several path columns which can all be used here), or it can 
 result of an intermediate step. To enable this behaviour, each step must be given a name.
 Additionally, each step also contains a <code class="docutils literal notranslate"><span class="pre">transforms</span></code> field, which is the list of transforms
 to be applied in that step, in order.</p>
-<p>A step that depends on a path column must specify:
-* <code class="docutils literal notranslate"><span class="pre">path_col</span></code> - the column that contains the path from which to read the input image
-* <code class="docutils literal notranslate"><span class="pre">channels</span></code> - the list of channels to use</p>
-<p>A step that depends on outputs of previous steps must specify:
-* <code class="docutils literal notranslate"><span class="pre">input_imgs</span></code> - the list of names of previous steps to use</p>
+<p>A step that depends on a path column must specify:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">path_col</span></code> - the column that contains the path from which to read the input image</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">channels</span></code> - the list of channels to use</p></li>
+</ul>
+<p>A step that depends on outputs of previous steps must specify:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">input_imgs</span></code> - the list of names of previous steps to use</p></li>
+</ul>
 <p>An additional key <code class="docutils literal notranslate"><span class="pre">unpack</span></code> can be used, in cases where the step depends on
 multiple input images and the underlying function expects multiple input arguments
 (e.g. <code class="docutils literal notranslate"><span class="pre">numpy.concatenate</span></code>). This corresponds to applying the * operator to

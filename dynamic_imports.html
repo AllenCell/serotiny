@@ -219,26 +219,28 @@
         <article role="main">
           <div class="section" id="dynamic-imports">
 <h1>Dynamic imports<a class="headerlink" href="#dynamic-imports" title="Permalink to this headline">¶</a></h1>
-<p>For its users, <code class="code docutils literal notranslate"><span class="pre">serotiny</span></code> intends to be a configuration-centric framework.
-The idea is that for someone to leverage a <code class="code docutils literal notranslate"><span class="pre">serotiny</span></code>-based workflow and
+<p>For its users, <code class="docutils literal notranslate"><span class="pre">serotiny</span></code> intends to be a configuration-centric framework.
+The idea is that for someone to leverage a <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>-based workflow and
 adapt it to their use-case, they should only have to tweak configuration
 parameters in a YAML file. Moreover, this makes it easy to integrate with
 workflow frameworks like <a class="reference external" href="https://snakemake.readthedocs.io/en/stable/">Snakemake</a> ,
 which is also YAML/config-based</p>
-<p>To maximize the configurability of <code class="code docutils literal notranslate"><span class="pre">serotiny</span></code>, we developed a dynamic import
+<p>To maximize the configurability of <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>, we developed a dynamic import
 functionality, which allows Python dictionaries (which can be read from
 YAML configs) containing special configurations to be interpreted and loaded.</p>
-<p>There are 3 ways of using this functionality:
-* <code class="code docutils literal notranslate"><span class="pre">^init</span></code> - to instantiate classes
-* <code class="code docutils literal notranslate"><span class="pre">^invoke</span></code> - to return the results of function calls
-* <code class="code docutils literal notranslate"><span class="pre">^bind</span></code> - to load functions with partially attributed arguments</p>
-<p>Additionally, there is a special keyword <code class="code docutils literal notranslate"><span class="pre">^positional_args</span></code> which
+<p>There are 3 ways of using this functionality:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">^init</span></code> - to instantiate classes</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">^invoke</span></code> - to return the results of function calls</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">^bind</span></code> - to load functions with partially attributed arguments</p></li>
+</ul>
+<p>Additionally, there is a special keyword <code class="docutils literal notranslate"><span class="pre">^positional_args</span></code> which
 can be used when the arguments to be served must be positional, or
 the function takes a variable number of arguments.</p>
 <p>Examples for each of these are provided ahead.</p>
 <div class="section" id="init">
-<h2><code class="code docutils literal notranslate"><span class="pre">^init</span></code><a class="headerlink" href="#init" title="Permalink to this headline">¶</a></h2>
-<p>To instantiate a class described by a dictionary, we can use the <code class="code docutils literal notranslate"><span class="pre">^init</span></code>
+<h2><code class="docutils literal notranslate"><span class="pre">^init</span></code><a class="headerlink" href="#init" title="Permalink to this headline">¶</a></h2>
+<p>To instantiate a class described by a dictionary, we can use the <code class="docutils literal notranslate"><span class="pre">^init</span></code>
 keyword. For example, to instantiate a Unet:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">full_load</span><span class="p">(</span><span class="s2">"""</span>
 <span class="go">^init: serotiny.networks._3d.Unet</span>
@@ -253,8 +255,8 @@ keyword. For example, to instantiate a Unet:</p>
 </div>
 </div>
 <div class="section" id="invoke">
-<h2><code class="code docutils literal notranslate"><span class="pre">^invoke</span></code><a class="headerlink" href="#invoke" title="Permalink to this headline">¶</a></h2>
-<p>To call and return the result of a function, the <code class="code docutils literal notranslate"><span class="pre">^invoke</span></code> keyword is used:</p>
+<h2><code class="docutils literal notranslate"><span class="pre">^invoke</span></code><a class="headerlink" href="#invoke" title="Permalink to this headline">¶</a></h2>
+<p>To call and return the result of a function, the <code class="docutils literal notranslate"><span class="pre">^invoke</span></code> keyword is used:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ones_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">full_load</span><span class="p">(</span><span class="s2">"""</span>
 <span class="go">^invoke: numpy.ones</span>
 <span class="go">shape: [3,3]</span>
@@ -268,13 +270,13 @@ keyword. For example, to instantiate a Unet:</p>
 </div>
 </div>
 <div class="section" id="bind">
-<h2><code class="code docutils literal notranslate"><span class="pre">^bind</span></code><a class="headerlink" href="#bind" title="Permalink to this headline">¶</a></h2>
-<p>Let’s use <code class="code docutils literal notranslate"><span class="pre">numpy.random.randint</span></code> as an example.
+<h2><code class="docutils literal notranslate"><span class="pre">^bind</span></code><a class="headerlink" href="#bind" title="Permalink to this headline">¶</a></h2>
+<p>Let’s use <code class="docutils literal notranslate"><span class="pre">numpy.random.randint</span></code> as an example.
 This is its signature</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'l'</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>We can bind the <code class="code docutils literal notranslate"><span class="pre">size</span></code> and <code class="code docutils literal notranslate"><span class="pre">low</span></code> parameters, yielding a function that expects only a <code class="code docutils literal notranslate"><span class="pre">high</span></code>
+<p>We can bind the <code class="docutils literal notranslate"><span class="pre">size</span></code> and <code class="docutils literal notranslate"><span class="pre">low</span></code> parameters, yielding a function that expects only a <code class="docutils literal notranslate"><span class="pre">high</span></code>
 parameter</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">randint_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">full_load</span><span class="p">(</span><span class="s2">"""</span>
 <span class="go">^bind: numpy.random.randint</span>
@@ -289,7 +291,7 @@ parameter</p>
 <span class="go">array([ 4, 19,  7,  1,  7])</span>
 </pre></div>
 </div>
-<p>Note: we can use <code class="code docutils literal notranslate"><span class="pre">^bind</span></code> with no arguments to simply pass the original function.
+<p>Note: we can use <code class="docutils literal notranslate"><span class="pre">^bind</span></code> with no arguments to simply pass the original function.
 We can also bind all of the arguments of a function, thus yielding a function
 which needs no further arguments to be called:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">randn_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">full_load</span><span class="p">(</span><span class="s2">"""</span>
@@ -305,9 +307,9 @@ which needs no further arguments to be called:</p>
 </div>
 </div>
 <div class="section" id="positional-args">
-<h2><code class="code docutils literal notranslate"><span class="pre">^positional_args</span></code><a class="headerlink" href="#positional-args" title="Permalink to this headline">¶</a></h2>
+<h2><code class="docutils literal notranslate"><span class="pre">^positional_args</span></code><a class="headerlink" href="#positional-args" title="Permalink to this headline">¶</a></h2>
 <p>When the function of interest has a variable number of arguments, we can use
-the special keyword <code class="code docutils literal notranslate"><span class="pre">^positional_args</span></code> to specify a list of positional arguments:</p>
+the special keyword <code class="docutils literal notranslate"><span class="pre">^positional_args</span></code> to specify a list of positional arguments:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">randn_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">full_load</span><span class="p">(</span><span class="s2">"""</span>
 <span class="go">^bind: numpy.random.randn</span>
 <span class="go">^positional_args: [10, 3]</span>
@@ -383,10 +385,10 @@ the special keyword <code class="code docutils literal notranslate"><span class=
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Dynamic imports</a><ul>
-<li><a class="reference internal" href="#init"><code class="code docutils literal notranslate"><span class="pre">^init</span></code></a></li>
-<li><a class="reference internal" href="#invoke"><code class="code docutils literal notranslate"><span class="pre">^invoke</span></code></a></li>
-<li><a class="reference internal" href="#bind"><code class="code docutils literal notranslate"><span class="pre">^bind</span></code></a></li>
-<li><a class="reference internal" href="#positional-args"><code class="code docutils literal notranslate"><span class="pre">^positional_args</span></code></a></li>
+<li><a class="reference internal" href="#init"><code class="docutils literal notranslate"><span class="pre">^init</span></code></a></li>
+<li><a class="reference internal" href="#invoke"><code class="docutils literal notranslate"><span class="pre">^invoke</span></code></a></li>
+<li><a class="reference internal" href="#bind"><code class="docutils literal notranslate"><span class="pre">^bind</span></code></a></li>
+<li><a class="reference internal" href="#positional-args"><code class="docutils literal notranslate"><span class="pre">^positional_args</span></code></a></li>
 </ul>
 </li>
 </ul>

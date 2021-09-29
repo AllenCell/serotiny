@@ -44,10 +44,13 @@ Additionally, each step also contains a ``transforms`` field, which is the list 
 to be applied in that step, in order.
 
 A step that depends on a path column must specify:
+
 * ``path_col`` - the column that contains the path from which to read the input image
+
 * ``channels`` - the list of channels to use
 
 A step that depends on outputs of previous steps must specify:
+
 * ``input_imgs`` - the list of names of previous steps to use
 
 An additional key ``unpack`` can be used, in cases where the step depends on
