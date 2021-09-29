@@ -39,7 +39,7 @@ def apply_transforms(
     # which is the list of steps needed to obtain the output image.
     # each element of "steps" is a dict containing instructions for
     # a sequence of transforms
-    for step in transforms_to_apply["steps"]:
+    for step in transforms_to_apply:
 
         # `name` will be used to refer to the result of this step,
         # when it's stored in the `result_imgs` dict.
@@ -86,16 +86,16 @@ def apply_transforms(
             else:
                 # if the input `imgs` at this point consists of
                 # more than a single image, there is an additional
-                # argument "unzip" that can be specified for this
+                # argument "unpack" that can be specified for this
                 # step, which tells us to use the * operator here
-                unzip = step.get("unzip", False)
-                imgs = [transform(*imgs)] if unzip else [transform(imgs)]
+                unpack = step.get("unpack", False)
+                imgs = [transform(*imgs)] if unpack else [transform(imgs)]
 
         result_imgs[name] = imgs
 
     # finally, the key of `result_imgs` which contains the output
-    # image is specified in the "output" field in the config
-    output_key = transforms_to_apply["output"]
+    # image is the name of the last step in the list
+    output_key = transforms_to_apply[-1]["name"]
     return result_imgs[output_key][0]
 
 
@@ -104,7 +104,7 @@ def _transform_from_row(
     transforms_to_apply: Dict,
     output_channel_names: Sequence[str],
     output_path: Union[str, Path],
-    index_col: str = "CellId",
+    index_col: str,
     include_cols: Sequence[str] = [],
 ):
     """
@@ -115,8 +115,16 @@ def _transform_from_row(
     ---
     row: Union[pd.Series, Dict]
         The DataFrame row from which the image path is taken
+
     transforms_to_apply: Dict
         Config dictionary specifying what transforms to apply
+
+    output_path: Union[str, Path]
+        Path to the folder where the outputs will be stored
+
+    output_channel_names: Sequence[str]
+        List of the names to be assigned to the channels in the output
+        image (in order)
     """
 
     output_path = output_path / f"{row[index_col]}.tiff"
@@ -140,10 +148,10 @@ def transform_batch(
     output_path: Union[str, Path],
     output_channel_names: Sequence[str],
     transforms_to_apply: Dict,
+    index_col: str,
     merge_col: Optional[str] = None,
-    n_workers: int = 1,
-    index_col: str = "CellId",
     include_cols: Sequence[str] = [],
+    n_workers: int = 1,
     verbose: bool = False,
 ):
     """
@@ -165,19 +173,23 @@ def transform_batch(
     transforms_to_apply: Dict
         Config dictionary specifying what transforms to apply
 
+    index_col: Optional[str]
+        Column to serve as index. Used for output filenames
+
     merge_col: Optional[str] = None
         Column on which to merge, in case there multiple input manifests are
-        provided
+        provided. If multiple manifests are provided and `merge_col` is None,
+        then the input manifests are concatenated (vertically)
 
-    index_col: Optional[str] = "CellId"
-        Column to serve as index
+    include_cols: Sequence[str] = []
+        List of columns to include in the output manifest, aside from the
+        column containing paths to the output images
 
     n_workers: int = 1
         Number of multiprocessing workers to use for parallel computation
 
     verbose: bool = False
         Flag to tell whether to produce command line output
-
     """
 
     input_manifest = None
@@ -185,19 +197,20 @@ def transform_batch(
     if isinstance(input_manifests, PathLike):
         input_manifests = [input_manifests]
 
-    if len(input_manifests) > 1:
-        assert merge_col is not None
-
     for manifest in input_manifests:
         manifest = Path(manifest)
         if not manifest.exists():
             raise FileNotFoundError(f"Given input path {manifest} does not exist")
         manifest = pd.read_csv(manifest)
 
-        if input_manifest is not None:
+        if input_manifest is None:
+            input_manifest = manifest
+            continue
+
+        if merge_col is not None:
             input_manifest = input_manifest.merge(manifest, on=merge_col, how="outer")
         else:
-            input_manifest = manifest
+            input_manifest = input_manifest.concat(manifest)
 
     output_path = Path(output_path)
     if not output_path.exists():
