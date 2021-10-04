@@ -61,7 +61,6 @@ requirements = [
     "Pillow",
     "pytorch-lightning",
     "pytorch-lightning-bolts",
-    "torch",
     "torchvision",
     "tqdm",
     "seaborn",
@@ -80,10 +79,7 @@ extra_requirements = {
     "setup": setup_requirements,
     "test": test_requirements,
     "dev": dev_requirements,
-    "all": [
-        *requirements,
-        *dev_requirements,
-    ],
+    "all": [*requirements, *dev_requirements],
 }
 
 setup(
