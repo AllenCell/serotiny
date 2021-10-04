@@ -6,16 +6,10 @@ from typing import Union, Dict
 
 import torch.nn as nn
 from torch.nn.modules.loss import _Loss as Loss
-import torch.nn.functional as F
-
-import pytorch_lightning as pl
-
-from serotiny.utils import init
-from serotiny.models._utils import find_optimizer
-from serotiny.networks.weight_init import weight_init
+from .base_graph import BaseGraph
 
 
-class GraphNodePredictionModel(pl.LightningModule):
+class GraphNodePredictionModel(BaseGraph):
     """
     Pytorch lightning module that implements regression model logic
 
@@ -52,154 +46,79 @@ class GraphNodePredictionModel(pl.LightningModule):
         lr: float,
         optimizer: str,
         task: str,
+        dataloader_type: str,
         loss: Union[Loss, Dict] = nn.MSELoss(),
     ):
-        super().__init__()
-        # Can be accessed via checkpoint['hyper_parameters']
-        # self.save_hyperparameters()
-        if isinstance(loss, dict):
-            self.loss = init(loss)
-        else:
-            self.loss = loss
-
-        if isinstance(network, dict):
-            network = init(network)
-
-        self.network = network.apply(weight_init)
-        self.lr = lr
-        self.optimizer = optimizer
-        self.task = task
-        self._cache = dict()
-
-    def parse_batch(self, batch):
-        """
-        Retrieve x and y from batch
-        """
-        x = batch.x
-        y = batch.y
-        if self.task == "classification":
-            y = y.long()
-        else:
-            y = y.float()
-        edge_index = batch.edge_index
-        edge_weight = batch.edge_weight
-        edge_attr = batch.edge_attr
-
-        return x.float(), edge_index, edge_weight, edge_attr, y
-
-    def forward(self, x):
-        return self.network(x)
-
-    def _step(self, yhat, y):
-
-        loss = self.loss(yhat, y)
-        pred = yhat.argmax(dim=-1)
-        correct = pred.eq(y)
-
-        return loss, pred, correct
+        self.dataloader_type = dataloader_type
+        super().__init__(
+            network=network, lr=lr, optimizer=optimizer, task=task, loss=loss,
+        )
 
     def training_step(self, batch, batch_idx):
 
-        self.network.set_aggr("add")
+        if self.dataloader_type == "graph_saint":
+            self.network.set_aggr("add")
+        else:
+            self.network.set_aggr("mean")
 
-        x, edge_index, edge_weight, edge_attr, y = self.parse_batch(batch)
-        edge_weight = batch.edge_norm * edge_weight
-        yhat = self.network(x, edge_index, edge_weight)
+        x, edge_index, edge_weight, _, y = self.parse_batch(batch)
 
-        loss, pred, correct = self._step(yhat, y)
-        y = y[batch.train_mask]
-        pred = pred[batch.train_mask]
-
-        # Node norm requires graph saint random walk
-        loss = (loss * batch.node_norm)[batch.train_mask].sum()
-
-        accs = []
-        for _, mask in batch("train_mask"):
-            accs.append(correct[mask].sum().item() / mask.sum().item())
+        if self.dataloader_type == "graph_saint":
+            edge_weight = batch.edge_norm * edge_weight
+            loss, yhat, y = self.base_step(
+                x, y, edge_index, edge_weight, batch.train_mask, batch.node_norm,
+            )
+        else:
+            edge_weight = batch.edge_weight
+            loss, yhat, y = self.base_step(
+                x, y, edge_index, edge_weight, batch.train_mask, None
+            )
 
         self.log("train_loss", loss.detach(), logger=True)
 
         return {
             "loss": loss,
             "train_loss": loss.detach(),
-            "preds": pred,
-            "correct": correct,
+            "train_mask": batch.train_mask,
+            "yhat": yhat.detach(),
             "target": y,
-            "train_accuracy": accs[0],
             "batch_idx": batch_idx,
         }
 
     def validation_step(self, batch, batch_idx):
         self.network.set_aggr("mean")
 
-        x, edge_index, edge_weight, edge_attr, y = self.parse_batch(batch)
+        x, edge_index, _, _, y = self.parse_batch(batch)
 
-        yhat = self.network(x, edge_index)
-
-        loss, pred, correct = self._step(yhat, y)
-        y = y[batch.val_mask]
-        pred = pred[batch.val_mask]
-
-        # Node norm requires graph saint random walk
-        loss = (loss * batch.node_norm)[batch.val_mask].sum()
-
-        accs = []
-        for _, mask in batch("val_mask"):
-            accs.append(correct[mask].sum().item() / mask.sum().item())
+        loss, yhat, y = self.base_step(
+            x, y, edge_index, batch.edge_weight, batch.val_mask, None
+        )
 
         self.log("val_loss", loss.detach(), logger=True)
 
         return {
             "val_loss": loss,
-            "preds": pred,
-            "correct": correct,
+            "val_mask": batch.val_mask,
+            "yhat": yhat,
             "target": y,
-            "val_accuracy": accs[0],
             "batch_idx": batch_idx,
         }
 
     def test_step(self, batch, batch_idx):
         self.network.set_aggr("mean")
 
-        x, edge_index, edge_weight, edge_attr, y = self.parse_batch(batch)
+        x, edge_index, _, _, y = self.parse_batch(batch)
 
-        yhat = self.network(x, edge_index)
-
-        loss, pred, correct = self._step(yhat, y)
-        y = y[batch.test_mask]
-        pred = pred[batch.test_mask]
-
-        # Node norm requires graph saint random walk
-        loss = (loss * batch.node_norm)[batch.test_mask].sum()
-
-        accs = []
-        for _, mask in batch("test_mask"):
-            accs.append(correct[mask].sum().item() / mask.sum().item())
+        loss, yhat, y = self.base_step(
+            x, y, edge_index, batch.edge_weight, batch.test_mask, None
+        )
 
         self.log("test_loss", loss.detach(), logger=True)
 
         return {
             "test_loss": loss,
-            "preds": pred,
-            "correct": correct,
+            "test_mask": batch.test_mask,
+            "yhat": yhat,
             "target": y,
-            "test_accuracy": accs[0],
             "batch_idx": batch_idx,
         }
-
-    def test_step_end(self, outputs):
-        return outputs
-
-    def configure_optimizers(self):
-        optimizer_class = find_optimizer(self.optimizer)
-        optimizer = optimizer_class(self.parameters(), lr=self.lr)
-
-        return (
-            {
-                "optimizer": optimizer,
-                "monitor": "val_loss",
-                "interval": "epoch",
-                "frequency": 1,
-                "strict": True,
-            },
-        )
