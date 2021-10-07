@@ -158,8 +158,11 @@ def get_checkpoint_callback(
     model_path = (zoo_root / model_class) / model_id
     model_path.mkdir(parents=True, exist_ok=True)
 
+    if "filename" not in checkpoint_callback_kwargs:
+        checkpoint_callback_kwargs["filename"] = "{epoch:02d}"
+
     return ModelCheckpoint(
-        dirpath=model_path, filename="epoch{epoch:02d}", **checkpoint_callback_kwargs
+        dirpath=model_path, **checkpoint_callback_kwargs
     )
 
 
