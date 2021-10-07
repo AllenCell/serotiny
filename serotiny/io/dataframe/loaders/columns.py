@@ -104,4 +104,4 @@ class LoadColumns(Loader):
 
     def __call__(self, row):
         filtered_cols = self._filter_columns(row.index)
-        return row[filtered_cols].values.astype(self.dtype)
+        return row[filtered_cols].astype(self.dtype)

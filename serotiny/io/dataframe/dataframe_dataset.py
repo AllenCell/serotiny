@@ -6,15 +6,18 @@ class _Row:
     Helper class to enable string indexing of numpy arrays
     """
 
-    def __init__(self, array, cols):
+    def __init__(self, array, columns):
         self.array = array
-        self.cols = cols
+        self.columns = columns
+        self.index = self.columns
 
     def __getitem__(self, col):
-        return self.array[self.cols.index(col)]
+        if isinstance(col, (list, tuple)):
+            return self.array[[self.columns.index(_col) for _col in col]]
+        return self.array[self.columns.index(col)]
 
     def __getattr__(self, col):
-        return self.array[self.cols.index(col)]
+        return self.array[self.columns.index(col)]
 
 
 class DataframeDataset(Dataset):
