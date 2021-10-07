@@ -49,6 +49,8 @@ class ManifestDatamodule(pl.LightningDataModule):
 
     Parameters
     ----------
+    path: Union[Path, str]
+        Path to a manifest file
 
     batch_size: int
         batch size for dataloader
@@ -56,15 +58,8 @@ class ManifestDatamodule(pl.LightningDataModule):
     num_workers: int
         Number of worker processes for dataloader
 
-    manifest: Optional[Union[Path, str]] = None
-        (optional) Path to a manifest file to be merged with the folder, or to
-        be the core of this dataset, if no path is provided
-
-    loader_dict: Dict
-        Dictionary of loader specifications for each given key. When the value
-        is callable, that is the assumed loader. When the value is a tuple, it
-        is assumed to be of the form (loader class name, loader class args) and
-        will be used to instantiate the loader
+    loaders: Dict
+        Dictionary of loader specifications for each given split.
 
     split_column: Optional[str] = None
         Name of a column in the dataset which can be used to create train, val, test
@@ -74,6 +69,9 @@ class ManifestDatamodule(pl.LightningDataModule):
         List of columns to load from the dataset, in case it's a parquet file.
         If None, load everything.
 
+    collate: Optional[Dict] = None
+        Alternative collate function for dataloader
+
     pin_memory: bool = True
         Set to true when using GPU, for better performance
 
@@ -81,7 +79,6 @@ class ManifestDatamodule(pl.LightningDataModule):
         Whether to drop the last batch (in case the given batch size is the only
         supported)
 
-    subset_train: float = 1.0
     """
 
     def __init__(
@@ -92,17 +89,19 @@ class ManifestDatamodule(pl.LightningDataModule):
         loaders: Dict,
         split_column: Optional[Union[Path, str]] = None,
         columns: Optional[Sequence[str]] = None,
-        collate: Dict = None,
+        collate: Optional[Dict] = None,
         pin_memory: bool = True,
         drop_last: bool = False,
+        multiprocessing_context: Optional[str] = None,
     ):
 
         super().__init__()
+        self.path = path
+        self.multiprocessing_context = multiprocessing_context
 
         # at least the train loaders have to be specified.
         # if only those are specified, the same loaders are
         # used for the remaining folds
-
         loaders["train"] = load_multiple(loaders["train"])
         for split in ["valid", "test"]:
             if split in loaders:
@@ -142,7 +141,8 @@ class ManifestDatamodule(pl.LightningDataModule):
             num_workers=self.num_workers,
             pin_memory=self.pin_memory,
             drop_last=self.drop_last,
-            collate=self.collate,
+            collate_fn=self.collate,
+            multiprocessing_context=self.multiprocessing_context,
         )
 
     def train_dataloader(self):
