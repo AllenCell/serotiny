@@ -234,6 +234,15 @@ def append_labels_to_integers(dataframe: pd.DataFrame, column: str):
 def append_class_weights(dataframe: pd.DataFrame, column: str):
     """
     Add class weights (based on `column`) to a dataframe
+
+    Parameters
+    -----------
+    dataframe: pd.DataFrame
+        Input dataframe
+
+    column: str
+        Column to base the weights on
+
     """
     labels_unique, counts = np.unique(dataframe[column], return_counts=True)
     class_weights = [sum(counts) / c for c in counts]
