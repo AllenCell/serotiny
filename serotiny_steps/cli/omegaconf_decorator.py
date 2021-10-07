@@ -23,13 +23,16 @@ def omegaconf_decorator(func, *config_args):
     """
 
     @wraps(func, append_args=Parameter(name="dotlist", kind=Parameter.VAR_POSITIONAL))
-    def wrapper(*args):
+    def wrapper(*args, **kwargs):
         func_sig = signature(func)
-
         func_arg_names = list(func_sig.parameters.keys())
-        base_conf = OmegaConf.create(
-            {arg_name: args[arg_ix] for arg_ix, arg_name in enumerate(func_arg_names)}
-        )
+
+        base_args = {}
+        for arg_ix, arg_value in enumerate(args):
+            base_args[func_arg_names[arg_ix]] = arg_value
+
+        base_args.update(kwargs)
+        base_conf = OmegaConf.create(base_args)
 
         for config in config_args:
             if isinstance(base_conf[config], str):
@@ -50,6 +53,6 @@ def omegaconf_decorator(func, *config_args):
 
         conf = OmegaConf.merge(base_conf, override_conf)
 
-        func(**conf)
+        return func(**conf)
 
     return wrapper
