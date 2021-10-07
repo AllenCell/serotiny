@@ -1,4 +1,4 @@
-from typing import Union, Dict, Sequence, Optional, T
+from typing import Union, Dict, Sequence, Optional
 from pathlib import Path
 import traceback
 
@@ -10,10 +10,8 @@ import multiprocessing_on_dill as mp
 from tqdm import tqdm
 
 from serotiny.io.image import tiff_writer, image_loader
+from serotiny.io.dataframe import read_dataframe
 from serotiny.utils import load_config
-
-PathLike = Union[str, Path]
-OneOrMany = Union[T, Sequence[T]]
 
 def apply_transforms(
     row: Union[Dict, pd.Series],
@@ -143,25 +141,24 @@ def _transform_from_row(
     return result
 
 
-def transform_batch(
-    input_manifests: OneOrMany[PathLike],
+def transform_images(
+    input_manifest: Union[pd.DataFrame, Union[str, Path]],
     output_path: Union[str, Path],
     output_channel_names: Sequence[str],
-    transforms_to_apply: Dict,
+    transforms_to_apply: Sequence,
     index_col: str,
-    merge_col: Optional[str] = None,
     include_cols: Sequence[str] = [],
     n_workers: int = 1,
     verbose: bool = False,
 ):
     """
-    Extract features from an image in a dataframe row, using extractors given by
+    Transform images given in a manifest, using transforms given by
     config in `transforms_to_apply`
 
     Parameters
     ----------
-    input_manifest: OneOrMany[PathLike]
-        Path(s) to the input manifest(s)
+    input_manifest: Union[pd.DataFrame, Union[str, Path]]
+        Path to the input manifest, or a pd.DataFrame
 
     output_path: Union[str, Path]
         Path to the folder where the outputs will be stored
@@ -170,16 +167,11 @@ def transform_batch(
         List of the names to be assigned to the channels in the output
         image (in order)
 
-    transforms_to_apply: Dict
+    transforms_to_apply: Sequence
         Config dictionary specifying what transforms to apply
 
-    index_col: Optional[str]
+    index_col: str
         Column to serve as index. Used for output filenames
-
-    merge_col: Optional[str] = None
-        Column on which to merge, in case there multiple input manifests are
-        provided. If multiple manifests are provided and `merge_col` is None,
-        then the input manifests are concatenated (vertically)
 
     include_cols: Sequence[str] = []
         List of columns to include in the output manifest, aside from the
@@ -192,25 +184,8 @@ def transform_batch(
         Flag to tell whether to produce command line output
     """
 
-    input_manifest = None
-
-    if isinstance(input_manifests, PathLike):
-        input_manifests = [input_manifests]
-
-    for manifest in input_manifests:
-        manifest = Path(manifest)
-        if not manifest.exists():
-            raise FileNotFoundError(f"Given input path {manifest} does not exist")
-        manifest = pd.read_csv(manifest)
-
-        if input_manifest is None:
-            input_manifest = manifest
-            continue
-
-        if merge_col is not None:
-            input_manifest = input_manifest.merge(manifest, on=merge_col, how="outer")
-        else:
-            input_manifest = input_manifest.concat(manifest)
+    if not isinstance(input_manifest, pd.DataFrame):
+        input_manifest = read_dataframe(input_manifest)
 
     output_path = Path(output_path)
     if not output_path.exists():
