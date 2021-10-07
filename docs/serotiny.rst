@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   serotiny.data
    serotiny.datamodules
    serotiny.io
    serotiny.losses
