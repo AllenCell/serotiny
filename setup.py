@@ -101,6 +101,7 @@ setup(
     description="library and commands for deep learning workflows",
     entry_points={
         "console_scripts": [
+            "serotiny=serotiny_steps.cli.main:main",
             "apply_projection=serotiny_steps.apply_projection:main",
             "change_resolution=serotiny_steps.change_resolution:main",
             "diagnostic_sheets=serotiny_steps.diagnostic_sheets:main",
