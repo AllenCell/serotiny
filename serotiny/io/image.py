@@ -31,7 +31,7 @@ def infer_dims(img: aicsimageio.AICSImage):
 def image_loader(
     path,
     select_channels: Optional[Union[Sequence[int], Sequence[str]]] = None,
-    output_dtype: Type[np.number] = np.float32,
+    output_dtype: Optional[Type[np.number]] = None,
     transform: Optional[Callable] = None,
     return_channels: bool = False,
 ):
@@ -86,7 +86,9 @@ def image_loader(
         channel_name: index for index, channel_name in enumerate(loaded_channels)
     }
 
-    data = data.astype(output_dtype)
+    if output_dtype is not None:
+        data = data.astype(output_dtype)
+
     if transform:
         data = transform(data)
 
