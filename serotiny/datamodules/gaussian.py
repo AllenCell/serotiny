@@ -2,7 +2,7 @@ from typing import Optional
 import pytorch_lightning as pl
 import torch
 from torch.utils.data import DataLoader, Dataset
-from torch.distributions import MultivariateNormal
+from torch.distributions import MultivariateNormal, Multinomial
 import numpy as np
 import multiprocessing as mp
 
@@ -17,6 +17,9 @@ class GaussianDataset(Dataset):
         x_dim,
         shuffle=True,
         corr=False,
+        binomial=False,
+        bimodal=False,
+        projection=False,
     ):
         """
         Args:
@@ -36,27 +39,93 @@ class GaussianDataset(Dataset):
         self.corr = corr
         self.shuffle = shuffle
         self.x_dim = x_dim
+        self.binomial = binomial
+        self.bimodal = bimodal
+        self.projection = projection
+        self.projection_dim = 20
 
         Batches_X, Batches_C, Batches_conds = (
             torch.empty([0]),
             torch.empty([0]),
             torch.empty([0]),
         )
+
+        if self.bimodal:
+            all_x_dims = []
+            for dims in range(self.x_dim):
+                N = int(self.length / 2)
+                mu, sigma = -50, 10
+                mu2, sigma2 = 50, 5
+                X1 = np.random.normal(mu, sigma, N)
+                X2 = np.random.normal(mu2, sigma2, self.length - N)
+                X_concat = np.concatenate([X1, X2])
+                all_x_dims.append(X_concat)
+            all_x = np.stack(all_x_dims)
+            all_x = np.swapaxes(all_x, 0, 1)
+            np.random.shuffle(all_x)
+            all_x = torch.tensor(all_x)
+        # import ipdb
+
+        # ipdb.set_trace()
+        if self.projection:
+            P = torch.zeros([self.projection_dim, self.projection_dim])
+            col = 0
+            for row in range(P.size()[0]):
+                # col = torch.randint(0,self.model_kwargs['x_dim'],(1,)).item()
+                # P[row][col] = torch.randn(1).item()
+                P[row][col] = 1 + torch.randn(1).item() / 100
+                # P[row][col] = 1
+                if col != self.x_dim - 1:
+                    col += 1
+                else:
+                    col = 0
+
         for j, i in enumerate(range(self.length)):
             if self.corr is False:
-                m = MultivariateNormal(
-                    torch.zeros(x_dim),
-                    torch.eye(x_dim),
-                )
+                if self.binomial:
+                    m = Multinomial(20, torch.tensor([1.0] * self.x_dim))
+                    X = m.sample((self.BATCH_SIZE,))
+                elif self.bimodal:
+                    X = all_x[j].view([1, -1])
+                elif self.projection:
+                    m = MultivariateNormal(
+                        torch.zeros(self.x_dim),
+                        torch.eye(self.x_dim),
+                    )
+                    X = None
+                    X = m.sample((self.BATCH_SIZE,))
+
+                    X = torch.cat(
+                        [
+                            X,
+                            torch.zeros(
+                                (
+                                    self.BATCH_SIZE,
+                                    self.projection_dim - self.x_dim,
+                                )
+                            ),
+                        ],
+                        1,
+                    )
+                    # X = torch.mm(P, X.t())
+                    X = torch.mm(P, torch.square(X.t())) + torch.mm(P, X.t())
+                    # torch.mm(P, torch.square(X.t()))
+                    X = X.t()
+                    x_dim = self.projection_dim
+                else:
+                    m = MultivariateNormal(
+                        torch.zeros(x_dim),
+                        torch.eye(x_dim),
+                    )
+                    X = m.sample((self.BATCH_SIZE,))
             else:
                 if j == 0:
                     corr_matrix = self.random_corr_mat(D=x_dim)
                     corr_matrix = torch.from_numpy(corr_matrix)
                 m = MultivariateNormal(torch.zeros(x_dim).float(), corr_matrix.float())
 
-            X = m.sample((self.BATCH_SIZE,))
-
             C = X.clone()
+
             count = 0
             if self.shuffle is True:
                 while count == 0:
@@ -111,10 +180,10 @@ class GaussianDataset(Dataset):
             for i in range(k + 1, D):
                 P[k, i] = 2 * np.random.beta(beta, beta) - 1
                 p = P[k, i]
-                for l in reversed(range(k)):
+                for l_ind in reversed(range(k)):
                     p = (
-                        p * np.sqrt((1 - P[l, i] ** 2) * (1 - P[l, k] ** 2))
-                        + P[l, i] * P[l, k]
+                        p * np.sqrt((1 - P[l_ind, i] ** 2) * (1 - P[l_ind, k] ** 2))
+                        + P[l_ind, i] * P[l_ind, k]
                     )
                 S[k, i] = S[i, k] = p
 
@@ -136,6 +205,9 @@ def make_dataloader(
     num_workers,
     shuffle,
     corr,
+    binomial,
+    bimodal,
+    projection,
 ):
     """
     Instantiate gaussian dataset and return dataloader
@@ -148,11 +220,14 @@ def make_dataloader(
         x_dim,
         shuffle=shuffle,
         corr=corr,
+        binomial=binomial,
+        bimodal=bimodal,
+        projection=projection,
     )
     return DataLoader(
         dataset,
         batch_size=batch_size,
-        pin_memory=True,
+        pin_memory=False,
         drop_last=True,
         num_workers=num_workers,
         multiprocessing_context=mp.get_context("fork"),
@@ -199,6 +274,9 @@ class GaussianDataModule(pl.LightningDataModule):
         length: int,
         shuffle: Optional[bool] = False,
         corr: Optional[bool] = False,
+        binomial: Optional[bool] = False,
+        bimodal: Optional[bool] = False,
+        projection: Optional[bool] = False,
         **kwargs
     ):
 
@@ -221,6 +299,9 @@ class GaussianDataModule(pl.LightningDataModule):
             num_workers,
             shuffle,
             corr,
+            binomial,
+            bimodal,
+            projection,
         )
 
     def train_dataloader(self):

@@ -55,6 +55,7 @@ step_workflow_requirements = [
 requirements = [
     *step_workflow_requirements,
     # project requires
+    "aicsimageio>=4.0.2",
     "numpy",
     "pandas",
     "Pillow",
@@ -70,9 +71,9 @@ requirements = [
     "ray[tune]",
     "brokenaxes",
     "torchio",
-    "aicsshparam>=0.1.1",
-    "aicscytoparam>=0.1.2",
-    "cvapipe_analysis @ git+https://git@github.com/AllenCell/cvapipe_analysis",
+    "hydra-core",
+    "sphinx",
+    "sphinx-rtd-theme",
 ]
 
 extra_requirements = {
@@ -100,6 +101,7 @@ setup(
     description="library and commands for deep learning workflows",
     entry_points={
         "console_scripts": [
+            "serotiny=serotiny_steps.cli.main:main",
             "apply_projection=serotiny_steps.apply_projection:main",
             "change_resolution=serotiny_steps.change_resolution:main",
             "diagnostic_sheets=serotiny_steps.diagnostic_sheets:main",

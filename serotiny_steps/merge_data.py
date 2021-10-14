@@ -1,16 +1,6 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import logging
 import fire
 
-from serotiny.io.data import load_csv
-
-###############################################################################
-
-log = logging.getLogger(__name__)
-
-###############################################################################
+from serotiny.io.dataframe import read_dataframe
 
 
 def merge_data(dataset_paths, manifest_path, required_fields=None, merge_datasets=None):
@@ -31,7 +21,9 @@ def merge_data(dataset_paths, manifest_path, required_fields=None, merge_dataset
     if not required_fields:
         required_fields = {}
 
-    datasets = [load_csv(path, required_fields.get(path, {})) for path in dataset_paths]
+    datasets = [
+        read_dataframe(path, required_fields.get(path, {})) for path in dataset_paths
+    ]
 
     manifest = datasets[0]
 

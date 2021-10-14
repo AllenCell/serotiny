@@ -12,12 +12,10 @@ import numpy as np
 import torch
 from torch import nn
 from torch.nn import functional as F
-import torch.optim as opt
 
 import pytorch_lightning as pl
 
-from serotiny.utils.model_utils import (
-    acc_prec_recall,
+from serotiny.models.utils import (
     add_pr_curve_tensorboard,
     find_optimizer,
     find_lr_scheduler,
@@ -343,3 +341,16 @@ class ClassificationModel(pl.LightningModule):
                 self.logger[0].experiment.add_histogram(
                     tag=name, values=grads, global_step=self.trainer.global_step
                 )
+
+
+def acc_prec_recall(n_classes):
+    """
+    util function to instantiate a ModuleDict for metrics
+    """
+    return nn.ModuleDict(
+        {
+            "accuracy": pl.metrics.Accuracy(),
+            "precision": pl.metrics.Precision(num_classes=n_classes, average="macro"),
+            "recall": pl.metrics.Recall(num_classes=n_classes, average="macro"),
+        }
+    )

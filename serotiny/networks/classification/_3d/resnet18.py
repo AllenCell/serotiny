@@ -97,10 +97,12 @@ class ResNet18(nn.Module):
             self.feature_extractor_first_layer.conv_before_resnet.weight
         )
 
-        # the layer arithmetic for the resnet assumes the inputs are at least 224 wide/high/deep.
-        # here, I'm padding the input with zeros so it fulfills that requirement.
-        # I'm doing symmetric padding for each dimension, so I calculate how much it lacks until
-        # it meets 224 and divide it by 2 (to add half on top/bottom left/right etc etc).
+        # the layer arithmetic for the resnet assumes the inputs are at least
+        # 224 wide/high/deep. here, I'm padding the input with zeros so it fulfills that
+        # requirement.
+        # I'm doing symmetric padding for each dimension, so I calculate how much it
+        # lacks until it meets 224 and divide it by 2 (to add half on
+        # top/bottom left/right etc etc).
         # the resulting padding tuple has 6 entries because it looks like
         # (pad_x_left, pad_x_right, pad_y_up, pad_y_down, pad_z_top, pad_z_bottom),
         # and I initialize it to all zeros so the cases that don't need padding get
@@ -116,7 +118,7 @@ class ResNet18(nn.Module):
         if pretrained:
             self.classifier = make_3D_resnet_from_2D(input_dims[0])
         else:
-            self.classifier = resnet18_3d(
+            self.classifier = make_3D_resnet18(
                 sample_size=224, sample_duration=input_dims[0]
             )
 

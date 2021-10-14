@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding:UTF-8 -*-
-
 import torch.nn as nn
 import torch.nn.init as init
 
@@ -46,7 +43,8 @@ def weight_init(m):
         init.constant_(m.bias.data, 0)
     elif isinstance(m, nn.Linear):
         init.xavier_normal_(m.weight.data)
-        init.normal_(m.bias.data)
+        if m.bias is not None:
+            init.normal_(m.bias.data)
     elif isinstance(m, nn.LSTM):
         for param in m.parameters():
             if len(param.shape) >= 2:
