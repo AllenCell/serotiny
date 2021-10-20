@@ -117,7 +117,7 @@ class BaseVAE(pl.LightningModule):
         self.encoder_args = inspect.getfullargspec(self.encoder.forward).args
         self.decoder_args = inspect.getfullargspec(self.decoder.forward).args
 
-    def parse_batch(self, batch):
+    def parse_batch(self, batch, parse_mask):
         return batch[self.hparams.x_label].float()
 
     def sample_z(self, mu, log_var):
@@ -170,8 +170,9 @@ class BaseVAE(pl.LightningModule):
             kld_per_latent_dimension,
         )
 
-    def _step(self, stage, batch, batch_idx, logger):
-        x = self.parse_batch(batch)
+    def _step(self, stage, batch, batch_idx, logger, parse_mask=None):
+
+        x = self.parse_batch(batch, parse_mask)
         if isinstance(x, tuple):
             x, forward_kwargs = x
         else:

@@ -74,12 +74,13 @@ class BaseGraph(pl.LightningModule):
         Retrieve x and y from batch
         """
         x = batch.x
-        y = batch.y
         if self.task == "classification":
-            y = y.long()
-        else:
-            y = y.float()
+            y = batch.y.long()
+        elif self.task == 'regression':
+            y = batch.y.float()
             y = y.unsqueeze(dim=1)
+        else:
+            y = None
 
         edge_index = batch.edge_index
         edge_weight = batch.edge_weight

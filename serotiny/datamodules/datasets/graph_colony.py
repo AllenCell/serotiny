@@ -166,6 +166,11 @@ class WholeGraph(InMemoryDataset):
             lambda x: (x - x.min()) / (x.max() - x.min())
         )
 
+        norm_cols = ["T_index_x"]
+        self.mask_df[norm_cols] = self.mask_df[norm_cols].apply(
+            lambda x: (x - x.min()) / (x.max() - x.min())
+        )
+
         save_path = Path(self.root + "/data")
         save_path.mkdir(parents=True, exist_ok=True)
         csv_path = save_path / "input_to_graph.csv"
@@ -267,6 +272,11 @@ class WholeGraph(InMemoryDataset):
                 [all_edge_attr_single_graph, all_track_edge_attr_single_graph], axis=0
             )
 
+            all_edges = np.concatenate([all_track_edges_single_graph], axis=0)
+            all_edge_attributes = np.concatenate(
+                [all_track_edge_attr_single_graph], axis=0
+            )
+
             all_nodes = torch.tensor(
                 np.array(all_nodes_single_graph).astype(float), dtype=torch.float
             )
@@ -351,6 +361,7 @@ class WholeGraph(InMemoryDataset):
                 elif self.task_dict["task"] == "regression":
                     targets = torch.tensor(df_sub[self.target_label], dtype=torch.float)
                 data.y = targets
+
                 data_list.append(data)
 
         self.data, self.slices = self.collate(data_list)
@@ -493,8 +504,8 @@ def get_track_edges(
     dataframe = dataframe.set_index("CellId")
     for split in groupby_split:
         df3 = dataframe.loc[dataframe[groupby_val] == split]
-        if df3.shape[0] > 30:
-            lags = 30
+        if df3.shape[0] > 10:
+            lags = 10
         else:
             lags = df3.shape[0]
         for lag in range(lags):
