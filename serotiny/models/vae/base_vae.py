@@ -34,7 +34,7 @@ class BaseVAE(pl.LightningModule):
         lr: float = 1e-3,
         loss_mask_label: Optional[str] = None,
         reconstruction_loss: Union[Loss, Dict] = nn.MSELoss(reduction="none"),
-        reconstruction_reduce: str = "mean",
+        reconstruction_reduce: str = "sum",
         prior_mode: str = "isotropic",
         prior_logvar: Optional[Array] = None,
         learn_prior_logvar: bool = False,
@@ -185,7 +185,7 @@ class BaseVAE(pl.LightningModule):
 
         # logvar is clamped here to avoid gradient explosion, since it
         # will get exponentiated when calculating kl_divergences
-        logvar = logvar.clamp(min=0, max=50)
+        #logvar = logvar.clamp(min=0, max=50)
         assert mu.shape == logvar.shape
 
         z = self.sample_z(mu, logvar)
