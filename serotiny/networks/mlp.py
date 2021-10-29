@@ -29,7 +29,7 @@ class MLP(nn.Module):
 
         net += [
             _make_block(input_dim, output_dim)
-            for (input_dim, output_dim) in zip(hidden_layers[1:], hidden_layers[2:])
+            for (input_dim, output_dim) in zip(hidden_layers[0:], hidden_layers[1:])
         ]
 
         net += [nn.Linear(hidden_layers[-1], self.output_dim)]
