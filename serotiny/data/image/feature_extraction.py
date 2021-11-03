@@ -2,23 +2,13 @@ import numpy as np
 from scipy.ndimage.morphology import binary_dilation
 
 from aicsshparam.shtools import align_image_2d
+from aicsshparam.shparam import get_shcoeffs
 from aicsimageprocessing import cell_rigid_registration
 
-#from cvapipe_analysis.steps.compute_features.compute_features_tools import (
-#    FeatureCalculator
-#)
 
-
-def _get_channel_ixs(channel_map, /, channels):
-    if len(channels) == 0:
-        return channel_map[channels[0]]
-    else:
-        return [channel_map[ch] for ch in channels]
-
-
-def angle(img, channel_map, /, channels, skew_adjust):
-    channel = _get_channel_ixs(channel_map, channels)
-    return align_image_2d(img, 0, make_unique=skew_adjust,
+def angle(img, channel_map, /, channel, skew_adjust):
+    channel = channel_map[channel]
+    return align_image_2d(img, channel, make_unique=skew_adjust,
                           compute_aligned_image=False)
 
 
@@ -69,25 +59,20 @@ def dillated_bbox(img, channel_map, /, channel, structuring_element=[5,5,5]):
 
 def center_of_mass(img, channel_map, /, channel):
     channel = channel_map[channel]
-    center_of_mass = np.mean(
+    _center_of_mass = np.mean(
         np.stack(np.where(img[channel] > 0)),
         axis=1
     )
-    return np.floor(center_of_mass + 0.5).astype(int).tolist()
+    return np.floor(_center_of_mass + 0.5).astype(int).tolist()
 
 
-def spharm(img, channel_map, /, channels, channel, cvapipe_analysis_config):
-    channel = _get_channel_ixs(channel_map, channels)
-    config = cvapipe_analysis_config
-
-    # add dummy parameter. needed to be able to instantiate FeatureCalculator
-    config["project"] = dict(local_staging="/dev/null")
-    fc = FeatureCalculator(config)
-
+def shcoeffs(img, channel_map, /, channel, lmax=4, sigma=0, compute_lcc=True,
+             alignment_2d=False, make_unique=False, prefix=None):
     channel = channel_map[channel]
+    (coeffs, _), _ = get_shcoeffs(image=img[channel], lmax=lmax,
+                                  sigma=sigma, compute_lcc=compute_lcc,
+                                  alignment_2d=alignment_2d, make_unique=make_unique)
 
-    return fc.get_features_from_binary_image(
-        input_image=img[channel],
-        input_reference_image=None,
-        compute_shcoeffs=True
-    )
+    if prefix is not None and len(prefix) > 0:
+        coeffs = {f"{prefix}_{k}":v for k,v in coeffs.items()}
+    return coeffs
