@@ -1,4 +1,4 @@
-from typing import Union, Dict, Sequence, Optional
+from typing import Union, Dict, Sequence
 from pathlib import Path
 import traceback
 
@@ -6,12 +6,20 @@ from functools import partial
 import json
 import pandas as pd
 import multiprocessing_on_dill as mp
+from omegaconf.dictconfig import DictConfig
 
 from tqdm import tqdm
 
 from serotiny.io.image import tiff_writer, image_loader
 from serotiny.io.dataframe import read_dataframe
 from serotiny.utils import load_config
+
+
+def _unpack_image_channels(img):
+    if isinstance(img, list):
+        return img
+    return [img[ch] for ch in range(img.shape[0])]
+
 
 def apply_transforms(
     row: Union[Dict, pd.Series],
@@ -44,19 +52,43 @@ def apply_transforms(
         name = step["name"]
 
         # a step may have as starting point either a file on disk,
-        # or the output of a previous step. in the first case,
-        # a field "path_col" indicates which dataframe column to use.
-        # in the second case, a field "input_imgs" tells us which
-        # key of `result_imgs` to use.
-        if "path_col" in step:  # load image from disk
-            path_col = step["path_col"]
-            channels = step["channels"]
-            img, channel_map = image_loader(row[path_col], return_channels=True)
-            imgs = [img[[channel_map[ch] for ch in channels]]]
-        elif "input_imgs" in step:  # use result of previous step
+        # or the output of a previous step. if a step's "input" field
+        # should be a dictionary, where each key is a string - indicating
+        # either a previous step's result or a column in the dataframe -
+        # and each value is the list of channels to use for that input.
+        # if an input is being read from disk, channel labels can be used.
+        # if an input is being read as the result of a previous step, channel
+        # indices must be used
+        if isinstance(step["input"], str):
+            if step["input"] in result_imgs:
+                #imgs = _unpack_image_channels(result_imgs[step["input"]])
+                imgs = [result_imgs[step["input"]]]
+            else:
+                img = image_loader(row[step["input"]], output_dtype="float32")
+                #imgs = _unpack_image_channels(img)
+                imgs = [img]
+        elif isinstance(step["input"], (dict, DictConfig)):
             imgs = []
-            for inpt in step["input_imgs"]:
-                imgs += [img for img in result_imgs[inpt]]
+            for input_img, channels in step["input"].items():
+                if input_img in result_imgs:
+                    _img = result_imgs[input_img]
+                elif input_img in row:
+                    _img, channel_map = image_loader(row[input_img],
+                                                     output_dtype="float32",
+                                                     return_channels=True)
+                else:
+                    raise ValueError(f"Given input not found: {input_img}")
+
+                if channels is None:
+                    #imgs += _unpack_image_channels(_img)
+                    imgs += [_img]
+                else:
+                    channels_type = set(map(type, channels)).pop()
+                    if channels_type == int:
+                        channel_map = list(range(_img.shape[0]))
+                    imgs += [_img[[channel_map[ch] for ch in channels]]]
+        else:
+            raise TypeError(f"Unexpected type for `input`: {step['input']}")
 
         # after the starting point for this step has been loaded,
         # we iterate over the transforms listed in this step's
@@ -65,36 +97,39 @@ def apply_transforms(
         # using our dynamic_import utils
         transforms_configs = step["transforms"]
         for transform in transforms_configs:
-            # if an "individual_args" key is present, as that means
+            # if an "^individual_args" key is present, as that means
             # there are values we need to retrieve from this row
             # as additional arguments to the transform
-            if "individual_args" in transform:
-                for arg, column in transform["individual_args"].items():
-                    transform[arg] = json.loads(row[column])
+            if "^individual_args" in transform:
+                for arg, column in transform["^individual_args"].items():
+                    try:
+                        transform[arg] = json.loads(row[column])
+                    except json.JSONDecodeError:
+                        transform[arg] = row[column]
 
             # load the transform using our dynamic import logic
             transform = load_config(
-                {k: v for k, v in transform.items() if k != "individual_args"}
+                {k: v for k, v in transform.items() if k != "^individual_args"}
             )
 
             # the result of the transform is always stored in a list,
             # even if it's a single image
             if len(imgs) == 1:
-                imgs = [transform(imgs[0])]
+                imgs = transform(imgs[0])
             else:
                 # if the input `imgs` at this point consists of
                 # more than a single image, there is an additional
                 # argument "unpack" that can be specified for this
                 # step, which tells us to use the * operator here
                 unpack = step.get("unpack", False)
-                imgs = [transform(*imgs)] if unpack else [transform(imgs)]
+                imgs = transform(*imgs) if unpack else transform(imgs)
 
         result_imgs[name] = imgs
 
     # finally, the key of `result_imgs` which contains the output
     # image is the name of the last step in the list
     output_key = transforms_to_apply[-1]["name"]
-    return result_imgs[output_key][0]
+    return result_imgs[output_key]
 
 
 def _transform_from_row(
@@ -104,6 +139,7 @@ def _transform_from_row(
     output_path: Union[str, Path],
     index_col: str,
     include_cols: Sequence[str] = [],
+    debug: bool = False,
 ):
     """
     Transform an image in a dataframe row, using transforms given by
@@ -123,6 +159,16 @@ def _transform_from_row(
     output_channel_names: Sequence[str]
         List of the names to be assigned to the channels in the output
         image (in order)
+
+    index_col: str
+        Column to serve as index. Used for output filenames
+
+    include_cols: Sequence[str]
+        List of columns to include in the output manifest, aside from the
+        column containing paths to the output images
+
+    debug: bool = False
+        Whether to return errors in csv instead of raising and breaking
     """
 
     output_path = output_path / f"{row[index_col]}.tiff"
@@ -135,8 +181,11 @@ def _transform_from_row(
         img = apply_transforms(row, transforms_to_apply)
         tiff_writer(img, output_path, channel_names=output_channel_names)
         result["errors"] = ""
-    except Exception:
-        result["errors"] = traceback.format_exc()
+    except Exception as e:
+        if debug:
+            result["errors"] = traceback.format_exc()
+        else:
+            raise e
 
     return result
 
@@ -150,6 +199,7 @@ def transform_images(
     include_cols: Sequence[str] = [],
     n_workers: int = 1,
     verbose: bool = False,
+    debug: bool = False,
 ):
     """
     Transform images given in a manifest, using transforms given by
@@ -199,6 +249,7 @@ def transform_images(
         output_path=output_path,
         index_col=index_col,
         include_cols=include_cols,
+        debug=debug
     )
     iter_rows = (row for _, row in input_manifest.iterrows())
 
