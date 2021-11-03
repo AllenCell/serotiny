@@ -35,22 +35,21 @@ class NormalizeMean:
 
 
 class MinMaxNormalize:
-    def __init__(self, clip_min=None, clip_max=None, clip_quantile=False):
+    def __init__(self, clip_min=None, clip_max=None, clip_quantile=False,
+                 return_torch=False):
         self.clip_min = clip_min
         self.clip_max = clip_max
         self.clip_quantile = clip_quantile
+        self.return_torch = return_torch
 
     def __call__(self, img):
-        if not isinstance(img, torch.Tensor):
-            img = torch.tensor(img)
-
         if self.clip_min is not None:
             if isinstance(self.clip_min, (int, float)):
                 if not self.clip_quantile:
                     clip_min = [self.clip_min] * img.shape[0]
                 else:
                     clip_min = [
-                        img[ch].quantile(self.clip_min).item()
+                        np.quantile(img[ch], self.clip_min)
                         for ch in range(img.shape[0])
                     ]
             else:
@@ -65,7 +64,7 @@ class MinMaxNormalize:
                     clip_max = [self.clip_max] * img.shape[0]
                 else:
                     clip_max = [
-                        img[ch].quantile(self.clip_max).item()
+                        np.quantile(img[ch], self.clip_max)
                         for ch in range(img.shape[0])
                     ]
             else:
@@ -76,21 +75,29 @@ class MinMaxNormalize:
 
         for chan in range(img.shape[0]):
             if clip_min[chan] is not None:
-                img[chan] = torch.where(
+                _chan_result = np.where(
                     img[chan] < clip_min[chan],
-                    torch.tensor(clip_min[chan], dtype=img.dtype),
+                    clip_min[chan],
                     img[chan],
                 )
+                if isinstance(img, torch.Tensor):
+                    _chan_result = torch.tensor(_chan_result)
+                img[chan] = _chan_result
 
             if clip_max[chan] is not None:
-                img[chan] = torch.where(
+                _chan_result = np.where(
                     img[chan] > clip_max[chan],
-                    torch.tensor(clip_max[chan], dtype=img.dtype),
+                    clip_max[chan],
                     img[chan],
                 )
+                if isinstance(img, torch.Tensor):
+                    _chan_result = torch.tensor(_chan_result)
+                img[chan] = _chan_result
 
             m = img[chan].min()
             M = img[chan].max()
             img[chan] = (img[chan] - m) / (M - m)
 
+        if self.return_torch:
+            img = torch.tensor(img)
         return img
