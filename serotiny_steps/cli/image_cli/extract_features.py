@@ -3,6 +3,7 @@ from typing import Union, Dict
 from functools import partial
 import json
 import pandas as pd
+import numpy as np
 import multiprocessing_on_dill as mp
 from tqdm import tqdm
 
@@ -32,7 +33,11 @@ def _extract_features(input_path, features_to_extract):
 
     for feature, config in features_to_extract.items():
         feature_extractor = load_config(config)
-        results[feature] = feature_extractor(img, channel_map)
+        result = feature_extractor(img, channel_map)
+        if isinstance(result, dict):
+            results.update(result)
+        else:
+            results[feature] = result
 
     return results
 
@@ -43,7 +48,7 @@ def _extract_from_row(
     index_col: str,
     features_to_extract: Dict,
 ):
-    _, features = _extract_features(row[path_col], features_to_extract)
+    features = _extract_features(row[path_col], features_to_extract)
     features[index_col] = row[index_col]
     return features
 
@@ -55,7 +60,8 @@ def extract_features(
     input_path = Path(input_path)
 
     features = _extract_features(input_path, features_to_extract)
-    return json.dumps(features, cls=NpEncoder)
+
+    return json.dumps(features, cls=NumpyJSONEncoder)
 
 
 def extract_features_batch(
@@ -64,6 +70,7 @@ def extract_features_batch(
     path_col: str,
     index_col: str,
     features_to_extract: Dict,
+    return_merged: bool = True,
     n_workers: int = 1,
     verbose: bool = False,
 ):
@@ -89,6 +96,10 @@ def extract_features_batch(
     features_to_extract: Dict
         Config dictionary specifying what features to extract
 
+    return_merged: bool = True
+        If True, return the result manifest merged with the input.
+        Otherwise, return only the result.
+
     n_workers: int = 1
         Number of multiprocessing workers to use for parallel computation
 
@@ -100,8 +111,8 @@ def extract_features_batch(
         input_manifest = read_dataframe(input_manifest)
 
     output_path = Path(output_path)
-    if not output_path.exists():
-        output_path.mkdir(parents=True)
+    if not output_path.parent.exists():
+        output_path.parent.mkdir(parents=True)
 
     # make helper function with pre attributed params except df row
     extract_features_ = partial(
@@ -124,5 +135,8 @@ def extract_features_batch(
         success = pd.DataFrame.from_records(
             [extract_features_(row) for row in iter_rows]
         )
+
+    if return_merged:
+        success = success.merge(input_manifest, on=index_col)
 
     success.to_csv(output_path)
