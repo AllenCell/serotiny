@@ -330,6 +330,10 @@ value for the diagonal of the prior covariance matrix</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.vae.conditional_vae.ConditionalVAE.allow_zero_length_dataloader_with_multiple_devices">
+<span class="sig-name descname"><span class="pre">allow_zero_length_dataloader_with_multiple_devices</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.vae.conditional_vae.ConditionalVAE.allow_zero_length_dataloader_with_multiple_devices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="serotiny.models.vae.conditional_vae.ConditionalVAE.parse_batch">
 <span class="sig-name descname"><span class="pre">parse_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/conditional_vae.html#ConditionalVAE.parse_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.conditional_vae.ConditionalVAE.parse_batch" title="Permalink to this definition">¶</a></dt>
@@ -337,6 +341,10 @@ value for the diagonal of the prior covariance matrix</p></li>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.conditional_vae.ConditionalVAE.precision">
 <span class="sig-name descname"><span class="pre">precision</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#serotiny.models.vae.conditional_vae.ConditionalVAE.precision" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.vae.conditional_vae.ConditionalVAE.prepare_data_per_node">
+<span class="sig-name descname"><span class="pre">prepare_data_per_node</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.vae.conditional_vae.ConditionalVAE.prepare_data_per_node" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.conditional_vae.ConditionalVAE.training">
@@ -354,6 +362,10 @@ value for the diagonal of the prior covariance matrix</p></li>
 <dt class="sig sig-object py" id="serotiny.models.vae.condprior_vae.ConditionalPriorVAE">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.models.vae.condprior_vae.</span></span><span class="sig-name descname"><span class="pre">ConditionalPriorVAE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">encoder:</span> <span class="pre">Union[torch.nn.modules.module.Module,</span> <span class="pre">Dict],</span> <span class="pre">decoder:</span> <span class="pre">Union[torch.nn.modules.module.Module,</span> <span class="pre">Dict],</span> <span class="pre">latent_dim:</span> <span class="pre">Union[int,</span> <span class="pre">Sequence[int]],</span> <span class="pre">prior_encoder:</span> <span class="pre">Union[torch.nn.modules.module.Module,</span> <span class="pre">Dict],</span> <span class="pre">optimizer:</span> <span class="pre">str,</span> <span class="pre">lr:</span> <span class="pre">float,</span> <span class="pre">x_label:</span> <span class="pre">str,</span> <span class="pre">c_label:</span> <span class="pre">Union[str,</span> <span class="pre">int,</span> <span class="pre">Sequence[int]],</span> <span class="pre">loss_mask_label:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">reconstruction_loss:</span> <span class="pre">Union[torch.nn.modules.loss._Loss,</span> <span class="pre">str]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'torch.nn.modules.loss.MSELoss'&gt;,</span> <span class="pre">condition_mode:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'label'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/condprior_vae.html#ConditionalPriorVAE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.condprior_vae.ConditionalPriorVAE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#serotiny.models.vae.conditional_vae.ConditionalVAE" title="serotiny.models.vae.conditional_vae.ConditionalVAE"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.models.vae.conditional_vae.ConditionalVAE</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.vae.condprior_vae.ConditionalPriorVAE.allow_zero_length_dataloader_with_multiple_devices">
+<span class="sig-name descname"><span class="pre">allow_zero_length_dataloader_with_multiple_devices</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.vae.condprior_vae.ConditionalPriorVAE.allow_zero_length_dataloader_with_multiple_devices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="serotiny.models.vae.condprior_vae.ConditionalPriorVAE.forward">
 <span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">condition</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/condprior_vae.html#ConditionalPriorVAE.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.condprior_vae.ConditionalPriorVAE.forward" title="Permalink to this definition">¶</a></dt>
@@ -361,6 +373,10 @@ value for the diagonal of the prior covariance matrix</p></li>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.condprior_vae.ConditionalPriorVAE.precision">
 <span class="sig-name descname"><span class="pre">precision</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#serotiny.models.vae.condprior_vae.ConditionalPriorVAE.precision" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.vae.condprior_vae.ConditionalPriorVAE.prepare_data_per_node">
+<span class="sig-name descname"><span class="pre">prepare_data_per_node</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.vae.condprior_vae.ConditionalPriorVAE.prepare_data_per_node" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.condprior_vae.ConditionalPriorVAE.training">
@@ -379,8 +395,16 @@ value for the diagonal of the prior covariance matrix</p></li>
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.models.vae.image_vae.</span></span><span class="sig-name descname"><span class="pre">ImageVAE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">latent_dim:</span> <span class="pre">Union[int,</span> <span class="pre">Sequence[int]],</span> <span class="pre">in_channels:</span> <span class="pre">int,</span> <span class="pre">hidden_channels:</span> <span class="pre">Sequence[int],</span> <span class="pre">max_pool_layers:</span> <span class="pre">Sequence[int],</span> <span class="pre">input_dims:</span> <span class="pre">Sequence[int],</span> <span class="pre">x_label:</span> <span class="pre">str,</span> <span class="pre">optimizer:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'Adam',</span> <span class="pre">lr:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.001,</span> <span class="pre">beta:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.0,</span> <span class="pre">decoder_non_linearity:</span> <span class="pre">Optional[Union[torch.nn.modules.module.Module,</span> <span class="pre">Dict]]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">loss_mask_label:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">reconstruction_loss:</span> <span class="pre">Union[torch.nn.modules.loss._Loss,</span> <span class="pre">Dict]</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'torch.nn.modules.loss.MSELoss'&gt;,</span> <span class="pre">reconstruction_reduce:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'mean',</span> <span class="pre">prior_mode:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'isotropic',</span> <span class="pre">prior_logvar:</span> <span class="pre">Optional[Union[torch.Tensor,</span> <span class="pre">numpy.array,</span> <span class="pre">Sequence[float]]]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">learn_prior_logvar:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">mode:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'3d'</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/image_vae.html#ImageVAE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.image_vae.ImageVAE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#serotiny.models.vae.base_vae.BaseVAE" title="serotiny.models.vae.base_vae.BaseVAE"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.models.vae.base_vae.BaseVAE</span></code></a></p>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.vae.image_vae.ImageVAE.allow_zero_length_dataloader_with_multiple_devices">
+<span class="sig-name descname"><span class="pre">allow_zero_length_dataloader_with_multiple_devices</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.vae.image_vae.ImageVAE.allow_zero_length_dataloader_with_multiple_devices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.image_vae.ImageVAE.precision">
 <span class="sig-name descname"><span class="pre">precision</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#serotiny.models.vae.image_vae.ImageVAE.precision" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.vae.image_vae.ImageVAE.prepare_data_per_node">
+<span class="sig-name descname"><span class="pre">prepare_data_per_node</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.vae.image_vae.ImageVAE.prepare_data_per_node" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.image_vae.ImageVAE.training">
@@ -427,6 +451,10 @@ value for the diagonal of the prior covariance matrix</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.vae.tabular_conditional_vae.TabularConditionalVAE.allow_zero_length_dataloader_with_multiple_devices">
+<span class="sig-name descname"><span class="pre">allow_zero_length_dataloader_with_multiple_devices</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.vae.tabular_conditional_vae.TabularConditionalVAE.allow_zero_length_dataloader_with_multiple_devices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="serotiny.models.vae.tabular_conditional_vae.TabularConditionalVAE.parse_batch">
 <span class="sig-name descname"><span class="pre">parse_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/tabular_conditional_vae.html#TabularConditionalVAE.parse_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.tabular_conditional_vae.TabularConditionalVAE.parse_batch" title="Permalink to this definition">¶</a></dt>
@@ -434,6 +462,10 @@ value for the diagonal of the prior covariance matrix</p></li>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.tabular_conditional_vae.TabularConditionalVAE.precision">
 <span class="sig-name descname"><span class="pre">precision</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#serotiny.models.vae.tabular_conditional_vae.TabularConditionalVAE.precision" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.vae.tabular_conditional_vae.TabularConditionalVAE.prepare_data_per_node">
+<span class="sig-name descname"><span class="pre">prepare_data_per_node</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.vae.tabular_conditional_vae.TabularConditionalVAE.prepare_data_per_node" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.tabular_conditional_vae.TabularConditionalVAE.training">
@@ -481,8 +513,16 @@ value for the diagonal of the prior covariance matrix</p></li>
 </dd>
 </dl>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.vae.tabular_condprior_vae.TabularConditionalPriorVAE.allow_zero_length_dataloader_with_multiple_devices">
+<span class="sig-name descname"><span class="pre">allow_zero_length_dataloader_with_multiple_devices</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.vae.tabular_condprior_vae.TabularConditionalPriorVAE.allow_zero_length_dataloader_with_multiple_devices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.tabular_condprior_vae.TabularConditionalPriorVAE.precision">
 <span class="sig-name descname"><span class="pre">precision</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#serotiny.models.vae.tabular_condprior_vae.TabularConditionalPriorVAE.precision" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.vae.tabular_condprior_vae.TabularConditionalPriorVAE.prepare_data_per_node">
+<span class="sig-name descname"><span class="pre">prepare_data_per_node</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.vae.tabular_condprior_vae.TabularConditionalPriorVAE.prepare_data_per_node" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.tabular_condprior_vae.TabularConditionalPriorVAE.training">
@@ -501,8 +541,16 @@ value for the diagonal of the prior covariance matrix</p></li>
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.models.vae.tabular_vae.</span></span><span class="sig-name descname"><span class="pre">TabularVAE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dim</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">latent_dim</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_layers</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_mask_label</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'Adam'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">float</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_mode</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'isotropic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prior_logvar</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">,</span> </span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learn_prior_logvar</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/tabular_vae.html#TabularVAE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.tabular_vae.TabularVAE" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#serotiny.models.vae.base_vae.BaseVAE" title="serotiny.models.vae.base_vae.BaseVAE"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.models.vae.base_vae.BaseVAE</span></code></a></p>
 <dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.vae.tabular_vae.TabularVAE.allow_zero_length_dataloader_with_multiple_devices">
+<span class="sig-name descname"><span class="pre">allow_zero_length_dataloader_with_multiple_devices</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.vae.tabular_vae.TabularVAE.allow_zero_length_dataloader_with_multiple_devices" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.tabular_vae.TabularVAE.precision">
 <span class="sig-name descname"><span class="pre">precision</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#serotiny.models.vae.tabular_vae.TabularVAE.precision" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="serotiny.models.vae.tabular_vae.TabularVAE.prepare_data_per_node">
+<span class="sig-name descname"><span class="pre">prepare_data_per_node</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.vae.tabular_vae.TabularVAE.prepare_data_per_node" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.tabular_vae.TabularVAE.training">
