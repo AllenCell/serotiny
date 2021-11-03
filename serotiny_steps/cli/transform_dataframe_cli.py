@@ -37,7 +37,7 @@ def _store_many_dfs(result, output_path):
             df.to_csv(output_path / name)
         elif name.suffix == ".parquet":
             df.to_parquet(output_path / name)
-        elif name.suffix == ""
+        elif name.suffix == "":
             df.to_csv(output_path / name.with_suffix(".csv"))
         else:
             raise TypeError(f"Unexpected suffix: '{name.suffix}'")
