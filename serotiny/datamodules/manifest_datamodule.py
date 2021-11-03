@@ -91,6 +91,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         columns: Optional[Sequence[str]] = None,
         collate: Optional[Dict] = None,
         pin_memory: bool = True,
+        shuffle: bool = True,
         drop_last: bool = False,
         multiprocessing_context: Optional[str] = None,
     ):
@@ -132,6 +133,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         self.num_workers = num_workers
         self.pin_memory = pin_memory
         self.drop_last = drop_last
+        self.shuffle = shuffle
         self.collate = None if collate is None else load_config(collate)
 
     def make_dataloader(self, split):
@@ -143,6 +145,7 @@ class ManifestDatamodule(pl.LightningDataModule):
             drop_last=self.drop_last,
             collate_fn=self.collate,
             multiprocessing_context=self.multiprocessing_context,
+            shuffle=(self.shuffle if split == "train" else False),
         )
 
     def train_dataloader(self):
