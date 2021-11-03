@@ -2,6 +2,42 @@ from inspect import Parameter, signature
 from makefun import wraps
 from omegaconf import OmegaConf, ListConfig
 from omegaconf._utils import split_key
+from omegaconf.errors import ConfigTypeError
+
+
+def _maybe_int(value):
+    return int(value) if value.isdigit() else value
+
+
+def _merge_override(cfg, override):
+    if sum(c == "=" for c in override) > 1:
+        raise NotImplementedError("Can't handle expressions with multiple '=' chars")
+
+    target, value = override.split("=")
+    value = _maybe_int(value)
+    path = split_key(target)
+
+    to_update = cfg
+    for step in path[:-1]:
+        to_update = to_update[_maybe_int(step)]
+    to_update[_maybe_int(path[-1])] = value
+
+
+def _try_read_yaml(param_value):
+    if isinstance(param_value, str):
+        config_path = param_value
+        dotstring = None
+        if ":" in config_path:
+            config_path, dotstring = config_path.split(":")
+
+        _this_config = OmegaConf.load(config_path)
+        if dotstring is not None:
+            for field in split_key(dotstring):
+                if isinstance(_this_config, ListConfig):
+                    field = int(field)
+                _this_config = _this_config[field]
+        return _this_config
+    return param_value
 
 
 def omegaconf_decorator(func, *config_args):
@@ -22,37 +58,61 @@ def omegaconf_decorator(func, *config_args):
 
     """
 
-    @wraps(func, append_args=Parameter(name="dotlist", kind=Parameter.VAR_POSITIONAL))
+    #@wraps(func, append_args=Parameter(name="dotlist", kind=Parameter.VAR_POSITIONAL))
+    @wraps(func)
     def wrapper(*args, **kwargs):
         func_sig = signature(func)
-        func_arg_names = list(func_sig.parameters.keys())
+        args = list(args)
+        _kwargs = {}
+        _positional_arg_names = []
 
-        base_args = {}
-        for arg_ix, arg_value in enumerate(args):
-            base_args[func_arg_names[arg_ix]] = arg_value
+        # iterate over function parameters, consuming them from `args`
+        # and `kwargs` appropriately. the elements that remain in `args`
+        # after this loop will be part of a variadic argument (if they exist)
+        # for each of the arguments registered in `config_args`, check
+        # if they are a path to a .yaml file or a field therein. if so,
+        # read the config from there
+        for param_name, param in func_sig.parameters.items():
+            if param.kind == Parameter.POSITIONAL_ONLY:
+                raise NotImplementedError(
+                    "This decorator doesn't support functions with "
+                    "positional-only arguments."
+                )
 
-        base_args.update(kwargs)
-        base_conf = OmegaConf.create(base_args)
+            elif param.kind == Parameter.POSITIONAL_OR_KEYWORD:
+                param_value = (kwargs.pop(param_name) if param_name in kwargs
+                               else args.pop(0))
+                if param_name in config_args:
+                    param_value = _try_read_yaml(param_value)
+                _kwargs[param_name] = param_value
+                _positional_arg_names.append(param_name)
 
-        for config in config_args:
-            if isinstance(base_conf[config], str):
-                config_path = base_conf[config]
-                dotstring = None
-                if ":" in config_path:
-                    config_path, dotstring = config_path.split(":")
+        for param_name, param_value in kwargs.items():
+            if param_name in config_args:
+                param_value = _try_read_yaml(param_value)
+            _kwargs[param_name] = param_value
 
-                _this_config = OmegaConf.load(config_path)
-                if dotstring is not None:
-                    for field in split_key(dotstring):
-                        if isinstance(_this_config, ListConfig):
-                            field = int(field)
-                        _this_config = _this_config[field]
-                base_conf[config] = _this_config
+        variadic_args = args
+        conf = OmegaConf.create(_kwargs)
 
-        override_conf = OmegaConf.from_dotlist(args[len(func_arg_names) :])
+        # this gets returned by Fire and either is provided
+        # with additional arguments, which will be dotlist
+        # overrides, or no overrides are passed and it gets
+        # called as is
+        def _merge_overrides_or_call(*args):
+            _conf = conf
+            if len(args) > 0:
+                try:
+                    override_conf = OmegaConf.from_dotlist(args)
+                    _conf = OmegaConf.merge(conf, override_conf)
+                except ConfigTypeError:
+                    for override in args:
+                        _merge_override(conf, override)
+                    _conf = conf
 
-        conf = OmegaConf.merge(base_conf, override_conf)
+            pos_args = [_conf.pop(arg) for arg in _positional_arg_names]
+            return func(*pos_args, *variadic_args, **conf)
 
-        return func(**conf)
+        return _merge_overrides_or_call
 
     return wrapper
