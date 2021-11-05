@@ -1,9 +1,8 @@
-from typing import Union, Dict, Sequence, Optional, T
-from pathlib import Path
-from inspect import Parameter, signature
-from makefun import wraps
-
 import logging
+from typing import Union, Sequence, Optional, T
+from pathlib import Path
+from inspect import signature
+from makefun import wraps
 
 import pandas as pd
 import serotiny.data.dataframe.transforms as df_transforms
@@ -104,7 +103,7 @@ class TransformDataframeCLI(PipelineCLI):
                 _dataframe_from_disk(df_transforms.append_one_hot),
                 _dataframe_from_disk(df_transforms.append_labels_to_integers),
                 _dataframe_from_disk(df_transforms.append_class_weights),
-                omegaconf_decorator(transform_images, "transforms_to_apply")
+                omegaconf_decorator(transform_images)
             ],
             store_methods={
                 pd.DataFrame: _store_one_df,
