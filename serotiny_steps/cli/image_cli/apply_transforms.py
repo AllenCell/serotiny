@@ -7,6 +7,7 @@ import json
 import pandas as pd
 import multiprocessing_on_dill as mp
 from omegaconf.dictconfig import DictConfig
+from omegaconf.listconfig import ListConfig
 
 from tqdm import tqdm
 
@@ -41,16 +42,14 @@ def apply_transforms(
 
     result_imgs = dict()
 
-    # the `transforms_to_apply` dict contains a field "steps",
-    # which is the list of steps needed to obtain the output image.
-    # each element of "steps" is a dict containing instructions for
-    # a sequence of transforms
-    for step in transforms_to_apply:
+    # the `transforms_to_apply` dict contains a field "transforms",
+    # which is the sequence of transforms needed to obtain the output image.
+    # each element of "transforms" is a dict containing instructions for
+    # a sequence of steps
 
-        # `name` will be used to refer to the result of this step,
-        # when it's stored in the `result_imgs` dict.
-        name = step["name"]
-
+    # `name` will be used to refer to the result of this transform,
+    # when it's stored in the `result_imgs` dict.
+    for name, transform in transforms_to_apply.items():
         # a step may have as starting point either a file on disk,
         # or the output of a previous step. if a step's "input" field
         # should be a dictionary, where each key is a string - indicating
@@ -59,17 +58,15 @@ def apply_transforms(
         # if an input is being read from disk, channel labels can be used.
         # if an input is being read as the result of a previous step, channel
         # indices must be used
-        if isinstance(step["input"], str):
-            if step["input"] in result_imgs:
-                #imgs = _unpack_image_channels(result_imgs[step["input"]])
-                imgs = [result_imgs[step["input"]]]
+        if isinstance(transform["input"], str):
+            if transform["input"] in result_imgs:
+                imgs = [result_imgs[transform["input"]]]
             else:
-                img = image_loader(row[step["input"]], output_dtype="float32")
-                #imgs = _unpack_image_channels(img)
+                img = image_loader(row[transform["input"]], output_dtype="float32")
                 imgs = [img]
-        elif isinstance(step["input"], (dict, DictConfig)):
+        elif isinstance(transform["input"], (dict, DictConfig)):
             imgs = []
-            for input_img, channels in step["input"].items():
+            for input_img, channels in transform["input"].items():
                 if input_img in result_imgs:
                     _img = result_imgs[input_img]
                 elif input_img in row:
@@ -80,7 +77,6 @@ def apply_transforms(
                     raise ValueError(f"Given input not found: {input_img}")
 
                 if channels is None:
-                    #imgs += _unpack_image_channels(_img)
                     imgs += [_img]
                 else:
                     channels_type = set(map(type, channels)).pop()
@@ -88,47 +84,57 @@ def apply_transforms(
                         channel_map = list(range(_img.shape[0]))
                     imgs += [_img[[channel_map[ch] for ch in channels]]]
         else:
-            raise TypeError(f"Unexpected type for `input`: {step['input']}")
+            raise TypeError(f"Unexpected type for `input`: {transform['input']}")
 
-        # after the starting point for this step has been loaded,
-        # we iterate over the transforms listed in this step's
-        # "transforms" field. each element of this list is a dict
+        # after the starting point for this transform has been loaded,
+        # we iterate over the steps listed in this transform's
+        # "steps" field. each element of "steps" is a dict
         # specifying a specific transform. these dicts are parsed
         # using our dynamic_import utils
-        transforms_configs = step["transforms"]
-        for transform in transforms_configs:
+
+        if isinstance(transform["steps"], (list, ListConfig)):
+            steps_configs = transform["steps"]
+        elif isinstance(transform["steps"], (dict, DictConfig)):
+            steps_configs = transform["steps"].values()
+        else:
+            raise TypeError(f"Unexpected type for `steps` field: "
+                            f"{type(transform['steps'])}")
+
+        for step in steps_configs:
             # if an "^individual_args" key is present, as that means
             # there are values we need to retrieve from this row
             # as additional arguments to the transform
-            if "^individual_args" in transform:
-                for arg, column in transform["^individual_args"].items():
-                    try:
-                        transform[arg] = json.loads(row[column])
-                    except json.JSONDecodeError:
-                        transform[arg] = row[column]
+            individual_args = step.pop("^individual_args", {})
+            for arg, column in individual_args.items():
+                try:
+                    step[arg] = json.loads(row[column])
+                except json.JSONDecodeError:
+                    step[arg] = row[column]
 
-            # load the transform using our dynamic import logic
-            transform = load_config(
-                {k: v for k, v in transform.items() if k != "^individual_args"}
-            )
+            # retrieve another special key "^unpack", if it's present.
+            # it's use is explained below
+            unpack = step.pop("^unpack", False)
 
-            # the result of the transform is always stored in a list,
-            # even if it's a single image
-            if len(imgs) == 1:
-                imgs = transform(imgs[0])
+            # load the step using our dynamic import logic
+            step = load_config(step)
+
+            # because of the way we collect the inputs,
+            # `imgs` can be a list with a single image, if this is
+            # the first step in this transform
+            if isinstance(imgs, list) and len(imgs) == 1:
+                imgs = step(imgs[0])
             else:
                 # if the input `imgs` at this point consists of
                 # more than a single image, there is an additional
-                # argument "unpack" that can be specified for this
+                # argument "^unpack" that can be specified for this
                 # step, which tells us to use the * operator here
-                unpack = step.get("unpack", False)
-                imgs = transform(*imgs) if unpack else transform(imgs)
+                imgs = step(*imgs) if unpack else step(imgs)
 
         result_imgs[name] = imgs
 
     # finally, the key of `result_imgs` which contains the output
     # image is the name of the last step in the list
-    output_key = transforms_to_apply[-1]["name"]
+    output_key = list(transforms_to_apply.keys())[-1]
     return result_imgs[output_key]
 
 
