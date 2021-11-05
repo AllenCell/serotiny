@@ -1,11 +1,7 @@
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Union
 import pandas as pd
 import numpy as np
 
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import OneHotEncoder, LabelEncoder
-
-from serotiny.io.dataframe import filter_columns as _filter_columns
 
 
 def split_dataframe(
@@ -39,6 +35,9 @@ def split_dataframe(
         a column to the existing dataframe and return the modified
         dataframe
     """
+
+    # import here to optimize CLIs / Fire usage
+    from sklearn.model_selection import train_test_split
 
     train_ix, val_test_ix = train_test_split(
         dataframe.index.tolist(), train_size=train_frac
@@ -92,8 +91,62 @@ def filter_rows(
         return dataframe.loc[dataframe[column].isin(values)]
 
 
+def _filter_columns(
+    columns_to_filter: Sequence[str],
+    regex: Optional[str] = None,
+    startswith: Optional[str] = None,
+    endswith: Optional[str] = None,
+    contains: Optional[str] = None,
+    excludes: Optional[str] = None,
+) -> Sequence[str]:
+    """
+    Filter a list of columns, using a combination of different
+    queries, or a `regex` pattern. If `regex` is supplied it
+    takes precedence and the remaining arguments are ignored.
+    Otherwise, the logical AND of the supplied filters is applied,
+    i.e. the columns that respect all of the supplied conditions
+    are returned.
+
+    Parameters
+    ----------
+    columns_to_filter: Sequence[str]
+        List of columns to filter
+
+    regex: Optional[str] = None
+        A string containing a regular expression to be matched
+
+    startswith: Optional[str] = None
+        A substring the matching columns must start with
+
+    endswith: Optional[str] = None
+        A substring the matching columns must end with
+
+    contains: Optional[str] = None
+        A substring the matching columns must contain
+
+    excludes: Optional[str] = None
+        A substring the matching columns must not contain
+
+    """
+    if regex is not None:
+        return [col for col in columns_to_filter if re.match(regex, col)]
+
+    keep = [True] * len(columns_to_filter)
+    for i in range(len(columns_to_filter)):
+        if startswith is not None:
+            keep[i] &= str(columns_to_filter[i]).startswith(startswith)
+        if endswith is not None:
+            keep[i] &= str(columns_to_filter[i]).endswith(endswith)
+        if contains is not None:
+            keep[i] &= contains in str(columns_to_filter[i])
+        if excludes is not None:
+            keep[i] &= excludes not in str(columns_to_filter[i])
+
+    return [col for col, keep_column in zip(columns_to_filter, keep) if keep_column]
+
+
 def filter_columns(
-    dataframe: pd.DataFrame,
+    input: Union[pd.DataFrame, Sequence[str]],
     columns: Optional[Sequence[str]] = None,
     startswith: Optional[str] = None,
     endswith: Optional[str] = None,
@@ -103,35 +156,46 @@ def filter_columns(
 ):
     """
     Select columns in a dataset, using different filtering options.
-    See serotiny.io.dataframe.readers.filter_columns for more details.
+    See serotiny.data.dataframe.transforms.filter_columns for more details.
 
     Parameters
     ----------
-    columns: Sequence[str]
+    input: Union[pd.DataFrame, Sequence[str]]
+        The input to operate on. It can either be a pandas DataFrame,
+        in which case the result is a DataFrame with only the columns
+        that match the filters; or it can be a list of strings, and
+        in that case the result is a list containing only the strings
+        that match the filters
+
+    columns: Optional[Sequence[str]] = None
         Explicit list of columns to include. If it is supplied,
         the remaining filters are ignored
 
-    startswith: Sequence[str] = None
+    startswith: Optional[str] = None
         A substring the matching columns must start with
 
-    endswith: Sequence[str] = None
+    endswith: Optional[str] = None
         A substring the matching columns must end with
 
-    contains: Sequence[str] = None
+    contains: Optional[str] = None
         A substring the matching columns must contain
 
-    excludes: Sequence[str] = None
+    excludes: Optional[str] = None
         A substring the matching columns must not contain
 
     regex: Optional[str] = None
         A string containing a regular expression to be matched
     """
 
-    if columns is None:
-        columns = _filter_columns(
-            dataframe.columns.tolist(), regex, startswith, endswith, contains, excludes
-        )
-    return dataframe[columns]
+    if isinstance(input, pd.DataFrame):
+        if columns is None:
+            columns = _filter_columns(
+                input.columns.tolist(), regex, startswith, endswith, contains, excludes
+            )
+            return input[columns]
+    return _filter_columns(input.columns.tolist(), regex, startswith,
+                           endswith, contains, excludes)
+
 
 
 def sample_n_each(
@@ -203,6 +267,8 @@ def append_one_hot(dataframe: pd.DataFrame, column: str):
 
     """
 
+    # import here to optimize CLIs / Fire usage
+    from sklearn.preprocessing import OneHotEncoder
     one_hot = OneHotEncoder(sparse=False).fit_transform(dataframe[[column]])
 
     for idx in range(one_hot.shape[1]):
@@ -226,6 +292,8 @@ def append_labels_to_integers(dataframe: pd.DataFrame, column: str):
 
     """
 
+    # import here to optimize CLIs / Fire usage
+    from sklearn.preprocessing import LabelEncoder
     dataframe[f"{column}_integer"] = LabelEncoder().fit_transform(dataframe[[column]])
 
     return dataframe
