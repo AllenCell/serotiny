@@ -232,20 +232,20 @@
 <li class="toctree-l2"><a class="reference internal" href="serotiny.io.dataframe.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="serotiny.io.dataframe.loaders.html">serotiny.io.dataframe.loaders package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.io.dataframe.loaders.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders.abstract_loader">serotiny.io.dataframe.loaders.abstract_loader module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders.classes">serotiny.io.dataframe.loaders.classes module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders.columns">serotiny.io.dataframe.loaders.columns module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders.image2d">serotiny.io.dataframe.loaders.image2d module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders.image3d">serotiny.io.dataframe.loaders.image3d module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders">Module contents</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.io.dataframe.loaders.html#serotiny-io-dataframe-loaders-abstract-loader-module">serotiny.io.dataframe.loaders.abstract_loader module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.io.dataframe.loaders.html#serotiny-io-dataframe-loaders-classes-module">serotiny.io.dataframe.loaders.classes module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.io.dataframe.loaders.html#serotiny-io-dataframe-loaders-columns-module">serotiny.io.dataframe.loaders.columns module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.io.dataframe.loaders.html#serotiny-io-dataframe-loaders-image2d-module">serotiny.io.dataframe.loaders.image2d module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.io.dataframe.loaders.html#serotiny-io-dataframe-loaders-image3d-module">serotiny.io.dataframe.loaders.image3d module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.io.dataframe.loaders.html#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.io.dataframe.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="serotiny.io.dataframe.html#module-serotiny.io.dataframe.dataframe_dataset">serotiny.io.dataframe.dataframe_dataset module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="serotiny.io.dataframe.html#module-serotiny.io.dataframe.readers">serotiny.io.dataframe.readers module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="serotiny.io.dataframe.html#module-serotiny.io.dataframe">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.io.dataframe.html#serotiny-io-dataframe-dataframe-dataset-module">serotiny.io.dataframe.dataframe_dataset module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.io.dataframe.html#serotiny-io-dataframe-readers-module">serotiny.io.dataframe.readers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.io.dataframe.html#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>
@@ -254,151 +254,17 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-serotiny.io.buffered_patch_dataset">
-<span id="serotiny-io-buffered-patch-dataset-module"></span><h2>serotiny.io.buffered_patch_dataset module<a class="headerlink" href="#module-serotiny.io.buffered_patch_dataset" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="serotiny.io.buffered_patch_dataset.BufferedPatchDataset">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.io.buffered_patch_dataset.</span></span><span class="sig-name descname"><span class="pre">BufferedPatchDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.utils.data.dataset.Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patch_columns</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">patch_shape</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">(32,</span> <span class="pre">64,</span> <span class="pre">64)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_size</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_switch_interval</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle_images</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/io/buffered_patch_dataset.html#BufferedPatchDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.io.buffered_patch_dataset.BufferedPatchDataset" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Generic</span></code>[<code class="xref py py-obj docutils literal notranslate"><span class="pre">torch.utils.data.dataset.T_co</span></code>]</p>
-<p>Provides patches from items of a dataset.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>dataset</strong> – Dataset object.</p></li>
-<li><p><strong>patch_shape</strong> – Shape of patch to be extracted from dataset items.</p></li>
-<li><p><strong>buffer_size</strong> – Size of buffer.</p></li>
-<li><p><strong>buffer_switch_interval</strong> – Number of patches provided between buffer item exchanges. Set to -1 to
-disable exchanges.</p></li>
-<li><p><strong>shuffle_images</strong> – Set to randomize order of dataset item insertion into buffer.</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="serotiny.io.buffered_patch_dataset.BufferedPatchDataset.get_buffer_history">
-<span class="sig-name descname"><span class="pre">get_buffer_history</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/serotiny/io/buffered_patch_dataset.html#BufferedPatchDataset.get_buffer_history"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.io.buffered_patch_dataset.BufferedPatchDataset.get_buffer_history" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a list of indices of dataset elements inserted into the
-buffer.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Indices of dataset elements.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>List[int]</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="serotiny.io.buffered_patch_dataset.BufferedPatchDataset.get_patch">
-<span class="sig-name descname"><span class="pre">get_patch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">buffer_index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/io/buffered_patch_dataset.html#BufferedPatchDataset.get_patch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.io.buffered_patch_dataset.BufferedPatchDataset.get_patch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Samples patch from the item in the buffer at the given buffer_index.</p>
-<p>Let nd be the number of dimensions of the patch. If the item has more
-dimensions than the patch, then sampling will be from the last nd
-dimensions of the item.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Random patch sampled from a dataset item.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>List[ArrayLike]</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="serotiny.io.buffered_patch_dataset.BufferedPatchDataset.get_random_patch">
-<span class="sig-name descname"><span class="pre">get_random_patch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">,</span> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/serotiny/io/buffered_patch_dataset.html#BufferedPatchDataset.get_random_patch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.io.buffered_patch_dataset.BufferedPatchDataset.get_random_patch" title="Permalink to this definition">¶</a></dt>
-<dd><p>Samples random patch from an item in the buffer.</p>
-<p>Let nd be the number of dimensions of the patch. If the item has more
-dimensions than the patch, then sampling will be from the last nd
-dimensions of the item.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Random patch sampled from a dataset item.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>List[ArrayLike]</p>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="serotiny.io.buffered_patch_dataset.BufferedPatchDataset.insert_new_element_into_buffer">
-<span class="sig-name descname"><span class="pre">insert_new_element_into_buffer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/serotiny/io/buffered_patch_dataset.html#BufferedPatchDataset.insert_new_element_into_buffer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.io.buffered_patch_dataset.BufferedPatchDataset.insert_new_element_into_buffer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inserts new dataset item into buffer.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p></p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>None</p>
-</dd>
-</dl>
-</dd></dl>
-</dd></dl>
+<div class="section" id="serotiny-io-buffered-patch-dataset-module">
+<h2>serotiny.io.buffered_patch_dataset module<a class="headerlink" href="#serotiny-io-buffered-patch-dataset-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-serotiny.io.image">
-<span id="serotiny-io-image-module"></span><h2>serotiny.io.image module<a class="headerlink" href="#module-serotiny.io.image" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="serotiny.io.image.image_loader">
-<span class="sig-prename descclassname"><span class="pre">serotiny.io.image.</span></span><span class="sig-name descname"><span class="pre">image_loader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">select_channels</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dtype</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.number</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transform</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_channels</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/io/image.html#image_loader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.io.image.image_loader" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load image from path given by <cite>path</cite>. If the given image doesn’t have channel
-names, <cite>select_channels</cite> must be a list of integers</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> (<em>str</em>) – Path of the image to load</p></li>
-<li><p><strong>select_channels</strong> (<em>Optional[Union[Sequence[int], Sequence[str]]] = None</em>) – Channels to be retrieved from the image. If the given image doesn’t
-have channel names, <cite>select_channels</cite> must be a list of integers</p></li>
-<li><p><strong>output_dtype</strong> (<em>Type[np.number] = np.float32</em>) – Numpy dtype of output image</p></li>
-<li><p><strong>transform</strong> (<em>Optional[Callable] = None</em>) – Transform to apply before returning the image</p></li>
-<li><p><strong>return_channels</strong> (<em>bool = False</em>) – Flag to determine whether to return a channel-index map when loading
-the image. This is only useful when channels have names</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="serotiny.io.image.infer_dims">
-<span class="sig-prename descclassname"><span class="pre">serotiny.io.image.</span></span><span class="sig-name descname"><span class="pre">infer_dims</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">aicsimageio.aics_image.AICSImage</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/io/image.html#infer_dims"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.io.image.infer_dims" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a an AICSImage image, infer the corresponding
-tiff dimensions.</p>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="serotiny.io.image.tiff_writer">
-<span class="sig-prename descclassname"><span class="pre">serotiny.io.image.</span></span><span class="sig-name descname"><span class="pre">tiff_writer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_names</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim_order</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/io/image.html#tiff_writer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.io.image.tiff_writer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write an image to disk.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>img</strong> (<em>Union[np.array, torch.Tensor]</em>) – An array/tensor containing the image to be saved</p></li>
-<li><p><strong>path</strong> (<em>Union[str, Path]</em>) – The path where the image will be saved</p></li>
-<li><p><strong>channel_names</strong> (<em>Optional[Sequence] = None</em>) – Optional list of labels to assign to each channel
-(in the correct order)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
+<div class="section" id="serotiny-io-image-module">
+<h2>serotiny.io.image module<a class="headerlink" href="#serotiny-io-image-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-serotiny.io.quilt">
-<span id="serotiny-io-quilt-module"></span><h2>serotiny.io.quilt module<a class="headerlink" href="#module-serotiny.io.quilt" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="serotiny.io.quilt.download_quilt_data">
-<span class="sig-prename descclassname"><span class="pre">serotiny.io.quilt.</span></span><span class="sig-name descname"><span class="pre">download_quilt_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">package</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bucket</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_save_loc</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_warnings</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/io/quilt.html#download_quilt_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.io.quilt.download_quilt_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Download a quilt dataset and supress nfs file attribe warnings</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>package</strong> (<em>str</em>) – Name of the package on s3.
-Example: “aics/hipsc_single_cell_image_dataset”</p></li>
-<li><p><strong>bucket</strong> (<em>str</em>) – The s3 bucket storing the package
-Example: “s3://allencell”</p></li>
-<li><p><strong>data_save_loc</strong> (<em>str,</em>) – Path to save data</p></li>
-<li><p><strong>ignore_warnings</strong> (<em>bool,</em>) – Whether to suppress nfs file attribute warnings or not</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
+<div class="section" id="serotiny-io-quilt-module">
+<h2>serotiny.io.quilt module<a class="headerlink" href="#serotiny-io-quilt-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-serotiny.io">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-serotiny.io" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -458,10 +324,10 @@ Example: “s3://allencell”</p></li>
 <li><a class="reference internal" href="#">serotiny.io package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-serotiny.io.buffered_patch_dataset">serotiny.io.buffered_patch_dataset module</a></li>
-<li><a class="reference internal" href="#module-serotiny.io.image">serotiny.io.image module</a></li>
-<li><a class="reference internal" href="#module-serotiny.io.quilt">serotiny.io.quilt module</a></li>
-<li><a class="reference internal" href="#module-serotiny.io">Module contents</a></li>
+<li><a class="reference internal" href="#serotiny-io-buffered-patch-dataset-module">serotiny.io.buffered_patch_dataset module</a></li>
+<li><a class="reference internal" href="#serotiny-io-image-module">serotiny.io.image module</a></li>
+<li><a class="reference internal" href="#serotiny-io-quilt-module">serotiny.io.quilt module</a></li>
+<li><a class="reference internal" href="#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>

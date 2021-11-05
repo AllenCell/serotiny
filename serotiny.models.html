@@ -494,29 +494,9 @@ precision-recall curve</p>
 <dd><p>Given optimizer name, get it from torch.optim</p>
 </dd></dl>
 <dl class="py function">
-<dt class="sig sig-object py" id="serotiny.models.utils.images_to_probs">
-<span class="sig-prename descclassname"><span class="pre">serotiny.models.utils.</span></span><span class="sig-name descname"><span class="pre">images_to_probs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">images</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/utils.html#images_to_probs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.utils.images_to_probs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generates predictions and corresponding probabilities from a trained
-network and a list of images</p>
-</dd></dl>
-<dl class="py function">
 <dt class="sig sig-object py" id="serotiny.models.utils.index_to_onehot">
 <span class="sig-prename descclassname"><span class="pre">serotiny.models.utils.</span></span><span class="sig-name descname"><span class="pre">index_to_onehot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_classes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/utils.html#index_to_onehot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.utils.index_to_onehot" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="serotiny.models.utils.matplotlib_imshow">
-<span class="sig-prename descclassname"><span class="pre">serotiny.models.utils.</span></span><span class="sig-name descname"><span class="pre">matplotlib_imshow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">one_channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/utils.html#matplotlib_imshow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.utils.matplotlib_imshow" title="Permalink to this definition">¶</a></dt>
-<dd><p>Plot image via matplotlib’s imshow</p>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="serotiny.models.utils.plot_classes_preds">
-<span class="sig-prename descclassname"><span class="pre">serotiny.models.utils.</span></span><span class="sig-name descname"><span class="pre">plot_classes_preds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">classes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/utils.html#plot_classes_preds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.utils.plot_classes_preds" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generates matplotlib Figure using a trained network, along with images
-and labels from a batch, that shows the network’s top prediction along
-with its probability, alongside the actual label, coloring this
-information based on whether the prediction was correct or not.
-Uses the “images_to_probs” function.</p>
-</dd></dl>
 </div>
 <div class="section" id="module-serotiny.models.zoo">
 <span id="serotiny-models-zoo-module"></span><h2>serotiny.models.zoo module<a class="headerlink" href="#module-serotiny.models.zoo" title="Permalink to this headline">¶</a></h2>

@@ -223,14 +223,10 @@
         </div>
         <article role="main">
           <h1>Source code for serotiny.data.dataframe.transforms</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
-<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">OneHotEncoder</span><span class="p">,</span> <span class="n">LabelEncoder</span>
-
-<span class="kn">from</span> <span class="nn">serotiny.io.dataframe</span> <span class="kn">import</span> <span class="n">filter_columns</span> <span class="k">as</span> <span class="n">_filter_columns</span>
 
 
 <div class="viewcode-block" id="split_dataframe"><a class="viewcode-back" href="../../../../serotiny.data.dataframe.html#serotiny.data.dataframe.transforms.split_dataframe">[docs]</a><span class="k">def</span> <span class="nf">split_dataframe</span><span class="p">(</span>
@@ -264,6 +260,9 @@
 <span class="sd">        a column to the existing dataframe and return the modified</span>
 <span class="sd">        dataframe</span>
 <span class="sd">    """</span>
+
+    <span class="c1"># import here to optimize CLIs / Fire usage</span>
+    <span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
 
     <span class="n">train_ix</span><span class="p">,</span> <span class="n">val_test_ix</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
         <span class="n">dataframe</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">train_size</span><span class="o">=</span><span class="n">train_frac</span>
@@ -317,8 +316,62 @@
         <span class="k">return</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dataframe</span><span class="p">[</span><span class="n">column</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">values</span><span class="p">)]</span></div>
 
 
+<span class="k">def</span> <span class="nf">_filter_columns</span><span class="p">(</span>
+    <span class="n">columns_to_filter</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">regex</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">startswith</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">endswith</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">contains</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">excludes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">"""</span>
+<span class="sd">    Filter a list of columns, using a combination of different</span>
+<span class="sd">    queries, or a `regex` pattern. If `regex` is supplied it</span>
+<span class="sd">    takes precedence and the remaining arguments are ignored.</span>
+<span class="sd">    Otherwise, the logical AND of the supplied filters is applied,</span>
+<span class="sd">    i.e. the columns that respect all of the supplied conditions</span>
+<span class="sd">    are returned.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    columns_to_filter: Sequence[str]</span>
+<span class="sd">        List of columns to filter</span>
+
+<span class="sd">    regex: Optional[str] = None</span>
+<span class="sd">        A string containing a regular expression to be matched</span>
+
+<span class="sd">    startswith: Optional[str] = None</span>
+<span class="sd">        A substring the matching columns must start with</span>
+
+<span class="sd">    endswith: Optional[str] = None</span>
+<span class="sd">        A substring the matching columns must end with</span>
+
+<span class="sd">    contains: Optional[str] = None</span>
+<span class="sd">        A substring the matching columns must contain</span>
+
+<span class="sd">    excludes: Optional[str] = None</span>
+<span class="sd">        A substring the matching columns must not contain</span>
+
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">regex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns_to_filter</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">col</span><span class="p">)]</span>
+
+    <span class="n">keep</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns_to_filter</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">columns_to_filter</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">startswith</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keep</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="nb">str</span><span class="p">(</span><span class="n">columns_to_filter</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">startswith</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">endswith</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keep</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="nb">str</span><span class="p">(</span><span class="n">columns_to_filter</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">endswith</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">contains</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keep</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="n">contains</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">columns_to_filter</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">excludes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">keep</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&amp;=</span> <span class="n">excludes</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">columns_to_filter</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">keep_column</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">columns_to_filter</span><span class="p">,</span> <span class="n">keep</span><span class="p">)</span> <span class="k">if</span> <span class="n">keep_column</span><span class="p">]</span>
+
+
 <div class="viewcode-block" id="filter_columns"><a class="viewcode-back" href="../../../../serotiny.data.dataframe.html#serotiny.data.dataframe.transforms.filter_columns">[docs]</a><span class="k">def</span> <span class="nf">filter_columns</span><span class="p">(</span>
-    <span class="n">dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+    <span class="nb">input</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
     <span class="n">columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">startswith</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">endswith</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -328,35 +381,46 @@
 <span class="p">):</span>
     <span class="sd">"""</span>
 <span class="sd">    Select columns in a dataset, using different filtering options.</span>
-<span class="sd">    See serotiny.io.dataframe.readers.filter_columns for more details.</span>
+<span class="sd">    See serotiny.data.dataframe.transforms.filter_columns for more details.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    columns: Sequence[str]</span>
+<span class="sd">    input: Union[pd.DataFrame, Sequence[str]]</span>
+<span class="sd">        The input to operate on. It can either be a pandas DataFrame,</span>
+<span class="sd">        in which case the result is a DataFrame with only the columns</span>
+<span class="sd">        that match the filters; or it can be a list of strings, and</span>
+<span class="sd">        in that case the result is a list containing only the strings</span>
+<span class="sd">        that match the filters</span>
+
+<span class="sd">    columns: Optional[Sequence[str]] = None</span>
 <span class="sd">        Explicit list of columns to include. If it is supplied,</span>
 <span class="sd">        the remaining filters are ignored</span>
 
-<span class="sd">    startswith: Sequence[str] = None</span>
+<span class="sd">    startswith: Optional[str] = None</span>
 <span class="sd">        A substring the matching columns must start with</span>
 
-<span class="sd">    endswith: Sequence[str] = None</span>
+<span class="sd">    endswith: Optional[str] = None</span>
 <span class="sd">        A substring the matching columns must end with</span>
 
-<span class="sd">    contains: Sequence[str] = None</span>
+<span class="sd">    contains: Optional[str] = None</span>
 <span class="sd">        A substring the matching columns must contain</span>
 
-<span class="sd">    excludes: Sequence[str] = None</span>
+<span class="sd">    excludes: Optional[str] = None</span>
 <span class="sd">        A substring the matching columns must not contain</span>
 
 <span class="sd">    regex: Optional[str] = None</span>
 <span class="sd">        A string containing a regular expression to be matched</span>
 <span class="sd">    """</span>
 
-    <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">columns</span> <span class="o">=</span> <span class="n">_filter_columns</span><span class="p">(</span>
-            <span class="n">dataframe</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">regex</span><span class="p">,</span> <span class="n">startswith</span><span class="p">,</span> <span class="n">endswith</span><span class="p">,</span> <span class="n">contains</span><span class="p">,</span> <span class="n">excludes</span>
-        <span class="p">)</span>
-    <span class="k">return</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span></div>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">columns</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="n">_filter_columns</span><span class="p">(</span>
+                <span class="nb">input</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">regex</span><span class="p">,</span> <span class="n">startswith</span><span class="p">,</span> <span class="n">endswith</span><span class="p">,</span> <span class="n">contains</span><span class="p">,</span> <span class="n">excludes</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="nb">input</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">_filter_columns</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">regex</span><span class="p">,</span> <span class="n">startswith</span><span class="p">,</span>
+                           <span class="n">endswith</span><span class="p">,</span> <span class="n">contains</span><span class="p">,</span> <span class="n">excludes</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="sample_n_each"><a class="viewcode-back" href="../../../../serotiny.data.dataframe.html#serotiny.data.dataframe.transforms.sample_n_each">[docs]</a><span class="k">def</span> <span class="nf">sample_n_each</span><span class="p">(</span>
@@ -428,6 +492,8 @@
 
 <span class="sd">    """</span>
 
+    <span class="c1"># import here to optimize CLIs / Fire usage</span>
+    <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">OneHotEncoder</span>
     <span class="n">one_hot</span> <span class="o">=</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[[</span><span class="n">column</span><span class="p">]])</span>
 
     <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">one_hot</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
@@ -451,6 +517,8 @@
 
 <span class="sd">    """</span>
 
+    <span class="c1"># import here to optimize CLIs / Fire usage</span>
+    <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">LabelEncoder</span>
     <span class="n">dataframe</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2">_integer"</span><span class="p">]</span> <span class="o">=</span> <span class="n">LabelEncoder</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[[</span><span class="n">column</span><span class="p">]])</span>
 
     <span class="k">return</span> <span class="n">dataframe</span></div>

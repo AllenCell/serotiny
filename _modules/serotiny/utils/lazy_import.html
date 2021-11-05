@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
     <meta name="generator" content="sphinx-4.2.0, furo 2021.10.09"/>
-        <title>serotiny.datamodules.dummy - serotiny 0.0.1 documentation</title>
+        <title>serotiny.utils.lazy_import - serotiny 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=0254c309f5cadf746f1a613e7677379ac9c8cdcd" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
@@ -222,143 +222,96 @@
           </label>
         </div>
         <article role="main">
-          <h1>Source code for serotiny.datamodules.dummy</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span>
-<span class="kn">import</span> <span class="nn">multiprocessing</span> <span class="k">as</span> <span class="nn">mp</span>
-<span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
+          <h1>Source code for serotiny.utils.lazy_import</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">import</span> <span class="nn">importlib.util</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataLoader</span>
-
-
-<div class="viewcode-block" id="DummyDataset"><a class="viewcode-back" href="../../../serotiny.datamodules.html#serotiny.datamodules.dummy.DummyDataset">[docs]</a><span class="k">class</span> <span class="nc">DummyDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">_lazy_import_from</span><span class="p">:</span>
     <span class="sd">"""</span>
-<span class="sd">    Instantiate a dummy pytorch dataset</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-
-<span class="sd">    x_label: str</span>
-<span class="sd">        Key to retrieve image</span>
-
-<span class="sd">    y_label: str</span>
-<span class="sd">        Key to retrieve image label</span>
-
-<span class="sd">    dims: str</span>
-<span class="sd">        Dimensions of image</span>
-
-<span class="sd">    length:</span>
-<span class="sd">        Length of the dummy dataset</span>
-
+<span class="sd">    adapted from https://coderbook.com/python/2020/04/23/how-to-make-lazy-python.html</span>
 <span class="sd">    """</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="c1"># Assign using __dict__ to avoid the setattr method.</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_label</span><span class="p">,</span> <span class="n">y_label</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">x_dims</span><span class="p">,</span> <span class="n">y_dims</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">length</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">x_dims</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">x_dims</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">y_dims</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">y_dims</span><span class="p">)</span> <span class="k">if</span> <span class="n">y_dims</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">x_label</span> <span class="o">=</span> <span class="n">x_label</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">y_label</span> <span class="o">=</span> <span class="n">y_label</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">'_wrapped'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">'_is_init'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">'_module'</span><span class="p">]</span> <span class="o">=</span> <span class="n">module</span>
+        <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">'_name'</span><span class="p">]</span> <span class="o">=</span> <span class="n">name</span>
 
-    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">length</span>
+    <span class="k">def</span> <span class="nf">_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_module</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_init</span> <span class="o">=</span> <span class="kc">True</span>
 
-    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_dims</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_dims</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">new_method_proxy</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Util function to help us route functions</span>
+<span class="sd">        to the nested object.</span>
+<span class="sd">        """</span>
+        <span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span> <span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_init</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">inner</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_init</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="c1"># These are special names that are on the LazyObject.</span>
+        <span class="c1"># every other attribute should be on the wrapped object.</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">"_is_init"</span><span class="p">,</span> <span class="s2">"_wrapped"</span><span class="p">}:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">high</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_init</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">()</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">x_label</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_dims</span><span class="p">),</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">y_label</span><span class="p">:</span> <span class="n">y</span><span class="p">,</span>
-        <span class="p">}</span></div>
+    <span class="k">def</span> <span class="fm">__delattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"_wrapped"</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"can't delete _wrapped."</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_init</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_setup</span><span class="p">()</span>
+        <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wrapped</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+    <span class="fm">__getattr__</span> <span class="o">=</span> <span class="n">new_method_proxy</span><span class="p">(</span><span class="nb">getattr</span><span class="p">)</span>
+    <span class="fm">__bytes__</span> <span class="o">=</span> <span class="n">new_method_proxy</span><span class="p">(</span><span class="nb">bytes</span><span class="p">)</span>
+    <span class="fm">__str__</span> <span class="o">=</span> <span class="n">new_method_proxy</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+    <span class="fm">__bool__</span> <span class="o">=</span> <span class="n">new_method_proxy</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="fm">__dir__</span> <span class="o">=</span> <span class="n">new_method_proxy</span><span class="p">(</span><span class="nb">dir</span><span class="p">)</span>
+    <span class="fm">__hash__</span> <span class="o">=</span> <span class="n">new_method_proxy</span><span class="p">(</span><span class="nb">hash</span><span class="p">)</span>
+    <span class="vm">__class__</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">new_method_proxy</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">attrgetter</span><span class="p">(</span><span class="s2">"__class__"</span><span class="p">)))</span>
+    <span class="vm">__name__</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">new_method_proxy</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">attrgetter</span><span class="p">(</span><span class="s2">"__name__"</span><span class="p">)))</span>
+    <span class="fm">__eq__</span> <span class="o">=</span> <span class="n">new_method_proxy</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">eq</span><span class="p">)</span>
+    <span class="fm">__lt__</span> <span class="o">=</span> <span class="n">new_method_proxy</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">lt</span><span class="p">)</span>
+    <span class="fm">__gt__</span> <span class="o">=</span> <span class="n">new_method_proxy</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">gt</span><span class="p">)</span>
+    <span class="fm">__ne__</span> <span class="o">=</span> <span class="n">new_method_proxy</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">ne</span><span class="p">)</span>
+    <span class="fm">__hash__</span> <span class="o">=</span> <span class="n">new_method_proxy</span><span class="p">(</span><span class="nb">hash</span><span class="p">)</span>
+    <span class="fm">__getitem__</span> <span class="o">=</span> <span class="n">new_method_proxy</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">getitem</span><span class="p">)</span>
+    <span class="fm">__setitem__</span> <span class="o">=</span> <span class="n">new_method_proxy</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">setitem</span><span class="p">)</span>
+    <span class="fm">__delitem__</span> <span class="o">=</span> <span class="n">new_method_proxy</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">delitem</span><span class="p">)</span>
+    <span class="fm">__iter__</span> <span class="o">=</span> <span class="n">new_method_proxy</span><span class="p">(</span><span class="nb">iter</span><span class="p">)</span>
+    <span class="fm">__len__</span> <span class="o">=</span> <span class="n">new_method_proxy</span><span class="p">(</span><span class="nb">len</span><span class="p">)</span>
+    <span class="fm">__contains__</span> <span class="o">=</span> <span class="n">new_method_proxy</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">contains</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="make_dataloader"><a class="viewcode-back" href="../../../serotiny.datamodules.html#serotiny.datamodules.dummy.make_dataloader">[docs]</a><span class="k">def</span> <span class="nf">make_dataloader</span><span class="p">(</span>
-    <span class="n">x_label</span><span class="p">,</span> <span class="n">y_label</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">x_dims</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">y_dims</span><span class="o">=</span><span class="kc">None</span>
-<span class="p">):</span>
-    <span class="sd">"""</span>
-<span class="sd">    Instantiate dummy dataset and return dataloader</span>
-<span class="sd">    """</span>
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">DummyDataset</span><span class="p">(</span><span class="n">x_label</span><span class="p">,</span> <span class="n">y_label</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">x_dims</span><span class="p">,</span> <span class="n">y_dims</span><span class="o">=</span><span class="n">y_dims</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
-        <span class="n">dataset</span><span class="p">,</span>
-        <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
-        <span class="n">pin_memory</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">num_workers</span><span class="o">=</span><span class="n">num_workers</span><span class="p">,</span>
-        <span class="n">multiprocessing_context</span><span class="o">=</span><span class="n">mp</span><span class="o">.</span><span class="n">get_context</span><span class="p">(</span><span class="s2">"fork"</span><span class="p">),</span>
-    <span class="p">)</span></div>
+<div class="viewcode-block" id="lazy_import"><a class="viewcode-back" href="../../../serotiny.utils.html#serotiny.utils.lazy_import.lazy_import">[docs]</a><span class="k">class</span> <span class="nc">lazy_import</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">loader</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">LazyLoader</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">loader</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">loader</span> <span class="o">=</span> <span class="n">loader</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">module</span>
+        <span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">module</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">module</span> <span class="o">=</span> <span class="n">module</span>
 
-
-<div class="viewcode-block" id="DummyDatamodule"><a class="viewcode-back" href="../../../serotiny.datamodules.html#serotiny.datamodules.dummy.DummyDatamodule">[docs]</a><span class="k">class</span> <span class="nc">DummyDatamodule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
-    <span class="sd">"""</span>
-<span class="sd">    A pytorch lightning datamodule that handles the logic for</span>
-<span class="sd">    loading a dummy dataset</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    -----------</span>
-<span class="sd">    batch_size: int</span>
-<span class="sd">        batch size for dataloader</span>
-
-<span class="sd">    num_workers: int</span>
-<span class="sd">        Number of worker processes for dataloader</span>
-
-<span class="sd">    x_label: str</span>
-<span class="sd">        x_label key to retrive image</span>
-
-<span class="sd">    y_label: str</span>
-<span class="sd">        y_label key to retrieve image label</span>
-
-<span class="sd">    dims: list</span>
-<span class="sd">        Dimensions for dummy images</span>
-
-<span class="sd">    length: int</span>
-<span class="sd">        Length of dummy dataset</span>
-
-<span class="sd">    channels: list = [],</span>
-<span class="sd">        Number of channels for dummy images</span>
-<span class="sd">    """</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">x_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">y_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">x_dims</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
-        <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">channels</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="p">[],</span>
-        <span class="n">y_dims</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
-
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">x_label</span> <span class="o">=</span> <span class="n">x_label</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">y_label</span> <span class="o">=</span> <span class="n">y_label</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">length</span> <span class="o">=</span> <span class="n">length</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">num_channels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">channels</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">x_dims</span> <span class="o">=</span> <span class="n">x_dims</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_channels</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">dl_dims</span> <span class="o">=</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">num_channels</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">x_dims</span><span class="p">)),)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">dl_dims</span> <span class="o">=</span> <span class="n">x_dims</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataloader</span> <span class="o">=</span> <span class="n">make_dataloader</span><span class="p">(</span>
-            <span class="n">x_label</span><span class="p">,</span> <span class="n">y_label</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">dl_dims</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">num_workers</span><span class="p">,</span> <span class="n">y_dims</span><span class="o">=</span><span class="n">y_dims</span>
-        <span class="p">)</span>
-
-<div class="viewcode-block" id="DummyDatamodule.train_dataloader"><a class="viewcode-back" href="../../../serotiny.datamodules.html#serotiny.datamodules.dummy.DummyDatamodule.train_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataloader</span></div>
-
-<div class="viewcode-block" id="DummyDatamodule.val_dataloader"><a class="viewcode-back" href="../../../serotiny.datamodules.html#serotiny.datamodules.dummy.DummyDatamodule.val_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataloader</span></div>
-
-<div class="viewcode-block" id="DummyDatamodule.test_dataloader"><a class="viewcode-back" href="../../../serotiny.datamodules.html#serotiny.datamodules.dummy.DummyDatamodule.test_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataloader</span></div></div>
+    <span class="k">def</span> <span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_lazy_import_from</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">module</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span></div>
 </pre></div>
         </article>
       </div>
