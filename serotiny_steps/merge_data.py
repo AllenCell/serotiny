@@ -1,8 +1,5 @@
 import fire
 
-from serotiny.io.dataframe import read_dataframe
-
-
 def merge_data(dataset_paths, manifest_path, required_fields=None, merge_datasets=None):
     """
     Load a list of dataset csv's, merge them, then write back out to csv.
@@ -17,6 +14,9 @@ def merge_data(dataset_paths, manifest_path, required_fields=None, merge_dataset
         there is always (number of datasets - 1)
         elements in this list.
     """
+
+    # import here to optimize CLIs / Fire usage
+    from serotiny.io.dataframe import read_dataframe
 
     if not required_fields:
         required_fields = {}

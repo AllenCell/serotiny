@@ -7,9 +7,8 @@ from makefun import wraps
 import pandas as pd
 import serotiny.data.dataframe.transforms as df_transforms
 from serotiny.io.dataframe import read_dataframe
-from ._pipeline_cli import PipelineCLI
-from .image_cli.apply_transforms import transform_images
-from .omegaconf_decorator import omegaconf_decorator
+from .._utils import PipelineCLI, omegaconf_decorator
+from ..image_cli.apply_transforms import transform_images
 
 PathLike = Union[str, Path]
 OneOrMany = Union[T, Sequence[T]]
@@ -91,7 +90,7 @@ def _dataframe_from_disk(func):
     return wrapper
 
 
-class TransformDataframeCLI(PipelineCLI):
+class DataframeTransformCLI(PipelineCLI):
     def __init__(self, input_manifests=None, output_path=None):
         super().__init__(
             output_path=output_path,

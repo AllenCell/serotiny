@@ -4,16 +4,17 @@ import traceback
 
 from functools import partial
 import json
-import pandas as pd
+
 import multiprocessing_on_dill as mp
 from omegaconf.dictconfig import DictConfig
 from omegaconf.listconfig import ListConfig
 
 from tqdm import tqdm
 
-from serotiny.io.image import tiff_writer, image_loader
-from serotiny.io.dataframe import read_dataframe
 from serotiny.utils import load_config
+from serotiny.utils.lazy_import import lazy_import
+
+pd = lazy_import("pandas")
 
 
 def _unpack_image_channels(img):
@@ -39,6 +40,9 @@ def apply_transforms(
     transforms_to_apply: Dict
         The dictionary specifying the transforms to apply
     """
+
+    # import here to optimize CLIs / Fire usage
+    from serotiny.io.image import image_loader
 
     result_imgs = dict()
 
@@ -177,6 +181,9 @@ def _transform_from_row(
         Whether to return errors in csv instead of raising and breaking
     """
 
+    # import here to optimize CLIs and Fire
+    from serotiny.io.image import tiff_writer
+
     output_path = output_path / f"{row[index_col]}.tiff"
 
     result = {col: row[col] for col in include_cols}
@@ -241,6 +248,8 @@ def transform_images(
     """
 
     if not isinstance(input_manifest, pd.DataFrame):
+        # import here to optimize CLIs / Fire usage
+        from serotiny.io.dataframe import read_dataframe
         input_manifest = read_dataframe(input_manifest)
 
     output_path = Path(output_path)

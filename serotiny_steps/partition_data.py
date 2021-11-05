@@ -5,9 +5,6 @@ import fire
 import pandas as pd
 
 
-from serotiny.io.dataframe import read_dataframe
-
-
 def reset_index(dataset, index):
     pd.DataFrame(dataset.loc[index, :].reset_index(drop=True))
 
@@ -32,6 +29,9 @@ def partition_data(
     each set has `partition_size` elements, generating filenames
     based on `partition_prefix`.
     """
+
+    # import here to optimize CLIs / Fire usage
+    from serotiny.io.dataframe import read_dataframe
 
     if required_fields is None:
         required_fields = {}

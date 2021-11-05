@@ -1,12 +1,12 @@
 from pathlib import Path
 import logging
-import joblib
 from makefun import wraps
 
 logger = logging.getLogger(__name__)
 
-
 def _save_as_joblib(result, output_path):
+    # import here to optimize CLIs / Fire
+    import joblib
     if output_path.is_dir():
         output_path = output_path / "result.joblib"
     joblib.dump(result, output_path)

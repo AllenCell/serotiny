@@ -1,20 +1,16 @@
 import os
 import logging
-import inspect
 
 from typing import List, Dict
 from datetime import datetime
 
 import fire
-import pytorch_lightning as pl
-
-from serotiny.models.zoo import store_metadata, get_checkpoint_callback
-from serotiny.utils import INIT_KEY, load_config, load_multiple
 
 log = logging.getLogger(__name__)
 
 
 def _get_kwargs():
+    import inspect
     frame = inspect.currentframe().f_back
     keys, _, _, values = inspect.getargvalues(frame)
     kwargs = {}
@@ -35,6 +31,11 @@ def train_model(
     version_string: str = "zero",
     seed: int = 42,
 ):
+    # imports here to optimize CLI / Fire usage
+    import pytorch_lightning as pl
+    from serotiny.models.zoo import store_metadata, get_checkpoint_callback
+    from serotiny.utils import INIT_KEY, load_config, load_multiple
+
     called_args = _get_kwargs()
 
     pl.seed_everything(seed)

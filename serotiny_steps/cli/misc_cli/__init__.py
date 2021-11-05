@@ -1,7 +1,7 @@
-# from serotiny_steps.diagnostic_sheets import diagnostic_sheets
+from serotiny_steps.fit_pca import fit_pca as _fit_pca
+from serotiny_steps.make_aics_mnist_dataset import make_aics_mnist_dataset as _make_mnist
 
 
-class UtilsCLI:
-    def __init__(self):
-        # self.diagnostic_sheets = diagnostic_sheets
-        self.dummy = lambda x: print(x)
+class MiscCLI:
+    fit_pca = _fit_pca
+    make_aics_mnist_dataset = _make_mnist

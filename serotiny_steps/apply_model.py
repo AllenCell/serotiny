@@ -3,11 +3,6 @@ import os
 from typing import Dict, List
 
 import fire
-import pytorch_lightning as pl
-
-from serotiny.models.zoo import get_model
-from serotiny.utils import init, load_multiple
-
 
 def apply_model(
     model_class: str,
@@ -19,6 +14,10 @@ def apply_model(
     gpu_ids: List[int],
     loggers: List[Dict] = [],
 ):
+    # imports here to optimize CLI / Fire
+    import pytorch_lightning as pl
+    from serotiny.models.zoo import get_model
+    from serotiny.utils import init, load_multiple
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
     os.environ["CUDA_VISIBLE_DEVICES"] = ",".join([str(id) for id in gpu_ids])

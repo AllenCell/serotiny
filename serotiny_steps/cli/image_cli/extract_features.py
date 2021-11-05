@@ -7,9 +7,6 @@ import numpy as np
 import multiprocessing_on_dill as mp
 from tqdm import tqdm
 
-from serotiny.io.image import image_loader
-from serotiny.io.dataframe import read_dataframe
-from serotiny.utils import load_config
 
 
 class NumpyJSONEncoder(json.JSONEncoder):
@@ -28,6 +25,9 @@ class NumpyJSONEncoder(json.JSONEncoder):
 
 
 def _extract_features(input_path, features_to_extract):
+    # imports here to optimize CLIs / Fire usage
+    from serotiny.io.image import image_loader
+    from serotiny.utils import load_config
     img, channel_map = image_loader(input_path, return_channels=True)
     results = dict()
 
@@ -108,6 +108,8 @@ def extract_features_batch(
     """
 
     if not isinstance(input_manifest, pd.DataFrame):
+        # import here to optimize CLIs / Fire usage
+        from serotiny.io.dataframe import read_dataframe
         input_manifest = read_dataframe(input_manifest)
 
     output_path = Path(output_path)
