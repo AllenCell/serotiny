@@ -24,11 +24,13 @@ def _merge_override(cfg, override):
 
 
 def _try_read_yaml(param_value):
-    if isinstance(param_value, str):
+    if isinstance(param_value, str) and ".yaml:" in param_value:
         config_path = param_value
         dotstring = None
-        if ":" in config_path:
-            config_path, dotstring = config_path.split(":")
+        _spl = config_path.split(":")
+        config_path = _spl[0]
+        if len(_spl) > 1:
+            dotstring = "".join(_spl[1:])
 
         _this_config = OmegaConf.load(config_path)
         if dotstring is not None:
@@ -40,7 +42,7 @@ def _try_read_yaml(param_value):
     return param_value
 
 
-def omegaconf_decorator(func, *config_args):
+def omegaconf_decorator(func):
     """
     Decorator to wrap around serotiny steps, to give them OmegaConf capabilities.
     This allows easy integration in workflows, overriding config parameters, and
@@ -50,12 +52,6 @@ def omegaconf_decorator(func, *config_args):
     ----------
     func: callable
         The function to be decorated
-
-    config_args: Sequence[str]
-        List of arguments to be registered as "configuration arguments" for the
-        function `func`. This tells the decorator to check whether these arguments
-        are paths to .yaml files, and if so, it loads them
-
     """
 
     #@wraps(func, append_args=Parameter(name="dotlist", kind=Parameter.VAR_POSITIONAL))
@@ -82,14 +78,12 @@ def omegaconf_decorator(func, *config_args):
             elif param.kind == Parameter.POSITIONAL_OR_KEYWORD:
                 param_value = (kwargs.pop(param_name) if param_name in kwargs
                                else args.pop(0))
-                if param_name in config_args:
-                    param_value = _try_read_yaml(param_value)
+                param_value = _try_read_yaml(param_value)
                 _kwargs[param_name] = param_value
                 _positional_arg_names.append(param_name)
 
         for param_name, param_value in kwargs.items():
-            if param_name in config_args:
-                param_value = _try_read_yaml(param_value)
+            param_value = _try_read_yaml(param_value)
             _kwargs[param_name] = param_value
 
         variadic_args = args
@@ -111,7 +105,7 @@ def omegaconf_decorator(func, *config_args):
                     _conf = conf
 
             pos_args = [_conf.pop(arg) for arg in _positional_arg_names]
-            return func(*pos_args, *variadic_args, **conf)
+            return func(*pos_args, *variadic_args, **_conf)
 
         return _merge_overrides_or_call
 
