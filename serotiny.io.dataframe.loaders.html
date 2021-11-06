@@ -227,23 +227,216 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="serotiny-io-dataframe-loaders-abstract-loader-module">
-<h2>serotiny.io.dataframe.loaders.abstract_loader module<a class="headerlink" href="#serotiny-io-dataframe-loaders-abstract-loader-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-serotiny.io.dataframe.loaders.abstract_loader">
+<span id="serotiny-io-dataframe-loaders-abstract-loader-module"></span><h2>serotiny.io.dataframe.loaders.abstract_loader module<a class="headerlink" href="#module-serotiny.io.dataframe.loaders.abstract_loader" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="serotiny.io.dataframe.loaders.abstract_loader.Loader">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.io.dataframe.loaders.abstract_loader.</span></span><span class="sig-name descname"><span class="pre">Loader</span></span><a class="reference internal" href="_modules/serotiny/io/dataframe/loaders/abstract_loader.html#Loader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.io.dataframe.loaders.abstract_loader.Loader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Abstract class for manifest loaders. Subclasses of this class
+shall implement specific mechanisms to load data from pandas
+dataframes.</p>
+<p>Instances of this class (and its subclasses) are callable objects,
+used by the <cite>DataframeDataset</cite> class, which always provides them
+with a dataframe row from which data is extracted</p>
+</dd></dl>
 </div>
-<div class="section" id="serotiny-io-dataframe-loaders-classes-module">
-<h2>serotiny.io.dataframe.loaders.classes module<a class="headerlink" href="#serotiny-io-dataframe-loaders-classes-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-serotiny.io.dataframe.loaders.classes">
+<span id="serotiny-io-dataframe-loaders-classes-module"></span><h2>serotiny.io.dataframe.loaders.classes module<a class="headerlink" href="#module-serotiny.io.dataframe.loaders.classes" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="serotiny.io.dataframe.loaders.classes.LoadClass">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.io.dataframe.loaders.classes.</span></span><span class="sig-name descname"><span class="pre">LoadClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_classes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_encoded_label</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/io/dataframe/loaders/classes.html#LoadClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.io.dataframe.loaders.classes.LoadClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#serotiny.io.dataframe.loaders.abstract_loader.Loader" title="serotiny.io.dataframe.loaders.abstract_loader.Loader"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.io.dataframe.loaders.abstract_loader.Loader</span></code></a></p>
+<p>Loader class, used to retrieve class values from the dataframe,</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_classes</strong> (<em>int</em>) – Number of possible class values</p></li>
+<li><p><strong>y_encoded_label</strong> (<em>str</em>) – Name of column containing the class value</p></li>
+<li><p><strong>binary</strong> (<em>bool</em>) – Flag to determine whether to return class values or
+one-hot vectors</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 </div>
-<div class="section" id="serotiny-io-dataframe-loaders-columns-module">
-<h2>serotiny.io.dataframe.loaders.columns module<a class="headerlink" href="#serotiny-io-dataframe-loaders-columns-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-serotiny.io.dataframe.loaders.columns">
+<span id="serotiny-io-dataframe-loaders-columns-module"></span><h2>serotiny.io.dataframe.loaders.columns module<a class="headerlink" href="#module-serotiny.io.dataframe.loaders.columns" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="serotiny.io.dataframe.loaders.columns.LoadColumn">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.io.dataframe.loaders.columns.</span></span><span class="sig-name descname"><span class="pre">LoadColumn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/io/dataframe/loaders/columns.html#LoadColumn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.io.dataframe.loaders.columns.LoadColumn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#serotiny.io.dataframe.loaders.abstract_loader.Loader" title="serotiny.io.dataframe.loaders.abstract_loader.Loader"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.io.dataframe.loaders.abstract_loader.Loader</span></code></a></p>
+<p>Loader class, used to retrieve fields directly from dataframe columns</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>column</strong> (<em>str</em>) – The column to retrieve</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="serotiny.io.dataframe.loaders.columns.LoadColumns">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.io.dataframe.loaders.columns.</span></span><span class="sig-name descname"><span class="pre">LoadColumns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">startswith</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endswith</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contains</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excludes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regex</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'float'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/io/dataframe/loaders/columns.html#LoadColumns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.io.dataframe.loaders.columns.LoadColumns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#serotiny.io.dataframe.loaders.abstract_loader.Loader" title="serotiny.io.dataframe.loaders.abstract_loader.Loader"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.io.dataframe.loaders.abstract_loader.Loader</span></code></a></p>
+<p>Loader class, used to retrieve fields directly from multiple
+dataframe columns, concatenating them into an array. It leverages
+<cite>filter_columns</cite> to enable using simple queries to select the
+columns to use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>columns</strong> (<em>Sequence[str]</em>) – Explicit list of columns to include. If it is supplied,
+the remaining filters are ignored</p></li>
+<li><p><strong>regex</strong> (<em>Optional[str] = None</em>) – A string containing a regular expression to be matched</p></li>
+<li><p><strong>startswith</strong> (<em>Sequence[str] = None</em>) – A substring the matching columns must start with</p></li>
+<li><p><strong>endswith</strong> (<em>Sequence[str] = None</em>) – A substring the matching columns must end with</p></li>
+<li><p><strong>contains</strong> (<em>Sequence[str] = None</em>) – A substring the matching columns must contain</p></li>
+<li><p><strong>excludes</strong> (<em>Sequence[str] = None</em>) – A substring the matching columns must not contain</p></li>
+<li><p><strong>dtype</strong> (<em>str = “float”</em>) – dtype of the resulting array</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 </div>
-<div class="section" id="serotiny-io-dataframe-loaders-image2d-module">
-<h2>serotiny.io.dataframe.loaders.image2d module<a class="headerlink" href="#serotiny-io-dataframe-loaders-image2d-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-serotiny.io.dataframe.loaders.image2d">
+<span id="serotiny-io-dataframe-loaders-image2d-module"></span><h2>serotiny.io.dataframe.loaders.image2d module<a class="headerlink" href="#module-serotiny.io.dataframe.loaders.image2d" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="serotiny.io.dataframe.loaders.image2d.Load2DImage">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.io.dataframe.loaders.image2d.</span></span><span class="sig-name descname"><span class="pre">Load2DImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'tiff'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">select_channels</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transforms</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/io/dataframe/loaders/image2d.html#Load2DImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.io.dataframe.loaders.image2d.Load2DImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#serotiny.io.dataframe.loaders.abstract_loader.Loader" title="serotiny.io.dataframe.loaders.abstract_loader.Loader"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.io.dataframe.loaders.abstract_loader.Loader</span></code></a></p>
+<p>Loader class, used to retrieve 2d images from paths given in a dataframe column</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>column</strong> (<em>str</em>) – Dataframe column which contains the image path</p></li>
+<li><p><strong>file_type</strong> (<em>str</em>) – File format of the image. For now, “tiff” is the
+only supported format. But in the future other formats (like zarr)
+might be supported too</p></li>
+<li><p><strong>select_channels</strong> (<em>Optional[Sequence] = None</em>) – List of channels to include in the loaded image.</p></li>
+<li><p><strong>transforms</strong> (<em>Optional[Sequence] = None</em>) – List of transforms to apply upon loading the image. The
+transforms are provided as a list of configuration dicts,
+loaded dynamically via serotiny’s dynamic import utils</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 </div>
-<div class="section" id="serotiny-io-dataframe-loaders-image3d-module">
-<h2>serotiny.io.dataframe.loaders.image3d module<a class="headerlink" href="#serotiny-io-dataframe-loaders-image3d-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-serotiny.io.dataframe.loaders.image3d">
+<span id="serotiny-io-dataframe-loaders-image3d-module"></span><h2>serotiny.io.dataframe.loaders.image3d module<a class="headerlink" href="#module-serotiny.io.dataframe.loaders.image3d" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="serotiny.io.dataframe.loaders.image3d.Load3DImage">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.io.dataframe.loaders.image3d.</span></span><span class="sig-name descname"><span class="pre">Load3DImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'tiff'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">select_channels</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transforms</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/io/dataframe/loaders/image3d.html#Load3DImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.io.dataframe.loaders.image3d.Load3DImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#serotiny.io.dataframe.loaders.abstract_loader.Loader" title="serotiny.io.dataframe.loaders.abstract_loader.Loader"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.io.dataframe.loaders.abstract_loader.Loader</span></code></a></p>
+<p>Loader class, used to retrieve 3d images from paths given in a dataframe column</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>column</strong> (<em>str</em>) – Dataframe column which contains the image path</p></li>
+<li><p><strong>file_type</strong> (<em>str</em>) – File format of the image. For now, “tiff” is the
+only supported format. But in the future other
+formats (like zarr) might be supported too</p></li>
+<li><p><strong>select_channels</strong> (<em>Optional[Sequence] = None</em>) – List of channels to load. If nothing is provided,
+all the available channels are loaded</p></li>
+<li><p><strong>transforms</strong> (<em>Optional[Sequence] = None</em>) – List of transforms to apply upon loading the image. The
+transforms are provided as a list of configuration dicts,
+loaded dynamically via serotiny’s dynamic import utils</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 </div>
-<div class="section" id="module-contents">
-<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-serotiny.io.dataframe.loaders">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-serotiny.io.dataframe.loaders" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="serotiny.io.dataframe.loaders.Load2DImage">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.io.dataframe.loaders.</span></span><span class="sig-name descname"><span class="pre">Load2DImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'tiff'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">select_channels</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transforms</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/io/dataframe/loaders/image2d.html#Load2DImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.io.dataframe.loaders.Load2DImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#serotiny.io.dataframe.loaders.abstract_loader.Loader" title="serotiny.io.dataframe.loaders.abstract_loader.Loader"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.io.dataframe.loaders.abstract_loader.Loader</span></code></a></p>
+<p>Loader class, used to retrieve 2d images from paths given in a dataframe column</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>column</strong> (<em>str</em>) – Dataframe column which contains the image path</p></li>
+<li><p><strong>file_type</strong> (<em>str</em>) – File format of the image. For now, “tiff” is the
+only supported format. But in the future other formats (like zarr)
+might be supported too</p></li>
+<li><p><strong>select_channels</strong> (<em>Optional[Sequence] = None</em>) – List of channels to include in the loaded image.</p></li>
+<li><p><strong>transforms</strong> (<em>Optional[Sequence] = None</em>) – List of transforms to apply upon loading the image. The
+transforms are provided as a list of configuration dicts,
+loaded dynamically via serotiny’s dynamic import utils</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="serotiny.io.dataframe.loaders.Load3DImage">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.io.dataframe.loaders.</span></span><span class="sig-name descname"><span class="pre">Load3DImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'tiff'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">select_channels</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transforms</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/io/dataframe/loaders/image3d.html#Load3DImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.io.dataframe.loaders.Load3DImage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#serotiny.io.dataframe.loaders.abstract_loader.Loader" title="serotiny.io.dataframe.loaders.abstract_loader.Loader"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.io.dataframe.loaders.abstract_loader.Loader</span></code></a></p>
+<p>Loader class, used to retrieve 3d images from paths given in a dataframe column</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>column</strong> (<em>str</em>) – Dataframe column which contains the image path</p></li>
+<li><p><strong>file_type</strong> (<em>str</em>) – File format of the image. For now, “tiff” is the
+only supported format. But in the future other
+formats (like zarr) might be supported too</p></li>
+<li><p><strong>select_channels</strong> (<em>Optional[Sequence] = None</em>) – List of channels to load. If nothing is provided,
+all the available channels are loaded</p></li>
+<li><p><strong>transforms</strong> (<em>Optional[Sequence] = None</em>) – List of transforms to apply upon loading the image. The
+transforms are provided as a list of configuration dicts,
+loaded dynamically via serotiny’s dynamic import utils</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="serotiny.io.dataframe.loaders.LoadClass">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.io.dataframe.loaders.</span></span><span class="sig-name descname"><span class="pre">LoadClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_classes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_encoded_label</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binary</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/io/dataframe/loaders/classes.html#LoadClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.io.dataframe.loaders.LoadClass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#serotiny.io.dataframe.loaders.abstract_loader.Loader" title="serotiny.io.dataframe.loaders.abstract_loader.Loader"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.io.dataframe.loaders.abstract_loader.Loader</span></code></a></p>
+<p>Loader class, used to retrieve class values from the dataframe,</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_classes</strong> (<em>int</em>) – Number of possible class values</p></li>
+<li><p><strong>y_encoded_label</strong> (<em>str</em>) – Name of column containing the class value</p></li>
+<li><p><strong>binary</strong> (<em>bool</em>) – Flag to determine whether to return class values or
+one-hot vectors</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="serotiny.io.dataframe.loaders.LoadColumn">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.io.dataframe.loaders.</span></span><span class="sig-name descname"><span class="pre">LoadColumn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/io/dataframe/loaders/columns.html#LoadColumn"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.io.dataframe.loaders.LoadColumn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#serotiny.io.dataframe.loaders.abstract_loader.Loader" title="serotiny.io.dataframe.loaders.abstract_loader.Loader"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.io.dataframe.loaders.abstract_loader.Loader</span></code></a></p>
+<p>Loader class, used to retrieve fields directly from dataframe columns</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>column</strong> (<em>str</em>) – The column to retrieve</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="serotiny.io.dataframe.loaders.LoadColumns">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.io.dataframe.loaders.</span></span><span class="sig-name descname"><span class="pre">LoadColumns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">startswith</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endswith</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contains</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">excludes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regex</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dtype</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'float'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/io/dataframe/loaders/columns.html#LoadColumns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.io.dataframe.loaders.LoadColumns" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#serotiny.io.dataframe.loaders.abstract_loader.Loader" title="serotiny.io.dataframe.loaders.abstract_loader.Loader"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.io.dataframe.loaders.abstract_loader.Loader</span></code></a></p>
+<p>Loader class, used to retrieve fields directly from multiple
+dataframe columns, concatenating them into an array. It leverages
+<cite>filter_columns</cite> to enable using simple queries to select the
+columns to use.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>columns</strong> (<em>Sequence[str]</em>) – Explicit list of columns to include. If it is supplied,
+the remaining filters are ignored</p></li>
+<li><p><strong>regex</strong> (<em>Optional[str] = None</em>) – A string containing a regular expression to be matched</p></li>
+<li><p><strong>startswith</strong> (<em>Sequence[str] = None</em>) – A substring the matching columns must start with</p></li>
+<li><p><strong>endswith</strong> (<em>Sequence[str] = None</em>) – A substring the matching columns must end with</p></li>
+<li><p><strong>contains</strong> (<em>Sequence[str] = None</em>) – A substring the matching columns must contain</p></li>
+<li><p><strong>excludes</strong> (<em>Sequence[str] = None</em>) – A substring the matching columns must not contain</p></li>
+<li><p><strong>dtype</strong> (<em>str = “float”</em>) – dtype of the resulting array</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 </div>
 </div>
 
@@ -302,12 +495,12 @@
             <ul>
 <li><a class="reference internal" href="#">serotiny.io.dataframe.loaders package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#serotiny-io-dataframe-loaders-abstract-loader-module">serotiny.io.dataframe.loaders.abstract_loader module</a></li>
-<li><a class="reference internal" href="#serotiny-io-dataframe-loaders-classes-module">serotiny.io.dataframe.loaders.classes module</a></li>
-<li><a class="reference internal" href="#serotiny-io-dataframe-loaders-columns-module">serotiny.io.dataframe.loaders.columns module</a></li>
-<li><a class="reference internal" href="#serotiny-io-dataframe-loaders-image2d-module">serotiny.io.dataframe.loaders.image2d module</a></li>
-<li><a class="reference internal" href="#serotiny-io-dataframe-loaders-image3d-module">serotiny.io.dataframe.loaders.image3d module</a></li>
-<li><a class="reference internal" href="#module-contents">Module contents</a></li>
+<li><a class="reference internal" href="#module-serotiny.io.dataframe.loaders.abstract_loader">serotiny.io.dataframe.loaders.abstract_loader module</a></li>
+<li><a class="reference internal" href="#module-serotiny.io.dataframe.loaders.classes">serotiny.io.dataframe.loaders.classes module</a></li>
+<li><a class="reference internal" href="#module-serotiny.io.dataframe.loaders.columns">serotiny.io.dataframe.loaders.columns module</a></li>
+<li><a class="reference internal" href="#module-serotiny.io.dataframe.loaders.image2d">serotiny.io.dataframe.loaders.image2d module</a></li>
+<li><a class="reference internal" href="#module-serotiny.io.dataframe.loaders.image3d">serotiny.io.dataframe.loaders.image3d module</a></li>
+<li><a class="reference internal" href="#module-serotiny.io.dataframe.loaders">Module contents</a></li>
 </ul>
 </li>
 </ul>

@@ -228,7 +228,6 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 
-
 <div class="viewcode-block" id="split_dataframe"><a class="viewcode-back" href="../../../../serotiny.data.dataframe.html#serotiny.data.dataframe.transforms.split_dataframe">[docs]</a><span class="k">def</span> <span class="nf">split_dataframe</span><span class="p">(</span>
     <span class="n">dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
     <span class="n">train_frac</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
@@ -543,6 +542,24 @@
     <span class="n">weights</span> <span class="o">=</span> <span class="p">[</span><span class="n">class_weights_dict</span><span class="p">[</span><span class="n">e</span><span class="p">]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">column</span><span class="p">]]</span>
     <span class="n">dataframe</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2">_class_weights"</span><span class="p">]</span> <span class="o">=</span> <span class="n">weights</span>
     <span class="k">return</span> <span class="n">dataframe</span></div>
+
+
+<div class="viewcode-block" id="make_random_df"><a class="viewcode-back" href="../../../../serotiny.data.dataframe.html#serotiny.data.dataframe.transforms.make_random_df">[docs]</a><span class="k">def</span> <span class="nf">make_random_df</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="s2">"ABCD"</span><span class="p">),</span> <span class="n">n_rows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">):</span>
+    <span class="sd">"""</span>
+<span class="sd">    Generate a random dataframe. Useful to test data wrangling pipelines.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    columns: Sequence[str] = ["A","B","C","D"]</span>
+<span class="sd">        List of columns to add to the random dataframe. If none are provided,</span>
+<span class="sd">        a dataframe with columns ["A","B","C","D"] is created</span>
+
+<span class="sd">    n_rows: int = 100</span>
+<span class="sd">        Number of rows to create for the random dataframe</span>
+<span class="sd">    """</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n_rows</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span></div>
 </pre></div>
         </article>
       </div>

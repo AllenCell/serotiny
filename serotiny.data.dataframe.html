@@ -310,6 +310,20 @@ column’s value is contained in a list of values</p>
 </dl>
 </dd></dl>
 <dl class="py function">
+<dt class="sig sig-object py" id="serotiny.data.dataframe.transforms.make_random_df">
+<span class="sig-prename descclassname"><span class="pre">serotiny.data.dataframe.transforms.</span></span><span class="sig-name descname"><span class="pre">make_random_df</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">['A',</span> <span class="pre">'B',</span> <span class="pre">'C',</span> <span class="pre">'D']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_rows</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/data/dataframe/transforms.html#make_random_df"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.data.dataframe.transforms.make_random_df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a random dataframe. Useful to test data wrangling pipelines.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>columns</strong> (<em>Sequence[str] = [“A”,”B”,”C”,”D”]</em>) – List of columns to add to the random dataframe. If none are provided,
+a dataframe with columns [“A”,”B”,”C”,”D”] is created</p></li>
+<li><p><strong>n_rows</strong> (<em>int = 100</em>) – Number of rows to create for the random dataframe</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
 <dt class="sig sig-object py" id="serotiny.data.dataframe.transforms.sample_n_each">
 <span class="sig-prename descclassname"><span class="pre">serotiny.data.dataframe.transforms.</span></span><span class="sig-name descname"><span class="pre">sample_n_each</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframe</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pandas.core.frame.DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">42</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/data/dataframe/transforms.html#sample_n_each"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.data.dataframe.transforms.sample_n_each" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transform a dataframe to have equal number of rows per value of <cite>column</cite>.</p>
