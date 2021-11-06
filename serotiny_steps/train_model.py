@@ -31,6 +31,39 @@ def train_model(
     version_string: str = "zero",
     seed: int = 42,
 ):
+    """
+    Train a model given its configuration.
+
+    Parameters
+    ----------
+    model: Dict
+        The model configuration
+
+    datamodule: Dict
+        The datamodule configuration
+
+    trainer: Dict
+        The Pytorch Lightning Trainer configuration
+
+    model_zoo: Dict
+        The model zoo configuration, specifying how models shall be stored
+
+    loggers: List[Dict]
+        A list with the configuration of each logger to use
+
+    callbacks: List[Dict]
+        A list with the configuration of each callback to use
+
+    gpu_ids: List[int]
+        List of GPU ids to use
+
+    version_string: str
+        A string to tag the model and results with
+
+    seed:
+        Random seed
+    """
+
     # imports here to optimize CLI / Fire usage
     import pytorch_lightning as pl
     from serotiny.models.zoo import store_metadata, get_checkpoint_callback

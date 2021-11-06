@@ -4,14 +4,17 @@ def merge_data(dataset_paths, manifest_path, required_fields=None, merge_dataset
     """
     Load a list of dataset csv's, merge them, then write back out to csv.
 
-    dataset_paths - list of paths to dataset csvs.
-    manifest_path - where to write the result.
-    required_fields - dictionary of dataset paths to a list
-    of required fields for that dataset.
-    merge_datasets - list of options to merge successive datasets
-        into a single dataset. As this is
-        defined by an operation between two datasets,
-        there is always (number of datasets - 1)
+    Parameters
+    ----------
+    dataset_paths:
+        list of paths to dataset csvs.
+    manifest_path:
+        where to write the result.
+    required_fields:
+        dictionary of dataset paths to a list of required fields for that dataset.
+    merge_datasets:
+        list of options to merge successive datasets into a single dataset. As this is
+        defined by an operation between two datasets, there is always (number of datasets - 1)
         elements in this list.
     """
 

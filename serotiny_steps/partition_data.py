@@ -1,4 +1,5 @@
 import os
+from typing import Optional, Sequence
 from pathlib import Path
 import fire
 
@@ -20,14 +21,31 @@ def write_csvs(datasets, output_path):
 def partition_data(
     dataset_path: str,
     output_path: str,
-    partition_size=100,
-    partition_prefix="partition",
-    required_fields=None,
+    partition_size: int = 100,
+    partition_prefix: str = "partition",
+    required_fields: Optional[Sequence[str]] = None,
 ):
     """
     Split the incoming data into N sets of output data, where
     each set has `partition_size` elements, generating filenames
     based on `partition_prefix`.
+
+    Parameters
+    ----------
+    dataset_path: str
+        Path to input dataframe file
+
+    output_path: str
+        Path to output dataframe folder
+
+    partition_size: int = 100
+        Size of each partition
+
+    partition_prefix: str = "partition"
+        Prefix to append to each partition's filename
+
+    required_fields: Optional[Sequence[str]] = None
+        Fields to check for existence in the input dataframe
     """
 
     # import here to optimize CLIs / Fire usage
