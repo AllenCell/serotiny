@@ -225,8 +225,9 @@
           <div class="section" id="serotiny-cli">
 <h1>serotiny CLI<a class="headerlink" href="#serotiny-cli" title="Permalink to this headline">¶</a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">serotiny</span></code> comes with a CLI to make it’s use straightforward. The CLI has
-multiple modules, for different functionalities. You can append <code class="docutils literal notranslate"><span class="pre">--help</span></code>
-to any module in the command-line, to obtain more information.</p>
+multiple modules, for different functionalities. You can append <code class="docutils literal notranslate"><span class="pre">-</span> <span class="pre">--help</span></code>
+to any module in the command-line, to obtain more information
+(note the first dash. I’m working on making that unnecessary).</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">serotiny</span></code></p>
 <ul>
@@ -246,10 +247,10 @@ to any module in the command-line, to obtain more information.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">image</span></code></p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">transform</span></code> : define and apply image transform pipelines</p></li>
-<li><p>(Coming soon) <code class="docutils literal notranslate"><span class="pre">feature_extraction</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">feature_extraction</span></code></p></li>
 </ul>
 </li>
-<li><p><code class="docutils literal notranslate"><span class="pre">utils</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">misc</span></code></p></li>
 </ul>
 </li>
 </ul>
@@ -260,9 +261,12 @@ for complex enough scenarios, it can be quite cumbersome to enter a dictionary
 in the command line. For that reason, wherever a config dict is accepted, it
 is also possible to pass it a path to a YAML file which contains the desired
 config:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ serotiny model train --model=model.yaml ...
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ serotiny model train --model=model.yaml: ...
 </pre></div>
 </div>
+<p>Note the colon after the filename. This is how the CLI knows to interpret this
+argument as a loadable config file, and not just pass it as a string to the
+underlying function.</p>
 <p>If you don’t want to have a file per config dict, and prefer having all your
 configurations in a single file, you can also specify a field in your YAML
 file to be passed. Use “dot-notation” to specify nested fields:</p>

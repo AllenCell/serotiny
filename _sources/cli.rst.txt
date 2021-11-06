@@ -2,8 +2,9 @@ serotiny CLI
 ============
 
 ``serotiny`` comes with a CLI to make it's use straightforward. The CLI has
-multiple modules, for different functionalities. You can append ``--help``
-to any module in the command-line, to obtain more information.
+multiple modules, for different functionalities. You can append ``- --help``
+to any module in the command-line, to obtain more information
+(note the first dash. I'm working on making that unnecessary).
 
 * ``serotiny``
 
@@ -25,9 +26,9 @@ to any module in the command-line, to obtain more information.
 
     * ``transform`` : define and apply image transform pipelines
 
-    * (Coming soon) ``feature_extraction``
+    * ``feature_extraction``
 
-  * ``utils``
+  * ``misc``
 
 
 Passing config dicts in CLI
@@ -40,7 +41,11 @@ is also possible to pass it a path to a YAML file which contains the desired
 config:
 ::
 
-   $ serotiny model train --model=model.yaml ...
+   $ serotiny model train --model=model.yaml: ...
+
+Note the colon after the filename. This is how the CLI knows to interpret this
+argument as a loadable config file, and not just pass it as a string to the
+underlying function.
 
 If you don't want to have a file per config dict, and prefer having all your
 configurations in a single file, you can also specify a field in your YAML
