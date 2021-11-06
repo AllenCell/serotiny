@@ -7,7 +7,7 @@ from makefun import wraps
 import pandas as pd
 import serotiny.data.dataframe.transforms as df_transforms
 from serotiny.io.dataframe import read_dataframe
-from .._utils import PipelineCLI, omegaconf_decorator
+from ..utils import PipelineCLI
 from ..image_cli.apply_transforms import transform_images
 
 PathLike = Union[str, Path]
@@ -15,6 +15,7 @@ OneOrMany = Union[T, Sequence[T]]
 
 
 logger = logging.getLogger(__name__)
+
 
 def _store_one_df(result, output_path):
     if output_path.suffix == ".parquet":
@@ -91,18 +92,27 @@ def _dataframe_from_disk(func):
 
 
 class DataframeTransformCLI(PipelineCLI):
+    """
+    Apply a transform (or chain of transforms) to a dataframe
+    """
+    @classmethod
+    def _decorate(cls, func):
+        func = _dataframe_from_disk(func)
+        return super()._decorate(func)
+
     def __init__(self, input_manifests=None, output_path=None):
         super().__init__(
             output_path=output_path,
             transforms=[
-                _dataframe_from_disk(df_transforms.split_dataframe),
-                _dataframe_from_disk(df_transforms.filter_rows),
-                _dataframe_from_disk(df_transforms.filter_columns),
-                _dataframe_from_disk(df_transforms.sample_n_each),
-                _dataframe_from_disk(df_transforms.append_one_hot),
-                _dataframe_from_disk(df_transforms.append_labels_to_integers),
-                _dataframe_from_disk(df_transforms.append_class_weights),
-                omegaconf_decorator(transform_images)
+                df_transforms.split_dataframe,
+                df_transforms.filter_rows,
+                df_transforms.filter_columns,
+                df_transforms.sample_n_each,
+                df_transforms.append_one_hot,
+                df_transforms.append_labels_to_integers,
+                df_transforms.append_class_weights,
+                df_transforms.make_random_df,
+                transform_images
             ],
             store_methods={
                 pd.DataFrame: _store_one_df,

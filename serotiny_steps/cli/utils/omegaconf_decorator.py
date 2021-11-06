@@ -54,7 +54,6 @@ def omegaconf_decorator(func):
         The function to be decorated
     """
 
-    #@wraps(func, append_args=Parameter(name="dotlist", kind=Parameter.VAR_POSITIONAL))
     @wraps(func)
     def wrapper(*args, **kwargs):
         func_sig = signature(func)

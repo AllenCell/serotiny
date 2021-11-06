@@ -1,6 +1,7 @@
 from pathlib import Path
 import logging
 from makefun import wraps
+from .base_cli import BaseCLI
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +13,7 @@ def _save_as_joblib(result, output_path):
     joblib.dump(result, output_path)
 
 
-class PipelineCLI:
+class PipelineCLI(BaseCLI):
     def __init__(
         self,
         output_path=None,
@@ -43,7 +44,17 @@ class PipelineCLI:
             for key, value in kwargs.items():
                 if value in [..., "..."]:
                     kwargs[key] = self._result
-            self._result = func(*args, **kwargs)
+
+            _func = self._decorate(func)
+            self._result = _func(*args, **kwargs)
+
+            if hasattr(self._result, "__name__"):
+                if self._result.__name__ == "_merge_overrides_or_call":
+                    # if the result comes from an omegaconf-decorated function,
+                    # self._result contains the function itself, so it
+                    # must be called
+                    self._result = self._result()
+
             return self
 
         setattr(self, func.__name__, wrapper)
