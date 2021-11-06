@@ -23,4 +23,4 @@ class DataframeCLI(BaseCLI):
         Apply a transform (or chain of transforms) to a dataframe
         """
         from .transform import DataframeTransformCLI
-        return DataframeTransformCLI()
+        return DataframeTransformCLI
