@@ -9,24 +9,43 @@ We implemented a CLI tool for this. It exposes to the CLI all the transforms def
 in the :py:mod:`dataframe transforms module <serotiny.data.dataframe.transforms>`, but
 importantly it also allows the user to chain them in a single CLI call.
 
-Example calling a single transform:
+Calling a single transform
+***************************
 
 ::
-   serotiny dataframe transform \
-       filter_columns my_input.csv --columns='["cellid","crop_seg","crop_raw"]' \
-       --output_path my_output.csv
+
+   $ serotiny dataframe transform \
+         filter_columns my_input.csv --columns='["cellid","crop_seg","crop_raw"]' \
+         --output_path my_output.csv
 
 
-Example chaining multiple transforms:
+Chaining multiple transforms
+****************************
 
 ::
-   serotiny dataframe transform \
-       filter_rows my_input.csv cellid '[1,2,3,4]' --exclude  - \
-       filter_columns ... --columns='["cellid","crop_seg","crop_raw"]' - \
-       split_dataframe ... --train_frac=0.7 --return_splits=false - \
-       --output_path my_output.csv
+
+   $ serotiny dataframe transform \
+         filter_rows my_input.csv cellid '[1,2,3,4]' --exclude - \
+         filter_columns ... --columns='["cellid","crop_seg","crop_raw"]' - \
+         split_dataframe ... --train_frac=0.7 --return_splits=false - \
+         --output_path my_output.csv
 
 Note the ``-`` at the end of the steps. That signifies we're done providing arguments
 to the step that precedes it. Note also the ``...`` as the first argument to the
 second and third steps. That is a placeholder, letting the CLI know which of the
 input arguments to be provided with the result of the previous step
+
+
+Testing dataframe wrangling pipelines
+*************************************
+
+To test and experiment with dataframe wrangling pipelines, we provide a
+helper transform which generates a random dataframe, which you can use
+as a starting point:
+
+::
+
+   $ serotiny dataframe transform \
+         make_random_df --columns='["a", "b", "c"]' --n_rows=50 -\
+         # you can chain the steps you want to test here!
+         --output_path my_output.csv

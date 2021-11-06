@@ -3,7 +3,7 @@ Dynamic imports
 
 For its users, ``serotiny`` intends to be a configuration-centric framework.
 The idea is that for someone to leverage a ``serotiny``-based workflow and
-adapt it to their use-case, they should only have to tweak configuration
+adapt it to their use-case, it should be almost enough to just tweak configuration
 parameters in a YAML file. Moreover, this makes it easy to integrate with
 workflow frameworks like `Snakemake <https://snakemake.readthedocs.io/en/stable/>`_ ,
 which is also YAML/config-based
