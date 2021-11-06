@@ -136,16 +136,13 @@ def apply_transforms(
 
         result_imgs[name] = imgs
 
-    # finally, the key of `result_imgs` which contains the output
-    # image is the name of the last step in the list
-    output_key = list(transforms_to_apply.keys())[-1]
-    return result_imgs[output_key]
+    return result_imgs
 
 
 def _transform_from_row(
     row: Union[pd.Series, Dict],
     transforms_to_apply: Dict,
-    output_channel_names: Sequence[str],
+    outputs: Dict[str, Sequence[str]],
     output_path: Union[str, Path],
     index_col: str,
     include_cols: Sequence[str] = [],
@@ -163,12 +160,13 @@ def _transform_from_row(
     transforms_to_apply: Dict
         Config dictionary specifying what transforms to apply
 
+    outputs: Dict[str, Sequence[str]]
+        Dictionary containing the keys for each output to save to disk,
+        and the corresponding channel names for that output. The channel
+        names are assumed to be in the correct order for each output
+
     output_path: Union[str, Path]
         Path to the folder where the outputs will be stored
-
-    output_channel_names: Sequence[str]
-        List of the names to be assigned to the channels in the output
-        image (in order)
 
     index_col: str
         Column to serve as index. Used for output filenames
@@ -184,16 +182,17 @@ def _transform_from_row(
     # import here to optimize CLIs and Fire
     from serotiny.io.image import tiff_writer
 
-    output_path = output_path / f"{row[index_col]}.tiff"
-
     result = {col: row[col] for col in include_cols}
     result[index_col] = row[index_col]
-    result["img_path"] = output_path
+    result["errors"] = ""
 
     try:
-        img = apply_transforms(row, transforms_to_apply)
-        tiff_writer(img, output_path, channel_names=output_channel_names)
-        result["errors"] = ""
+        result_imgs = apply_transforms(row, transforms_to_apply)
+        for output, channel_names in outputs.items():
+            _output_path = output_path / f"{row[index_col]}_{output}.tiff"
+            img = result_imgs[output]
+            tiff_writer(img, _output_path, channel_names=channel_names)
+            result[f"{output}_path"] = str(_output_path)
     except Exception as e:
         if debug:
             result["errors"] = traceback.format_exc()
@@ -205,8 +204,8 @@ def _transform_from_row(
 
 def transform_images(
     input_manifest: Union[pd.DataFrame, Union[str, Path]],
+    outputs: Dict[str, Sequence[str]],
     output_path: Union[str, Path],
-    output_channel_names: Sequence[str],
     transforms_to_apply: Sequence,
     index_col: str,
     include_cols: Sequence[str] = [],
@@ -223,12 +222,13 @@ def transform_images(
     input_manifest: Union[pd.DataFrame, Union[str, Path]]
         Path to the input manifest, or a pd.DataFrame
 
+    outputs: Dict[str, Sequence[str]]
+        Dictionary containing the keys for each output to save to disk,
+        and the corresponding channel names for that output. The channel
+        names are assumed to be in the correct order for each output
+
     output_path: Union[str, Path]
         Path to the folder where the outputs will be stored
-
-    output_channel_names: Sequence[str]
-        List of the names to be assigned to the channels in the output
-        image (in order)
 
     transforms_to_apply: Sequence
         Config dictionary specifying what transforms to apply
@@ -260,7 +260,7 @@ def transform_images(
     apply_transform = partial(
         _transform_from_row,
         transforms_to_apply=transforms_to_apply,
-        output_channel_names=output_channel_names,
+        outputs=outputs,
         output_path=output_path,
         index_col=index_col,
         include_cols=include_cols,
