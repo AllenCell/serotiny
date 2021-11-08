@@ -6,6 +6,7 @@ from functools import partial
 import json
 
 import multiprocessing_on_dill as mp
+from copy import deepcopy
 from omegaconf.dictconfig import DictConfig
 from omegaconf.listconfig import ListConfig
 
@@ -44,6 +45,7 @@ def apply_transforms(
     # import here to optimize CLIs / Fire usage
     from serotiny.io.image import image_loader
 
+    transforms_to_apply = deepcopy(transforms_to_apply)
     result_imgs = dict()
 
     # the `transforms_to_apply` dict contains a field "transforms",
@@ -180,6 +182,7 @@ def _transform_from_row(
     """
 
     # import here to optimize CLIs and Fire
+    import torch
     from serotiny.io.image import tiff_writer
 
     result = {col: row[col] for col in include_cols}
@@ -191,6 +194,8 @@ def _transform_from_row(
         for output, channel_names in outputs.items():
             _output_path = output_path / f"{row[index_col]}_{output}.tiff"
             img = result_imgs[output]
+            if isinstance(img, torch.Tensor):
+                img = img.numpy()
             tiff_writer(img, _output_path, channel_names=channel_names)
             result[f"{output}"] = str(_output_path)
     except Exception as e:
