@@ -192,7 +192,7 @@ def _transform_from_row(
             _output_path = output_path / f"{row[index_col]}_{output}.tiff"
             img = result_imgs[output]
             tiff_writer(img, _output_path, channel_names=channel_names)
-            result[f"{output}_path"] = str(_output_path)
+            result[f"{output}"] = str(_output_path)
     except Exception as e:
         if debug:
             result["errors"] = traceback.format_exc()
