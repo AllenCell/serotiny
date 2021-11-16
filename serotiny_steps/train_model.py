@@ -81,10 +81,10 @@ def train_model(
     callbacks_config = callbacks
 
     model_zoo_path = model_zoo_config.get("path")
-    model_name = model_config.get(INIT_KEY, "UNDEFINED_MODEL_NAME")
+    model_class = model_config.get(INIT_KEY, "UNDEFINED_MODEL_CLASS")
     datamodule_name = datamodule_config.get(INIT_KEY, "UNDEFINED_DATAMODULE_NAME")
 
-    store_metadata(called_args, model_name, version_string, model_zoo_path)
+    store_metadata(called_args, model_class, version_string, model_zoo_path)
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
     os.environ["CUDA_VISIBLE_DEVICES"] = ",".join([str(id) for id in gpu_ids])
@@ -109,7 +109,7 @@ def train_model(
         config.update(checkpoint_config)
 
         checkpoint_callback = get_checkpoint_callback(
-            model_name, version_string, model_zoo_path, **config
+            model_class, version_string, model_zoo_path, **config
         )
     else:
         checkpoint_callback = None
