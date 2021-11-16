@@ -5,6 +5,7 @@ import torch
 import numpy as np
 
 import aicsimageio
+from aicsimageio.aics_image import _load_reader
 from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
 
 
@@ -34,6 +35,7 @@ def image_loader(
     output_dtype: Optional[Type[np.number]] = None,
     transform: Optional[Callable] = None,
     return_channels: bool = False,
+    reader: Optional[str] = None,
 ):
     """
     Load image from path given by `path`. If the given image doesn't have channel
@@ -59,7 +61,10 @@ def image_loader(
         the image. This is only useful when channels have names
     """
 
-    img = aicsimageio.AICSImage(path)
+    if reader is not None:
+        reader = _load_reader(reader)
+
+    img = aicsimageio.AICSImage(path, reader=reader)
     channel_names = img.channel_names or list(range(img.data.shape[0]))
 
     if (select_channels is None) or (len(select_channels) == 0):
