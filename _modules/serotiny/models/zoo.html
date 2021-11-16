@@ -163,6 +163,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../image_transforms.html">Applying image transforms</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../feature_extraction.html">Extraction features from images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../dataframe_transforms.html">Dataframe wrangling</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model_zoo.html">Model zoo</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../example_workflows.html">Example workflows</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../modules.html">Package modules</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../serotiny.html">serotiny package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -264,7 +265,7 @@
 
 <span class="k">def</span> <span class="nf">_get_checkpoint</span><span class="p">(</span>
     <span class="n">model_class</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">version_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">zoo_root</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="n">zoo_root</span> <span class="o">=</span> <span class="n">get_root</span><span class="p">(</span><span class="n">zoo_root</span><span class="p">)</span>
@@ -272,9 +273,9 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">zoo_root</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">"Given zoo_root does not exists."</span><span class="p">)</span>
 
-    <span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span>
+    <span class="n">version_string</span> <span class="o">=</span> <span class="n">version_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span>
 
-    <span class="n">model_path</span> <span class="o">=</span> <span class="p">(</span><span class="n">zoo_root</span> <span class="o">/</span> <span class="n">model_class</span><span class="p">)</span> <span class="o">/</span> <span class="n">model_id</span>
+    <span class="n">model_path</span> <span class="o">=</span> <span class="p">(</span><span class="n">zoo_root</span> <span class="o">/</span> <span class="n">model_class</span><span class="p">)</span> <span class="o">/</span> <span class="n">version_string</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span> <span class="o">+</span> <span class="s2">".yaml"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">yaml</span><span class="o">.</span><span class="n">UnsafeLoader</span><span class="p">)</span>
@@ -286,7 +287,7 @@
 
 <div class="viewcode-block" id="get_model"><a class="viewcode-back" href="../../../serotiny.models.html#serotiny.models.zoo.get_model">[docs]</a><span class="k">def</span> <span class="nf">get_model</span><span class="p">(</span>
     <span class="n">model_class</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">version_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">zoo_root</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">"""</span>
@@ -298,7 +299,7 @@
 <span class="sd">        The "import path" to the model class, e.g.</span>
 <span class="sd">        serotiny.models.RegressionModel</span>
 
-<span class="sd">    model_id:</span>
+<span class="sd">    version_string:</span>
 <span class="sd">        a version string that uniquely identifies the model within the</span>
 <span class="sd">        zoo.</span>
 
@@ -306,7 +307,7 @@
 <span class="sd">        (Optional) path to the model zoo root</span>
 <span class="sd">    """</span>
 
-    <span class="n">ckpt_path</span><span class="p">,</span> <span class="n">config</span> <span class="o">=</span> <span class="n">_get_checkpoint</span><span class="p">(</span><span class="n">model_class</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">zoo_root</span><span class="p">)</span>
+    <span class="n">ckpt_path</span><span class="p">,</span> <span class="n">config</span> <span class="o">=</span> <span class="n">_get_checkpoint</span><span class="p">(</span><span class="n">model_class</span><span class="p">,</span> <span class="n">version_string</span><span class="p">,</span> <span class="n">zoo_root</span><span class="p">)</span>
     <span class="n">model_class</span> <span class="o">=</span> <span class="n">module_or_path</span><span class="p">(</span><span class="n">models</span><span class="p">,</span> <span class="n">model_class</span><span class="p">)</span>
 
     <span class="n">model_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">"model"</span><span class="p">]</span>
@@ -314,7 +315,7 @@
     <span class="k">return</span> <span class="n">model_class</span><span class="o">.</span><span class="n">load_from_checkpoint</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="o">=</span><span class="n">ckpt_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_config</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="store_model"><a class="viewcode-back" href="../../../serotiny.models.html#serotiny.models.zoo.store_model">[docs]</a><span class="k">def</span> <span class="nf">store_model</span><span class="p">(</span><span class="n">trainer</span><span class="p">,</span> <span class="n">model_class</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">zoo_root</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="store_model"><a class="viewcode-back" href="../../../serotiny.models.html#serotiny.models.zoo.store_model">[docs]</a><span class="k">def</span> <span class="nf">store_model</span><span class="p">(</span><span class="n">trainer</span><span class="p">,</span> <span class="n">model_class</span><span class="p">,</span> <span class="n">version_string</span><span class="p">,</span> <span class="n">zoo_root</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">"""</span>
 <span class="sd">    Stored a model in disk, inside a model zoo.</span>
 
@@ -327,7 +328,7 @@
 <span class="sd">        A string containing the "import path" to the model class,</span>
 <span class="sd">        e.g. serotiny.models.RegressionModel</span>
 
-<span class="sd">    model_id: str</span>
+<span class="sd">    version_string: str</span>
 <span class="sd">        A version string that uniquely identifies the model within the</span>
 <span class="sd">        zoo.</span>
 
@@ -343,16 +344,16 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">model_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="n">model_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span> <span class="k">if</span> <span class="s2">".ckpt"</span> <span class="ow">in</span> <span class="n">model_id</span> <span class="k">else</span> <span class="n">model_id</span> <span class="o">+</span> <span class="s2">".ckpt"</span>
-    <span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span>
+    <span class="n">version_string</span> <span class="o">=</span> <span class="n">version_string</span> <span class="k">if</span> <span class="s2">".ckpt"</span> <span class="ow">in</span> <span class="n">version_string</span> <span class="k">else</span> <span class="n">version_string</span> <span class="o">+</span> <span class="s2">".ckpt"</span>
+    <span class="n">version_string</span> <span class="o">=</span> <span class="n">version_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span>
 
-    <span class="n">model_path</span> <span class="o">=</span> <span class="n">model_path</span> <span class="o">/</span> <span class="n">model_id</span>
+    <span class="n">model_path</span> <span class="o">=</span> <span class="n">model_path</span> <span class="o">/</span> <span class="n">version_string</span>
     <span class="n">trainer</span><span class="o">.</span><span class="n">save_checkpoint</span><span class="p">(</span><span class="n">model_path</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_checkpoint_callback"><a class="viewcode-back" href="../../../serotiny.models.html#serotiny.models.zoo.get_checkpoint_callback">[docs]</a><span class="k">def</span> <span class="nf">get_checkpoint_callback</span><span class="p">(</span>
     <span class="n">model_class</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">version_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">zoo_root</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">checkpoint_callback_kwargs</span>
 <span class="p">):</span>
@@ -366,7 +367,7 @@
 <span class="sd">        A string containing the "import path" to the model class,</span>
 <span class="sd">        e.g. serotiny.models.RegressionModel</span>
 
-<span class="sd">    model_id: str</span>
+<span class="sd">    version_string: str</span>
 <span class="sd">        A version string that uniquely identifies the model within the</span>
 <span class="sd">        zoo.</span>
 
@@ -380,8 +381,8 @@
 <span class="sd">    """</span>
 
     <span class="n">zoo_root</span> <span class="o">=</span> <span class="n">get_root</span><span class="p">(</span><span class="n">zoo_root</span><span class="p">)</span>
-    <span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span>
-    <span class="n">model_path</span> <span class="o">=</span> <span class="p">(</span><span class="n">zoo_root</span> <span class="o">/</span> <span class="n">model_class</span><span class="p">)</span> <span class="o">/</span> <span class="n">model_id</span>
+    <span class="n">version_string</span> <span class="o">=</span> <span class="n">version_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span>
+    <span class="n">model_path</span> <span class="o">=</span> <span class="p">(</span><span class="n">zoo_root</span> <span class="o">/</span> <span class="n">model_class</span><span class="p">)</span> <span class="o">/</span> <span class="n">version_string</span>
     <span class="n">model_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="s2">"filename"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">checkpoint_callback_kwargs</span><span class="p">:</span>
@@ -394,7 +395,7 @@
 
 <div class="viewcode-block" id="get_trainer_at_checkpoint"><a class="viewcode-back" href="../../../serotiny.models.html#serotiny.models.zoo.get_trainer_at_checkpoint">[docs]</a><span class="k">def</span> <span class="nf">get_trainer_at_checkpoint</span><span class="p">(</span>
     <span class="n">model_class</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">version_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">zoo_root</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">reload_callbacks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">reload_loggers</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -409,7 +410,7 @@
 <span class="sd">        A string containing the "import path" to the model class,</span>
 <span class="sd">        e.g. serotiny.models.RegressionModel</span>
 
-<span class="sd">    model_id: str</span>
+<span class="sd">    version_string: str</span>
 <span class="sd">        A version string that uniquely identifies the model within the</span>
 <span class="sd">        zoo.</span>
 
@@ -423,14 +424,14 @@
 <span class="sd">        Flag to determine whether to reload the trainer's loggers</span>
 <span class="sd">    """</span>
 
-    <span class="n">ckpt_path</span><span class="p">,</span> <span class="n">config</span> <span class="o">=</span> <span class="n">_get_checkpoint</span><span class="p">(</span><span class="n">model_class</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">zoo_root</span><span class="p">)</span>
+    <span class="n">ckpt_path</span><span class="p">,</span> <span class="n">config</span> <span class="o">=</span> <span class="n">_get_checkpoint</span><span class="p">(</span><span class="n">model_class</span><span class="p">,</span> <span class="n">version_string</span><span class="p">,</span> <span class="n">zoo_root</span><span class="p">)</span>
 
     <span class="n">trainer_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">"trainer"</span><span class="p">]</span>
 
     <span class="n">model_zoo_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">"model_zoo"</span><span class="p">]</span>
     <span class="n">checkpoint_callback</span> <span class="o">=</span> <span class="n">get_checkpoint_callback</span><span class="p">(</span>
         <span class="n">model_class</span><span class="p">,</span>
-        <span class="n">model_id</span><span class="p">,</span>
+        <span class="n">version_string</span><span class="p">,</span>
         <span class="n">model_zoo_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"checkpoint_monitor"</span><span class="p">),</span>
         <span class="n">model_zoo_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"checkpoint_mode"</span><span class="p">,</span> <span class="s2">"min"</span><span class="p">),</span>
         <span class="n">zoo_root</span><span class="p">,</span>
@@ -453,7 +454,7 @@
     <span class="k">return</span> <span class="n">trainer</span></div>
 
 
-<div class="viewcode-block" id="store_metadata"><a class="viewcode-back" href="../../../serotiny.models.html#serotiny.models.zoo.store_metadata">[docs]</a><span class="k">def</span> <span class="nf">store_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">model_class</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">zoo_root</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="store_metadata"><a class="viewcode-back" href="../../../serotiny.models.html#serotiny.models.zoo.store_metadata">[docs]</a><span class="k">def</span> <span class="nf">store_metadata</span><span class="p">(</span><span class="n">metadata</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">model_class</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">zoo_root</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">"""</span>
 <span class="sd">    Store metadata associated with a training run of a model</span>
 
@@ -466,7 +467,7 @@
 <span class="sd">        The "import path" to the model class, e.g.</span>
 <span class="sd">        serotiny.models.RegressionModel</span>
 
-<span class="sd">    model_id:</span>
+<span class="sd">    version_string:</span>
 <span class="sd">        a version string that uniquely identifies the model within the</span>
 <span class="sd">        zoo.</span>
 
@@ -475,7 +476,7 @@
 
 <span class="sd">    """</span>
 
-    <span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span>
+    <span class="n">version_string</span> <span class="o">=</span> <span class="n">version_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"/"</span><span class="p">,</span> <span class="s2">"_"</span><span class="p">)</span>
     <span class="n">zoo_root</span> <span class="o">=</span> <span class="n">get_root</span><span class="p">(</span><span class="n">zoo_root</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">zoo_root</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
@@ -485,9 +486,9 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">model_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
         <span class="n">model_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="n">model_id</span> <span class="o">=</span> <span class="n">model_id</span> <span class="k">if</span> <span class="s2">".yaml"</span> <span class="ow">in</span> <span class="n">model_id</span> <span class="k">else</span> <span class="n">model_id</span> <span class="o">+</span> <span class="s2">".yaml"</span>
+    <span class="n">version_string</span> <span class="o">=</span> <span class="n">version_string</span> <span class="k">if</span> <span class="s2">".yaml"</span> <span class="ow">in</span> <span class="n">version_string</span> <span class="k">else</span> <span class="n">version_string</span> <span class="o">+</span> <span class="s2">".yaml"</span>
 
-    <span class="n">model_path</span> <span class="o">=</span> <span class="n">model_path</span> <span class="o">/</span> <span class="n">model_id</span>
+    <span class="n">model_path</span> <span class="o">=</span> <span class="n">model_path</span> <span class="o">/</span> <span class="n">version_string</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">omegaconf</span><span class="o">.</span><span class="n">DictConfig</span><span class="p">):</span>
         <span class="n">omegaconf</span><span class="o">.</span><span class="n">OmegaConf</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">model_path</span><span class="p">,</span> <span class="n">resolve</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
