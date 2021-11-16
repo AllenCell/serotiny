@@ -1,12 +1,20 @@
+import os
 from pathlib import Path
-from typing import Union, Dict
+from typing import Union, Dict, Optional, Sequence
 from functools import partial
 import json
 import pandas as pd
 import numpy as np
-import multiprocessing_on_dill as mp
-from tqdm import tqdm
 
+
+def _do_imports():
+    global image_loader
+    global load_config, load_multiple
+    global _parse_batch
+
+    from serotiny.io.image import image_loader
+    from serotiny.utils import load_config, load_multiple
+    from .batch_work import _parse_batch
 
 
 class NumpyJSONEncoder(json.JSONEncoder):
@@ -24,15 +32,11 @@ class NumpyJSONEncoder(json.JSONEncoder):
             return super(NumpyJSONEncoder, self).default(obj)
 
 
-def _extract_features(input_path, features_to_extract):
-    # imports here to optimize CLIs / Fire usage
-    from serotiny.io.image import image_loader
-    from serotiny.utils import load_config
-    img, channel_map = image_loader(input_path, return_channels=True)
+def _extract_features(input_path, features_to_extract, reader=None):
+    img, channel_map = image_loader(input_path, return_channels=True, reader=reader)
     results = dict()
 
-    for feature, config in features_to_extract.items():
-        feature_extractor = load_config(config)
+    for feature, feature_extractor in features_to_extract.items():
         result = feature_extractor(img, channel_map)
         if isinstance(result, dict):
             results.update(result)
@@ -47,8 +51,9 @@ def _extract_from_row(
     path_col: str,
     index_col: str,
     features_to_extract: Dict,
+    reader=None,
 ):
-    features = _extract_features(row[path_col], features_to_extract)
+    features = _extract_features(row[path_col], features_to_extract, reader=reader)
     features[index_col] = row[index_col]
     return features
 
@@ -56,10 +61,11 @@ def _extract_from_row(
 def extract_features(
     input_path: Union[str, Path],
     features_to_extract: Dict,
+    reader=None,
 ):
     input_path = Path(input_path)
 
-    features = _extract_features(input_path, features_to_extract)
+    features = _extract_features(input_path, features_to_extract, reader=reader)
 
     return json.dumps(features, cls=NumpyJSONEncoder)
 
@@ -67,12 +73,18 @@ def extract_features(
 def extract_features_batch(
     input_manifest: Union[pd.DataFrame, Union[str, Path]],
     output_path: Union[str, Path],
+    features_to_extract: Dict,
     path_col: str,
     index_col: str,
-    features_to_extract: Dict,
+    include_cols: Sequence[str] = [],
+    image_reader: Optional[str] = None,
     return_merged: bool = True,
+    backend: str = "multiprocessing",
+    write_every_n_rows: int = 100,
     n_workers: int = 1,
     verbose: bool = False,
+    skip_if_exists: bool = False,
+    debug: bool = False,
 ):
     """
     Extract features from an image in a dataframe row, using extractors given by
@@ -86,6 +98,9 @@ def extract_features_batch(
     output_path: Union[str, Path]
         Path where the output dataframe will be stored
 
+    features_to_extract: Dict
+        Config dictionary specifying what features to extract
+
     path_col: str
         Column that contains the paths to the input images
 
@@ -93,52 +108,62 @@ def extract_features_batch(
         Column to serve as index. Included in the output manifest
         (useful for merging)
 
-    features_to_extract: Dict
-        Config dictionary specifying what features to extract
+    include_cols: Sequence[str] = []
+        List of columns to include in the output manifest, aside from the
+        column containing paths to the output images
+
+    image_reader: Optional[str] = None
+        aicsimageio reader to use. If None, it is automatically determined,
+        but it entails additional io which makes things slower
 
     return_merged: bool = True
         If True, return the result manifest merged with the input.
         Otherwise, return only the result.
 
+    backend: str = "multiprocessing"
+        Backend to use for parallel computation. Possible values are
+        "multiprocessing", "slurm"
+
+    write_every_n_rows: int = 100
+        Write results to temporary file every n rows
+
     n_workers: int = 1
-        Number of multiprocessing workers to use for parallel computation
+        Number of parallel workers to use for parallel computation
 
     verbose: bool = False
         Flag to tell whether to produce command line output
+
+    skip_if_exists: bool = False
+        Whether to skip images if they're found on disk. Useful to avoid
+        redoing computations when something fails
+
+    debug: bool = False
+        Whether to return errors in csv instead of raising and breaking
+
     """
 
-    if not isinstance(input_manifest, pd.DataFrame):
-        # import here to optimize CLIs / Fire usage
-        from serotiny.io.dataframe import read_dataframe
-        input_manifest = read_dataframe(input_manifest)
-
-    output_path = Path(output_path)
-    if not output_path.parent.exists():
-        output_path.parent.mkdir(parents=True)
+    _do_imports()
 
     # make helper function with pre attributed params except df row
     extract_features_ = partial(
         _extract_from_row,
         path_col=path_col,
         index_col=index_col,
-        features_to_extract=features_to_extract,
+        features_to_extract=load_multiple(features_to_extract),
+        reader=image_reader,
     )
-    iter_rows = (row for _, row in input_manifest.iterrows())
 
-    if n_workers > 1:
-        with mp.Pool(n_workers) as pool:
-            jobs = pool.imap_unordered(extract_features_, iter_rows)
-            if verbose:
-                jobs = tqdm(jobs, total=len(input_manifest))
-            success = pd.DataFrame.from_records(list(jobs))
-    else:
-        if verbose:
-            iter_rows = tqdm(iter_rows, total=len(input_manifest))
-        success = pd.DataFrame.from_records(
-            [extract_features_(row) for row in iter_rows]
-        )
-
-    if return_merged:
-        success = success.merge(input_manifest, on=index_col)
-
-    success.to_csv(output_path)
+    _parse_batch(
+        input_manifest=input_manifest,
+        func_per_row=extract_features_,
+        output_path=output_path,
+        index_col=index_col,
+        include_cols=include_cols,
+        write_every_n_rows=write_every_n_rows,
+        return_merged=return_merged,
+        backend=backend,
+        n_workers=n_workers,
+        verbose=verbose,
+        skip_if_exists=skip_if_exists,
+        debug=debug,
+    )

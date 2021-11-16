@@ -1,21 +1,29 @@
-from typing import Union, Dict, Sequence
+from typing import Union, Dict, Sequence, Optional
 from pathlib import Path
-import traceback
 
+from collections import defaultdict
 from functools import partial
 import json
 
-import multiprocessing_on_dill as mp
 from copy import deepcopy
+import pandas as pd
 from omegaconf.dictconfig import DictConfig
 from omegaconf.listconfig import ListConfig
 
-from tqdm import tqdm
 
-from serotiny.utils import load_config
-from serotiny.utils.lazy_import import lazy_import
+def _do_imports():
+    # import here to optimize CLIs / Fire usage
+    global torch
+    global image_loader
+    global tiff_writer
+    global load_config
+    global _parse_batch
 
-pd = lazy_import("pandas")
+    import torch
+
+    from serotiny.io.image import image_loader, tiff_writer
+    from serotiny.utils import load_config
+    from .batch_work import _parse_batch
 
 
 def _unpack_image_channels(img):
@@ -24,9 +32,59 @@ def _unpack_image_channels(img):
     return [img[ch] for ch in range(img.shape[0])]
 
 
+def _preload_transforms(transforms_to_apply):
+    transforms_to_apply = deepcopy(transforms_to_apply)
+    _new_transforms = defaultdict(dict)
+    for name, transform in transforms_to_apply.items():
+        _new_transforms[name]["input"] = transform["input"]
+
+        if isinstance(transform["steps"], (list, ListConfig)):
+            steps_configs = transform["steps"]
+        elif isinstance(transform["steps"], (dict, DictConfig)):
+            steps_configs = transform["steps"].values()
+        else:
+            raise TypeError(f"Unexpected type for `steps` field: "
+                            f"{type(transform['steps'])}")
+
+        _steps = []
+        for step in steps_configs:
+
+            # if an "^individual_args" key is present, as that means
+            # there are values we need to retrieve from each row
+            # as additional arguments to the transform
+            individual_args = step.pop("^individual_args", {})
+
+            # in case this step is a class, the individual_args
+            # need to be used in its __init__, so we turn it
+            # into a ^bind, and signal that it must be inited
+            # before it is called
+            must_init = False
+            if len(individual_args) > 0:
+                if "^init" in step:
+                    step["^bind"] = step["^init"]
+                    del step["^init"]
+                    must_init = True
+                for arg in individual_args:
+                    if arg in step:
+                        del step[arg]
+
+
+            # retrieve another special key "^unpack", if it's present.
+            # its use is explained below
+            unpack = step.pop("^unpack", False)
+
+
+            # load the step with our dynamic import functionality
+            step = load_config(step)
+            _steps.append((step, individual_args, unpack, must_init))
+        _new_transforms[name]["steps"] = _steps
+    return _new_transforms
+
+
 def apply_transforms(
     row: Union[Dict, pd.Series],
     transforms_to_apply,
+    reader=None
 ):
     """
     Apply transforms defined by `transforms_to_apply` to images in
@@ -42,8 +100,6 @@ def apply_transforms(
         The dictionary specifying the transforms to apply
     """
 
-    # import here to optimize CLIs / Fire usage
-    from serotiny.io.image import image_loader
 
     transforms_to_apply = deepcopy(transforms_to_apply)
     result_imgs = dict()
@@ -68,7 +124,7 @@ def apply_transforms(
             if transform["input"] in result_imgs:
                 imgs = [result_imgs[transform["input"]]]
             else:
-                img = image_loader(row[transform["input"]], output_dtype="float32")
+                img = image_loader(row[transform["input"]], output_dtype="float32", reader=reader)
                 imgs = [img]
         elif isinstance(transform["input"], (dict, DictConfig)):
             imgs = []
@@ -96,45 +152,35 @@ def apply_transforms(
         # we iterate over the steps listed in this transform's
         # "steps" field. each element of "steps" is a dict
         # specifying a specific transform. these dicts are parsed
-        # using our dynamic_import utils
+        # using our dynamic_import utils. at this point, the transforms
+        # have been preloaded in the main process and passed to each worker
 
-        if isinstance(transform["steps"], (list, ListConfig)):
-            steps_configs = transform["steps"]
-        elif isinstance(transform["steps"], (dict, DictConfig)):
-            steps_configs = transform["steps"].values()
-        else:
-            raise TypeError(f"Unexpected type for `steps` field: "
-                            f"{type(transform['steps'])}")
-
-        for step in steps_configs:
-            # if an "^individual_args" key is present, as that means
-            # there are values we need to retrieve from this row
-            # as additional arguments to the transform
-            individual_args = step.pop("^individual_args", {})
+        for (step, individual_args, unpack, must_init) in transform["steps"]:
+            kwargs = dict()
             for arg, column in individual_args.items():
                 try:
-                    step[arg] = json.loads(row[column])
+                    kwargs[arg] = json.loads(row[column])
                 except json.JSONDecodeError:
-                    step[arg] = row[column]
+                    kwargs[arg] = row[column]
 
-            # retrieve another special key "^unpack", if it's present.
-            # it's use is explained below
-            unpack = step.pop("^unpack", False)
-
-            # load the step using our dynamic import logic
-            step = load_config(step)
+            if must_init:
+                # if we're here, it means this step is a class that
+                # requires individual_args to be inited, and so it
+                # must be inited here before it's called ahead
+                step = step(**kwargs)
+                kwargs = dict()
 
             # because of the way we collect the inputs,
             # `imgs` can be a list with a single image, if this is
             # the first step in this transform
             if isinstance(imgs, list) and len(imgs) == 1:
-                imgs = step(imgs[0])
+                imgs = step(imgs[0], **kwargs)
             else:
                 # if the input `imgs` at this point consists of
                 # more than a single image, there is an additional
                 # argument "^unpack" that can be specified for this
                 # step, which tells us to use the * operator here
-                imgs = step(*imgs) if unpack else step(imgs)
+                imgs = step(*imgs, **kwargs) if unpack else step(imgs, **kwargs)
 
         result_imgs[name] = imgs
 
@@ -147,8 +193,7 @@ def _transform_from_row(
     outputs: Dict[str, Sequence[str]],
     output_path: Union[str, Path],
     index_col: str,
-    include_cols: Sequence[str] = [],
-    debug: bool = False,
+    reader: Optional[str] = None,
 ):
     """
     Transform an image in a dataframe row, using transforms given by
@@ -173,49 +218,37 @@ def _transform_from_row(
     index_col: str
         Column to serve as index. Used for output filenames
 
-    include_cols: Sequence[str]
-        List of columns to include in the output manifest, aside from the
-        column containing paths to the output images
-
-    debug: bool = False
-        Whether to return errors in csv instead of raising and breaking
+    reader: Optional[str] = None
+        aicsimageio reader to use. If None, it is automatically determined,
+        but it entails additional io which makes things slower
     """
 
-    # import here to optimize CLIs and Fire
-    import torch
-    from serotiny.io.image import tiff_writer
-
-    result = {col: row[col] for col in include_cols}
-    result[index_col] = row[index_col]
-    result["errors"] = ""
-
-    try:
-        result_imgs = apply_transforms(row, transforms_to_apply)
-        for output, channel_names in outputs.items():
-            _output_path = output_path / f"{row[index_col]}_{output}.tiff"
-            img = result_imgs[output]
-            if isinstance(img, torch.Tensor):
-                img = img.numpy()
-            tiff_writer(img, _output_path, channel_names=channel_names)
-            result[f"{output}"] = str(_output_path)
-    except Exception as e:
-        if debug:
-            result["errors"] = traceback.format_exc()
-        else:
-            raise e
-
+    result = dict()
+    result_imgs = apply_transforms(row, transforms_to_apply, reader=reader)
+    for output, channel_names in outputs.items():
+        _output_path = output_path / f"{row[index_col]}_{output}.tiff"
+        img = result_imgs[output]
+        if isinstance(img, torch.Tensor):
+            img = img.numpy()
+        tiff_writer(img, _output_path, channel_names=channel_names)
+        result[output] = str(_output_path)
     return result
 
 
 def transform_images(
     input_manifest: Union[pd.DataFrame, Union[str, Path]],
-    outputs: Dict[str, Sequence[str]],
     output_path: Union[str, Path],
     transforms_to_apply: Sequence,
+    outputs: Dict[str, Sequence[str]],
     index_col: str,
     include_cols: Sequence[str] = [],
+    image_reader: Optional[str] = None,
+    backend: str = "multiprocessing",
+    return_merged: bool = False,
+    write_every_n_rows: int = 100,
     n_workers: int = 1,
     verbose: bool = False,
+    skip_if_exists: bool = False,
     debug: bool = False,
 ):
     """
@@ -227,16 +260,16 @@ def transform_images(
     input_manifest: Union[pd.DataFrame, Union[str, Path]]
         Path to the input manifest, or a pd.DataFrame
 
-    outputs: Dict[str, Sequence[str]]
-        Dictionary containing the keys for each output to save to disk,
-        and the corresponding channel names for that output. The channel
-        names are assumed to be in the correct order for each output
-
     output_path: Union[str, Path]
         Path to the folder where the outputs will be stored
 
     transforms_to_apply: Sequence
         Config dictionary specifying what transforms to apply
+
+    outputs: Dict[str, Sequence[str]]
+        Dictionary containing the keys for each output to save to disk,
+        and the corresponding channel names for that output. The channel
+        names are assumed to be in the correct order for each output
 
     index_col: str
         Column to serve as index. Used for output filenames
@@ -245,43 +278,58 @@ def transform_images(
         List of columns to include in the output manifest, aside from the
         column containing paths to the output images
 
+    image_reader: Optional[str] = None
+        aicsimageio reader to use. If None, it is automatically determined,
+        but it entails additional io which makes things slower
+
+    return_merged: bool = True
+        If True, return the result manifest merged with the input.
+        Otherwise, return only the result.
+
+    backend: str = "multiprocessing"
+        Backend to use for parallel computation. Possible values are
+        "multiprocessing", "slurm"
+
+    write_every_n_rows: int = 100
+        Write results to temporary file every n rows
+
     n_workers: int = 1
         Number of multiprocessing workers to use for parallel computation
 
     verbose: bool = False
         Flag to tell whether to produce command line output
+
+    skip_if_exists: bool = False
+        Whether to skip images if they're found on disk. Useful to avoid
+        redoing computations when something fails
+
+    debug: bool = False
+        Whether to return errors in csv instead of raising and breaking
     """
 
-    if not isinstance(input_manifest, pd.DataFrame):
-        # import here to optimize CLIs / Fire usage
-        from serotiny.io.dataframe import read_dataframe
-        input_manifest = read_dataframe(input_manifest)
-
-    output_path = Path(output_path)
-    if not output_path.exists():
-        output_path.mkdir(parents=True)
+    _do_imports()
 
     # make helper function with pre attributed params except df row
     apply_transform = partial(
         _transform_from_row,
-        transforms_to_apply=transforms_to_apply,
+        transforms_to_apply=_preload_transforms(transforms_to_apply),
         outputs=outputs,
+        output_path=Path(output_path),
+        index_col=index_col,
+        reader=image_reader,
+    )
+
+    _parse_batch(
+        input_manifest=input_manifest,
+        func_per_row=apply_transform,
         output_path=output_path,
         index_col=index_col,
         include_cols=include_cols,
-        debug=debug
+        return_merged=return_merged,
+        backend=backend,
+        write_every_n_rows=write_every_n_rows,
+        n_workers=n_workers,
+        verbose=verbose,
+        skip_if_exists=skip_if_exists,
+        debug=debug,
     )
-    iter_rows = (row for _, row in input_manifest.iterrows())
-
-    if n_workers > 1:
-        with mp.Pool(n_workers) as pool:
-            jobs = pool.imap_unordered(apply_transform, iter_rows)
-            if verbose:
-                jobs = tqdm(jobs, total=len(input_manifest))
-            success = pd.DataFrame.from_records(list(jobs))
-    else:
-        if verbose:
-            iter_rows = tqdm(iter_rows, total=len(input_manifest))
-        success = pd.DataFrame.from_records([apply_transform(row) for row in iter_rows])
-
-    success.to_csv(output_path / "manifest.csv")
