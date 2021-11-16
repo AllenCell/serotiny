@@ -74,7 +74,7 @@ requirements = [
     "hydra-core",
     "sphinx",
     "sphinx-rtd-theme",
-    "furo"
+    "furo",
     "aicsshparam"
 ]
 
