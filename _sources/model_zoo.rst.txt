@@ -9,7 +9,7 @@ this will store models in a folder inside your home directory
 You can also specify a zoo root by setting the environment variable
 ``SEROTINY_ZOO_ROOT`` to the desired value. Otherwise, it's also
 possible to specify a zoo root by setting the ``path`` parameter
-of the ``model_zoo** config passed to the model training CLI util.
+of the ``model_zoo`` config passed to the model training CLI util.
 
 Once a zoo root is specified, the model training functionality will
 store models in that folder, under a subfolder corresponding to their
@@ -20,7 +20,7 @@ Loading a trained model
 ***********************
 
 After a model is trained, we can load it via
-:py:func:`<serotiny.models.zoo.get_model>`, which takes
+:py:func:`serotiny.models.zoo.get_model`, which takes
 as parameters: the model class, the version string, and optionally
 the zoo root (which can be specified as described in the previous section).
 

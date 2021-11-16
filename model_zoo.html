@@ -233,7 +233,7 @@ this will store models in a folder inside your home directory
 <p>You can also specify a zoo root by setting the environment variable
 <code class="docutils literal notranslate"><span class="pre">SEROTINY_ZOO_ROOT</span></code> to the desired value. Otherwise, it’s also
 possible to specify a zoo root by setting the <code class="docutils literal notranslate"><span class="pre">path</span></code> parameter
-of the <a href="#id1"><span class="problematic" id="id2">``</span></a>model_zoo** config passed to the model training CLI util.</p>
+of the <code class="docutils literal notranslate"><span class="pre">model_zoo</span></code> config passed to the model training CLI util.</p>
 <p>Once a zoo root is specified, the model training functionality will
 store models in that folder, under a subfolder corresponding to their
 model class. Each model is identified within that subfolder by its
@@ -241,7 +241,7 @@ version string.</p>
 <div class="section" id="loading-a-trained-model">
 <h2>Loading a trained model<a class="headerlink" href="#loading-a-trained-model" title="Permalink to this headline">¶</a></h2>
 <p>After a model is trained, we can load it via
-<code class="xref py py-func docutils literal notranslate"><span class="pre">&lt;serotiny.models.zoo.get_model&gt;()</span></code>, which takes
+<a class="reference internal" href="serotiny.models.html#serotiny.models.zoo.get_model" title="serotiny.models.zoo.get_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">serotiny.models.zoo.get_model()</span></code></a>, which takes
 as parameters: the model class, the version string, and optionally
 the zoo root (which can be specified as described in the previous section).</p>
 <p>An example would be:</p>
