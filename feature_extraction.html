@@ -260,10 +260,21 @@ column name in the output manifest. The value for each key is a config dict,
 (which is loaded using <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>’s <a class="reference internal" href="dynamic_imports.html"><span class="doc">dynamic import functionality</span></a>),
 specifying a feature extraction callable. these need to conform to a certain API
 (for now, at least). You can find existing ones in the
-<code class="xref py py-mod docutils literal notranslate"><span class="pre">image</span> <span class="pre">feature</span> <span class="pre">extraction</span> <span class="pre">module</span></code></p>
+<a class="reference internal" href="serotiny.data.image.html#module-serotiny.data.image.feature_extraction" title="serotiny.data.image.feature_extraction"><code class="xref py py-mod docutils literal notranslate"><span class="pre">image</span> <span class="pre">feature</span> <span class="pre">extraction</span> <span class="pre">module</span></code></a></p>
 </div>
 <div class="section" id="example-feature-extraction">
 <h2>Example feature extraction<a class="headerlink" href="#example-feature-extraction" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">bounding_box</span><span class="p">:</span>
+  <span class="nt">features_to_extract</span><span class="p">:</span>
+    <span class="nt">bbox</span><span class="p">:</span>
+      <span class="nt">^bind</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">serotiny.data.image.dillated_bbox</span>
+      <span class="nt">channel</span><span class="p">:</span> <span class="s">"membrane_seg"</span>
+      <span class="nt">structuring_element</span><span class="p">:</span> <span class="p p-Indicator">[</span><span class="nv">8</span><span class="p p-Indicator">,</span><span class="nv">8</span><span class="p p-Indicator">,</span><span class="nv">8</span><span class="p p-Indicator">]</span>
+    <span class="nt">center_of_mass</span><span class="p">:</span>
+      <span class="nt">^bind</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">serotiny.data.image.center_of_mass</span>
+      <span class="nt">channel</span><span class="p">:</span> <span class="s">"membrane_seg"</span>
+</pre></div>
+</div>
 </div>
 </div>
 
