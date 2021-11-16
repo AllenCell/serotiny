@@ -139,9 +139,9 @@ def _parse_batch(
     output_path = Path(output_path)
     if not output_path.exists():
         if output_path.suffix == "":
-            output_path.mkdir(parents=True)
+            output_path.mkdir(parents=True, exist_ok=True)
         else:
-            output_path.parent.mkdir(parents=True)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
 
     to_skip = set()
 
