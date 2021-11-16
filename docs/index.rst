@@ -12,6 +12,7 @@ serotiny
    cli
    dynamic_imports
    image_transforms
+   feature_extraction
    dataframe_transforms
    example_workflows
    Package modules <modules>
