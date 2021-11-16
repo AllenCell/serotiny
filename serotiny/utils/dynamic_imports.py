@@ -1,5 +1,6 @@
 import importlib
 from functools import partial
+from omegaconf import DictConfig
 
 INVOKE_KEY = "^invoke"
 BIND_KEY = "^bind"
@@ -138,7 +139,7 @@ def load_config(config, recurrent=True):
 
 
 def load_multiple(configs, recurrent=True):
-    if isinstance(configs, dict):
+    if hasattr(configs, "items"):
         return {key: load_config(config, recurrent) for key, config in configs.items()}
     elif iter(configs):
         return [load_config(config, recurrent) for config in configs]
