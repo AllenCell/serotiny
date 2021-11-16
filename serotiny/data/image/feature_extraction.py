@@ -7,12 +7,20 @@ from aicsimageprocessing import cell_rigid_registration
 
 
 def angle(img, channel_map, /, channel, skew_adjust):
+    """
+    Extract angle of rotation in the X place, for alignment
+    of major axes of the max projection of `channel`.
+    """
     channel = channel_map[channel]
     return align_image_2d(img, channel, make_unique=skew_adjust,
                           compute_aligned_image=False)
 
 
 def min_max(img, channel_map, /, channels):
+    """
+    Extract the minimum and maximum values for the given list
+    of channels
+    """
     results = {}
     for channel in channels:
         channel_ix = channel_map[channel]
@@ -23,17 +31,25 @@ def min_max(img, channel_map, /, channels):
 
 
 def percentile(img, channel_map, /, channels, up_p, low_p):
+    """
+    Extract an "upper" percentile and a "lower" percentile for the
+    given list of channels
+    """
     channels = range(img.shape[0])
     results = {}
     for channel in channels:
         channel_ix = channel_map[channel]
-        results[f"{channel}_0.5_perc"] = np.percentile(img[channel_ix], up_p)
-        results[f"{channel}_99.5_perc"] = np.percentile(img[channel_ix], low_p)
+        results[f"{channel}_{up_p:.2f}_perc"] = np.percentile(img[channel_ix], up_p)
+        results[f"{channel}_{low_p:.2f}_perc"] = np.percentile(img[channel_ix], low_p)
 
     return results
 
 
 def bbox(img, channel_map, /, channels):
+    """
+    Extract the bounding box, using a pair of channels given
+    in `channels`, as [center of mass channel, cropping channel]
+    """
     img = img[channels]
     channel_com, channel_crop = channels
 
@@ -49,6 +65,10 @@ def bbox(img, channel_map, /, channels):
 
 
 def dillated_bbox(img, channel_map, /, channel, structuring_element=[5,5,5]):
+    """
+    Extract the bounding box of the result of dilating the channel
+    given by channel, using the given structuring element
+    """
     channel_ix = channel_map[channel]
     img = img[channel_ix]
     img = binary_dilation(img, np.ones(structuring_element))
@@ -58,6 +78,9 @@ def dillated_bbox(img, channel_map, /, channel, structuring_element=[5,5,5]):
 
 
 def center_of_mass(img, channel_map, /, channel):
+    """
+    Extract the center of mass of the given channel
+    """
     channel = channel_map[channel]
     _center_of_mass = np.mean(
         np.stack(np.where(img[channel] > 0)),
@@ -68,6 +91,9 @@ def center_of_mass(img, channel_map, /, channel):
 
 def shcoeffs(img, channel_map, /, channel, lmax=4, sigma=0, compute_lcc=True,
              alignment_2d=False, make_unique=False, prefix=None):
+    """
+    Compute spherical harmonic coefficients for the given channel
+    """
     channel = channel_map[channel]
     (coeffs, _), _ = get_shcoeffs(image=img[channel], lmax=lmax,
                                   sigma=sigma, compute_lcc=compute_lcc,
