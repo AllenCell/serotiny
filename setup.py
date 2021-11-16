@@ -74,6 +74,8 @@ requirements = [
     "hydra-core",
     "sphinx",
     "sphinx-rtd-theme",
+    "furo"
+    "aicsshparam"
 ]
 
 extra_requirements = {

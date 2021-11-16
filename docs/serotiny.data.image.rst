@@ -4,6 +4,22 @@ serotiny.data.image package
 Submodules
 ----------
 
+serotiny.data.image.align module
+--------------------------------
+
+.. automodule:: serotiny.data.image.align
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+serotiny.data.image.feature\_extraction module
+----------------------------------------------
+
+.. automodule:: serotiny.data.image.feature_extraction
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 serotiny.data.image.normalize module
 ------------------------------------
 

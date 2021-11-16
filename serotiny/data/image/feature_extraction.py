@@ -1,3 +1,5 @@
+from typing import Union, Dict, Sequence, Optional
+import torch
 import numpy as np
 from scipy.ndimage.morphology import binary_dilation
 
@@ -5,21 +7,59 @@ from aicsshparam.shtools import align_image_2d
 from aicsshparam.shparam import get_shcoeffs
 from aicsimageprocessing import cell_rigid_registration
 
+ArrayLike = Union[np.array, torch.Tensor]
 
-def angle(img, channel_map, /, channel, skew_adjust):
+def angle(
+    img: ArrayLike,
+    channel_map: Dict,
+    /,
+    channel: str,
+    skew_adjust: bool
+):
     """
     Extract angle of rotation in the X place, for alignment
     of major axes of the max projection of `channel`.
+
+    Parameters
+    ----------
+    img: ArrayLike
+        The image from which to extract the feature
+
+    channel_map: Dict[str, int]
+        A dictionary containing channel names and correspoding indices
+
+    channel: str
+        The channel name from which to extract the angle
+
+    skew_adjust: bool
+        Whether to adjust for skewness
     """
     channel = channel_map[channel]
     return align_image_2d(img, channel, make_unique=skew_adjust,
                           compute_aligned_image=False)
 
 
-def min_max(img, channel_map, /, channels):
+def min_max(
+    img: ArrayLike,
+    channel_map: Dict[str, int],
+    /,
+    channels: Sequence[str]
+):
     """
     Extract the minimum and maximum values for the given list
     of channels
+
+    Parameters
+    ----------
+    img: ArrayLike
+        The image from which to extract the feature
+
+    channel_map: Dict[str, int]
+        A dictionary containing channel names and correspoding indices
+
+    channels: Sequence[str]
+        List of channels for which to extract mins and maxes
+
     """
     results = {}
     for channel in channels:
@@ -30,25 +70,62 @@ def min_max(img, channel_map, /, channels):
     return results
 
 
-def percentile(img, channel_map, /, channels, up_p, low_p):
+def percentile(
+    img: ArrayLike,
+    channel_map: Dict[str, int],
+    /,
+    channels: Sequence[str],
+    perc: float
+):
     """
-    Extract an "upper" percentile and a "lower" percentile for the
-    given list of channels
+    Extract a given percentile value for the given list of channels
+
+    Parameters
+    ----------
+    img: ArrayLike
+        The image from which to extract the feature
+
+    channel_map: Dict[str, int]
+        A dictionary containing channel names and correspoding indices
+
+    channels: Sequence[str]
+        List of channels for which to extract the percentile value
+
+    perc: float
+        The percentile to extract
+
     """
     channels = range(img.shape[0])
     results = {}
     for channel in channels:
         channel_ix = channel_map[channel]
-        results[f"{channel}_{up_p:.2f}_perc"] = np.percentile(img[channel_ix], up_p)
-        results[f"{channel}_{low_p:.2f}_perc"] = np.percentile(img[channel_ix], low_p)
+        results[f"{channel}_{perc:.2f}_perc"] = np.percentile(img[channel_ix],
+                                                              perc)
 
     return results
 
 
-def bbox(img, channel_map, /, channels):
+def bbox(
+    img: ArrayLike,
+    channel_map: Dict[str, int],
+    /,
+    channels: Sequence[str],
+):
     """
     Extract the bounding box, using a pair of channels given
     in `channels`, as [center of mass channel, cropping channel]
+
+    Parameters
+    ----------
+    img: ArrayLike
+        The image from which to extract the feature
+
+    channel_map: Dict[str, int]
+        A dictionary containing channel names and correspoding indices
+
+    channels: Sequence[str]
+        List of channels for which to extract the bounding box
+
     """
     img = img[channels]
     channel_com, channel_crop = channels
@@ -64,10 +141,31 @@ def bbox(img, channel_map, /, channels):
     return img.shape.tolist()
 
 
-def dillated_bbox(img, channel_map, /, channel, structuring_element=[5,5,5]):
+def dillated_bbox(
+    img: ArrayLike,
+    channel_map: Dict[str, int],
+    /,
+    channel: str,
+    structuring_element: Sequence[int] = [5,5,5],
+):
     """
     Extract the bounding box of the result of dilating the channel
     given by channel, using the given structuring element
+
+    Parameters
+    ----------
+    img: ArrayLike
+        The image from which to extract the feature
+
+    channel_map: Dict[str, int]
+        A dictionary containing channel names and correspoding indices
+
+    channel: str
+        The channel name from which to extract the bounding box
+
+    structuring_element: Sequence[int]
+        The dillation structuring element shape
+
     """
     channel_ix = channel_map[channel]
     img = img[channel_ix]
@@ -77,9 +175,26 @@ def dillated_bbox(img, channel_map, /, channel, structuring_element=[5,5,5]):
     return (non_zero.max(axis=0) - non_zero.min(axis=0)).tolist()
 
 
-def center_of_mass(img, channel_map, /, channel):
+def center_of_mass(
+    img: ArrayLike,
+    channel_map: Dict[str, int],
+    /,
+    channel: str,
+):
     """
     Extract the center of mass of the given channel
+
+    Parameters
+    ----------
+    img: ArrayLike
+        The image from which to extract the feature
+
+    channel_map: Dict[str, int]
+        A dictionary containing channel names and correspoding indices
+
+    channel: str
+        The channel name from which to extract the center of mass
+
     """
     channel = channel_map[channel]
     _center_of_mass = np.mean(
@@ -89,10 +204,51 @@ def center_of_mass(img, channel_map, /, channel):
     return np.floor(_center_of_mass + 0.5).astype(int).tolist()
 
 
-def shcoeffs(img, channel_map, /, channel, lmax=4, sigma=0, compute_lcc=True,
-             alignment_2d=False, make_unique=False, prefix=None):
+def shcoeffs(
+    img: ArrayLike,
+    channel_map: Dict[str, int],
+    /,
+    channel: str,
+    lmax: int = 4,
+    sigma: float = 0,
+    compute_lcc: bool = True,
+    alignment_2d: bool = False,
+    make_unique: bool = False,
+    prefix: Optional[str] = None
+):
     """
     Compute spherical harmonic coefficients for the given channel
+
+    Parameters
+    ----------
+    img: ArrayLike
+        The image from which to extract the feature
+
+    channel_map: Dict[str, int]
+        A dictionary containing channel names and correspoding indices
+
+    channel: str
+        The channel name from which to extract the spherical harmonic
+        coefficients
+
+    lmax: int = 4
+        See https://github.com/AllenCell/aics-shparam/blob/main/aicsshparam/shparam.py
+
+    sigma: float = 0
+        See https://github.com/AllenCell/aics-shparam/blob/main/aicsshparam/shparam.py
+
+    compute_lcc: bool = True
+        See https://github.com/AllenCell/aics-shparam/blob/main/aicsshparam/shparam.py
+
+    alignment_2d: bool = False
+        See https://github.com/AllenCell/aics-shparam/blob/main/aicsshparam/shparam.py
+
+    make_unique: bool = False
+        See https://github.com/AllenCell/aics-shparam/blob/main/aicsshparam/shparam.py
+
+    prefix: Optional[str] = None
+        A prefix to prepend to the keys in the result dictionary
+
     """
     channel = channel_map[channel]
     (coeffs, _), _ = get_shcoeffs(image=img[channel], lmax=lmax,

@@ -80,6 +80,7 @@ Example transform pipeline (with comments)
 
 
 .. code-block:: yaml
+
   crop_and_normalize:
     transforms: # in the example command above, this is the field passed to the `transforms_to_apply` parameter
       cropped: # name of this transform. we use it to refer to its output as well

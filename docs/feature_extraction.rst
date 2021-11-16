@@ -50,6 +50,7 @@ Example feature extraction
 
 
 .. code-block:: yaml
+
   bounding_box:
     features_to_extract:
       bbox:
