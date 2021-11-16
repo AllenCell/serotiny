@@ -6,7 +6,7 @@ import fire
 
 def apply_model(
     model_class: str,
-    model_id: str,
+    version_string: str,
     datamodule: Dict,
     trainer: Dict,
     model_zoo: Dict,
@@ -23,7 +23,7 @@ def apply_model(
     model_class: str
         The "import path" to the model class, e.g. serotiny.models.RegressionModel
 
-    model_id:
+    version_string:
         A version string that uniquely identifies the model within the
         zoo.
 
@@ -69,7 +69,7 @@ def apply_model(
     loggers_config = loggers
 
     model_zoo_path = model_zoo_config.get("path")
-    model = get_model(model_class, model_id, model_zoo_path)
+    model = get_model(model_class, version_string, model_zoo_path)
 
     datamodule = init(datamodule_config)
     datamodule.setup()

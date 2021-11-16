@@ -38,7 +38,7 @@ def get_root(zoo_root: Optional[Union[str, Path]] = None):
 
 def _get_checkpoint(
     model_class: str,
-    model_id: str,
+    version_string: str,
     zoo_root: Optional[Union[str, Path]] = None,
 ):
     zoo_root = get_root(zoo_root)
@@ -46,9 +46,9 @@ def _get_checkpoint(
     if not zoo_root.exists():
         raise FileNotFoundError("Given zoo_root does not exists.")
 
-    model_id = model_id.replace("/", "_")
+    version_string = version_string.replace("/", "_")
 
-    model_path = (zoo_root / model_class) / model_id
+    model_path = (zoo_root / model_class) / version_string
 
     with open(str(model_path) + ".yaml") as f:
         config = yaml.load(f, Loader=yaml.UnsafeLoader)
@@ -60,7 +60,7 @@ def _get_checkpoint(
 
 def get_model(
     model_class: str,
-    model_id: str,
+    version_string: str,
     zoo_root: Optional[Union[str, Path]] = None,
 ):
     """
@@ -72,7 +72,7 @@ def get_model(
         The "import path" to the model class, e.g.
         serotiny.models.RegressionModel
 
-    model_id:
+    version_string:
         a version string that uniquely identifies the model within the
         zoo.
 
@@ -80,7 +80,7 @@ def get_model(
         (Optional) path to the model zoo root
     """
 
-    ckpt_path, config = _get_checkpoint(model_class, model_id, zoo_root)
+    ckpt_path, config = _get_checkpoint(model_class, version_string, zoo_root)
     model_class = module_or_path(models, model_class)
 
     model_config = config["model"]
@@ -88,7 +88,7 @@ def get_model(
     return model_class.load_from_checkpoint(checkpoint_path=ckpt_path, **model_config)
 
 
-def store_model(trainer, model_class, model_id, zoo_root=None):
+def store_model(trainer, model_class, version_string, zoo_root=None):
     """
     Stored a model in disk, inside a model zoo.
 
@@ -101,7 +101,7 @@ def store_model(trainer, model_class, model_id, zoo_root=None):
         A string containing the "import path" to the model class,
         e.g. serotiny.models.RegressionModel
 
-    model_id: str
+    version_string: str
         A version string that uniquely identifies the model within the
         zoo.
 
@@ -117,16 +117,16 @@ def store_model(trainer, model_class, model_id, zoo_root=None):
     if not model_path.exists():
         model_path.mkdir(parents=True, exist_ok=True)
 
-    model_id = model_id if ".ckpt" in model_id else model_id + ".ckpt"
-    model_id = model_id.replace("/", "_")
+    version_string = version_string if ".ckpt" in version_string else version_string + ".ckpt"
+    version_string = version_string.replace("/", "_")
 
-    model_path = model_path / model_id
+    model_path = model_path / version_string
     trainer.save_checkpoint(model_path)
 
 
 def get_checkpoint_callback(
     model_class: str,
-    model_id: str,
+    version_string: str,
     zoo_root: Optional[Union[str, Path]] = None,
     **checkpoint_callback_kwargs
 ):
@@ -140,7 +140,7 @@ def get_checkpoint_callback(
         A string containing the "import path" to the model class,
         e.g. serotiny.models.RegressionModel
 
-    model_id: str
+    version_string: str
         A version string that uniquely identifies the model within the
         zoo.
 
@@ -154,8 +154,8 @@ def get_checkpoint_callback(
     """
 
     zoo_root = get_root(zoo_root)
-    model_id = model_id.replace("/", "_")
-    model_path = (zoo_root / model_class) / model_id
+    version_string = version_string.replace("/", "_")
+    model_path = (zoo_root / model_class) / version_string
     model_path.mkdir(parents=True, exist_ok=True)
 
     if "filename" not in checkpoint_callback_kwargs:
@@ -168,7 +168,7 @@ def get_checkpoint_callback(
 
 def get_trainer_at_checkpoint(
     model_class: str,
-    model_id: str,
+    version_string: str,
     zoo_root: Optional[Union[str, Path]] = None,
     reload_callbacks: bool = False,
     reload_loggers: bool = True,
@@ -183,7 +183,7 @@ def get_trainer_at_checkpoint(
         A string containing the "import path" to the model class,
         e.g. serotiny.models.RegressionModel
 
-    model_id: str
+    version_string: str
         A version string that uniquely identifies the model within the
         zoo.
 
@@ -197,14 +197,14 @@ def get_trainer_at_checkpoint(
         Flag to determine whether to reload the trainer's loggers
     """
 
-    ckpt_path, config = _get_checkpoint(model_class, model_id, zoo_root)
+    ckpt_path, config = _get_checkpoint(model_class, version_string, zoo_root)
 
     trainer_config = config["trainer"]
 
     model_zoo_config = config["model_zoo"]
     checkpoint_callback = get_checkpoint_callback(
         model_class,
-        model_id,
+        version_string,
         model_zoo_config.get("checkpoint_monitor"),
         model_zoo_config.get("checkpoint_mode", "min"),
         zoo_root,
@@ -227,7 +227,7 @@ def get_trainer_at_checkpoint(
     return trainer
 
 
-def store_metadata(metadata: Dict, model_class: str, model_id: str, zoo_root=None):
+def store_metadata(metadata: Dict, model_class: str, version_string: str, zoo_root=None):
     """
     Store metadata associated with a training run of a model
 
@@ -240,7 +240,7 @@ def store_metadata(metadata: Dict, model_class: str, model_id: str, zoo_root=Non
         The "import path" to the model class, e.g.
         serotiny.models.RegressionModel
 
-    model_id:
+    version_string:
         a version string that uniquely identifies the model within the
         zoo.
 
@@ -249,7 +249,7 @@ def store_metadata(metadata: Dict, model_class: str, model_id: str, zoo_root=Non
 
     """
 
-    model_id = model_id.replace("/", "_")
+    version_string = version_string.replace("/", "_")
     zoo_root = get_root(zoo_root)
 
     if not zoo_root.exists():
@@ -259,9 +259,9 @@ def store_metadata(metadata: Dict, model_class: str, model_id: str, zoo_root=Non
     if not model_path.exists():
         model_path.mkdir(parents=True, exist_ok=True)
 
-    model_id = model_id if ".yaml" in model_id else model_id + ".yaml"
+    version_string = version_string if ".yaml" in version_string else version_string + ".yaml"
 
-    model_path = model_path / model_id
+    model_path = model_path / version_string
 
     if isinstance(metadata, omegaconf.DictConfig):
         omegaconf.OmegaConf.save(metadata, model_path, resolve=True)
