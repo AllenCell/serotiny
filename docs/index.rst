@@ -14,6 +14,7 @@ serotiny
    image_transforms
    feature_extraction
    dataframe_transforms
+   model_zoo
    example_workflows
    Package modules <modules>
    contributing
