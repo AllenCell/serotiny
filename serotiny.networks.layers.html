@@ -4,11 +4,11 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny.utils package" href="serotiny.utils.html" /><link rel="prev" title="serotiny.networks.classification package" href="serotiny.networks.classification.html" />
 
-    <meta name="generator" content="sphinx-4.2.0, furo 2021.10.09"/>
+    <meta name="generator" content="sphinx-4.3.0, furo 2021.11.16"/>
         <title>serotiny.networks.layers package - serotiny 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=0254c309f5cadf746f1a613e7677379ac9c8cdcd" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=916d6ed8f59335acffa15474ff504849343d4c76" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=0af69da206d614734f649b27d4cdc2dd6c31f41d" />
     
     
 
@@ -161,6 +161,7 @@
 <li class="toctree-l1"><a class="reference internal" href="cli.html">serotiny CLI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dynamic_imports.html">Dynamic imports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="image_transforms.html">Applying image transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_extraction.html">Extraction features from images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dataframe_transforms.html">Dataframe wrangling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="example_workflows.html">Example workflows</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="modules.html">Package modules</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
@@ -239,7 +240,7 @@
 <span id="serotiny-networks-layers-pad-module"></span><h2>serotiny.networks.layers.pad module<a class="headerlink" href="#module-serotiny.networks.layers.pad" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="serotiny.networks.layers.pad.PadLayer">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.networks.layers.pad.</span></span><span class="sig-name descname"><span class="pre">PadLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dimensionality</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_dims</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/networks/layers/pad.html#PadLayer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.networks.layers.pad.PadLayer" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.networks.layers.pad.</span></span><span class="sig-name descname"><span class="pre">PadLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dimensionality</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad_dims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/networks/layers/pad.html#PadLayer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.networks.layers.pad.PadLayer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
 <p>Layer to apply symmetric padding according to what is given in pad_dims</p>
 <dl class="field-list simple">
@@ -256,7 +257,7 @@
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.networks.layers.pad.PadLayer.training">
-<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.networks.layers.pad.PadLayer.training" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#serotiny.networks.layers.pad.PadLayer.training" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 </dd></dl>
 </div>
@@ -264,7 +265,7 @@
 <span id="serotiny-networks-layers-spatial-pyramid-pool-module"></span><h2>serotiny.networks.layers.spatial_pyramid_pool module<a class="headerlink" href="#module-serotiny.networks.layers.spatial_pyramid_pool" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="serotiny.networks.layers.spatial_pyramid_pool.SpatialPyramidPool">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.networks.layers.spatial_pyramid_pool.</span></span><span class="sig-name descname"><span class="pre">SpatialPyramidPool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out_pool_sizes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/networks/layers/spatial_pyramid_pool.html#SpatialPyramidPool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.networks.layers.spatial_pyramid_pool.SpatialPyramidPool" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.networks.layers.spatial_pyramid_pool.</span></span><span class="sig-name descname"><span class="pre">SpatialPyramidPool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">out_pool_sizes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/networks/layers/spatial_pyramid_pool.html#SpatialPyramidPool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.networks.layers.spatial_pyramid_pool.SpatialPyramidPool" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="serotiny.networks.layers.spatial_pyramid_pool.SpatialPyramidPool.forward">
@@ -272,7 +273,7 @@
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.networks.layers.spatial_pyramid_pool.SpatialPyramidPool.training">
-<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#serotiny.networks.layers.spatial_pyramid_pool.SpatialPyramidPool.training" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#serotiny.networks.layers.spatial_pyramid_pool.SpatialPyramidPool.training" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 </dd></dl>
 <dl class="py function">
@@ -314,11 +315,9 @@
 
         <div class="related-information">
               Copyright &#169; 2021 |
-            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
-              and
-              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
-              <a href="https://github.com/pradyunsg/furo">Furo theme</a>. |
-            <a class="muted-link" href="_sources/serotiny.networks.layers.rst.txt"
+          Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+          <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+            | <a class="muted-link" href="_sources/serotiny.networks.layers.rst.txt"
                rel="nofollow">
               Show Source
             </a>
@@ -359,6 +358,6 @@
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/scripts/main.js"></script>
+    <script src="_static/scripts/furo.js"></script>
     </body>
 </html>

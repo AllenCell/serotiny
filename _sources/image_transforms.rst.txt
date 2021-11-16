@@ -16,21 +16,27 @@ The general structure of the CLI call is:
 
    serotiny image transform \
        --input_manifest=my_manifest.csv \
-       --outputs=example.yaml:crop_and_normalize.outputs \
        --output_path=output_manifest.csv \
        --transforms_to_apply=example.yaml:crop_and_normalize.transforms \ # we will dive into this YAML file ahead
-       --index_col="cell_id" # the index col is used for the image filenames
-       # --merge_col=... \ # optional. to merge multiple manifests (horizontally)
+       --outputs=example.yaml:crop_and_normalize.outputs \
+       --index_col="cell_id" \# the index col is used for the image filenames
        # --include_cols=... \ # optional. to include other columns in the output manifest
+       # --image_reader=aicsimageio.readers.ome_tiff_reader.OmeTiffReader \ # optional. avoids an initial io operation to select what type of reader to use.
+       # --backend="multiprocessing" \ # optional. select which parallel backend to use
+       # --return_merged=True \ # optional. whether to merge the results with the input
+       # --write_every_n_rows=100 \ # optional. number of iterations to save to disk at once
        # --n_workers=10 \ # optional. process multiple images in parallel
        # --verbose=False \ # optional. produce command line output
+       # --skip_if_exists=False \ # optional. whether to try to retrieve results from an unfinished run and continue from there
+       # --debug=False \ # optional. whether to return errors in csv instead of raising and breaking
+
 
 
 Configuring ``transforms_to_apply``
 ***************************************
 
 ``transforms_to_apply`` is where the whole transform pipeline is specified.
-It can rely on ``serotiny``'s :doc:`dynamic import functionality <dynamic_imports>`
+It relies on ``serotiny``'s :doc:`dynamic import functionality <dynamic_imports>`
 to provide very flexible transform pipelines. As described in the :doc:`CLI page <cli>`,
 a config can either be provided directly in the command line, or it can be given
 as a YAML file, or part of one. In any of those cases, the ``transforms_to_apply``

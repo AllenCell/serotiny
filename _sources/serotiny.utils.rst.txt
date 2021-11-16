@@ -12,14 +12,6 @@ serotiny.utils.dynamic\_imports module
    :undoc-members:
    :show-inheritance:
 
-serotiny.utils.lazy\_import module
-----------------------------------
-
-.. automodule:: serotiny.utils.lazy_import
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 

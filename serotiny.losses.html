@@ -4,11 +4,11 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny.metrics package" href="serotiny.metrics.html" /><link rel="prev" title="serotiny.io.dataframe.loaders package" href="serotiny.io.dataframe.loaders.html" />
 
-    <meta name="generator" content="sphinx-4.2.0, furo 2021.10.09"/>
+    <meta name="generator" content="sphinx-4.3.0, furo 2021.11.16"/>
         <title>serotiny.losses package - serotiny 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=0254c309f5cadf746f1a613e7677379ac9c8cdcd" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=916d6ed8f59335acffa15474ff504849343d4c76" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=0af69da206d614734f649b27d4cdc2dd6c31f41d" />
     
     
 
@@ -161,6 +161,7 @@
 <li class="toctree-l1"><a class="reference internal" href="cli.html">serotiny CLI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dynamic_imports.html">Dynamic imports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="image_transforms.html">Applying image transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_extraction.html">Extraction features from images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dataframe_transforms.html">Dataframe wrangling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="example_workflows.html">Example workflows</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="modules.html">Package modules</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
@@ -231,7 +232,7 @@
 <span id="serotiny-losses-continuous-bernoulli-module"></span><h2>serotiny.losses.continuous_bernoulli module<a class="headerlink" href="#module-serotiny.losses.continuous_bernoulli" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="serotiny.losses.continuous_bernoulli.CBLogLoss">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">serotiny.losses.continuous_bernoulli.</span></span><span class="sig-name descname"><span class="pre">CBLogLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sum'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'probs'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/losses/continuous_bernoulli.html#CBLogLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.losses.continuous_bernoulli.CBLogLoss" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.losses.continuous_bernoulli.</span></span><span class="sig-name descname"><span class="pre">CBLogLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sum'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'probs'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/losses/continuous_bernoulli.html#CBLogLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.losses.continuous_bernoulli.CBLogLoss" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.loss._Loss</span></code></p>
 <p>Continuous Bernoulli loss, proposed here: <a class="reference external" href="https://arxiv.org/abs/1907.06845">https://arxiv.org/abs/1907.06845</a></p>
 <dl class="py method">
@@ -240,7 +241,7 @@
 <dd></dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.losses.continuous_bernoulli.CBLogLoss.reduction">
-<span class="sig-name descname"><span class="pre">reduction</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#serotiny.losses.continuous_bernoulli.CBLogLoss.reduction" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">reduction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#serotiny.losses.continuous_bernoulli.CBLogLoss.reduction" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 </dd></dl>
 </div>
@@ -248,7 +249,7 @@
 <span id="serotiny-losses-kl-divergence-module"></span><h2>serotiny.losses.kl_divergence module<a class="headerlink" href="#module-serotiny.losses.kl_divergence" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="serotiny.losses.kl_divergence.diagonal_gaussian_kl">
-<span class="sig-prename descclassname"><span class="pre">serotiny.losses.kl_divergence.</span></span><span class="sig-name descname"><span class="pre">diagonal_gaussian_kl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu1</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu2</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar1</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar2</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/losses/kl_divergence.html#diagonal_gaussian_kl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.losses.kl_divergence.diagonal_gaussian_kl" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">serotiny.losses.kl_divergence.</span></span><span class="sig-name descname"><span class="pre">diagonal_gaussian_kl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">torch.Tensor</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/losses/kl_divergence.html#diagonal_gaussian_kl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.losses.kl_divergence.diagonal_gaussian_kl" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the Kullback-Leibler divergence between two diagonal
 gaussians (not necessarily isotropic). It also works batch-wise.</p>
 <dl class="field-list simple">
@@ -311,11 +312,9 @@ and an isotropic (0,1) gaussian. It also works batch-wise.</p>
 
         <div class="related-information">
               Copyright &#169; 2021 |
-            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
-              and
-              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
-              <a href="https://github.com/pradyunsg/furo">Furo theme</a>. |
-            <a class="muted-link" href="_sources/serotiny.losses.rst.txt"
+          Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+          <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+            | <a class="muted-link" href="_sources/serotiny.losses.rst.txt"
                rel="nofollow">
               Show Source
             </a>
@@ -355,6 +354,6 @@ and an isotropic (0,1) gaussian. It also works batch-wise.</p>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/scripts/main.js"></script>
+    <script src="_static/scripts/furo.js"></script>
     </body>
 </html>

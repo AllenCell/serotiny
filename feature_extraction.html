@@ -2,10 +2,10 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Applying image transforms" href="image_transforms.html" /><link rel="prev" title="serotiny CLI" href="cli.html" />
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Dataframe wrangling" href="dataframe_transforms.html" /><link rel="prev" title="Applying image transforms" href="image_transforms.html" />
 
     <meta name="generator" content="sphinx-4.3.0, furo 2021.11.16"/>
-        <title>Dynamic imports - serotiny 0.0.1 documentation</title>
+        <title>Extraction features from images - serotiny 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=916d6ed8f59335acffa15474ff504849343d4c76" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=0af69da206d614734f649b27d4cdc2dd6c31f41d" />
@@ -159,9 +159,9 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">serotiny CLI</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Dynamic imports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dynamic_imports.html">Dynamic imports</a></li>
 <li class="toctree-l1"><a class="reference internal" href="image_transforms.html">Applying image transforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="feature_extraction.html">Extraction features from images</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Extraction features from images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dataframe_transforms.html">Dataframe wrangling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="example_workflows.html">Example workflows</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="modules.html">Package modules</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -223,117 +223,46 @@
           </label>
         </div>
         <article role="main">
-          <div class="section" id="dynamic-imports">
-<h1>Dynamic imports<a class="headerlink" href="#dynamic-imports" title="Permalink to this headline">¶</a></h1>
-<p>For its users, <code class="docutils literal notranslate"><span class="pre">serotiny</span></code> intends to be a configuration-centric framework.
-The idea is that for someone to leverage a <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>-based workflow and
-adapt it to their use-case, it should be almost enough to just tweak configuration
-parameters in a YAML file. Moreover, this makes it easy to integrate with
-workflow frameworks like <a class="reference external" href="https://snakemake.readthedocs.io/en/stable/">Snakemake</a> ,
-which is also YAML/config-based</p>
-<p>To maximize the configurability of <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>, we developed a dynamic import
-functionality, which allows Python dictionaries (which can be read from
-YAML configs) containing special configurations to be interpreted and loaded.</p>
-<p>There are 3 ways of using this functionality:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">^init</span></code> - to instantiate classes</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">^invoke</span></code> - to return the results of function calls</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">^bind</span></code> - to load functions with partially attributed arguments</p></li>
-</ul>
-<p>Additionally, there is a special keyword <code class="docutils literal notranslate"><span class="pre">^positional_args</span></code> which
-can be used when the arguments to be served must be positional, or
-the function takes a variable number of arguments.</p>
-<p>Examples for each of these are provided ahead.</p>
-<div class="section" id="init">
-<h2><code class="docutils literal notranslate"><span class="pre">^init</span></code><a class="headerlink" href="#init" title="Permalink to this headline">¶</a></h2>
-<p>To instantiate a class described by a dictionary, we can use the <code class="docutils literal notranslate"><span class="pre">^init</span></code>
-keyword. For example, to instantiate a Unet:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">net_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">full_load</span><span class="p">(</span><span class="s2">"""</span>
-<span class="go">^init: serotiny.networks._3d.Unet</span>
-<span class="go">depth: 4</span>
-<span class="go">channel_fan: 2</span>
-<span class="go">channel_fan_top: 8 # down from 64</span>
-<span class="go">num_input_channels: 2 # specify how many channels</span>
-<span class="go">num_output_channels: 1</span>
-<span class="go">""")</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">net</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">(</span><span class="n">net_config</span><span class="p">)</span>
+          <div class="section" id="extraction-features-from-images">
+<h1>Extraction features from images<a class="headerlink" href="#extraction-features-from-images" title="Permalink to this headline">¶</a></h1>
+<p>Often we need to extract features for images, either for direct use in downstream
+tasks (e.g. computing spherical harmonic coefficients), or as a intermediate step
+for image processing (e.g. computing quantiles, bounding-boxes, etc.).</p>
+<p>For this, we provide a CLI utility, similar in spirit to the image transform one,
+that enables a set of features to be extracted from a dataset of images and stored
+in a manifest. As usual, the starting point is
+a manifest file (e.g. a <code class="docutils literal notranslate"><span class="pre">.csv</span></code> file) which contains (at least) a column
+with paths to the images in the dataset.</p>
+<p>The general structure of the CLI call is:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">serotiny</span> <span class="n">image</span> <span class="n">extract_features</span> \
+    <span class="o">--</span><span class="n">input_manifest</span><span class="o">=</span><span class="n">my_manifest</span><span class="o">.</span><span class="n">csv</span> \
+    <span class="o">--</span><span class="n">output_path</span><span class="o">=</span><span class="n">my_computed_features</span><span class="o">.</span><span class="n">csv</span> \
+    <span class="o">--</span><span class="n">features_to_extract</span><span class="o">=</span><span class="n">example</span><span class="o">.</span><span class="n">yaml</span><span class="p">:</span><span class="n">bounding_box</span><span class="o">.</span><span class="n">features_to_extract</span> \ <span class="c1"># explained ahead</span>
+    <span class="o">--</span><span class="n">path_col</span><span class="o">=</span><span class="n">the_input_image_col</span> \
+    <span class="o">--</span><span class="n">index_col</span><span class="o">=</span><span class="n">CellId</span> \
+    <span class="o">--</span><span class="n">include_cols</span><span class="o">=</span><span class="s1">'[]'</span> \ <span class="c1"># list of columns from the input manifest to include in the output</span>
+    <span class="c1"># --image_reader=aicsimageio.readers.ome_tiff_reader.OmeTiffReader \ # optional. avoids an initial io operation to select what type of reader to use.</span>
+    <span class="c1"># --return_merged=True \ # optional. whether to merge the results with the input</span>
+    <span class="c1"># --backend="multiprocessing" \ # optional. select which parallel backend to use</span>
+    <span class="c1"># --write_every_n_rows=100 \ # optional. number of iterations to save to disk at once</span>
+    <span class="c1"># --n_workers=1 \ # optional. number of workers to parallelize the task</span>
+    <span class="c1"># --verbose=False \ # optional. whether to produce some cli output</span>
+    <span class="c1"># --skip_if_exists=False \ # optional. whether to try to retrieve results from an unfinished run and continue from there</span>
+    <span class="c1"># --debug=False \ # optional. whether to return errors in csv instead of raising and breaking</span>
 </pre></div>
 </div>
+<div class="section" id="configuring-features-to-extract">
+<h2>Configuring <code class="docutils literal notranslate"><span class="pre">features_to_extract</span></code><a class="headerlink" href="#configuring-features-to-extract" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">features_to_extract</span></code> is a dictionary where each key
+is the name of a feature to extract, and will be used as the corresponding
+column name in the output manifest. The value for each key is a config dict,
+(which is loaded using <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>’s <a class="reference internal" href="dynamic_imports.html"><span class="doc">dynamic import functionality</span></a>),
+specifying a feature extraction callable. these need to conform to a certain API
+(for now, at least). You can find existing ones in the
+<code class="xref py py-mod docutils literal notranslate"><span class="pre">image</span> <span class="pre">feature</span> <span class="pre">extraction</span> <span class="pre">module</span></code></p>
 </div>
-<div class="section" id="invoke">
-<h2><code class="docutils literal notranslate"><span class="pre">^invoke</span></code><a class="headerlink" href="#invoke" title="Permalink to this headline">¶</a></h2>
-<p>To call and return the result of a function, the <code class="docutils literal notranslate"><span class="pre">^invoke</span></code> keyword is used:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ones_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">full_load</span><span class="p">(</span><span class="s2">"""</span>
-<span class="go">^invoke: numpy.ones</span>
-<span class="go">shape: [3,3]</span>
-<span class="go">""")</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ones</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">(</span><span class="n">ones_config</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ones</span>
-<span class="go">array([[1., 1., 1.],</span>
-<span class="go">       [1., 1., 1.],</span>
-<span class="go">       [1., 1., 1.]])</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="bind">
-<h2><code class="docutils literal notranslate"><span class="pre">^bind</span></code><a class="headerlink" href="#bind" title="Permalink to this headline">¶</a></h2>
-<p>Let’s use <code class="docutils literal notranslate"><span class="pre">numpy.random.randint</span></code> as an example.
-This is its signature</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">'l'</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>We can bind the <code class="docutils literal notranslate"><span class="pre">size</span></code> and <code class="docutils literal notranslate"><span class="pre">low</span></code> parameters, yielding a function that expects only a <code class="docutils literal notranslate"><span class="pre">high</span></code>
-parameter</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">randint_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">full_load</span><span class="p">(</span><span class="s2">"""</span>
-<span class="go">^bind: numpy.random.randint</span>
-<span class="go">low: 0</span>
-<span class="go">size: 5</span>
-<span class="go">""")</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">my_randint</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">(</span><span class="n">randint_config</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>If we now call the function, we obtain:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">my_randint</span><span class="p">(</span><span class="n">high</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-<span class="go">array([ 4, 19,  7,  1,  7])</span>
-</pre></div>
-</div>
-<p>Note: we can use <code class="docutils literal notranslate"><span class="pre">^bind</span></code> with no arguments to simply pass the original function.
-We can also bind all of the arguments of a function, thus yielding a function
-which needs no further arguments to be called:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">randn_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">full_load</span><span class="p">(</span><span class="s2">"""</span>
-<span class="go">^bind: numpy.random.randint</span>
-<span class="go">low: 0</span>
-<span class="go">high: 5</span>
-<span class="go">size: 5</span>
-<span class="go">""")</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">my_randint</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">(</span><span class="n">randint_config</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">my_randint</span><span class="p">()</span>
-<span class="go">array([1, 4, 3, 1, 3])</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="positional-args">
-<h2><code class="docutils literal notranslate"><span class="pre">^positional_args</span></code><a class="headerlink" href="#positional-args" title="Permalink to this headline">¶</a></h2>
-<p>When the function of interest has a variable number of arguments, we can use
-the special keyword <code class="docutils literal notranslate"><span class="pre">^positional_args</span></code> to specify a list of positional arguments:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">randn_config</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">full_load</span><span class="p">(</span><span class="s2">"""</span>
-<span class="go">^bind: numpy.random.randn</span>
-<span class="go">^positional_args: [10, 3]</span>
-<span class="go">""")</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">my_randn</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">(</span><span class="n">randn_config</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">my_randn</span><span class="p">()</span>
-<span class="go">array([[-0.8956135 ,  0.32854592,  0.20821983],</span>
-<span class="go">       [-1.59323792,  0.0151588 ,  0.05956044],</span>
-<span class="go">       [ 1.56047808,  1.3287971 , -1.78241693],</span>
-<span class="go">       [-0.98165106, -0.59621   ,  0.98945791],</span>
-<span class="go">       [-0.37383497,  0.49404687,  2.14726909],</span>
-<span class="go">       [ 0.98437869, -0.66560783,  0.00638175],</span>
-<span class="go">       [-1.89774285, -0.60767339, -0.78599943],</span>
-<span class="go">       [ 0.32604151,  0.48772363, -0.68928192],</span>
-<span class="go">       [-0.98970493, -0.29300648,  0.01525316],</span>
-<span class="go">       [-0.54736776, -0.41411613,  0.82680974]])</span>
-</pre></div>
-</div>
+<div class="section" id="example-feature-extraction">
+<h2>Example feature extraction<a class="headerlink" href="#example-feature-extraction" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -342,23 +271,23 @@ the special keyword <code class="docutils literal notranslate"><span class="pre"
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="image_transforms.html">
+          <a class="next-page" href="dataframe_transforms.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Applying image transforms</div>
+                <div class="title">Dataframe wrangling</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="cli.html">
+          <a class="prev-page" href="image_transforms.html">
               <svg><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">serotiny CLI</div>
+                <div class="title">Applying image transforms</div>
                 
               </div>
             </a>
@@ -368,7 +297,7 @@ the special keyword <code class="docutils literal notranslate"><span class="pre"
               Copyright &#169; 2021 |
           Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
           <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
-            | <a class="muted-link" href="_sources/dynamic_imports.rst.txt"
+            | <a class="muted-link" href="_sources/feature_extraction.rst.txt"
                rel="nofollow">
               Show Source
             </a>
@@ -388,11 +317,9 @@ the special keyword <code class="docutils literal notranslate"><span class="pre"
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Dynamic imports</a><ul>
-<li><a class="reference internal" href="#init"><code class="docutils literal notranslate"><span class="pre">^init</span></code></a></li>
-<li><a class="reference internal" href="#invoke"><code class="docutils literal notranslate"><span class="pre">^invoke</span></code></a></li>
-<li><a class="reference internal" href="#bind"><code class="docutils literal notranslate"><span class="pre">^bind</span></code></a></li>
-<li><a class="reference internal" href="#positional-args"><code class="docutils literal notranslate"><span class="pre">^positional_args</span></code></a></li>
+<li><a class="reference internal" href="#">Extraction features from images</a><ul>
+<li><a class="reference internal" href="#configuring-features-to-extract">Configuring <code class="docutils literal notranslate"><span class="pre">features_to_extract</span></code></a></li>
+<li><a class="reference internal" href="#example-feature-extraction">Example feature extraction</a></li>
 </ul>
 </li>
 </ul>

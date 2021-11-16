@@ -2,13 +2,13 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Dataframe wrangling" href="dataframe_transforms.html" /><link rel="prev" title="Dynamic imports" href="dynamic_imports.html" />
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Extraction features from images" href="feature_extraction.html" /><link rel="prev" title="Dynamic imports" href="dynamic_imports.html" />
 
-    <meta name="generator" content="sphinx-4.2.0, furo 2021.10.09"/>
+    <meta name="generator" content="sphinx-4.3.0, furo 2021.11.16"/>
         <title>Applying image transforms - serotiny 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=0254c309f5cadf746f1a613e7677379ac9c8cdcd" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=16fb25fabf47304eee183a5e9af80b1ba98259b1" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=916d6ed8f59335acffa15474ff504849343d4c76" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=0af69da206d614734f649b27d4cdc2dd6c31f41d" />
     
     
 
@@ -161,6 +161,7 @@
 <li class="toctree-l1"><a class="reference internal" href="cli.html">serotiny CLI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dynamic_imports.html">Dynamic imports</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Applying image transforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="feature_extraction.html">Extraction features from images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dataframe_transforms.html">Dataframe wrangling</a></li>
 <li class="toctree-l1"><a class="reference internal" href="example_workflows.html">Example workflows</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="modules.html">Package modules</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -234,20 +235,25 @@ with paths to the images in the dataset.</p>
 <p>The general structure of the CLI call is:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">serotiny</span> <span class="n">image</span> <span class="n">transform</span> \
     <span class="o">--</span><span class="n">input_manifest</span><span class="o">=</span><span class="n">my_manifest</span><span class="o">.</span><span class="n">csv</span> \
-    <span class="o">--</span><span class="n">outputs</span><span class="o">=</span><span class="n">example</span><span class="o">.</span><span class="n">yaml</span><span class="p">:</span><span class="n">crop_and_normalize</span><span class="o">.</span><span class="n">outputs</span> \
     <span class="o">--</span><span class="n">output_path</span><span class="o">=</span><span class="n">output_manifest</span><span class="o">.</span><span class="n">csv</span> \
     <span class="o">--</span><span class="n">transforms_to_apply</span><span class="o">=</span><span class="n">example</span><span class="o">.</span><span class="n">yaml</span><span class="p">:</span><span class="n">crop_and_normalize</span><span class="o">.</span><span class="n">transforms</span> \ <span class="c1"># we will dive into this YAML file ahead</span>
-    <span class="o">--</span><span class="n">index_col</span><span class="o">=</span><span class="s2">"cell_id"</span> <span class="c1"># the index col is used for the image filenames</span>
-    <span class="c1"># --merge_col=... \ # optional. to merge multiple manifests (horizontally)</span>
+    <span class="o">--</span><span class="n">outputs</span><span class="o">=</span><span class="n">example</span><span class="o">.</span><span class="n">yaml</span><span class="p">:</span><span class="n">crop_and_normalize</span><span class="o">.</span><span class="n">outputs</span> \
+    <span class="o">--</span><span class="n">index_col</span><span class="o">=</span><span class="s2">"cell_id"</span> \<span class="c1"># the index col is used for the image filenames</span>
     <span class="c1"># --include_cols=... \ # optional. to include other columns in the output manifest</span>
+    <span class="c1"># --image_reader=aicsimageio.readers.ome_tiff_reader.OmeTiffReader \ # optional. avoids an initial io operation to select what type of reader to use.</span>
+    <span class="c1"># --backend="multiprocessing" \ # optional. select which parallel backend to use</span>
+    <span class="c1"># --return_merged=True \ # optional. whether to merge the results with the input</span>
+    <span class="c1"># --write_every_n_rows=100 \ # optional. number of iterations to save to disk at once</span>
     <span class="c1"># --n_workers=10 \ # optional. process multiple images in parallel</span>
     <span class="c1"># --verbose=False \ # optional. produce command line output</span>
+    <span class="c1"># --skip_if_exists=False \ # optional. whether to try to retrieve results from an unfinished run and continue from there</span>
+    <span class="c1"># --debug=False \ # optional. whether to return errors in csv instead of raising and breaking</span>
 </pre></div>
 </div>
 <div class="section" id="configuring-transforms-to-apply">
 <h2>Configuring <code class="docutils literal notranslate"><span class="pre">transforms_to_apply</span></code><a class="headerlink" href="#configuring-transforms-to-apply" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">transforms_to_apply</span></code> is where the whole transform pipeline is specified.
-It can rely on <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>’s <a class="reference internal" href="dynamic_imports.html"><span class="doc">dynamic import functionality</span></a>
+It relies on <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>’s <a class="reference internal" href="dynamic_imports.html"><span class="doc">dynamic import functionality</span></a>
 to provide very flexible transform pipelines. As described in the <a class="reference internal" href="cli.html"><span class="doc">CLI page</span></a>,
 a config can either be provided directly in the command line, or it can be given
 as a YAML file, or part of one. In any of those cases, the <code class="docutils literal notranslate"><span class="pre">transforms_to_apply</span></code>
@@ -291,12 +297,12 @@ value is a list of the channels to store for that key.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="dataframe_transforms.html">
+          <a class="next-page" href="feature_extraction.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Dataframe wrangling</div>
+                <div class="title">Extraction features from images</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -315,11 +321,9 @@ value is a list of the channels to store for that key.</p>
 
         <div class="related-information">
               Copyright &#169; 2021 |
-            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
-              and
-              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
-              <a href="https://github.com/pradyunsg/furo">Furo theme</a>. |
-            <a class="muted-link" href="_sources/image_transforms.rst.txt"
+          Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+          <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+            | <a class="muted-link" href="_sources/image_transforms.rst.txt"
                rel="nofollow">
               Show Source
             </a>
@@ -358,6 +362,6 @@ value is a list of the channels to store for that key.</p>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/scripts/main.js"></script>
+    <script src="_static/scripts/furo.js"></script>
     </body>
 </html>
