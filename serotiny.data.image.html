@@ -229,135 +229,14 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-serotiny.data.image.align">
-<span id="serotiny-data-image-align-module"></span><h2>serotiny.data.image.align module<a class="headerlink" href="#module-serotiny.data.image.align" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="serotiny.data.image.align.align_image_2d">
-<span class="sig-prename descclassname"><span class="pre">serotiny.data.image.align.</span></span><span class="sig-name descname"><span class="pre">align_image_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjust_for_skew</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/data/image/align.html#align_image_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.data.image.align.align_image_2d" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<div class="section" id="serotiny-data-image-align-module">
+<h2>serotiny.data.image.align module<a class="headerlink" href="#serotiny-data-image-align-module" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-serotiny.data.image.feature_extraction">
-<span id="serotiny-data-image-feature-extraction-module"></span><h2>serotiny.data.image.feature_extraction module<a class="headerlink" href="#module-serotiny.data.image.feature_extraction" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="serotiny.data.image.feature_extraction.angle">
-<span class="sig-prename descclassname"><span class="pre">serotiny.data.image.feature_extraction.</span></span><span class="sig-name descname"><span class="pre">angle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skew_adjust</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/data/image/feature_extraction.html#angle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.data.image.feature_extraction.angle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract angle of rotation in the X place, for alignment
-of major axes of the max projection of <cite>channel</cite>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>img</strong> (<em>ArrayLike</em>) – The image from which to extract the feature</p></li>
-<li><p><strong>channel_map</strong> (<em>Dict[str, int]</em>) – A dictionary containing channel names and correspoding indices</p></li>
-<li><p><strong>channel</strong> (<em>str</em>) – The channel name from which to extract the angle</p></li>
-<li><p><strong>skew_adjust</strong> (<em>bool</em>) – Whether to adjust for skewness</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="serotiny.data.image.feature_extraction.bbox">
-<span class="sig-prename descclassname"><span class="pre">serotiny.data.image.feature_extraction.</span></span><span class="sig-name descname"><span class="pre">bbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/data/image/feature_extraction.html#bbox"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.data.image.feature_extraction.bbox" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract the bounding box, using a pair of channels given
-in <cite>channels</cite>, as [center of mass channel, cropping channel]</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>img</strong> (<em>ArrayLike</em>) – The image from which to extract the feature</p></li>
-<li><p><strong>channel_map</strong> (<em>Dict[str, int]</em>) – A dictionary containing channel names and correspoding indices</p></li>
-<li><p><strong>channels</strong> (<em>Sequence[str]</em>) – List of channels for which to extract the bounding box</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="serotiny.data.image.feature_extraction.center_of_mass">
-<span class="sig-prename descclassname"><span class="pre">serotiny.data.image.feature_extraction.</span></span><span class="sig-name descname"><span class="pre">center_of_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/data/image/feature_extraction.html#center_of_mass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.data.image.feature_extraction.center_of_mass" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract the center of mass of the given channel</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>img</strong> (<em>ArrayLike</em>) – The image from which to extract the feature</p></li>
-<li><p><strong>channel_map</strong> (<em>Dict[str, int]</em>) – A dictionary containing channel names and correspoding indices</p></li>
-<li><p><strong>channel</strong> (<em>str</em>) – The channel name from which to extract the center of mass</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="serotiny.data.image.feature_extraction.dillated_bbox">
-<span class="sig-prename descclassname"><span class="pre">serotiny.data.image.feature_extraction.</span></span><span class="sig-name descname"><span class="pre">dillated_bbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structuring_element</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[5,</span> <span class="pre">5,</span> <span class="pre">5]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/data/image/feature_extraction.html#dillated_bbox"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.data.image.feature_extraction.dillated_bbox" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract the bounding box of the result of dilating the channel
-given by channel, using the given structuring element</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>img</strong> (<em>ArrayLike</em>) – The image from which to extract the feature</p></li>
-<li><p><strong>channel_map</strong> (<em>Dict[str, int]</em>) – A dictionary containing channel names and correspoding indices</p></li>
-<li><p><strong>channel</strong> (<em>str</em>) – The channel name from which to extract the bounding box</p></li>
-<li><p><strong>structuring_element</strong> (<em>Sequence[int]</em>) – The dillation structuring element shape</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="serotiny.data.image.feature_extraction.min_max">
-<span class="sig-prename descclassname"><span class="pre">serotiny.data.image.feature_extraction.</span></span><span class="sig-name descname"><span class="pre">min_max</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/data/image/feature_extraction.html#min_max"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.data.image.feature_extraction.min_max" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract the minimum and maximum values for the given list
-of channels</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>img</strong> (<em>ArrayLike</em>) – The image from which to extract the feature</p></li>
-<li><p><strong>channel_map</strong> (<em>Dict[str, int]</em>) – A dictionary containing channel names and correspoding indices</p></li>
-<li><p><strong>channels</strong> (<em>Sequence[str]</em>) – List of channels for which to extract mins and maxes</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="serotiny.data.image.feature_extraction.percentile">
-<span class="sig-prename descclassname"><span class="pre">serotiny.data.image.feature_extraction.</span></span><span class="sig-name descname"><span class="pre">percentile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/data/image/feature_extraction.html#percentile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.data.image.feature_extraction.percentile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract a given percentile value for the given list of channels</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>img</strong> (<em>ArrayLike</em>) – The image from which to extract the feature</p></li>
-<li><p><strong>channel_map</strong> (<em>Dict[str, int]</em>) – A dictionary containing channel names and correspoding indices</p></li>
-<li><p><strong>channels</strong> (<em>Sequence[str]</em>) – List of channels for which to extract the percentile value</p></li>
-<li><p><strong>perc</strong> (<em>float</em>) – The percentile to extract</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="serotiny.data.image.feature_extraction.shcoeffs">
-<span class="sig-prename descclassname"><span class="pre">serotiny.data.image.feature_extraction.</span></span><span class="sig-name descname"><span class="pre">shcoeffs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.array</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">torch.Tensor</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_map</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">/</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lmax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_lcc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alignment_2d</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_unique</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/data/image/feature_extraction.html#shcoeffs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.data.image.feature_extraction.shcoeffs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute spherical harmonic coefficients for the given channel</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>img</strong> (<em>ArrayLike</em>) – The image from which to extract the feature</p></li>
-<li><p><strong>channel_map</strong> (<em>Dict[str, int]</em>) – A dictionary containing channel names and correspoding indices</p></li>
-<li><p><strong>channel</strong> (<em>str</em>) – The channel name from which to extract the spherical harmonic
-coefficients</p></li>
-<li><p><strong>lmax</strong> (<em>int = 4</em>) – See <a class="reference external" href="https://github.com/AllenCell/aics-shparam/blob/main/aicsshparam/shparam.py">https://github.com/AllenCell/aics-shparam/blob/main/aicsshparam/shparam.py</a></p></li>
-<li><p><strong>sigma</strong> (<em>float = 0</em>) – See <a class="reference external" href="https://github.com/AllenCell/aics-shparam/blob/main/aicsshparam/shparam.py">https://github.com/AllenCell/aics-shparam/blob/main/aicsshparam/shparam.py</a></p></li>
-<li><p><strong>compute_lcc</strong> (<em>bool = True</em>) – See <a class="reference external" href="https://github.com/AllenCell/aics-shparam/blob/main/aicsshparam/shparam.py">https://github.com/AllenCell/aics-shparam/blob/main/aicsshparam/shparam.py</a></p></li>
-<li><p><strong>alignment_2d</strong> (<em>bool = False</em>) – See <a class="reference external" href="https://github.com/AllenCell/aics-shparam/blob/main/aicsshparam/shparam.py">https://github.com/AllenCell/aics-shparam/blob/main/aicsshparam/shparam.py</a></p></li>
-<li><p><strong>make_unique</strong> (<em>bool = False</em>) – See <a class="reference external" href="https://github.com/AllenCell/aics-shparam/blob/main/aicsshparam/shparam.py">https://github.com/AllenCell/aics-shparam/blob/main/aicsshparam/shparam.py</a></p></li>
-<li><p><strong>prefix</strong> (<em>Optional[str] = None</em>) – A prefix to prepend to the keys in the result dictionary</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
+<div class="section" id="serotiny-data-image-feature-extraction-module">
+<h2>serotiny.data.image.feature_extraction module<a class="headerlink" href="#serotiny-data-image-feature-extraction-module" title="Permalink to this headline">¶</a></h2>
 </div>
 <div class="section" id="module-serotiny.data.image.normalize">
 <span id="serotiny-data-image-normalize-module"></span><h2>serotiny.data.image.normalize module<a class="headerlink" href="#module-serotiny.data.image.normalize" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="serotiny.data.image.normalize.MinMaxNormalize">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.data.image.normalize.</span></span><span class="sig-name descname"><span class="pre">MinMaxNormalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clip_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip_quantile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_torch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/data/image/normalize.html#MinMaxNormalize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.data.image.normalize.MinMaxNormalize" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-</dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="serotiny.data.image.normalize.NormalizeAbsolute">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.data.image.normalize.</span></span><span class="sig-name descname"><span class="pre">NormalizeAbsolute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/data/image/normalize.html#NormalizeAbsolute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.data.image.normalize.NormalizeAbsolute" title="Permalink to this definition">¶</a></dt>
@@ -366,6 +245,11 @@ coefficients</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="serotiny.data.image.normalize.NormalizeMean">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.data.image.normalize.</span></span><span class="sig-name descname"><span class="pre">NormalizeMean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/data/image/normalize.html#NormalizeMean"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.data.image.normalize.NormalizeMean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="serotiny.data.image.normalize.NormalizeMinMax">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.data.image.normalize.</span></span><span class="sig-name descname"><span class="pre">NormalizeMinMax</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">clip_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clip_quantile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_torch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/data/image/normalize.html#NormalizeMinMax"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.data.image.normalize.NormalizeMinMax" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 </div>
@@ -446,8 +330,8 @@ coefficients</p></li>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 </dd></dl>
 </div>
-<div class="section" id="module-serotiny.data.image">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-serotiny.data.image" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-contents">
+<h2>Module contents<a class="headerlink" href="#module-contents" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -504,14 +388,14 @@ coefficients</p></li>
             <ul>
 <li><a class="reference internal" href="#">serotiny.data.image package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-serotiny.data.image.align">serotiny.data.image.align module</a></li>
-<li><a class="reference internal" href="#module-serotiny.data.image.feature_extraction">serotiny.data.image.feature_extraction module</a></li>
+<li><a class="reference internal" href="#serotiny-data-image-align-module">serotiny.data.image.align module</a></li>
+<li><a class="reference internal" href="#serotiny-data-image-feature-extraction-module">serotiny.data.image.feature_extraction module</a></li>
 <li><a class="reference internal" href="#module-serotiny.data.image.normalize">serotiny.data.image.normalize module</a></li>
 <li><a class="reference internal" href="#module-serotiny.data.image.pad">serotiny.data.image.pad module</a></li>
 <li><a class="reference internal" href="#module-serotiny.data.image.project">serotiny.data.image.project module</a></li>
 <li><a class="reference internal" href="#module-serotiny.data.image.resize">serotiny.data.image.resize module</a></li>
 <li><a class="reference internal" href="#module-serotiny.data.image.swap">serotiny.data.image.swap module</a></li>
-<li><a class="reference internal" href="#module-serotiny.data.image">Module contents</a></li>
+<li><a class="reference internal" href="#module-contents">Module contents</a></li>
 </ul>
 </li>
 </ul>

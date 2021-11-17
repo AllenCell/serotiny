@@ -229,6 +229,7 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pytorch_lightning</span> <span class="k">as</span> <span class="nn">pl</span>
 <span class="kn">from</span> <span class="nn">pytorch_lightning.utilities.exceptions</span> <span class="kn">import</span> <span class="n">MisconfigurationException</span>
@@ -258,8 +259,8 @@
     <span class="n">split_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">split_path</span><span class="p">)</span>
     <span class="n">datasets</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="k">for</span> <span class="n">fpath</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">split_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.csv"</span><span class="p">)</span> <span class="o">+</span> <span class="n">split_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.parquet"</span><span class="p">)):</span>
-        <span class="n">mode</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(.*)\.(csv|parquet)"</span><span class="p">,</span> <span class="n">fpath</span><span class="o">.</span><span class="n">name</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">fpath</span> <span class="ow">in</span> <span class="n">chain</span><span class="p">(</span><span class="n">split_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.csv"</span><span class="p">),</span> <span class="n">split_path</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s2">"*.parquet"</span><span class="p">)):</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(.*)\.(?:csv|parquet)"</span><span class="p">,</span> <span class="n">fpath</span><span class="o">.</span><span class="n">name</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">dataframe</span> <span class="o">=</span> <span class="n">read_dataframe</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">required_columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">DataframeDataset</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">loaders</span><span class="o">=</span><span class="n">loaders</span><span class="p">[</span><span class="n">mode</span><span class="p">])</span>
         <span class="n">datasets</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span>
