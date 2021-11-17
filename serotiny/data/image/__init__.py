@@ -3,7 +3,7 @@ from .swap import SwapAxes
 from .resize import ResizeTo, ResizeBy, CropCenter
 from .project import Project
 from .align import align_image_2d
-from .normalize import MinMaxNormalize, NormalizeAbsolute, NormalizeMean
+from .normalize import NormalizeMinMax, NormalizeAbsolute, NormalizeMean
 
 
 from .feature_extraction import (
