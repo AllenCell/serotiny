@@ -18,6 +18,7 @@ class Load2DImage(Loader):
         file_type: str = "tiff",
         select_channels: Optional[Sequence] = None,
         transforms: Optional[Sequence] = None,
+        reader: str = 'aicsimageio.readers.ome_tiff_reader.OmeTiffReader'
     ):
         """
         Parameters
@@ -42,6 +43,7 @@ class Load2DImage(Loader):
         super().__init__()
         self.column = column
         self.select_channels = select_channels
+        self.reader = reader
 
         if file_type not in ("tiff"):
             raise NotImplementedError(f"File type {file_type} not supported.")
@@ -60,4 +62,5 @@ class Load2DImage(Loader):
                 select_channels=self.select_channels,
                 output_dtype=np.float32,
                 transform=self.transforms,
+                reader=self.reader
             )
