@@ -2,6 +2,7 @@ from typing import Union, Optional, Dict, Sequence
 from pathlib import Path
 
 import re
+from itertools import chain
 import numpy as np
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.exceptions import MisconfigurationException
@@ -31,8 +32,8 @@ def _make_multiple_manifest_splits(split_path, loaders, columns=None):
     split_path = Path(split_path)
     datasets = {}
 
-    for fpath in list(split_path.glob("*.csv") + split_path.glob("*.parquet")):
-        mode = re.findall(r"(.*)\.(csv|parquet)", fpath.name)[0]
+    for fpath in chain(split_path.glob("*.csv"), split_path.glob("*.parquet")):
+        mode = re.findall(r"(.*)\.(?:csv|parquet)", fpath.name)[0]
         dataframe = read_dataframe(fpath, required_columns=columns)
         dataset = DataframeDataset(dataframe, loaders=loaders[mode])
         datasets[mode] = dataset
