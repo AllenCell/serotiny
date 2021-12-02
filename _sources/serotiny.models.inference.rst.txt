@@ -1,0 +1,21 @@
+serotiny.models.inference package
+=================================
+
+Submodules
+----------
+
+serotiny.models.inference.tile\_prediction module
+-------------------------------------------------
+
+.. automodule:: serotiny.models.inference.tile_prediction
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: serotiny.models.inference
+   :members:
+   :undoc-members:
+   :show-inheritance:

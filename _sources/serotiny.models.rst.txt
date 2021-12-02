@@ -8,19 +8,10 @@ Subpackages
    :maxdepth: 4
 
    serotiny.models.callbacks
+   serotiny.models.inference
    serotiny.models.unet
+   serotiny.models.utils
    serotiny.models.vae
-
-Submodules
-----------
-
-serotiny.models.utils module
-----------------------------
-
-.. automodule:: serotiny.models.utils
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 Module contents
 ---------------
