@@ -1,37 +1,5 @@
 import inspect
-import torch
-import torch.nn.functional as F
 import torch.optim as opt
-
-import numpy as np
-import matplotlib.pyplot as plt
-
-def add_pr_curve_tensorboard(
-    logger, classes, class_index, test_probs, test_preds, global_step=0, name="_val"
-):
-    """
-    Takes in a "class_index" and plots the corresponding
-    precision-recall curve
-    """
-    tensorboard_preds = test_preds == class_index
-    tensorboard_probs = test_probs[:, class_index]
-
-    logger.experiment.add_pr_curve(
-        str(classes[class_index]) + name,
-        tensorboard_preds,
-        tensorboard_probs,
-        global_step=global_step,
-    )
-    logger.experiment.close()
-
-
-def index_to_onehot(index, n_classes):
-    index = index.long()
-
-    onehot = torch.zeros(len(index), n_classes).type_as(index).float()
-    onehot.scatter_(1, index, 1)
-
-    return onehot
 
 
 def find_optimizer(optimizer_name):

@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 
-from serotiny.networks.weight_init import weight_init
+from serotiny.networks.utils import weight_init
 
 
 def _make_block(input_dim, output_dim):

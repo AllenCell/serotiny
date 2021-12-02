@@ -1,12 +1,7 @@
-"""
-General conditional beta variational autoencoder module,
-implemented as a Pytorch Lightning module
-"""
-
-from pathlib import Path
 import inspect
 from typing import Sequence, Union, Optional, Dict
 import logging
+from pathlib import Path
 
 import numpy as np
 

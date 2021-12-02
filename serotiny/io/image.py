@@ -83,9 +83,9 @@ def image_loader(
     dims = infer_dims(img)
 
     if "Z" in dims:
-        data = img.get_image_data(dims, S=0, T=0, channels=loaded_channels_idx)
+        data = img.get_image_data(dims, S=0, T=0, C=loaded_channels_idx)
     else:
-        data = img.get_image_data(dims, Z=0, S=0, T=0, channels=loaded_channels_idx)
+        data = img.get_image_data(dims, Z=0, S=0, T=0, C=loaded_channels_idx)
 
     channel_map = {
         channel_name: index for index, channel_name in enumerate(loaded_channels)

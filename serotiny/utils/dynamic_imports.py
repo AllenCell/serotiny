@@ -125,24 +125,30 @@ def bind(config, recurrent=True):
     return _bind(to_bind, *positional_args, **arguments)
 
 
-def load_config(config, recurrent=True):
-    if BIND_KEY in config:
-        return bind(config, recurrent)
-    elif INIT_KEY in config:
-        return init(config, recurrent)
-    elif INVOKE_KEY in config:
-        return invoke(config, recurrent)
-    else:
+def load_config(config, recurrent=True, loaded_ok=False):
+    if hasattr(config, "items"):
+        if BIND_KEY in config:
+            return bind(config, recurrent)
+        elif INIT_KEY in config:
+            return init(config, recurrent)
+        elif INVOKE_KEY in config:
+            return invoke(config, recurrent)
+
+    if not loaded_ok:
         raise KeyError(
             f"None of [{BIND_KEY}, {INVOKE_KEY}, {INIT_KEY}] found " f"in config."
         )
+    return config
 
 
-def load_multiple(configs, recurrent=True):
+
+def load_multiple(configs, recurrent=True, loaded_ok=False):
     if hasattr(configs, "items"):
-        return {key: load_config(config, recurrent) for key, config in configs.items()}
+        return {key: load_config(config, recurrent, loaded_ok)
+                for key, config in configs.items()}
     elif iter(configs):
-        return [load_config(config, recurrent) for config in configs]
+        return [load_config(config, recurrent, loaded_ok)
+                for config in configs]
     else:
         raise TypeError(
             f"can only bind/invoke/init paths from a dict or an "

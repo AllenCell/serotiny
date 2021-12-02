@@ -1,4 +1,3 @@
-import os
 import logging
 
 from typing import List, Dict
@@ -30,6 +29,9 @@ def train_model(
     gpu_ids: List[int] = [0],
     version_string: str = "zero",
     seed: int = 42,
+    test: bool = True,
+    dynamic_imports_recurrent: bool = True,
+    dynamic_imports_loaded_ok: bool = False,
 ):
     """
     Train a model given its configuration.
@@ -60,8 +62,19 @@ def train_model(
     version_string: str
         A string to tag the model and results with
 
-    seed:
+    seed: int = 42
         Random seed
+
+    test: bool = True
+        Whether to run `trainer.test`
+
+    dynamic_imports_recurrent: bool = True
+        Whether to recursively apply the dynamic import functions
+
+    dynamic_imports_loaded_ok: bool = False
+        Whether to return the object passed into dynamic import functions,
+        in case it's not loadable (e.g. has been loaded before this function
+        was called)
     """
 
     # imports here to optimize CLI / Fire usage
@@ -71,7 +84,7 @@ def train_model(
 
     called_args = _get_kwargs()
 
-    pl.seed_everything(seed)
+    pl.seed_everything(seed, workers=True)
 
     model_config = model
     datamodule_config = datamodule
@@ -86,22 +99,23 @@ def train_model(
 
     store_metadata(called_args, model_class, version_string, model_zoo_path)
 
-    os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
-    os.environ["CUDA_VISIBLE_DEVICES"] = ",".join([str(id) for id in gpu_ids])
-    num_gpus = len(gpu_ids)
-    num_gpus = num_gpus if num_gpus != 0 else None
-
-    model = load_config(model_config)
+    model = load_config(model_config,
+                        recurrent=dynamic_imports_recurrent,
+                        loaded_ok=dynamic_imports_loaded_ok)
 
     if version_string is None:
         version_string = "version_" + datetime.now().strftime("%d-%m-%Y--%H-%M-%S")
 
     log.info(f"creating datamodule {datamodule_name} with {datamodule_config}")
 
-    datamodule = load_config(datamodule_config)
+    datamodule = load_config(datamodule_config,
+                             recurrent=dynamic_imports_recurrent,
+                             loaded_ok=dynamic_imports_loaded_ok)
     datamodule.setup()
 
-    loggers = load_multiple(loggers_config)
+    loggers = load_multiple(loggers_config,
+                            recurrent=dynamic_imports_recurrent,
+                            loaded_ok=dynamic_imports_loaded_ok)
 
     if len(model_zoo) > 0:
         config = {"filename": "epoch-{epoch:02d}"}
@@ -114,20 +128,28 @@ def train_model(
     else:
         checkpoint_callback = None
 
-    callbacks = load_multiple(callbacks_config)
+    callbacks = load_multiple(callbacks_config,
+                              recurrent=dynamic_imports_recurrent,
+                              loaded_ok=dynamic_imports_loaded_ok)
+
     if checkpoint_callback is not None:
         callbacks.append(checkpoint_callback)
+
+    if len(gpu_ids) == 0:
+        gpu_ids = None
 
     trainer = pl.Trainer(
         **trainer_config,
         logger=loggers,
-        gpus=num_gpus,
+        gpus=gpu_ids,
         callbacks=callbacks,
     )
 
     log.info("Calling trainer.fit")
     trainer.fit(model, datamodule)
-    trainer.test(datamodule=datamodule, ckpt_path=None)
+
+    if test:
+        trainer.test(datamodule=datamodule, ckpt_path=None)
 
 
 if __name__ == "__main__":

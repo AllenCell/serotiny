@@ -1,51 +1,14 @@
-from typing import Sequence, Optional, Dict, Union
+from typing import Optional, Union, Dict, Callable, Sequence
 import logging
 
 import numpy as np
 import torch
 import torch.nn as nn
 
-from serotiny.networks.layers.spatial_pyramid_pool import spatial_pyramid_pool
-from serotiny.utils.dynamic_imports import load_config
+from serotiny.networks.layers import conv_block
+from serotiny.networks.layers import spatial_pyramid_pool
 
 log = logging.getLogger(__name__)
-
-
-def _conv_layer(
-    in_c: int,
-    out_c: int,
-    kernel_size: int = 3,
-    padding: int = 0,
-    up_conv: bool = False,
-    non_linearity=nn.ReLU,
-    mode: str = "3d",
-):
-    """
-    Util function to instantiate a convolutional block.
-
-    Parameters
-    ----------
-    in_c: int
-        number of input channels
-    out_c: int
-        number of output channels
-    kernel_size: Sequence[int] (defaults to (3, 3, 3))
-        dimensions of the convolutional kernel to be applied
-    padding:
-        padding value for the convolution (defaults to 0)
-    """
-    if mode == "2d":
-        conv = nn.ConvTranspose2d if up_conv else nn.Conv2d
-        batch_norm = nn.BatchNorm2d
-    else:
-        conv = nn.ConvTranspose3d if up_conv else nn.Conv3d
-        batch_norm = nn.BatchNorm3d
-
-    return nn.Sequential(
-        conv(in_c, out_c, kernel_size=kernel_size, padding=padding),
-        non_linearity(),
-        batch_norm(out_c),
-    )
 
 
 class BasicCNN(nn.Module):
@@ -61,7 +24,7 @@ class BasicCNN(nn.Module):
         pyramid_pool_splits: Optional[Sequence[int]] = None,
         flat_output: bool = True,
         up_conv: bool = False,
-        non_linearity: Union[type, Dict] = nn.ReLU,
+        non_linearity=Union[Dict, nn.Module, Callable],
         mode: str = "3d",
     ):
         """
@@ -93,15 +56,12 @@ class BasicCNN(nn.Module):
         self.pyramid_pool_splits = pyramid_pool_splits
         self.flat_output = flat_output
 
-        if isinstance(non_linearity, dict):
-            non_linearity = load_config(non_linearity)
-
         layers = []
 
         _in_channels = in_channels
         for out_channels in hidden_channels:
             layers.append(
-                _conv_layer(
+                conv_block(
                     _in_channels,
                     out_channels,
                     kernel_size=kernel_size,

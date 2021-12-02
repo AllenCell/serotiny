@@ -16,6 +16,7 @@ class DownConvolution(nn.Module):
         kernel_size_pooling: int = 2,  # Original paper = 2
         stride_pooling: int = 2,  # Original paper = no mention, label-free = 2
         padding_pooling: int = 0,  # Original paper = no mention, label-free = default
+        bn=True,
     ):
         super().__init__()
 
@@ -27,6 +28,7 @@ class DownConvolution(nn.Module):
             kernel_size=kernel_size_doubleconv,
             stride=stride_doubleconv,
             padding=padding_doubleconv,
+            bn=bn,
         )
 
         # If we're at the bottom, only instantiate one double_conv and nothing else
@@ -56,7 +58,7 @@ class DownConvolution(nn.Module):
                     padding=padding_pooling,
                 )
 
-            self.batch_norm = nn.BatchNorm3d(n_out)
+            self.batch_norm = (nn.BatchNorm3d(n_out) if bn else nn.Identity())
             self.activation = nn.ReLU()
 
     def forward(self, x):
@@ -67,21 +69,16 @@ class DownConvolution(nn.Module):
             x_doubleconv_down = self.double_conv(x)
             # print(f' x_doubleconv_down = {x_doubleconv_down.shape}')
 
-            x_pool_down = self.pooling(x_doubleconv_down)
+            x = self.pooling(x_doubleconv_down)
             # print(f' x_pool_down = {x_pool_down.shape}')
 
-            x_batchnorm_down = self.batch_norm(x_pool_down)
+            x = self.batch_norm(x)
             # print(f' x_batchnorm_down = {x_batchnorm_down.shape}')
 
-            x_activation_down = self.activation(x_batchnorm_down)
+            x = self.activation(x)
             # print(f' x_activation_down = {x_activation_down.shape}')
-
-            x_return = x_activation_down
-
+            return x, x_doubleconv_down
         else:
-            x_doubleconv_down = self.double_conv(x)
+            x = self.double_conv(x)
             # print(f' x_doubleconv_down = {x_doubleconv_down.shape}')
-
-            x_return = x_doubleconv_down
-
-        return x_return, x_doubleconv_down
+            return x, x

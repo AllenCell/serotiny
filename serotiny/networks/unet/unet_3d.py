@@ -1,10 +1,10 @@
 from torch import nn
 
-from ..layers._3d.unet_downconv import DownConvolution
-from ..layers._3d.unet_upconv import UpConvolution
+from .unet_downconv import DownConvolution
+from .unet_upconv import UpConvolution
 
 
-class Unet(nn.Module):
+class Unet3d(nn.Module):
     def __init__(
         self,
         depth: int = 4,
@@ -30,6 +30,7 @@ class Unet(nn.Module):
         stride_finalconv: int = 1,  # Original paper = no mention, label-free = default
         padding_finalconv: int = 1,  # Original paper = no mention, label-free = 1
         # dimensions: tuple, # =(176, 104, 52),
+        bn=True,
     ):
 
         """
@@ -113,7 +114,7 @@ class Unet(nn.Module):
                 )  # Is hardcoded to 2 in original paper and label-free
 
             self.channels_down[current_depth] = (n_in, n_out)
-            self.networks_down[str(current_depth)]["subnet"] = DownConvolution(
+            self.networks_down[str(current_depth)] = DownConvolution(
                 current_depth,
                 n_in,
                 n_out,
@@ -124,6 +125,7 @@ class Unet(nn.Module):
                 kernel_size_pooling=kernel_size_pooling,
                 stride_pooling=stride_pooling,
                 padding_pooling=padding_pooling,
+                bn=bn,
             )
 
         # Create the up pathway by traversing the upward path
@@ -144,7 +146,7 @@ class Unet(nn.Module):
                 )  # Is hardcoded to 2 in original paper and label-free
 
                 self.channels_up[current_depth] = (n_in, n_out)
-                self.networks_up[str(current_depth)]["subnet"] = UpConvolution(
+                self.networks_up[str(current_depth)] = UpConvolution(
                     current_depth,
                     n_in,
                     n_out,
@@ -154,6 +156,7 @@ class Unet(nn.Module):
                     kernel_size_doubleconv=kernel_size_doubleconv,
                     stride_doubleconv=stride_doubleconv,
                     padding_doubleconv=padding_doubleconv,
+                    bn=bn,
                 )
 
         # In original paper, kernel_size = 1
@@ -202,7 +205,7 @@ class Unet(nn.Module):
 
             x_previous_layer, x_doubleconv_down = self.networks_down[
                 str(current_depth)
-            ]["subnet"](x_previous_layer)
+            ](x_previous_layer)
 
             doubleconv_down_out[
                 current_depth
@@ -211,7 +214,7 @@ class Unet(nn.Module):
         for current_depth in network_layers_up:
             # print(f"Level = {current_depth}")
 
-            x_previous_layer = self.networks_up[str(current_depth)]["subnet"](
+            x_previous_layer = self.networks_up[str(current_depth)](
                 x_previous_layer, doubleconv_down_out[current_depth]
             )
 
