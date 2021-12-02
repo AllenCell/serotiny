@@ -4,10 +4,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Example workflows" href="example_workflows.html" /><link rel="prev" title="Dataframe wrangling" href="dataframe_transforms.html" />
 
-    <meta name="generator" content="sphinx-4.3.0, furo 2021.11.16"/>
+    <meta name="generator" content="sphinx-4.3.1, furo 2021.11.23"/>
         <title>Model zoo - serotiny 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=916d6ed8f59335acffa15474ff504849343d4c76" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=7f0192ddeb2adecfbaa87ffbcf67d16358b30bc1" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=0af69da206d614734f649b27d4cdc2dd6c31f41d" />
     
     
@@ -184,12 +184,16 @@
 <li class="toctree-l3"><a class="reference internal" href="serotiny.metrics.html">serotiny.metrics package</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.models.html">serotiny.models package</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.callbacks.html">serotiny.models.callbacks package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.models.unet.html">serotiny.models.unet package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.vae.html">serotiny.models.vae package</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.networks.html">serotiny.networks package</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.classification.html">serotiny.networks.classification package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.basic_cnn.html">serotiny.networks.basic_cnn package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.networks.layers.html">serotiny.networks.layers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.mlp.html">serotiny.networks.mlp package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.unet.html">serotiny.networks.unet package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.utils.html">serotiny.networks.utils package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="serotiny.utils.html">serotiny.utils package</a></li>
@@ -241,7 +245,7 @@ version string.</p>
 <div class="section" id="loading-a-trained-model">
 <h2>Loading a trained model<a class="headerlink" href="#loading-a-trained-model" title="Permalink to this headline">¶</a></h2>
 <p>After a model is trained, we can load it via
-<a class="reference internal" href="serotiny.models.html#serotiny.models.zoo.get_model" title="serotiny.models.zoo.get_model"><code class="xref py py-func docutils literal notranslate"><span class="pre">serotiny.models.zoo.get_model()</span></code></a>, which takes
+<code class="xref py py-func docutils literal notranslate"><span class="pre">serotiny.models.zoo.get_model()</span></code>, which takes
 as parameters: the model class, the version string, and optionally
 the zoo root (which can be specified as described in the previous section).</p>
 <p>An example would be:</p>

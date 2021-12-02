@@ -28,6 +28,14 @@ serotiny.io.image module
    :undoc-members:
    :show-inheritance:
 
+serotiny.io.models module
+-------------------------
+
+.. automodule:: serotiny.io.models
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 serotiny.io.quilt module
 ------------------------
 

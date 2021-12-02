@@ -4,10 +4,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny package" href="serotiny.html" /><link rel="prev" title="Example workflows" href="example_workflows.html" />
 
-    <meta name="generator" content="sphinx-4.3.0, furo 2021.11.16"/>
+    <meta name="generator" content="sphinx-4.3.1, furo 2021.11.23"/>
         <title>serotiny - serotiny 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=916d6ed8f59335acffa15474ff504849343d4c76" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=7f0192ddeb2adecfbaa87ffbcf67d16358b30bc1" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=0af69da206d614734f649b27d4cdc2dd6c31f41d" />
     
     
@@ -184,12 +184,16 @@
 <li class="toctree-l3"><a class="reference internal" href="serotiny.metrics.html">serotiny.metrics package</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.models.html">serotiny.models package</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.callbacks.html">serotiny.models.callbacks package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.models.unet.html">serotiny.models.unet package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.vae.html">serotiny.models.vae package</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.networks.html">serotiny.networks package</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.classification.html">serotiny.networks.classification package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.basic_cnn.html">serotiny.networks.basic_cnn package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.networks.layers.html">serotiny.networks.layers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.mlp.html">serotiny.networks.mlp package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.unet.html">serotiny.networks.unet package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.utils.html">serotiny.networks.utils package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="serotiny.utils.html">serotiny.utils package</a></li>
@@ -251,6 +255,7 @@
 <li class="toctree-l4"><a class="reference internal" href="serotiny.io.html#submodules">Submodules</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.io.html#module-serotiny.io.buffered_patch_dataset">serotiny.io.buffered_patch_dataset module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.io.html#module-serotiny.io.image">serotiny.io.image module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.io.html#module-serotiny.io.models">serotiny.io.models module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.io.html#module-serotiny.io.quilt">serotiny.io.quilt module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.io.html#module-serotiny.io">Module contents</a></li>
 </ul>
@@ -274,20 +279,12 @@
 <li class="toctree-l3"><a class="reference internal" href="serotiny.models.html">serotiny.models package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.html#subpackages">Subpackages</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.models.html#module-serotiny.models.classification">serotiny.models.classification module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.models.html#module-serotiny.models.regression">serotiny.models.regression module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.models.html#module-serotiny.models.unet">serotiny.models.unet module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.html#module-serotiny.models.utils">serotiny.models.utils module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.models.html#module-serotiny.models.zoo">serotiny.models.zoo module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.html#module-serotiny.models">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="serotiny.networks.html">serotiny.networks package</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.networks.html#subpackages">Subpackages</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.html#module-serotiny.networks.mlp">serotiny.networks.mlp module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.html#module-serotiny.networks.sequential">serotiny.networks.sequential module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.html#module-serotiny.networks.weight_init">serotiny.networks.weight_init module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.networks.html#module-serotiny.networks">Module contents</a></li>
 </ul>
 </li>

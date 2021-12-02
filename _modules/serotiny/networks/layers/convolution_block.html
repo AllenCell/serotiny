@@ -4,10 +4,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" />
 
-    <meta name="generator" content="sphinx-4.3.0, furo 2021.11.16"/>
-        <title>serotiny.networks.layers.activation - serotiny 0.0.1 documentation</title>
+    <meta name="generator" content="sphinx-4.3.1, furo 2021.11.23"/>
+        <title>serotiny.networks.layers.convolution_block - serotiny 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=916d6ed8f59335acffa15474ff504849343d4c76" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=7f0192ddeb2adecfbaa87ffbcf67d16358b30bc1" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?digest=0af69da206d614734f649b27d4cdc2dd6c31f41d" />
     
     
@@ -184,12 +184,16 @@
 <li class="toctree-l3"><a class="reference internal" href="../../../../serotiny.metrics.html">serotiny.metrics package</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../serotiny.models.html">serotiny.models package</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.models.callbacks.html">serotiny.models.callbacks package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.models.unet.html">serotiny.models.unet package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.models.vae.html">serotiny.models.vae package</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../serotiny.networks.html">serotiny.networks package</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.networks.classification.html">serotiny.networks.classification package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.networks.basic_cnn.html">serotiny.networks.basic_cnn package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.networks.layers.html">serotiny.networks.layers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.networks.mlp.html">serotiny.networks.mlp package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.networks.unet.html">serotiny.networks.unet package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.networks.utils.html">serotiny.networks.utils package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../serotiny.utils.html">serotiny.utils package</a></li>
@@ -224,31 +228,103 @@
           </label>
         </div>
         <article role="main">
-          <h1>Source code for serotiny.networks.layers.activation</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+          <h1>Source code for serotiny.networks.layers.convolution_block</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Callable</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">torch.nn.utils</span> <span class="kn">import</span> <span class="n">spectral_norm</span>
+
+<span class="kn">from</span> <span class="nn">serotiny.utils</span> <span class="kn">import</span> <span class="n">load_config</span>
 
 
-<div class="viewcode-block" id="activation_map"><a class="viewcode-back" href="../../../../serotiny.networks.layers.html#serotiny.networks.layers.activation.activation_map">[docs]</a><span class="k">def</span> <span class="nf">activation_map</span><span class="p">(</span><span class="n">activation</span><span class="p">):</span>
+<div class="viewcode-block" id="conv_block"><a class="viewcode-back" href="../../../../serotiny.networks.layers.html#serotiny.networks.layers.convolution_block.conv_block">[docs]</a><span class="k">def</span> <span class="nf">conv_block</span><span class="p">(</span>
+    <span class="n">in_c</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">out_c</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">kernel_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="n">padding</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">up_conv</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">non_linearity</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">Callable</span><span class="p">],</span>
+    <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"3d"</span><span class="p">,</span>
+<span class="p">):</span>
     <span class="sd">"""</span>
-<span class="sd">    Map from strings to activation functions</span>
+<span class="sd">    Util function to instantiate a convolutional block.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    in_c: int</span>
+<span class="sd">        number of input channels</span>
+<span class="sd">    out_c: int</span>
+<span class="sd">        number of output channels</span>
+<span class="sd">    kernel_size: Sequence[int] (defaults to (3, 3, 3))</span>
+<span class="sd">        dimensions of the convolutional kernel to be applied</span>
+<span class="sd">    padding:</span>
+<span class="sd">        padding value for the convolution (defaults to 0)</span>
+<span class="sd">    mode:</span>
+<span class="sd">        Dimensionality of the input data. Can be "2d" or "3d".</span>
 <span class="sd">    """</span>
-    <span class="k">if</span> <span class="n">activation</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">activation</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"none"</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">"2d"</span><span class="p">:</span>
+        <span class="n">conv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose2d</span> <span class="k">if</span> <span class="n">up_conv</span> <span class="k">else</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv2d</span>
+        <span class="n">batch_norm</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm2d</span>
+    <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">"3d"</span><span class="p">:</span>
+        <span class="n">conv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ConvTranspose3d</span> <span class="k">if</span> <span class="n">up_conv</span> <span class="k">else</span> <span class="n">nn</span><span class="o">.</span><span class="n">Conv3d</span>
+        <span class="n">batch_norm</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm3d</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Mode must be '2d' or '3d'. You passed '</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">'"</span><span class="p">)</span>
 
-    <span class="k">elif</span> <span class="n">activation</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"relu"</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">non_linearity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">non_linearity</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">non_linearity</span><span class="p">,</span> <span class="s2">"items"</span><span class="p">):</span>
+        <span class="n">non_linearity</span> <span class="o">=</span> <span class="n">load_config</span><span class="p">(</span><span class="n">non_linearity</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unexpected type for `non_linearity`: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">non_linearity</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-    <span class="k">elif</span> <span class="n">activation</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"prelu"</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">nn</span><span class="o">.</span><span class="n">PReLU</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+        <span class="n">conv</span><span class="p">(</span><span class="n">in_c</span><span class="p">,</span> <span class="n">out_c</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="n">kernel_size</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">),</span>
+        <span class="n">non_linearity</span><span class="p">,</span>
+        <span class="n">batch_norm</span><span class="p">(</span><span class="n">out_c</span><span class="p">),</span>
+    <span class="p">)</span></div>
 
-    <span class="k">elif</span> <span class="n">activation</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"sigmoid"</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sigmoid</span><span class="p">()</span>
 
-    <span class="k">elif</span> <span class="n">activation</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"leakyrelu"</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="viewcode-block" id="ConvBlock"><a class="viewcode-back" href="../../../../serotiny.networks.layers.html#serotiny.networks.layers.convolution_block.ConvBlock">[docs]</a><span class="k">class</span> <span class="nc">ConvBlock</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">in_c</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">out_c</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">kernel_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">padding</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">up_conv</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">non_linearity</span><span class="o">=</span><span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">Callable</span><span class="p">],</span>
+        <span class="n">mode</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"3d"</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Convolutional block class.</span>
 
-    <span class="k">elif</span> <span class="n">activation</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"softplus"</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">nn</span><span class="o">.</span><span class="n">Softplus</span><span class="p">()</span></div>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        in_c: int</span>
+<span class="sd">            number of input channels</span>
+<span class="sd">        out_c: int</span>
+<span class="sd">            number of output channels</span>
+<span class="sd">        kernel_size: Sequence[int] (defaults to (3, 3, 3))</span>
+<span class="sd">            dimensions of the convolutional kernel to be applied</span>
+<span class="sd">        padding:</span>
+<span class="sd">            padding value for the convolution (defaults to 0)</span>
+<span class="sd">        mode:</span>
+<span class="sd">            Dimensionality of the input data. Can be "2d" or "3d".</span>
+<span class="sd">        """</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">block</span> <span class="o">=</span> <span class="n">conv_block</span><span class="p">(</span>
+            <span class="n">in_c</span><span class="o">=</span><span class="n">in_c</span><span class="p">,</span>
+            <span class="n">out_c</span><span class="o">=</span><span class="n">out_c</span><span class="p">,</span>
+            <span class="n">kernel_size</span><span class="o">=</span><span class="n">kernel_size</span><span class="p">,</span>
+            <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span>
+            <span class="n">up_conv</span><span class="o">=</span><span class="n">up_conv</span><span class="p">,</span>
+            <span class="n">non_linearity</span><span class="o">=</span><span class="n">non_linearity</span><span class="p">,</span>
+            <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="ConvBlock.forward"><a class="viewcode-back" href="../../../../serotiny.networks.layers.html#serotiny.networks.layers.convolution_block.ConvBlock.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">block</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div></div>
 </pre></div>
         </article>
       </div>

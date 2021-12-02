@@ -1,0 +1,45 @@
+serotiny.networks.unet package
+==============================
+
+Submodules
+----------
+
+serotiny.networks.unet.double\_convolution module
+-------------------------------------------------
+
+.. automodule:: serotiny.networks.unet.double_convolution
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+serotiny.networks.unet.unet\_3d module
+--------------------------------------
+
+.. automodule:: serotiny.networks.unet.unet_3d
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+serotiny.networks.unet.unet\_downconv module
+--------------------------------------------
+
+.. automodule:: serotiny.networks.unet.unet_downconv
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+serotiny.networks.unet.unet\_upconv module
+------------------------------------------
+
+.. automodule:: serotiny.networks.unet.unet_upconv
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: serotiny.networks.unet
+   :members:
+   :undoc-members:
+   :show-inheritance:

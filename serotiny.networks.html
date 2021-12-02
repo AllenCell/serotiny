@@ -2,12 +2,12 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny.networks.classification package" href="serotiny.networks.classification.html" /><link rel="prev" title="serotiny.models.vae package" href="serotiny.models.vae.html" />
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny.networks.basic_cnn package" href="serotiny.networks.basic_cnn.html" /><link rel="prev" title="serotiny.models.vae package" href="serotiny.models.vae.html" />
 
-    <meta name="generator" content="sphinx-4.3.0, furo 2021.11.16"/>
+    <meta name="generator" content="sphinx-4.3.1, furo 2021.11.23"/>
         <title>serotiny.networks package - serotiny 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=916d6ed8f59335acffa15474ff504849343d4c76" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=7f0192ddeb2adecfbaa87ffbcf67d16358b30bc1" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=0af69da206d614734f649b27d4cdc2dd6c31f41d" />
     
     
@@ -184,12 +184,16 @@
 <li class="toctree-l3"><a class="reference internal" href="serotiny.metrics.html">serotiny.metrics package</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.models.html">serotiny.models package</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.callbacks.html">serotiny.models.callbacks package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.models.unet.html">serotiny.models.unet package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.vae.html">serotiny.models.vae package</a></li>
 </ul>
 </li>
 <li class="toctree-l3 current has-children current-page"><a class="current reference internal" href="#">serotiny.networks package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.classification.html">serotiny.networks.classification package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.basic_cnn.html">serotiny.networks.basic_cnn package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.networks.layers.html">serotiny.networks.layers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.mlp.html">serotiny.networks.mlp package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.unet.html">serotiny.networks.unet package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.utils.html">serotiny.networks.utils package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="serotiny.utils.html">serotiny.utils package</a></li>
@@ -230,69 +234,43 @@
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="serotiny.networks.classification.html">serotiny.networks.classification package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="serotiny.networks.classification.html#module-serotiny.networks.classification">Module contents</a></li>
+<li class="toctree-l1"><a class="reference internal" href="serotiny.networks.basic_cnn.html">serotiny.networks.basic_cnn package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.networks.basic_cnn.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.networks.basic_cnn.html#module-serotiny.networks.basic_cnn.basic_cnn">serotiny.networks.basic_cnn.basic_cnn module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.networks.basic_cnn.html#module-serotiny.networks.basic_cnn">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="serotiny.networks.layers.html">serotiny.networks.layers package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.networks.layers.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="serotiny.networks.layers.html#module-serotiny.networks.layers.activation">serotiny.networks.layers.activation module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="serotiny.networks.layers.html#module-serotiny.networks.layers.pad">serotiny.networks.layers.pad module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.networks.layers.html#module-serotiny.networks.layers.convolution_block">serotiny.networks.layers.convolution_block module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.networks.layers.html#module-serotiny.networks.layers.spatial_pyramid_pool">serotiny.networks.layers.spatial_pyramid_pool module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.networks.layers.html#module-serotiny.networks.layers">Module contents</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="serotiny.networks.mlp.html">serotiny.networks.mlp package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.networks.mlp.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.networks.mlp.html#module-serotiny.networks.mlp.mlp">serotiny.networks.mlp.mlp module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.networks.mlp.html#module-serotiny.networks.mlp">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="serotiny.networks.unet.html">serotiny.networks.unet package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.networks.unet.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.networks.unet.html#module-serotiny.networks.unet.double_convolution">serotiny.networks.unet.double_convolution module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.networks.unet.html#module-serotiny.networks.unet.unet_3d">serotiny.networks.unet.unet_3d module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.networks.unet.html#module-serotiny.networks.unet.unet_downconv">serotiny.networks.unet.unet_downconv module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.networks.unet.html#module-serotiny.networks.unet.unet_upconv">serotiny.networks.unet.unet_upconv module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.networks.unet.html#module-serotiny.networks.unet">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="serotiny.networks.utils.html">serotiny.networks.utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.networks.utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.networks.utils.html#module-serotiny.networks.utils.sequential">serotiny.networks.utils.sequential module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.networks.utils.html#module-serotiny.networks.utils.weight_init">serotiny.networks.utils.weight_init module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.networks.utils.html#module-serotiny.networks.utils">Module contents</a></li>
+</ul>
+</li>
 </ul>
 </div>
-</div>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-serotiny.networks.mlp">
-<span id="serotiny-networks-mlp-module"></span><h2>serotiny.networks.mlp module<a class="headerlink" href="#module-serotiny.networks.mlp" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="serotiny.networks.mlp.MLP">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.networks.mlp.</span></span><span class="sig-name descname"><span class="pre">MLP</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hidden_layers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[256]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/networks/mlp.html#MLP"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.networks.mlp.MLP" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="serotiny.networks.mlp.MLP.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/networks/mlp.html#MLP.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.networks.mlp.MLP.forward" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="serotiny.networks.mlp.MLP.training">
-<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#serotiny.networks.mlp.MLP.training" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-</dd></dl>
-</div>
-<div class="section" id="module-serotiny.networks.sequential">
-<span id="serotiny-networks-sequential-module"></span><h2>serotiny.networks.sequential module<a class="headerlink" href="#module-serotiny.networks.sequential" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="serotiny.networks.sequential.Sequential">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.networks.sequential.</span></span><span class="sig-name descname"><span class="pre">Sequential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modules</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/networks/sequential.html#Sequential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.networks.sequential.Sequential" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.module.Module</span></code></p>
-<p>Auxiliary class to allow instantiation of a composition of networks from
-a yaml config</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="serotiny.networks.sequential.Sequential.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/networks/sequential.html#Sequential.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.networks.sequential.Sequential.forward" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="serotiny.networks.sequential.Sequential.training">
-<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#serotiny.networks.sequential.Sequential.training" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-</dd></dl>
-</div>
-<div class="section" id="module-serotiny.networks.weight_init">
-<span id="serotiny-networks-weight-init-module"></span><h2>serotiny.networks.weight_init module<a class="headerlink" href="#module-serotiny.networks.weight_init" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="serotiny.networks.weight_init.weight_init">
-<span class="sig-prename descclassname"><span class="pre">serotiny.networks.weight_init.</span></span><span class="sig-name descname"><span class="pre">weight_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/networks/weight_init.html#weight_init"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.networks.weight_init.weight_init" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="simple">
-<dt>Usage:</dt><dd><p>model = Model()
-model.apply(weight_init)</p>
-</dd>
-</dl>
-</dd></dl>
 </div>
 <div class="section" id="module-serotiny.networks">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-serotiny.networks" title="Permalink to this headline">¶</a></h2>
@@ -304,12 +282,12 @@ model.apply(weight_init)</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="serotiny.networks.classification.html">
+          <a class="next-page" href="serotiny.networks.basic_cnn.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">serotiny.networks.classification package</div>
+                <div class="title">serotiny.networks.basic_cnn package</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -352,10 +330,6 @@ model.apply(weight_init)</p>
             <ul>
 <li><a class="reference internal" href="#">serotiny.networks package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-serotiny.networks.mlp">serotiny.networks.mlp module</a></li>
-<li><a class="reference internal" href="#module-serotiny.networks.sequential">serotiny.networks.sequential module</a></li>
-<li><a class="reference internal" href="#module-serotiny.networks.weight_init">serotiny.networks.weight_init module</a></li>
 <li><a class="reference internal" href="#module-serotiny.networks">Module contents</a></li>
 </ul>
 </li>

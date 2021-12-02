@@ -4,10 +4,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
 
-    <meta name="generator" content="sphinx-4.3.0, furo 2021.11.16"/>
+    <meta name="generator" content="sphinx-4.3.1, furo 2021.11.23"/>
         <title>Overview: module code - serotiny 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=916d6ed8f59335acffa15474ff504849343d4c76" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=7f0192ddeb2adecfbaa87ffbcf67d16358b30bc1" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=0af69da206d614734f649b27d4cdc2dd6c31f41d" />
     
     
@@ -184,12 +184,16 @@
 <li class="toctree-l3"><a class="reference internal" href="../serotiny.metrics.html">serotiny.metrics package</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../serotiny.models.html">serotiny.models package</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../serotiny.models.callbacks.html">serotiny.models.callbacks package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../serotiny.models.unet.html">serotiny.models.unet package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../serotiny.models.vae.html">serotiny.models.vae package</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../serotiny.networks.html">serotiny.networks package</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../serotiny.networks.classification.html">serotiny.networks.classification package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../serotiny.networks.basic_cnn.html">serotiny.networks.basic_cnn package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../serotiny.networks.layers.html">serotiny.networks.layers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../serotiny.networks.mlp.html">serotiny.networks.mlp package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../serotiny.networks.unet.html">serotiny.networks.unet package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../serotiny.networks.utils.html">serotiny.networks.utils package</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../serotiny.utils.html">serotiny.utils package</a></li>
@@ -248,6 +252,7 @@
 <li><a href="serotiny/io/dataframe/loaders/image3d.html">serotiny.io.dataframe.loaders.image3d</a></li>
 <li><a href="serotiny/io/dataframe/readers.html">serotiny.io.dataframe.readers</a></li>
 <li><a href="serotiny/io/image.html">serotiny.io.image</a></li>
+<li><a href="serotiny/io/models.html">serotiny.io.models</a></li>
 <li><a href="serotiny/io/quilt.html">serotiny.io.quilt</a></li>
 <li><a href="serotiny/losses/continuous_bernoulli.html">serotiny.losses.continuous_bernoulli</a></li>
 <li><a href="serotiny/losses/kl_divergence.html">serotiny.losses.kl_divergence</a></li>
@@ -256,9 +261,7 @@
 <li><a href="serotiny/metrics/inception.html">serotiny.metrics.inception</a></li>
 <li><a href="serotiny/metrics/pearson.html">serotiny.metrics.pearson</a></li>
 <li><a href="serotiny/models/callbacks/plot_xhat.html">serotiny.models.callbacks.plot_xhat</a></li>
-<li><a href="serotiny/models/classification.html">serotiny.models.classification</a></li>
-<li><a href="serotiny/models/regression.html">serotiny.models.regression</a></li>
-<li><a href="serotiny/models/unet.html">serotiny.models.unet</a></li>
+<li><a href="serotiny/models/unet/unet.html">serotiny.models.unet.unet</a></li>
 <li><a href="serotiny/models/utils.html">serotiny.models.utils</a></li>
 <li><a href="serotiny/models/vae/base_vae.html">serotiny.models.vae.base_vae</a></li>
 <li><a href="serotiny/models/vae/conditional_vae.html">serotiny.models.vae.conditional_vae</a></li>
@@ -267,13 +270,16 @@
 <li><a href="serotiny/models/vae/tabular_conditional_vae.html">serotiny.models.vae.tabular_conditional_vae</a></li>
 <li><a href="serotiny/models/vae/tabular_condprior_vae.html">serotiny.models.vae.tabular_condprior_vae</a></li>
 <li><a href="serotiny/models/vae/tabular_vae.html">serotiny.models.vae.tabular_vae</a></li>
-<li><a href="serotiny/models/zoo.html">serotiny.models.zoo</a></li>
-<li><a href="serotiny/networks/layers/activation.html">serotiny.networks.layers.activation</a></li>
-<li><a href="serotiny/networks/layers/pad.html">serotiny.networks.layers.pad</a></li>
+<li><a href="serotiny/networks/basic_cnn/basic_cnn.html">serotiny.networks.basic_cnn.basic_cnn</a></li>
+<li><a href="serotiny/networks/layers/convolution_block.html">serotiny.networks.layers.convolution_block</a></li>
 <li><a href="serotiny/networks/layers/spatial_pyramid_pool.html">serotiny.networks.layers.spatial_pyramid_pool</a></li>
-<li><a href="serotiny/networks/mlp.html">serotiny.networks.mlp</a></li>
-<li><a href="serotiny/networks/sequential.html">serotiny.networks.sequential</a></li>
-<li><a href="serotiny/networks/weight_init.html">serotiny.networks.weight_init</a></li>
+<li><a href="serotiny/networks/mlp/mlp.html">serotiny.networks.mlp.mlp</a></li>
+<li><a href="serotiny/networks/unet/double_convolution.html">serotiny.networks.unet.double_convolution</a></li>
+<li><a href="serotiny/networks/unet/unet_3d.html">serotiny.networks.unet.unet_3d</a></li>
+<li><a href="serotiny/networks/unet/unet_downconv.html">serotiny.networks.unet.unet_downconv</a></li>
+<li><a href="serotiny/networks/unet/unet_upconv.html">serotiny.networks.unet.unet_upconv</a></li>
+<li><a href="serotiny/networks/utils/sequential.html">serotiny.networks.utils.sequential</a></li>
+<li><a href="serotiny/networks/utils/weight_init.html">serotiny.networks.utils.weight_init</a></li>
 <li><a href="serotiny/utils/dynamic_imports.html">serotiny.utils.dynamic_imports</a></li>
 </ul></ul>
         </article>

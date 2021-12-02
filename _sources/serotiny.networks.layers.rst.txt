@@ -4,18 +4,10 @@ serotiny.networks.layers package
 Submodules
 ----------
 
-serotiny.networks.layers.activation module
-------------------------------------------
+serotiny.networks.layers.convolution\_block module
+--------------------------------------------------
 
-.. automodule:: serotiny.networks.layers.activation
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-serotiny.networks.layers.pad module
------------------------------------
-
-.. automodule:: serotiny.networks.layers.pad
+.. automodule:: serotiny.networks.layers.convolution_block
    :members:
    :undoc-members:
    :show-inheritance:
