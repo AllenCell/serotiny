@@ -25,26 +25,41 @@ def _get_kwargs():
 
 
 def train_model(
-    model: Dict,
-    datamodule: Dict,
-    trainer: Dict,
-    model_zoo: Dict,
-    loggers: List[Dict] = [],
-    callbacks: List[Dict] = [],
-    gpu_ids: List[int] = [0],
-    version_string: str = "zero",
-    seed: int = 42,
+    model: Dict = None,
+    datamodule: Dict = None,
+    trainer: Dict = None,
+    model_zoo: Dict = None,
+    loggers: List[Dict] = None,
+    callbacks: List[Dict] = None,
+    gpu_ids: List[int] = None,
+    version_string: str = None,
+    seed: int = None,
+    config: Dict = None,
 ):
     called_args = _get_kwargs()
 
-    pl.seed_everything(seed)
+    if config:
+        model_config = config.get("model", {})
+        datamodule_config = config.get("datamodule", {})
+        trainer_config = config.get("trainer", {})
+        model_zoo_config = config.get("model_zoo", {})
+        loggers_config = config.get("loggers", [])
+        callbacks_config = config.get("callbacks", [])
+        gpu_ids = config.get("gpu_ids", [0])
+        version_string = config.get("version_string", "zero")
+        seed = config.get("seed", 42)
+    else:
+        model_config = model or {}
+        datamodule_config = datamodule or {}
+        trainer_config = trainer or {}
+        model_zoo_config = model_zoo or {}
+        loggers_config = loggers or []
+        callbacks_config = callbacks or []
+        gpu_ids = gpu_ids or [0]
+        version_string = version_string or "zero"
+        seed = seed or 42
 
-    model_config = model
-    datamodule_config = datamodule
-    trainer_config = trainer
-    model_zoo_config = model_zoo
-    loggers_config = loggers
-    callbacks_config = callbacks
+    pl.seed_everything(seed)
 
     model_zoo_path = model_zoo_config.get("path")
     model_name = model_config.get(INIT_KEY, "UNDEFINED_MODEL_NAME")
@@ -70,12 +85,12 @@ def train_model(
     loggers = load_multiple(loggers_config)
 
     if len(model_zoo) > 0:
-        config = {"filename": "epoch-{epoch:02d}"}
+        zoo_config = {"filename": "epoch-{epoch:02d}"}
         checkpoint_config = model_zoo_config.get("checkpoint", {})
-        config.update(checkpoint_config)
+        zoo_config.update(checkpoint_config)
 
         checkpoint_callback = get_checkpoint_callback(
-            model_name, version_string, model_zoo_path, **config
+            model_name, version_string, model_zoo_path, **zoo_config
         )
     else:
         checkpoint_callback = None
