@@ -73,25 +73,19 @@ def train_model(
 
     if len(model_zoo) > 0:
         model_path = build_model_path(model_zoo_path, (model_name, version_string))
-        config = {"dirpath": model_path, "filename": "epoch-{epoch:02d}"}
+        config = {"dirpath": model_path, "filename": "{epoch:02d}"}
         checkpoint_config = model_zoo_config.get("checkpoint", {})
         config.update(checkpoint_config)
         checkpoint_callback = ModelCheckpoint(**config)
     else:
         checkpoint_callback = None
 
-    if checkpoint_callback:
-        trainer_config["checkpoint_callback"] = True
-
     callbacks = load_multiple(callbacks_config)
     if checkpoint_callback is not None:
         callbacks.append(checkpoint_callback)
 
     trainer = pl.Trainer(
-        **trainer_config,
-        logger=loggers,
-        gpus=num_gpus,
-        callbacks=callbacks,
+        **trainer_config, logger=loggers, gpus=num_gpus, callbacks=callbacks,
     )
 
     log.info("Calling trainer.fit")
