@@ -11,9 +11,16 @@ def _fit_pca(
     output_path: str,
     n_components: int,
     filter_options: dict,
+    filter_nonzero: bool,
     compression: int = 3,
 ):
     cols = filter_columns(dataset.columns.tolist(), **filter_options)
+    df2 = dataset[cols].copy()
+    if filter_nonzero:
+        df1 = df2.loc[:, (df2 != 0).all()]
+    else:
+        df1 = df2
+    cols = df1.columns
     dataset = dataset[cols]
     pca = PCA(n_components).fit(dataset)
 
