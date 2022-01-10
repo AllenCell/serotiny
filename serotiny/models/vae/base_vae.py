@@ -139,6 +139,12 @@ class BaseVAE(pl.LightningModule):
             z, **{k: v for k, v in kwargs.items() if k in self.decoder_args}
         )
 
+        mask_kwargs = {k: v for k, v in kwargs.items() if k in ["mask"]}
+        target = {v for k, v in kwargs.items() if k in ["target"]}
+
+        if len(target) > 0:
+            x = target.pop()
+
         (
             loss,
             recon_loss,
@@ -155,9 +161,12 @@ class BaseVAE(pl.LightningModule):
             mode=self.prior_mode,
             prior_mu=(None if self.prior_mean is None else self.prior_mean.type_as(mu)),
             prior_logvar=self.prior_logvar,
+            **mask_kwargs,
         )
-
+        # Batch size = 1 means RCL is summed across batch
+        # Batch size = x.shape[0] means RCL is mean across batch
         batch_size = x.shape[0]
+        # batch_size = 1
 
         return (
             x_hat,

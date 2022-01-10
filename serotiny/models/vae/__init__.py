@@ -3,3 +3,6 @@ from .image_vae import ImageVAE
 from .tabular_conditional_vae import TabularConditionalVAE
 from .tabular_condprior_vae import TabularConditionalPriorVAE
 from .base_vae import BaseVAE
+from .tabular_vae_with_mask import TabularVAEWithMask
+from .tabular_time_lagged_vae import TabularTimeLaggedVAE
+from .tabular_conditional_time_lagged_vae import TabularConditionalTimeLaggedVAE
