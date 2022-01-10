@@ -41,6 +41,7 @@ class WholeGraph(InMemoryDataset):
         transform=None,
         pre_transform=None,
         pre_filter=None,
+        normalize=None,
     ):
 
         self.node_loader = node_loader
@@ -50,6 +51,7 @@ class WholeGraph(InMemoryDataset):
         self.val_manifest = val_manifest
         self.train_test_split = train_test_split
         self.subset = subset
+        self.normalize = normalize
 
         super(WholeGraph, self).__init__(
             root, transform, pre_transform, pre_filter
@@ -99,7 +101,7 @@ class WholeGraph(InMemoryDataset):
 
         self.df = self.df.merge(pca_df, on="CellId")
 
-        if self.val_manifest is not None:
+        if (self.val_manifest is not None) & (self.val_manifest != "None"):
             self.val_manifest = pd.read_csv(self.val_manifest)
             size = self.val_manifest.shape[0]
 
@@ -141,6 +143,8 @@ class WholeGraph(InMemoryDataset):
                 main_manifest["val_mask"] = main_manifest["val_mask"].fillna(False)
             else:
                 main_manifest["mask"] = main_manifest["mask"].fillna(False)
+        else:
+            main_manifest = self.df
 
         self.target_label = self.task_dict["target_label"]
         if self.task_dict["task"] == "classification":
@@ -160,16 +164,18 @@ class WholeGraph(InMemoryDataset):
             )
 
         self.mask_df = main_manifest
-
-        norm_cols = ["centroid_x", "centroid_y", "centroid_z"] + self.node_cols
+        if self.normalize:
+            norm_cols = ["centroid_x", "centroid_y", "centroid_z"] + self.node_cols
+        else:
+            norm_cols = ["centroid_x", "centroid_y", "centroid_z"]
         self.df[norm_cols] = self.df[norm_cols].apply(
             lambda x: (x - x.min()) / (x.max() - x.min())
         )
 
-        norm_cols = ["T_index_x"]
-        self.mask_df[norm_cols] = self.mask_df[norm_cols].apply(
-            lambda x: (x - x.min()) / (x.max() - x.min())
-        )
+        # norm_cols = ["T_index_x"]
+        # self.mask_df[norm_cols] = self.mask_df[norm_cols].apply(
+        #     lambda x: (x - x.min()) / (x.max() - x.min())
+        # )
 
         save_path = Path(self.root + "/data")
         save_path.mkdir(parents=True, exist_ok=True)
