@@ -5,16 +5,20 @@ from serotiny.networks.weight_init import weight_init
 
 
 def _make_block(input_dim, output_dim):
+    # return nn.Sequential(
+    #     nn.Linear(input_dim, output_dim), nn.BatchNorm1d(output_dim), nn.ReLU()
+    # )
     return nn.Sequential(
-        nn.Linear(input_dim, output_dim), nn.BatchNorm1d(output_dim), nn.ReLU()
+        nn.Linear(input_dim, output_dim),
+        nn.BatchNorm1d(output_dim),
+        # nn.LeakyReLU(0.0001),
+        nn.ReLU(),
     )
 
 
 class MLP(nn.Module):
     def __init__(
-        self,
-        *dims,
-        hidden_layers=[256],
+        self, *dims, hidden_layers=[256],
     ):
         super().__init__()
 
@@ -29,7 +33,7 @@ class MLP(nn.Module):
 
         net += [
             _make_block(input_dim, output_dim)
-            for (input_dim, output_dim) in zip(hidden_layers[1:], hidden_layers[2:])
+            for (input_dim, output_dim) in zip(hidden_layers[:], hidden_layers[1:])
         ]
 
         net += [nn.Linear(hidden_layers[-1], self.output_dim)]
@@ -37,7 +41,9 @@ class MLP(nn.Module):
         self.net = nn.Sequential(*net)
         self.net.apply(weight_init)
 
-    def forward(self, x1, x2=None):
-        if x2 is not None:
-            x1 = torch.cat([x1, x2], dim=1)
+    def forward(self, x1, condition=None):
+        if condition is not None:
+            if len(condition.shape) == 1:
+                condition = condition.unsqueeze(dim=1)
+            x1 = torch.cat([x1, condition], dim=1)
         return self.net(x1)

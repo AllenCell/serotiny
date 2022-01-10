@@ -27,11 +27,22 @@ def calculate_elbo(
     mode="isotropic",
     prior_mu=None,
     prior_logvar=None,
+    **kwargs,
 ):
 
     recon_loss = recon_loss(reduction="none")
+
+    mask_kwargs = {k: v for k, v in kwargs.items() if k in ['mask']}
+    if len(mask_kwargs) != 0:
+        mask = mask_kwargs['mask']
+        reconstructed_x = reconstructed_x[mask]
+        x = x[mask]
+        mean = mean[mask]
+        log_var = log_var[mask]
+
     rcl_per_input_dimension = recon_loss(reconstructed_x, x)
-    rcl = rcl_per_input_dimension.sum(dim=1).mean()
+    rcl = rcl_per_input_dimension.sum(dim=1).sum()
+    # rcl = rcl_per_input_dimension.sum(dim=1).mean()
 
     if mode == "isotropic":
         kld_per_dimension = isotropic_gaussian_kl(mean, log_var)
@@ -42,6 +53,7 @@ def calculate_elbo(
         raise NotImplementedError(f"KLD mode '{mode}' not implemented")
 
     kld = kld_per_dimension.sum(dim=1).mean()
+    # kld = kld_per_dimension.sum(dim=1).sum()
 
     return (
         rcl + beta * kld,
