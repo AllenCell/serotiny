@@ -28,7 +28,7 @@ def main():
         )
 
     if not any(["output_root=" in arg for arg in sys.argv]):
-        sys.argv.insert(1, f"output_root={os.getcwd()}/output")
+        sys.argv.append(f"output_root={os.getcwd()}/output")
 
 
     if mode == "train":
