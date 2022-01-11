@@ -1,0 +1,6 @@
+hydra:
+  run:
+    dir: ${output_root}/${task}/${now:%Y-%m-%d}/${now:%H-%M-%S_%f}
+  sweep:
+    dir: ${output_root}/${task}/${now:%Y-%m-%d}
+    subdir: ${now:%H-%M-%S_%f}

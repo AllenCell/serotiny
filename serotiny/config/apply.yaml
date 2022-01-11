@@ -1,0 +1,8 @@
+defaults:
+  - _self_
+  - defaults
+  - hydra
+  - model: default
+  - data: default
+
+task: apply

@@ -3,7 +3,7 @@
 
 """The setup script."""
 
-from setuptools import find_packages, setup
+from setuptools import find_packages, setup, find_namespace_packages
 
 with open("README.md") as readme_file:
     readme = readme_file.read()
@@ -42,7 +42,7 @@ setup(
     description="library and commands for deep learning workflows",
     entry_points={
         "console_scripts": [
-            "serotiny=serotiny_steps.cli.main:main",
+            "serotiny=serotiny.cli.cli:main",
         ],
     },
     install_requires=requirements,
@@ -51,7 +51,8 @@ setup(
     include_package_data=True,
     keywords="serotiny",
     name="serotiny",
-    packages=find_packages(exclude=["tests", "*.tests", "*.tests.*"]),
+    packages=find_namespace_packages(include=["hydra_plugins.*"]) +
+        find_packages(exclude=["tests", "*.tests", "*.tests.*"]),
     python_requires=">=3.7",
     test_suite="serotiny/tests",
     url="https://github.com/AllenCellModeling/serotiny",
