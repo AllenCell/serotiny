@@ -94,6 +94,8 @@ def train_model(
         **trainer_config, logger=loggers, gpus=num_gpus, callbacks=callbacks,
     )
 
+    # trainer.tune(model, datamodule)
+
     log.info("Calling trainer.fit")
     trainer.fit(model, datamodule)
     trainer.test(datamodule=datamodule, ckpt_path=None)
