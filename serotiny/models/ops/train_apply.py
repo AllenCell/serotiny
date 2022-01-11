@@ -8,11 +8,6 @@ def _train_or_test(mode, model, data, trainer=None, seed=42,
     seed_everything(42)
 
     model = instantiate(model)
-    print(model)
-    return
-    #import pdb; pdb.set_trace()
-
-
     data = instantiate(data)
 
     trainer = add_mlflow_conf(trainer, mlflow)
