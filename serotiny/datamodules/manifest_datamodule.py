@@ -103,6 +103,8 @@ class ManifestDatamodule(pl.LightningDataModule):
         # at least the train loaders have to be specified.
         # if only those are specified, the same loaders are
         # used for the remaining folds
+        import pdb;pdb.set_trace()
+
         if not isinstance(loaders, dict):
             loaders = {
                 split: loaders
