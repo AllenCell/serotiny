@@ -1,4 +1,4 @@
-from typing import Union, Optional, Dict, Sequence, Function
+from typing import Union, Optional, Dict, Sequence, Callable
 from pathlib import Path
 
 import re
@@ -69,7 +69,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         List of columns to load from the dataset, in case it's a parquet file.
         If None, load everything.
 
-    collate: Optional[Function] = None
+    collate: Optional[Callable] = None
         Alternative collate function for dataloader
 
     pin_memory: bool = True
@@ -89,7 +89,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         loaders: Union[Dict, Loader],
         split_column: Optional[Union[Path, str]] = None,
         columns: Optional[Sequence[str]] = None,
-        collate: Optional[Function] = None,
+        collate: Optional[Callable] = None,
         pin_memory: bool = True,
         shuffle: bool = True,
         drop_last: bool = False,
