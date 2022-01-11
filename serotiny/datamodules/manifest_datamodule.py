@@ -1,4 +1,4 @@
-from typing import Union, Optional, Dict, Sequence, Function
+from typing import Union, Optional, Dict, Sequence
 from pathlib import Path
 
 import re
@@ -89,7 +89,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         loaders: Union[Dict, Loader],
         split_column: Optional[Union[Path, str]] = None,
         columns: Optional[Sequence[str]] = None,
-        collate: Optional[Function] = None,
+        collate: Optional = None,
         pin_memory: bool = True,
         shuffle: bool = True,
         drop_last: bool = False,
