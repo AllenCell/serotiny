@@ -5,16 +5,14 @@ from .utils import add_mlflow_conf
 
 def _train_or_test(mode, model, data, trainer=None, seed=42,
                    mlflow=None, **_):
-    print(model)
-    print(data)
-    print(trainer)
-    print(seed)
-    print(mlflow)
-    return
-
     seed_everything(42)
 
     model = instantiate(model)
+    print(model)
+    return
+    #import pdb; pdb.set_trace()
+
+
     data = instantiate(data)
 
     trainer = add_mlflow_conf(trainer, mlflow)
