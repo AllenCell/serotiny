@@ -40,6 +40,24 @@ def _make_multiple_manifest_splits(split_path, loaders, columns=None):
     return datasets
 
 
+def _dict_depth(d):
+    return max(_dict_depth(v) if isinstance(v, dict) else 0
+               for v in d.values()) + 1
+
+def _parse_loaders(loaders):
+    depth = _dict_depth(loaders)
+    if depth == 1:
+        loaders = {
+            split: loaders
+            for split in ["train", "valid", "test"]
+        }
+    elif depth != 2:
+        raise ValueError(f"Loaders dict should have depth 1 or 2. Got {depth}")
+
+    return loaders
+
+
+
 class ManifestDatamodule(pl.LightningDataModule):
     """
     A pytorch lightning datamodule based on manifest files. It can either use
@@ -100,14 +118,9 @@ class ManifestDatamodule(pl.LightningDataModule):
         self.path = path
         self.multiprocessing_context = multiprocessing_context
 
-        # at least the train loaders have to be specified.
-        # if only those are specified, the same loaders are
-        # used for the remaining folds
-        if not isinstance(loaders, dict):
-            loaders = {
-                split: loaders
-                for split in ["train", "valid", "test"]
-            }
+        # if only one loader is specified, the same loaders are
+        # used for all  folds
+        loaders = _parse_loaders(loaders)
 
         path = Path(path)
 
