@@ -1,0 +1,3 @@
+- model=tabular_vae_nucmorph.yaml
+- data=variance_subset.yaml
+- output_root=/allen/aics/modeling/theok/Projects/idle/serotiny/output

@@ -4,5 +4,6 @@ defaults:
   - hydra
   - model: default
   - data: default
+  - trainer: default
 
 task: train

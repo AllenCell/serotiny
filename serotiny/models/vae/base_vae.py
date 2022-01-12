@@ -86,6 +86,8 @@ class BaseVAE(pl.LightningModule):
             prior_logvar = torch.Tensor(prior_logvar)
         self.prior_logvar = prior_logvar
 
+        self.optimizer = optimizer
+
         if prior_mode not in ["isotropic", "anisotropic"]:
             raise NotImplementedError(f"KLD mode '{prior_mode}' not implemented")
 
