@@ -12,6 +12,8 @@ requirements = [
     # project requires
     "numpy",
     "pandas",
+    "pyarrow",
+    "hydra-core",
     "Pillow",
     "pytorch-lightning",
     "pytorch-lightning-bolts",
