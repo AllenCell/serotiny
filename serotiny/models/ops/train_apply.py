@@ -10,7 +10,8 @@ def _train_or_test(mode, model, data, trainer=None, seed=42,
     model = instantiate(model)
     data = instantiate(data)
 
-    trainer = add_mlflow_conf(trainer, mlflow)
+    # trainer = add_mlflow_conf(trainer, mlflow)
+    
     trainer = instantiate(trainer)
 
     if mode == "train":

@@ -11,7 +11,7 @@ def add_mlflow_conf(trainer_conf, mlflow_conf=None):
     if isinstance(new_logger, MLFlowLogger):
         return new_trainer_conf
 
-    mlf_logger = MLFlowLogger(**mlflow_conf)
+    # mlf_logger = MLFlowLogger(**mlflow_conf)
 
     if isinstance(new_logger, Logger):
         new_logger = [new_logger, mlf_logger]
@@ -20,9 +20,13 @@ def add_mlflow_conf(trainer_conf, mlflow_conf=None):
             new_logger = mlf_logger
         else:
             new_logger.append(mlf_logger)
+    elif new_logger is None:
+        new_logger = mlf_logger
     else:
         raise TypeError(f"Unexpected type for `logger`: {type(new_logger)}")
-
-    new_trainer_conf["logger"] = new_logger
+    # import ipdb
+    # ipdb.set_trace()
+    # new_trainer_conf["logger"] = new_logger
+    new_trainer_conf.logger = new_logger
 
     return new_trainer_conf
