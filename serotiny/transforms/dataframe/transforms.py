@@ -6,7 +6,7 @@ import numpy as np
 def split_dataframe(
     dataframe: pd.DataFrame,
     train_frac: float,
-    val_frac: Optional[float] = None,
+    valid_frac: Optional[float] = None,
     return_splits: bool = True,
 ):
     """
@@ -24,7 +24,7 @@ def split_dataframe(
     train_frac: float
         Fraction of data to use for training. Must be <= 1
 
-    val_frac: Optional[float]
+    valid_frac: Optional[float]
         Fraction of data to use for validation. By default,
         the data not used for training is split in half
         between validation and test
@@ -38,26 +38,26 @@ def split_dataframe(
     # import here to optimize CLIs / Fire usage
     from sklearn.model_selection import train_test_split
 
-    train_ix, val_test_ix = train_test_split(
+    train_ix, valid_test_ix = train_test_split(
         dataframe.index.tolist(), train_size=train_frac
     )
-    if val_frac is not None:
-        val_frac = val_frac / (1 - train_frac)
+    if valid_frac is not None:
+        valid_frac = valid_frac / (1 - train_frac)
     else:
         # by default use same size for val and test
         val_frac = 0.5
 
-    val_ix, test_ix = train_test_split(val_test_ix, train_size=val_frac)
+    valid_ix, test_ix = train_test_split(valid_test_ix, train_size=val_frac)
 
     if return_splits:
         return dict(
             train=dataframe.loc[train_ix],
-            val=dataframe.loc[val_ix],
+            valid=dataframe.loc[valid_ix],
             test=dataframe.loc[test_ix],
         )
 
     dataframe.loc[train_ix, "split"] = "train"
-    dataframe.loc[val_ix, "split"] = "valid"
+    dataframe.loc[valid_ix, "split"] = "valid"
     dataframe.loc[test_ix, "split"] = "test"
 
     return dataframe
