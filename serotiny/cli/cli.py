@@ -27,8 +27,8 @@ def main():
             f"`mode` must be either 'train' or 'test'. Got '{mode}'"
         )
 
-    if not any(["output_root=" in arg for arg in sys.argv]):
-        sys.argv.append(f"output_root={os.getcwd()}/output")
+    #if not any(["output_root=" in arg for arg in sys.argv]):
+    #    sys.argv.append(f"output_root={os.getcwd()}/output")
 
 
     if mode == "train":
