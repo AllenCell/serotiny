@@ -55,6 +55,7 @@ class TrajectoryDataModule(pl.LightningDataModule):
         filter_nonzero: bool = False,
         condition_label: str = None,
         condition: bool = None,
+        condition_shuffle: bool = False,
         **kwargs
     ):
 
@@ -70,6 +71,7 @@ class TrajectoryDataModule(pl.LightningDataModule):
         self.filter_nonzero = filter_nonzero
         self.condition_label = condition_label
         self.condition = condition
+        self.condition_shuffle = condition_shuffle
 
         df_val = pd.read_csv(manifest)
 
@@ -110,6 +112,9 @@ class TrajectoryDataModule(pl.LightningDataModule):
         for track, df1 in all_df.groupby("track_id"):
             if self.condition_label is not None:
                 condition_values = np.array(df1[condition_label]).astype(np.float32)
+                if self.condition_shuffle:
+                    np.random.shuffle(condition_values)
+
             else:
                 condition_values = None
                 

@@ -34,7 +34,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-
+noteboooks/
 # OS generated files
 .DS_Store
 
