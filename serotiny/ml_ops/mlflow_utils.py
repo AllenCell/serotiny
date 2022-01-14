@@ -1,6 +1,5 @@
 import time
-from copy import copy
-from pathlib import Path
+import tempfile
 
 import mlflow
 from mlflow.tracking import MlflowClient
@@ -36,25 +35,31 @@ def _patched_save_checkpoint(original, self, filepath, save_weights_only):
     )
 
 
-def _get_ckpt_timestamp(path):
-    return float(path.split("_")[-1].split(".ckpt")[0])
-
-
-def _get_newest_checkpoint(tracking_uri, run_id):
+def _get_newest_checkpoint(tracking_uri, run_id, tmp_dir):
     paths = []
     client = MlflowClient(tracking_uri=tracking_uri)
 
     for artifact in client.list_artifacts(run_id, path="checkpoints"):
-        if artifact.path.endswith(".ckpt"):
-            paths.append(artifact.path)
+        paths.append(artifact.path.split("/")[-1])
 
     if len(paths) == 0:
         return None
 
-    path = sorted(paths, key=_get_ckpt_timestamp, reverse=True)[0]
-    path = mlflow.get_artifact_uri(path)
+    path = sorted(paths, key=float, reverse=True)[0]
 
-    return path
+    ckpt = client.list_artifacts(run_id, path=f"checkpoints/{path}")
+    assert len(ckpt) <= 1
+
+    if len(ckpt) == 0:
+        return None
+
+    ckpt = ckpt[0].path
+
+    return client.download_artifacts(
+        run_id=run_id,
+        path=ckpt,
+        dst_path=tmp_dir
+    )
 
 
 def mlflow_fit(mlflow_conf, trainer, model, data):
@@ -63,7 +68,7 @@ def mlflow_fit(mlflow_conf, trainer, model, data):
     mlflow.set_tracking_uri(mlflow_conf.tracking_uri)
 
     # if autolog arguments aren't given, or are None, set to empty dict
-    autolog = (mlflow_conf.autolog if hasattr(mlflow_conf, "autolog") else None)
+    autolog = (mlflow_conf.autolog if hasattr(mlflow_conf, "w") else None)
     autolog = (autolog if autolog is not None else {})
     mlflow.pytorch.autolog(**autolog)
     safe_patch("pytorch", pl.Trainer, "save_checkpoint",
@@ -91,6 +96,11 @@ def mlflow_fit(mlflow_conf, trainer, model, data):
             run_id=run_id,
             nested=(run_id is not None)):
 
-        if run_id is not None:
-            ckpt_path = _get_newest_checkpoint(mlflow_conf.tracking_uri, run_id)
-        trainer.fit(model, data, ckpt_path=ckpt_path)
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            if run_id is not None:
+                ckpt_path = _get_newest_checkpoint(mlflow_conf.tracking_uri,
+                                                   run_id,
+                                                   tmp_dir)
+
+            if ckpt_path is not None:
+                trainer.fit(model, data, ckpt_path=ckpt_path)
