@@ -3,7 +3,7 @@ import sys
 
 import hydra
 from omegaconf import OmegaConf
-from serotiny.models.ops import train, apply
+from serotiny.ml_ops import train, apply
 
 
 def main():
@@ -26,10 +26,6 @@ def main():
         raise ValueError(
             f"`mode` must be either 'train' or 'test'. Got '{mode}'"
         )
-
-    #if not any(["output_root=" in arg for arg in sys.argv]):
-    #    sys.argv.append(f"output_root={os.getcwd()}/output")
-
 
     if mode == "train":
         hydra.main(config_path=None,
