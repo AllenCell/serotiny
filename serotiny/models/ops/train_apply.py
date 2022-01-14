@@ -1,30 +1,41 @@
+import pytorch_lightning as pl
 from hydra.utils import instantiate
-from pytorch_lightning import seed_everything
+from omegaconf import OmegaConf
 
-from .utils import add_mlflow_conf
+from .mlflow_utils import mlflow_fit
 
 def _train_or_test(mode, model, data, trainer=None, seed=42,
                    mlflow=None, **_):
-    seed_everything(42)
+
+    pl.seed_everything(42)
 
     model = instantiate(model)
     data = instantiate(data)
 
-    # trainer = add_mlflow_conf(trainer, mlflow)
-    
     trainer = instantiate(trainer)
 
     if mode == "train":
-        trainer.fit(model, data)
+        if mlflow is not None:
+            mlflow_fit(mlflow, trainer, model, data)
+        else:
+            trainer.fit(model, data)
+
+
     elif mode == "apply":
-        trainer.test(model, data)
+        raise NotImplementedError
     else:
         raise ValueError(
             f"`mode` must be either 'train' or 'test'. Got '{mode}'"
         )
 
 def train(cfg):
+    if isinstance(cfg, dict):
+        cfg = OmegaConf.create(cfg)
+
     _train_or_test("train", **cfg)
 
 def apply(cfg):
+    if isinstance(cfg, dict):
+        cfg = OmegaConf.create(cfg)
+
     _train_or_test("apply", **cfg)
