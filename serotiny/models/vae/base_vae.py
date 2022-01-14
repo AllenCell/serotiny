@@ -72,11 +72,11 @@ class BaseVAE(pl.LightningModule):
         """
         super().__init__()
 
-        #exclude encoder and decoder parts, gui to fix
         frame = inspect.currentframe()
         init_args = get_init_args(frame)
         self.save_hyperparameters(
-            *[arg for arg in init_args if arg not in ["encoder", "decoder", "optimizer"]]
+            *[arg for arg in init_args
+              if arg not in ["encoder", "decoder", "optimizer"]]
         )
 
         self.reconstruction_reduce = reconstruction_reduce
@@ -255,7 +255,7 @@ class BaseVAE(pl.LightningModule):
         return self._step("test", batch, batch_idx, logger=False)
 
     def configure_optimizers(self):
-        optimizer=self.optimizer(self.parameters())
+        optimizer = self.optimizer(self.parameters())
         return {
             "optimizer": optimizer,
             "monitor": "val_loss",
