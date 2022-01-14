@@ -1,0 +1,7 @@
+tracking_uri:
+experiment_name:
+run_name:
+run_id:
+autolog:
+  log_every_n_epoch: 1
+  log_models: True
