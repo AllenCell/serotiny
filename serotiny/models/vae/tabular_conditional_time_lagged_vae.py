@@ -54,3 +54,53 @@ class TabularConditionalTimeLaggedVAE(TabularTimeLaggedVAE):
         target = batch[self.xhat_label].float()
         condition = batch[self.c_label].float()
         return x, {"target": target, "condition": condition}
+
+    def _step(self, stage, batch, batch_idx, logger, parse_mask=None):
+
+        x = self.parse_batch(batch, parse_mask)
+        if isinstance(x, tuple):
+            x, forward_kwargs = x
+            condition = forward_kwargs["condition"]
+        else:
+            forward_kwargs = dict()
+
+        (
+            _,
+            mu,
+            _,
+            loss,
+            recon_loss,
+            kld_loss,
+            autocorr_loss,
+            rcl_per_input_dimension,
+            kld_per_lt_dimension,
+        ) = self.forward(x, **forward_kwargs)
+
+        self.log(f"{stage} reconstruction loss", recon_loss, logger=logger)
+        self.log(f"{stage} kld loss", kld_loss, logger=logger)
+        self.log(f"{stage}_loss", loss, logger=logger)
+
+        if torch.is_tensor(autocorr_loss):
+            if autocorr_loss.requires_grad:
+                autocorr_loss = autocorr_loss.detach()
+
+        results = {
+            "loss": loss,
+            f"{stage}_loss": loss.detach(),  # for epoch end logging purposes
+            "recon_loss": recon_loss.detach(),
+            "kld_loss": kld_loss.detach(),
+            "autocorr_loss": autocorr_loss,
+            "batch_idx": batch_idx,
+        }
+
+        if stage == "test":
+            results.update(
+                {
+                    "mu": mu.detach(),
+                    "kld_per_latent_dimension": kld_per_lt_dimension.detach().float(),
+                    "rcl_per_input_dimension": rcl_per_input_dimension.detach().float(),
+                    "condition": condition.detach().float(),
+                }
+            )
+
+        return results
