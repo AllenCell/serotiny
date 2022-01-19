@@ -3,7 +3,6 @@ import numpy as np
 from torchvision.transforms import Compose
 
 from serotiny.io.image import image_loader
-from serotiny.utils import load_multiple
 from .abstract_loader import Loader
 
 
@@ -50,9 +49,9 @@ class Load2DImage(Loader):
 
         self.file_type = file_type
 
-        if transforms is not None:
-            transforms = load_multiple(transforms)
-            transforms = Compose(transforms)
+        #if transforms is not None:
+        #    transforms = load_multiple(transforms)
+        #    transforms = Compose(transforms)
         self.transforms = transforms
 
     def __call__(self, row):

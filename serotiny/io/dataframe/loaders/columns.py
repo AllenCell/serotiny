@@ -1,6 +1,6 @@
 from typing import Optional, Sequence
 
-from serotiny.data.dataframe.transforms import filter_columns
+from serotiny.transforms.dataframe import filter_columns
 from .abstract_loader import Loader
 
 
