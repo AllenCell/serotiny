@@ -1,3 +1,6 @@
+defaults:
+  - callbacks: default
+
 _target_: pytorch_lightning.Trainer
 max_epochs:
 gpus:
