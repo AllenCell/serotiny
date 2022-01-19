@@ -2,9 +2,6 @@ from typing import Optional, Union, Dict, Callable
 from torch import nn
 from torch.nn.utils import spectral_norm
 
-from serotiny.utils import load_config
-
-
 def conv_block(
     in_c: int,
     out_c: int,
@@ -41,10 +38,6 @@ def conv_block(
 
     if non_linearity is None:
         non_linearity = nn.ReLU()
-    elif hasattr(non_linearity, "items"):
-        non_linearity = load_config(non_linearity)
-    else:
-        raise TypeError(f"Unexpected type for `non_linearity`: {type(non_linearity)}")
 
     return nn.Sequential(
         conv(in_c, out_c, kernel_size=kernel_size, padding=padding),

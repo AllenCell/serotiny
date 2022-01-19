@@ -8,7 +8,6 @@ import numpy as np
 
 from serotiny.networks import BasicCNN
 from serotiny.networks.utils import weight_init
-from serotiny.utils.dynamic_imports import load_config
 from .base_vae import BaseVAE
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]
@@ -71,8 +70,6 @@ class ImageVAE(BaseVAE):
         nn.utils.spectral_norm(decoder.linear_decompress)
 
         if decoder_non_linearity is not None:
-            if isinstance(decoder_non_linearity, dict):
-                decoder_non_linearity = load_config(decoder_non_linearity)
             decoder = nn.Sequential(decoder, decoder_non_linearity)
 
         super().__init__(
