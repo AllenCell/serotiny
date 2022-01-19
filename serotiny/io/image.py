@@ -1,6 +1,7 @@
 from typing import Union, Sequence, Optional, Type, Callable
 from pathlib import Path
 
+import sys
 import torch
 import numpy as np
 
@@ -148,9 +149,10 @@ def tiff_writer(
     )
 
 def image_info(path):
-    image = aicsimageio.AICSImage(path, reader=reader)
+    image = aicsimageio.AICSImage(path)
     return {
         'channel_names': image.channel_names}
 
 if __name__ == '__main__':
-    print(image_info(argv[1]))
+    print(sys.argv)
+    print(image_info(sys.argv[1]))
