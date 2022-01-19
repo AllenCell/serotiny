@@ -3,6 +3,7 @@ import importlib
 import inspect
 
 from omegaconf import OmegaConf
+from omegaconf._utils import is_primitive_type
 
 def get_obj_from_path(path: str):
     """
@@ -14,8 +15,10 @@ def get_obj_from_path(path: str):
     name = path[-1]
     return getattr(importlib.import_module(module), name)
 
-def create_config(path):
-    obj = get_obj_from_path(path)
+def _create_config(obj, path=None):
+
+    if path is None:
+        path = obj.__module__ + "." + obj.__name__
 
     if hasattr(obj, "__init__"):
         sig = inspect.getfullargspec(obj.__init__)
@@ -25,13 +28,23 @@ def create_config(path):
     args_dict = dict()
     args_dict["_target_"] = path
 
+    args = sig.args
     if sig.defaults is not None:
-        for ix, default_value in enumerate(sig.defaults):
-            args_dict[sig.args[ix]] = default_value
+        while len(args) > len(sig.defaults):
+            args_dict[args.pop(0)] = None
 
+        assert len(args) == len(sig.defaults)
+        for arg, default_value in zip(args, sig.defaults):
+            args_dict[arg] = default_value
+
+    kwargs = sig.kwonlyargs
     if sig.kwonlydefaults is not None:
-        for ix, default_value in enumerate(sig.kwonlydefaults):
-            args_dict[sig.kwonlyargs[ix]] = default_value
+        while len(kwargs) > len(sig.kwonlydefaults):
+            args_dict[kwargs.pop(0)] = None
+
+        assert len(args) == len(sig.defaults)
+        for arg, default_value in zip(kwargs, sig.kwonlydefaults):
+            args_dict[arg] = default_value
 
     for arg in (sig.args + sig.kwonlyargs):
         if arg not in args_dict:
@@ -40,7 +53,19 @@ def create_config(path):
     if "self" in args_dict:
         del args_dict["self"]
 
-    print(OmegaConf.to_yaml(OmegaConf.create(args_dict)))
+    for arg, default in args_dict.items():
+        if not is_primitive_type(default):
+            try:
+                args_dict[arg] = _create_config(default)
+            except:
+                args_dict[arg] = f"Unable to give default value of {type(default)}"
+
+    return args_dict
+
+def create_config(path):
+    obj = get_obj_from_path(path)
+    config = _create_config(obj, path)
+    print(OmegaConf.to_yaml(OmegaConf.create(config)))
 
 def main():
     fire.Fire(create_config)
