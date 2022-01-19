@@ -95,6 +95,7 @@ class PadTo:
         pad = []
         for i, dim in enumerate(self.target_dims):
             pad_dim = (dim - img.shape[i + 1]) / 2
+            pad_dim = max(0, pad_dim)
 
             # when 2 * pad_dim is even, this doesn't change the result.
             # when 2 * pad_dim is odd, this makes padding amount one pixel/voxel

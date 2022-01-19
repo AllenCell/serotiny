@@ -1,4 +1,4 @@
-from .pad import ExpandTo, ExpandColumns
+from .pad import ExpandTo, ExpandColumns, PadTo
 from .swap import SwapAxes
 from .resize import ResizeTo, ResizeBy, CropCenter
 from .project import Project
