@@ -71,6 +71,7 @@ def mlflow_fit(mlflow_conf, trainer, model, data):
     autolog = (mlflow_conf.autolog if hasattr(mlflow_conf, "w") else None)
     autolog = (autolog if autolog is not None else {})
     mlflow.pytorch.autolog(**autolog)
+
     safe_patch("pytorch", pl.Trainer, "save_checkpoint",
                _patched_save_checkpoint)
 
@@ -102,5 +103,4 @@ def mlflow_fit(mlflow_conf, trainer, model, data):
                                                    run_id,
                                                    tmp_dir)
 
-            if ckpt_path is not None:
-                trainer.fit(model, data, ckpt_path=ckpt_path)
+            trainer.fit(model, data, ckpt_path=ckpt_path)
