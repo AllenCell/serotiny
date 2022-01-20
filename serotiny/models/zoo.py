@@ -84,6 +84,10 @@ def get_model(
     model_class = module_or_path(models, model_class)
 
     model_config = config["model"]
+    if model_config is None:
+        with open(config['configfile'], 'r') as configfile:
+            yaml_config = yaml.load(configfile)
+            model_config = yaml_config['model']
 
     return model_class.load_from_checkpoint(checkpoint_path=ckpt_path, **model_config)
 
