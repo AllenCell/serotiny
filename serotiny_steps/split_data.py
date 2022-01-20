@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 import fire
 from serotiny.io.dataframe.split import split_dataset
-from serotiny.io.dataframe.utils import load_csv
+from serotiny.io.dataframe.readers import read_csv
 
 ###############################################################################
 
@@ -20,10 +20,11 @@ def split_data(dataset_path: str, output_path: str, ratios=None, required_fields
     be named after the keys for each ratio.
     """
 
-    if required_fields is None:
-        required_fields = {}
+    # if required_fields is None:
+    #     required_fields = {}
 
-    dataset = load_csv(dataset_path, required_fields)
+    dataset = read_csv(dataset_path, required_fields)
+
     datasets = split_dataset(dataset, ratios)
 
     # if ratios is None:
@@ -54,6 +55,10 @@ def split_data(dataset_path: str, output_path: str, ratios=None, required_fields
         if not os.path.exists(output_path):
             os.makedirs(output_path)
         save_path = Path(output_path) / f"{split}.csv"
+        print("split", split, "length", len(dataset), "to", save_path)
+        print(type(dataset))
+        print(dataset.head())
+
         dataset.to_csv(save_path, index=False)
         dataset_paths[split] = str(save_path)
 

@@ -14,7 +14,7 @@ from serotiny.io.dataframe import DataframeDataset
 def make_manifest_dataset(manifest: str, loaders: dict):
     dataframe = pd.read_csv(manifest)
 
-    return DataframeDataset(dataframe=dataframe, loaders=loaders, iloc=True)
+    return DataframeDataset(dataframe=dataframe, loaders=loaders)  # , iloc=True)
 
 
 class PatchDatamodule(pl.LightningDataModule):

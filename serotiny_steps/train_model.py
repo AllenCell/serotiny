@@ -1,7 +1,7 @@
 import os
 import logging
 import inspect
-
+import yaml
 from typing import List, Dict
 from datetime import datetime
 
@@ -35,8 +35,13 @@ def train_model(
     version_string: str = None,
     seed: int = None,
     config: Dict = None,
+    configfile: str = None,
 ):
     called_args = _get_kwargs()
+
+    if configfile:
+        with open(configfile, "r") as yaml_cf:
+            config = yaml.load(yaml_cf)
 
     if config:
         model_config = config.get("model", {})
@@ -84,7 +89,7 @@ def train_model(
 
     loggers = load_multiple(loggers_config)
 
-    if len(model_zoo) > 0:
+    if len(model_zoo_config) > 0:
         zoo_config = {"filename": "epoch-{epoch:02d}"}
         checkpoint_config = model_zoo_config.get("checkpoint", {})
         zoo_config.update(checkpoint_config)

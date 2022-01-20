@@ -1,7 +1,7 @@
 import os
 
 from typing import Dict, List
-
+import yaml
 import fire
 import pytorch_lightning as pl
 
@@ -10,15 +10,38 @@ from serotiny.utils import init, load_multiple
 
 
 def apply_model(
-    model_class: str,
-    model_id: str,
-    datamodule: Dict,
-    trainer: Dict,
-    model_zoo: Dict,
-    callbacks: Dict,
-    gpu_ids: List[int],
+    model_class: str = None,
+    model_id: str = None,
+    datamodule: Dict = None,
+    trainer: Dict = None,
+    model_zoo: Dict = None,
+    callbacks: Dict = None,
+    gpu_ids: List[int] = None,
     loggers: List[Dict] = [],
+    config: Dict = None,
+    configfile: str = None,
 ):
+    if configfile:
+        with open(configfile, "r") as yaml_cf:
+            config = yaml.load(yaml_cf)
+
+    if config:
+        model_class = config.get("model_class")
+        model_id = config.get("model_id", "10")
+        datamodule_config = config.get("datamodule", {})
+        trainer_config = config.get("trainer", {})
+        model_zoo_config = config.get("model_zoo", {})
+        loggers_config = config.get("loggers", [])
+        callbacks_config = config.get("callbacks", [])
+        gpu_ids = config.get("gpu_ids", [0])
+
+    else:
+        datamodule_config = datamodule or {}
+        trainer_config = trainer or {}
+        model_zoo_config = model_zoo or {}
+        loggers_config = loggers or []
+        callbacks_config = callbacks or []
+        gpu_ids = gpu_ids or [0]
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
     os.environ["CUDA_VISIBLE_DEVICES"] = ",".join([str(id) for id in gpu_ids])
