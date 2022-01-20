@@ -9,7 +9,7 @@ import fire
 import pytorch_lightning as pl
 
 from serotiny.models.zoo import store_metadata, get_checkpoint_callback
-from serotiny.utils import INIT_KEY, load_config, load_multiple
+from serotiny.utils import INIT_KEY, INVOKE_KEY, load_config, load_multiple
 
 log = logging.getLogger(__name__)
 
@@ -67,8 +67,8 @@ def train_model(
     pl.seed_everything(seed)
 
     model_zoo_path = model_zoo_config.get("path")
-    model_name = model_config.get(INIT_KEY, "UNDEFINED_MODEL_NAME")
-    datamodule_name = datamodule_config.get(INIT_KEY, "UNDEFINED_DATAMODULE_NAME")
+    model_name = model_config.get(INIT_KEY, model_config.get(INVOKE_KEY, "UNDEFINED_MODEL_NAME"))
+    datamodule_name = datamodule_config.get(INIT_KEY, model_config.get(INVOKE_KEY, "UNDEFINED_DATAMODULE_NAME"))
 
     store_metadata(called_args, model_name, version_string, model_zoo_path)
 
@@ -90,7 +90,7 @@ def train_model(
     loggers = load_multiple(loggers_config)
 
     if len(model_zoo_config) > 0:
-        zoo_config = {"filename": "epoch-{epoch:02d}"}
+        zoo_config = {"filename": "{epoch:02d}"}
         checkpoint_config = model_zoo_config.get("checkpoint", {})
         zoo_config.update(checkpoint_config)
 
