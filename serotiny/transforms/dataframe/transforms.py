@@ -52,7 +52,7 @@ def split_dataframe(
     if return_splits:
         return dict(
             train=dataframe.loc[train_ix],
-            val=dataframe.loc[val_ix],
+            valid=dataframe.loc[val_ix],
             test=dataframe.loc[test_ix],
         )
 
