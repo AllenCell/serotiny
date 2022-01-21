@@ -147,12 +147,3 @@ def tiff_writer(
     OmeTiffWriter.save(
         data=img, uri=path, channel_names=channel_names, dim_order=dim_order
     )
-
-def image_info(path):
-    image = aicsimageio.AICSImage(path)
-    return {
-        'channel_names': image.channel_names}
-
-if __name__ == '__main__':
-    print(sys.argv)
-    print(image_info(sys.argv[1]))
