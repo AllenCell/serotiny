@@ -1,0 +1,9 @@
+defaults:
+  - _self_
+  - @_global_.base
+  - model: default
+  - data: default
+  - trainer: default
+  - mlflow: default
+
+task: apply
