@@ -10,7 +10,7 @@ from pytorch_lightning.utilities.exceptions import MisconfigurationException
 from torch.utils.data import DataLoader
 
 from serotiny.io.dataframe import DataframeDataset, read_dataframe
-from serotiny.io.dataframe.loaders import Loader
+from serotiny.io.dataframe.loaders.abstract_loader import Loader
 
 def _make_single_manifest_splits(manifest_path, loaders, split_column, columns=None):
     dataframe = read_dataframe(manifest_path, columns)
