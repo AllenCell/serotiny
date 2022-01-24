@@ -15,10 +15,13 @@ def get_obj_from_path(path: str):
     name = path[-1]
     return getattr(importlib.import_module(module), name)
 
-def _create_config(obj, path=None):
+def _create_config(obj, path=None, add_partial=False):
 
     if path is None:
-        path = obj.__module__ + "." + obj.__name__
+        if hasattr(obj, "__name__"):
+            path = obj.__module__ + "." + obj.__name__
+        else:
+            path = obj.__module__ + "." + obj.__class__.__name__
 
     if hasattr(obj, "__init__"):
         sig = inspect.getfullargspec(obj.__init__)
@@ -26,6 +29,8 @@ def _create_config(obj, path=None):
         sig = inspect.getfullargspec(obj)
 
     args_dict = dict()
+    if add_partial:
+        args_dict["_partial_"] = True
     args_dict["_target_"] = path
 
     args = sig.args
@@ -54,10 +59,15 @@ def _create_config(obj, path=None):
         del args_dict["self"]
 
     for arg, default in args_dict.items():
-        if not is_primitive_type(default):
+        if isinstance(default, tuple):
+            args_dict[arg] = list(default)
+        elif not is_primitive_type(default):
             try:
-                args_dict[arg] = _create_config(default)
-            except:
+                args_dict[arg] = _create_config(
+                    default,
+                    add_partial=inspect.isclass(default)
+                )
+            except Exception:
                 args_dict[arg] = f"Unable to give default value of {type(default)}"
 
     return args_dict
