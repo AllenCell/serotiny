@@ -1,4 +1,4 @@
-from typing import Optional, Union, Dict, Callable
+from typing import Optional, Union, Dict
 from torch import nn
 from torch.nn.utils import spectral_norm
 
@@ -8,7 +8,7 @@ def conv_block(
     kernel_size: int = 3,
     padding: int = 0,
     up_conv: bool = False,
-    non_linearity=Union[Dict, nn.Module, Callable],
+    non_linearity: Optional[nn.Module] = None,
     mode: str = "3d",
 ):
     """
@@ -54,7 +54,7 @@ class ConvBlock(nn.Module):
         kernel_size: int = 3,
         padding: int = 0,
         up_conv: bool = False,
-        non_linearity=Union[Dict, nn.Module, Callable],
+        non_linearity: Optional[nn.Module] = None,
         mode: str = "3d",
     ):
         """

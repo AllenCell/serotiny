@@ -1,4 +1,4 @@
-from typing import Optional, Union, Dict, Callable, Sequence
+from typing import Optional, Union, Dict, Sequence
 import logging
 
 import numpy as np
@@ -24,7 +24,7 @@ class BasicCNN(nn.Module):
         pyramid_pool_splits: Optional[Sequence[int]] = None,
         flat_output: bool = True,
         up_conv: bool = False,
-        non_linearity=Union[Dict, nn.Module, Callable],
+        non_linearity: Optional[nn.Module] = None,
         mode: str = "3d",
     ):
         """
