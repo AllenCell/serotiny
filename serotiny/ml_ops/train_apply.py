@@ -2,7 +2,7 @@ import pytorch_lightning as pl
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
 
-from .mlflow_utils import mlflow_fit
+from .mlflow_utils import mlflow_fit, mlflow_apply
 
 def _train_or_test(mode, model, data, trainer=None, seed=42,
                    mlflow=None, **_):
@@ -11,7 +11,6 @@ def _train_or_test(mode, model, data, trainer=None, seed=42,
 
     model = instantiate(model)
     data = instantiate(data)
-
     trainer = instantiate(trainer)
 
     if mode == "train":
@@ -22,7 +21,11 @@ def _train_or_test(mode, model, data, trainer=None, seed=42,
 
 
     elif mode == "apply":
-        raise NotImplementedError
+        if mlflow is not None:
+            mlflow_apply(mlflow, trainer, model, data)
+        else:
+            raise NotImplementedError("Cannot `serotiny apply` without "
+                                      "an MLFlow config.")
     else:
         raise ValueError(
             f"`mode` must be either 'train' or 'test'. Got '{mode}'"

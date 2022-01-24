@@ -1,5 +1,7 @@
-import time
+import os
+import datetime
 import tempfile
+from pathlib import Path
 
 import mlflow
 from mlflow.tracking import MlflowClient
@@ -29,10 +31,22 @@ def _validate_mlflow_conf(mlflow_conf):
 def _patched_save_checkpoint(original, self, filepath, save_weights_only):
     original(self, filepath, save_weights_only)
 
+    latest_path = Path(filepath).with_name("latest.ckpt")
+    os.link(filepath, latest_path)
+
     mlflow.log_artifact(
-        local_path=filepath,
-        artifact_path=f"checkpoints/{time.time()}"
+        local_path=latest_path,
+        artifact_path="checkpoints"
     )
+    os.unlink(latest_path)
+
+
+def _timestamp():
+    return datetime.datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
+
+
+def _parse_timestamp(ts):
+    return datetime.datetime.strptime(ts, "%d_%m_%Y__%H_%M_%S")
 
 
 def _get_newest_checkpoint(tracking_uri, run_id, tmp_dir):
@@ -44,6 +58,7 @@ def _get_newest_checkpoint(tracking_uri, run_id, tmp_dir):
 
     if len(paths) == 0:
         return None
+
 
     path = sorted(paths, key=float, reverse=True)[0]
 
@@ -62,7 +77,7 @@ def _get_newest_checkpoint(tracking_uri, run_id, tmp_dir):
     )
 
 
-def mlflow_fit(mlflow_conf, trainer, model, data):
+def _mlflow_prep(mlflow_conf, trainer, model, data):
     _validate_mlflow_conf(mlflow_conf)
 
     mlflow.set_tracking_uri(mlflow_conf.tracking_uri)
@@ -82,14 +97,19 @@ def mlflow_fit(mlflow_conf, trainer, model, data):
     # we don't know yet if there's a checkpoint
     ckpt_path = None
 
+    run_id = mlflow_conf.get("run_id", None)
+
+    return experiment, run_id, ckpt_path
+
+
+def mlflow_fit(mlflow_conf, trainer, model, data):
+    experiment, run_id, ckpt_path = _mlflow_prep(
+        mlflow_conf, trainer, model, data)
+
     # if run_id has been specified, we're trying to resume
-    if hasattr(mlflow_conf, "run_id") and mlflow_conf.run_id is not None:
-        run_id = mlflow_conf.run_id
-        if not trainer.checkpoint_callback:
-            raise ValueError("You're trying to resume training, but "
-                             "checkpointing is not enabled.")
-    else:
-        run_id = None
+    if run_id is not None and not trainer.checkpoint_callback:
+        raise ValueError("You're trying to resume training, but "
+                         "checkpointing is not enabled.")
 
     with mlflow.start_run(
             experiment_id=experiment.experiment_id,
@@ -104,3 +124,25 @@ def mlflow_fit(mlflow_conf, trainer, model, data):
                                                    tmp_dir)
 
             trainer.fit(model, data, ckpt_path=ckpt_path)
+
+
+def mlflow_apply(mlflow_conf, trainer, model, data):
+    experiment, run_id, ckpt_path = _mlflow_prep(
+        mlflow_conf, trainer, model, data)
+
+    if run_id is None:
+        raise ValueError("You're calling serotiny apply but you "
+                         "haven't specified the run_id")
+
+    with mlflow.start_run(
+            experiment_id=experiment.experiment_id,
+            run_name=mlflow_conf.run_name,
+            run_id=run_id,
+            nested=(run_id is not None)):
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            ckpt_path = _get_newest_checkpoint(mlflow_conf.tracking_uri,
+                                               run_id,
+                                               tmp_dir)
+
+            trainer.test(model, data, ckpt_path=ckpt_path)
