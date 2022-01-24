@@ -7,9 +7,9 @@ from fire import Fire
 from omegaconf import OmegaConf
 from serotiny.ml_ops import train, apply
 from serotiny.ml_ops.project_utils import get_serotiny_project
-from serotiny.config.utils import create_config
 
 import serotiny.cli.image_cli as image_cli
+import serotiny.cli.config_cli as config_cli
 
 
 def print_help():
@@ -43,7 +43,7 @@ def main():
         # fire modes
         sys.argv.insert(1, mode)
         cli_dict = {
-            "config": create_config,
+            "config": config_cli,
             "image": image_cli,
         }
 
