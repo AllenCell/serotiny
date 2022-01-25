@@ -28,7 +28,7 @@ class BaseVAE(pl.LightningModule):
         latent_dim: Union[int, Sequence[int]],
         beta: float,
         x_label: str,
-        optimizer: type[torch.optim.Optimizer] = torch.optim.Adam,
+        optimizer = torch.optim.Adam,
         lr: float = 1e-3,
         loss_mask_label: Optional[str] = None,
         reconstruction_loss: Loss = nn.MSELoss(reduction="none"),
