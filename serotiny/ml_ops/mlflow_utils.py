@@ -3,11 +3,48 @@ import datetime
 import tempfile
 from pathlib import Path
 
+from omegaconf import OmegaConf
+import pytorch_lightning as pl
+from mlflow.utils.autologging_utils import autologging_integration, safe_patch
+
 import mlflow
 from mlflow.tracking import MlflowClient
-from mlflow.utils.autologging_utils import safe_patch
 
-import pytorch_lightning as pl
+@autologging_integration("pytorch")
+def patched_autolog(
+    log_every_n_epoch=1,
+    log_models=True,
+    disable=False,
+    exclusive=False,
+    disable_for_unsupported_versions=False,
+    silent=False,
+    fit_or_test="fit",
+):
+    """
+    Patched mlflow autolog, to enable on_test_epoch_end callbacks and to
+    cover trainer.test calls as well
+    """
+    from pytorch_lightning.utilities import rank_zero_only
+    import mlflow.pytorch._pytorch_autolog as _pytorch_autolog
+    from mlflow.utils.autologging_utils import safe_patch
+    @rank_zero_only
+    def _patched_on_test_epoch_end(
+            original, self, trainer, pl_module, *args
+    ):  # pylint: disable=signature-differs,arguments-differ,unused-argument
+        self._log_metrics(trainer, pl_module)
+
+    assert fit_or_test in ["fit", "test"]
+
+    safe_patch("pytorch", _pytorch_autolog.__MLflowPLCallback,
+               "on_test_epoch_end", _patched_on_test_epoch_end)
+
+    safe_patch("pytorch", mlflow.pytorch, "autolog", patched_autolog)
+
+    safe_patch("pytorch", pl.Trainer, fit_or_test, _pytorch_autolog.patched_fit,
+               manage_run=True)
+
+    safe_patch("pytorch", pl.Trainer, "save_checkpoint",
+               _patched_save_checkpoint)
 
 
 def _validate_mlflow_conf(mlflow_conf):
@@ -41,54 +78,31 @@ def _patched_save_checkpoint(original, self, filepath, save_weights_only):
     os.unlink(latest_path)
 
 
-def _timestamp():
-    return datetime.datetime.now().strftime("%d_%m_%Y__%H_%M_%S")
-
-
-def _parse_timestamp(ts):
-    return datetime.datetime.strptime(ts, "%d_%m_%Y__%H_%M_%S")
-
-
-def _get_newest_checkpoint(tracking_uri, run_id, tmp_dir):
-    paths = []
+def _get_latest_checkpoint(tracking_uri, run_id, tmp_dir):
     client = MlflowClient(tracking_uri=tracking_uri)
-
-    for artifact in client.list_artifacts(run_id, path="checkpoints"):
-        paths.append(artifact.path.split("/")[-1])
-
-    if len(paths) == 0:
-        return None
-
-
-    path = sorted(paths, key=float, reverse=True)[0]
-
-    ckpt = client.list_artifacts(run_id, path=f"checkpoints/{path}")
-    assert len(ckpt) <= 1
-
-    if len(ckpt) == 0:
-        return None
-
-    ckpt = ckpt[0].path
 
     return client.download_artifacts(
         run_id=run_id,
-        path=ckpt,
+        path="checkpoints/latest.ckpt",
         dst_path=tmp_dir
     )
 
 
-def _mlflow_prep(mlflow_conf, trainer, model, data):
+def _mlflow_prep(mlflow_conf, trainer, model, data, fit_or_test):
     _validate_mlflow_conf(mlflow_conf)
+    assert fit_or_test in ["fit", "test"]
+
+    # if autolog arguments aren't given, or are None, set to empty dict
+    autolog = (OmegaConf.to_object(mlflow_conf.autolog)
+               if hasattr(mlflow_conf, "autolog") else None)
+    autolog = (autolog if autolog is not None else {})
+    autolog["fit_or_test"] = fit_or_test
+    if fit_or_test == "test":
+        autolog["log_models"] = False
+    patched_autolog(**autolog)
 
     mlflow.set_tracking_uri(mlflow_conf.tracking_uri)
 
-    # if autolog arguments aren't given, or are None, set to empty dict
-    autolog = (mlflow_conf.autolog if hasattr(mlflow_conf, "w") else None)
-    autolog = (autolog if autolog is not None else {})
-    mlflow.pytorch.autolog(**autolog)
-
-    safe_patch("pytorch", pl.Trainer, "save_checkpoint",
-               _patched_save_checkpoint)
 
     # creates experiment if it doesn't exist, otherwise just gets it
     experiment = mlflow.set_experiment(
@@ -104,7 +118,7 @@ def _mlflow_prep(mlflow_conf, trainer, model, data):
 
 def mlflow_fit(mlflow_conf, trainer, model, data):
     experiment, run_id, ckpt_path = _mlflow_prep(
-        mlflow_conf, trainer, model, data)
+        mlflow_conf, trainer, model, data, "fit")
 
     # if run_id has been specified, we're trying to resume
     if run_id is not None and not trainer.checkpoint_callback:
@@ -119,7 +133,7 @@ def mlflow_fit(mlflow_conf, trainer, model, data):
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             if run_id is not None:
-                ckpt_path = _get_newest_checkpoint(mlflow_conf.tracking_uri,
+                ckpt_path = _get_latest_checkpoint(mlflow_conf.tracking_uri,
                                                    run_id,
                                                    tmp_dir)
 
@@ -128,7 +142,7 @@ def mlflow_fit(mlflow_conf, trainer, model, data):
 
 def mlflow_apply(mlflow_conf, trainer, model, data):
     experiment, run_id, ckpt_path = _mlflow_prep(
-        mlflow_conf, trainer, model, data)
+        mlflow_conf, trainer, model, data, "test")
 
     if run_id is None:
         raise ValueError("You're calling serotiny apply but you "
@@ -141,7 +155,7 @@ def mlflow_apply(mlflow_conf, trainer, model, data):
             nested=(run_id is not None)):
 
         with tempfile.TemporaryDirectory() as tmp_dir:
-            ckpt_path = _get_newest_checkpoint(mlflow_conf.tracking_uri,
+            ckpt_path = _get_latest_checkpoint(mlflow_conf.tracking_uri,
                                                run_id,
                                                tmp_dir)
 
