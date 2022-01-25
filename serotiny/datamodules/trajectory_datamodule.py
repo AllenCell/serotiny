@@ -56,6 +56,8 @@ class TrajectoryDataModule(pl.LightningDataModule):
         condition_label: str = None,
         condition: bool = None,
         condition_shuffle: bool = False,
+        sample_equal_timepoints: bool = False,
+        cols_to_normalize: list = None,
         **kwargs
     ):
 
@@ -72,17 +74,30 @@ class TrajectoryDataModule(pl.LightningDataModule):
         self.condition_label = condition_label
         self.condition = condition
         self.condition_shuffle = condition_shuffle
+        self.sample_equal_timepoints = sample_equal_timepoints
+        self.cols_to_normalize = cols_to_normalize
 
         df_val = pd.read_csv(manifest)
 
         min_t = 500
         all_df = []
         for track, df1 in df_val.groupby("track_id"):
-            this_df1 = df1.reset_index(drop=True)
-            all_df.append(this_df1)
-
-            if df1.shape[0] < min_t:
-                min_t = df1.shape[0]
+            if df1.shape[0] > 30:
+                this_df1 = df1.sort_values(by='T_index').reset_index(drop=True)
+                all_df.append(this_df1)
+                # print(this_df1.shape)
+                if this_df1.shape[0] < min_t:
+                    min_t = this_df1.shape[0]
+        # import ipdb
+        # ipdb.set_trace()
+        if self.sample_equal_timepoints:
+            all_df = []
+            for track, df1 in df_val.groupby("track_id"):
+                if df1.shape[0] > 30:
+                    this_df1 = df1.sample(n = min_t).sort_values(by='T_index').reset_index(drop=True)
+                    all_df.append(this_df1)     
+                    # import ipdb
+                    # ipdb.set_trace()   
 
         all_df = pd.concat(all_df, axis=0)
         # import ipdb
@@ -98,9 +113,15 @@ class TrajectoryDataModule(pl.LightningDataModule):
         self.cols = cols
 
         if normalize:
-            all_df[cols] = all_df[cols].apply(
+            if self.cols_to_normalize is not None:
+                all_df[self.cols_to_normalize] = all_df[self.cols_to_normalize].apply(
                 lambda x: (x - x.min()) / (x.max() - x.min())
             )
+                print('self cols norm')
+            else:
+                all_df[cols] = all_df[cols].apply(
+                    lambda x: (x - x.min()) / (x.max() - x.min())
+                )
         if self.condition_label is not None:
             if isinstance(condition_label, str):
                 condition_label = [condition_label]
