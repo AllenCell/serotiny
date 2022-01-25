@@ -1,6 +1,6 @@
 defaults:
   - _self_
-  - @_global_.base
+  - base
   - model: default
   - data: default
   - trainer: default
