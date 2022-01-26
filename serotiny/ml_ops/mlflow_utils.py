@@ -27,6 +27,7 @@ def patched_autolog(
     from pytorch_lightning.utilities import rank_zero_only
     import mlflow.pytorch._pytorch_autolog as _pytorch_autolog
     from mlflow.utils.autologging_utils import safe_patch
+
     @rank_zero_only
     def _patched_on_test_epoch_end(
             original, self, trainer, pl_module, *args
@@ -103,21 +104,21 @@ def _mlflow_prep(mlflow_conf, trainer, model, data, fit_or_test):
 
     mlflow.set_tracking_uri(mlflow_conf.tracking_uri)
 
-
-    # creates experiment if it doesn't exist, otherwise just gets it
-    experiment = mlflow.set_experiment(
-        experiment_name=mlflow_conf.experiment_name)
-
-    # we don't know yet if there's a checkpoint
-    ckpt_path = None
-
     run_id = mlflow_conf.get("run_id", None)
+    if run_id is None:
+        # creates experiment if it doesn't exist, otherwise just gets it
+        experiment = mlflow.set_experiment(
+            experiment_name=mlflow_conf.experiment_name)
+    else:
+        run = mlflow.get_run(run_id=run_id)
+        experiment = mlflow.set_experiment(
+            experiment_id=run.info.experiment_id)
 
-    return experiment, run_id, ckpt_path
+    return experiment, run_id
 
 
 def mlflow_fit(mlflow_conf, trainer, model, data):
-    experiment, run_id, ckpt_path = _mlflow_prep(
+    experiment, run_id = _mlflow_prep(
         mlflow_conf, trainer, model, data, "fit")
 
     # if run_id has been specified, we're trying to resume
@@ -131,6 +132,9 @@ def mlflow_fit(mlflow_conf, trainer, model, data):
             run_id=run_id,
             nested=(run_id is not None)):
 
+        # we don't know yet if there's a checkpoint
+        ckpt_path = None
+
         with tempfile.TemporaryDirectory() as tmp_dir:
             if run_id is not None:
                 ckpt_path = _get_latest_checkpoint(mlflow_conf.tracking_uri,
@@ -141,7 +145,7 @@ def mlflow_fit(mlflow_conf, trainer, model, data):
 
 
 def mlflow_apply(mlflow_conf, trainer, model, data):
-    experiment, run_id, ckpt_path = _mlflow_prep(
+    experiment, run_id = _mlflow_prep(
         mlflow_conf, trainer, model, data, "test")
 
     if run_id is None:
@@ -154,9 +158,13 @@ def mlflow_apply(mlflow_conf, trainer, model, data):
             run_id=run_id,
             nested=(run_id is not None)):
 
+        # we don't know yet if there's a checkpoint
+        ckpt_path = None
+
         with tempfile.TemporaryDirectory() as tmp_dir:
             ckpt_path = _get_latest_checkpoint(mlflow_conf.tracking_uri,
                                                run_id,
                                                tmp_dir)
 
             trainer.test(model, data, ckpt_path=ckpt_path)
+        mlflow.end_run(status="FINISHED")
