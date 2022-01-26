@@ -48,22 +48,20 @@ def patched_autolog(
                _patched_save_checkpoint)
 
 
-def _validate_mlflow_conf(mlflow_conf):
-    if (
-        (not hasattr(mlflow_conf, "tracking_uri")) or
-        (not hasattr(mlflow_conf, "experiment_name")) or
-        (mlflow_conf.tracking_uri is None) or
-        (mlflow_conf.experiment_name is None)
-    ):
-        raise ValueError(
-            "Must specify `tracking_uri` and `experiment_name`")
+def _is_empty(conf, key):
+    return conf.get(key, None) is None
 
-    if (
-        (not hasattr(mlflow_conf, "run_name") or mlflow_conf.run_name is None) and
-        (not hasattr(mlflow_conf, "run_id") or mlflow_conf.run_id is None)
-    ):
-        raise ValueError(
-            "Must specify at least `run_id` or `run_name`.")
+
+def _validate_mlflow_conf(conf):
+    if _is_empty(conf, "tracking_uri"):
+        raise ValueError("Must specify `tracking_uri`")
+
+    if _is_empty(conf, "experiment_name") and _is_empty(conf, "run_id"):
+        raise ValueError("If you don't specify `experiment_name`, you must "
+                         "specify `run_id`.")
+
+    if _is_empty(conf, "run_name") and _is_empty(conf, "run_id"):
+        raise ValueError("You must specify at least `run_id` or `run_name`")
 
 
 def _patched_save_checkpoint(original, self, filepath, save_weights_only):
