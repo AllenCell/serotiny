@@ -17,7 +17,7 @@ class TabularVAE(BaseVAE):
         hidden_layers: Sequence[int],
         x_label: str,
         loss_mask_label: Optional[str] = None,
-        optimizer: str = "Adam",
+        optimizer = torch.optim.Adam,
         lr: float = 1e-3,
         beta: float = 1.0,
         prior_mode: str = "isotropic",
