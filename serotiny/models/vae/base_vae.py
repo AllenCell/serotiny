@@ -29,7 +29,6 @@ class BaseVAE(pl.LightningModule):
         beta: float,
         x_label: str,
         optimizer = torch.optim.Adam,
-        lr: float = 1e-3,
         loss_mask_label: Optional[str] = None,
         reconstruction_loss: Loss = nn.MSELoss(reduction="none"),
         reconstruction_reduce: str = "sum",
@@ -50,8 +49,6 @@ class BaseVAE(pl.LightningModule):
             instantiating the given class.
         optimizer: str
             Optimizer to use
-        lr: float
-            Learning rate for training
         beta: float
             Beta parameter - the weight of the KLD term in the loss function
         x_label: str

@@ -18,7 +18,6 @@ class TabularVAE(BaseVAE):
         x_label: str,
         loss_mask_label: Optional[str] = None,
         optimizer = torch.optim.Adam,
-        lr: float = 1e-3,
         beta: float = 1.0,
         prior_mode: str = "isotropic",
         prior_logvar: Optional[Array] = None,
