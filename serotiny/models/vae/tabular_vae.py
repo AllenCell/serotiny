@@ -42,7 +42,6 @@ class TabularVAE(BaseVAE):
             optimizer=optimizer,
             x_label=x_label,
             loss_mask_label=loss_mask_label,
-            lr=lr,
             beta=beta,
             prior_mode=prior_mode,
             prior_logvar=prior_logvar,
