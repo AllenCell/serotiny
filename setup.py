@@ -27,6 +27,9 @@ requirements = [
     "sphinx",
     "sphinx-rtd-theme",
     "furo",
+    "fire",
+    "mlflow",
+    "hydra-core@git+https://github.com/facebookresearch/hydra.git",
 ]
 
 
