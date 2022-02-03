@@ -104,9 +104,24 @@ def _mlflow_prep(mlflow_conf, trainer, model, data, fit_or_test):
 
     run_id = mlflow_conf.get("run_id", None)
     if run_id is None:
+        run_name = mlflow_conf.get("run_name", None)
+        assert run_name is not None
         # creates experiment if it doesn't exist, otherwise just gets it
         experiment = mlflow.set_experiment(
             experiment_name=mlflow_conf.experiment_name)
+
+        runs = [
+            run for run in mlflow.list_run_infos(experiment_id=experiment.id)
+            if run.name == run_name
+        ]
+
+        if len(runs) > 1:
+            raise ValueError("You provided `run_name`, but there are multiple "
+                             "runs in this experiment with that name. Please "
+                             "specify `run_id`.")
+
+        run_id = runs[0].id
+
     else:
         run = mlflow.get_run(run_id=run_id)
         experiment = mlflow.set_experiment(
