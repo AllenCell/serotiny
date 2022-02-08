@@ -9,6 +9,28 @@ from mlflow.utils.autologging_utils import autologging_integration, safe_patch
 
 import mlflow
 from mlflow.tracking import MlflowClient
+from packaging.version import Version
+
+
+def _log_metrics_step(self, trainer, pl_module):
+    sanity_checking = (
+        trainer.sanity_checking
+        if Version(pl.__version__) > Version("1.4.5")
+        else trainer.running_sanity_check
+    )
+    if sanity_checking:
+        return
+
+    if (trainer.global_step + 1) % trainer.log_every_n_steps == 0:
+        # `trainer.callback_metrics` contains both training and validation metrics
+        cur_metrics = trainer.callback_metrics
+        # Cast metric value as  float before passing into logger.
+        metrics = dict(
+            map(lambda x: ("batch/" + x[0], float(x[1])),
+                cur_metrics.items()))
+
+        self.metrics_logger.record_metrics(metrics, trainer.global_step)
+
 
 @autologging_integration("pytorch")
 def patched_autolog(
@@ -30,14 +52,23 @@ def patched_autolog(
 
     @rank_zero_only
     def _patched_on_test_epoch_end(
-            original, self, trainer, pl_module, *args
+        original, self, trainer, pl_module, *args
     ):  # pylint: disable=signature-differs,arguments-differ,unused-argument
         self._log_metrics(trainer, pl_module)
+
+    @rank_zero_only
+    def _patched_on_train_batch_end(
+        original, self, trainer, pl_module, *args
+    ):
+        _log_metrics_step(self, trainer, pl_module)
 
     assert fit_or_test in ["fit", "test"]
 
     safe_patch("pytorch", _pytorch_autolog.__MLflowPLCallback,
                "on_test_epoch_end", _patched_on_test_epoch_end)
+
+    safe_patch("pytorch", _pytorch_autolog.__MLflowPLCallback,
+               "on_train_batch_end", _patched_on_train_batch_end)
 
     safe_patch("pytorch", mlflow.pytorch, "autolog", patched_autolog)
 
@@ -80,11 +111,14 @@ def _patched_save_checkpoint(original, self, filepath, save_weights_only):
 def _get_latest_checkpoint(tracking_uri, run_id, tmp_dir):
     client = MlflowClient(tracking_uri=tracking_uri)
 
-    return client.download_artifacts(
-        run_id=run_id,
-        path="checkpoints/latest.ckpt",
-        dst_path=tmp_dir
-    )
+    try:
+        return client.download_artifacts(
+            run_id=run_id,
+            path="checkpoints/latest.ckpt",
+            dst_path=tmp_dir
+        )
+    except:
+        return None
 
 
 def _mlflow_prep(mlflow_conf, trainer, model, data, fit_or_test):
@@ -110,17 +144,22 @@ def _mlflow_prep(mlflow_conf, trainer, model, data, fit_or_test):
         experiment = mlflow.set_experiment(
             experiment_name=mlflow_conf.experiment_name)
 
-        runs = [
-            run for run in mlflow.list_run_infos(experiment_id=experiment.id)
-            if run.name == run_name
-        ]
+
+        runs = []
+        for run_info in mlflow.list_run_infos(experiment_id=experiment.experiment_id):
+            run_tags = mlflow.get_run(run_info.run_id).data.tags
+
+            if run_tags["mlflow.runName"] == run_name:
+                runs.append(run_info.run_id)
 
         if len(runs) > 1:
             raise ValueError("You provided `run_name`, but there are multiple "
                              "runs in this experiment with that name. Please "
                              "specify `run_id`.")
-
-        run_id = runs[0].id
+        elif len(runs) == 1:
+            run_id = runs[0]
+        else: # redundant but leaving it here to be explicit
+            run_id = None
 
     else:
         run = mlflow.get_run(run_id=run_id)
@@ -130,7 +169,7 @@ def _mlflow_prep(mlflow_conf, trainer, model, data, fit_or_test):
     return experiment, run_id
 
 
-def mlflow_fit(mlflow_conf, trainer, model, data):
+def mlflow_fit(mlflow_conf, trainer, model, data, flat_conf):
     experiment, run_id = _mlflow_prep(
         mlflow_conf, trainer, model, data, "fit")
 
@@ -144,6 +183,9 @@ def mlflow_fit(mlflow_conf, trainer, model, data):
             run_name=mlflow_conf.run_name,
             run_id=run_id,
             nested=(run_id is not None)):
+
+        if run_id is None:
+            mlflow.log_params(flat_conf)
 
         # we don't know yet if there's a checkpoint
         ckpt_path = None
