@@ -112,6 +112,8 @@ class BaseVAE(pl.LightningModule):
         self.encoder_args = inspect.getfullargspec(self.encoder.forward).args
         self.decoder_args = inspect.getfullargspec(self.decoder.forward).args
 
+        self._cached_outputs = dict()
+
     def calculate_elbo(self, x, x_hat, mu, logvar, mask=None):
         rcl_per_input_dimension = self.reconstruction_loss(x_hat, x)
         if mask is not None:
@@ -211,7 +213,7 @@ class BaseVAE(pl.LightningModule):
             forward_kwargs = dict()
 
         (
-            _,
+            x_hat,
             mu,
             _,
             loss,
@@ -227,18 +229,16 @@ class BaseVAE(pl.LightningModule):
 
         results = {
             "loss": loss,
-            f"{stage}_loss": loss.detach(),  # for epoch end logging purposes
-            "reconstruction_loss": reconstruction_loss.detach(),
-            "kld_loss": kld_loss.detach(),
+            f"{stage}_loss": loss.detach().cpu(),  # for epoch end logging purposes
+            "reconstruction_loss": reconstruction_loss.detach().cpu(),
+            "kld_loss": kld_loss.detach().cpu(),
             "batch_idx": batch_idx,
+            "x_hat": x_hat.detach().cpu(),
+            "x": x.detach().cpu(),
+            "mu": mu.detach().cpu(),
+            "kld_per_latent_dimension": kld_per_latent_dimension.detach().float().cpu(),
+            "rcl_per_input_dimension": rcl_per_input_dimension.detach().float().cpu(),
         }
-
-        if stage in ("test", "val"):
-            results.update({
-                "mu": mu.detach(),
-                "kld_per_latent_dimension": kld_per_latent_dimension.detach().float(),
-                "rcl_per_input_dimension": rcl_per_input_dimension.detach().float(),
-            })
 
         return results
 
@@ -250,6 +250,21 @@ class BaseVAE(pl.LightningModule):
 
     def test_step(self, batch, batch_idx):
         return self._step("test", batch, batch_idx, logger=False)
+
+    def _epoch_end(self, split, outputs):
+        self._cached_outputs[split] = outputs
+
+    def train_epoch_end(self, outputs):
+        self._epoch_end("train", outputs)
+
+
+    def validation_epoch_end(self, outputs):
+        self._epoch_end("val", outputs)
+
+
+    def test_epoch_end(self, outputs):
+        self._epoch_end("test", outputs)
+
 
     def configure_optimizers(self):
         optimizer = self.optimizer(self.parameters())
