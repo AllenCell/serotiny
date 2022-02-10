@@ -1,4 +1,5 @@
-from typing import Union, Optional, Sequence, Dict
+from typing import Union, Optional, Sequence
+import gc
 
 import logging
 import inspect
@@ -233,12 +234,16 @@ class BaseVAE(pl.LightningModule):
             "reconstruction_loss": reconstruction_loss.detach().cpu(),
             "kld_loss": kld_loss.detach().cpu(),
             "batch_idx": batch_idx,
-            "x_hat": x_hat.detach().cpu(),
-            "x": x.detach().cpu(),
             "mu": mu.detach().cpu(),
             "kld_per_latent_dimension": kld_per_latent_dimension.detach().float().cpu(),
             "rcl_per_input_dimension": rcl_per_input_dimension.detach().float().cpu(),
         }
+
+        if stage == "test":
+            results.update({
+                "x_hat": x_hat.detach().cpu(),
+                "x": x.detach().cpu(),
+            })
 
         return results
 
@@ -252,6 +257,9 @@ class BaseVAE(pl.LightningModule):
         return self._step("test", batch, batch_idx, logger=False)
 
     def _epoch_end(self, split, outputs):
+        if split in self._cached_outputs:
+            del self._cached_outputs[split]
+            gc.collect()
         self._cached_outputs[split] = outputs
 
     def train_epoch_end(self, outputs):

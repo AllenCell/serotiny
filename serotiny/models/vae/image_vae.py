@@ -26,6 +26,7 @@ class ImageVAE(BaseVAE):
         x_label: str,
         optimizer: torch.optim.Adam,
         beta: float = 1.0,
+        non_linearity: Optional[nn.Module] = None,
         decoder_non_linearity: Optional[nn.Module] = None,
         loss_mask_label: Optional[str] = None,
         reconstruction_loss: Loss = nn.MSELoss(reduction="none"),
@@ -43,6 +44,7 @@ class ImageVAE(BaseVAE):
             hidden_channels=hidden_channels,
             max_pool_layers=max_pool_layers,
             mode=mode,
+            non_linearity=non_linearity,
         )
         encoder.apply(weight_init)
         nn.utils.spectral_norm(encoder.output)
@@ -64,6 +66,7 @@ class ImageVAE(BaseVAE):
             output_dims=tuple(input_dims),
             output_channels=in_channels,
             mode=mode,
+            non_linearity=non_linearity,
         )
         decoder.apply(weight_init)
         nn.utils.spectral_norm(decoder.linear_decompress)
@@ -96,6 +99,7 @@ class _ImageVAEDecoder(nn.Module):
         output_dims,
         output_channels,
         mode,
+        non_linearity,
     ):
         super().__init__()
 
@@ -117,6 +121,7 @@ class _ImageVAEDecoder(nn.Module):
             up_conv=True,
             flat_output=False,
             mode=mode,
+            non_linearity=non_linearity,
         )
 
     def forward(self, z):

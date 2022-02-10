@@ -148,7 +148,10 @@ class ManifestDatamodule(pl.LightningDataModule):
         self.shuffle = shuffle
         self.collate = collate
 
-    def make_dataloader(self, split):
+        self._predict_split = "test"
+
+    def make_dataloader(self, split, shuffle=False):
+        shuffle = (self.shuffle or shuffle)
         return DataLoader(
             dataset=self.datasets[split],
             batch_size=self.batch_size,
@@ -157,7 +160,7 @@ class ManifestDatamodule(pl.LightningDataModule):
             drop_last=self.drop_last,
             collate_fn=self.collate,
             multiprocessing_context=self.multiprocessing_context,
-            shuffle=(self.shuffle if split == "train" else False),
+            shuffle=(shuffle if split == "train" else False),
         )
 
     def train_dataloader(self):
@@ -168,3 +171,6 @@ class ManifestDatamodule(pl.LightningDataModule):
 
     def test_dataloader(self):
         return self.make_dataloader("test")
+
+    def predict_dataloader(self):
+        return self.make_dataloader(self._predict_split, shuffle=False)

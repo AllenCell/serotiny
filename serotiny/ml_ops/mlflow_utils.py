@@ -169,7 +169,7 @@ def _mlflow_prep(mlflow_conf, trainer, model, data, fit_or_test):
     return experiment, run_id
 
 
-def mlflow_fit(mlflow_conf, trainer, model, data, flat_conf):
+def mlflow_fit(mlflow_conf, trainer, model, data, flat_conf, test=False):
     experiment, run_id = _mlflow_prep(
         mlflow_conf, trainer, model, data, "fit")
 
@@ -197,6 +197,10 @@ def mlflow_fit(mlflow_conf, trainer, model, data, flat_conf):
                                                    tmp_dir)
 
             trainer.fit(model, data, ckpt_path=ckpt_path)
+
+            if test:
+                trainer.test(model, data)
+
 
 
 def mlflow_apply(mlflow_conf, trainer, model, data):
