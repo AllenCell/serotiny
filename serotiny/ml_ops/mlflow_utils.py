@@ -1,5 +1,5 @@
 import os
-import datetime
+import logging
 import tempfile
 from pathlib import Path
 
@@ -10,6 +10,8 @@ from mlflow.utils.autologging_utils import autologging_integration, safe_patch
 import mlflow
 from mlflow.tracking import MlflowClient
 from packaging.version import Version
+
+logger = logging.getLogger(__name__)
 
 
 def _log_metrics_step(self, trainer, pl_module):
@@ -121,7 +123,18 @@ def _get_latest_checkpoint(tracking_uri, run_id, tmp_dir):
         return None
 
 
+def _get_patience(trainer):
+    from pytorch_lightning.callbacks import EarlyStopping
+
+    for callback in trainer.callbacks:
+        if isinstance(callback, EarlyStopping):
+            return callback.patience
+    return None
+
+
 def _mlflow_prep(mlflow_conf, trainer, model, data, fit_or_test):
+    logger.info("Validating and processing MLFlow configuration")
+
     _validate_mlflow_conf(mlflow_conf)
     assert fit_or_test in ["fit", "test"]
 
@@ -144,7 +157,6 @@ def _mlflow_prep(mlflow_conf, trainer, model, data, fit_or_test):
         experiment = mlflow.set_experiment(
             experiment_name=mlflow_conf.experiment_name)
 
-
         runs = []
         for run_info in mlflow.list_run_infos(experiment_id=experiment.experiment_id):
             run_tags = mlflow.get_run(run_info.run_id).data.tags
@@ -166,11 +178,31 @@ def _mlflow_prep(mlflow_conf, trainer, model, data, fit_or_test):
         experiment = mlflow.set_experiment(
             experiment_id=run.info.experiment_id)
 
-    return experiment, run_id
+    patience = _get_patience(trainer)
+
+    # before this point, argv[0] will contain e.g. "/path/to/exectuable/serotiny train"
+    # because we append "train" or "apply" for presentation purposes in the CLI.
+    # however, this causes problems when using tools that need to fork this program
+    # e.g. torch's ddp training strategy, and which make use of argv[0] to rerun
+    # the program. For that reason, from this point on we remove the suffix, and
+    # re-insert it as the second element in argv
+    import sys
+    try:
+        command, suffix = sys.argv[0].split(" ")
+        sys.argv[0] = command
+        sys.argv.insert(1, suffix)
+    except:
+        # in hydra sweeps, this only needs to be done once and will cause an
+        # error if we try to do it again
+        pass
+
+
+
+    return experiment, run_id, patience
 
 
 def mlflow_fit(mlflow_conf, trainer, model, data, flat_conf, test=False):
-    experiment, run_id = _mlflow_prep(
+    experiment, run_id, patience = _mlflow_prep(
         mlflow_conf, trainer, model, data, "fit")
 
     # if run_id has been specified, we're trying to resume
@@ -178,6 +210,7 @@ def mlflow_fit(mlflow_conf, trainer, model, data, flat_conf, test=False):
         raise ValueError("You're trying to resume training, but "
                          "checkpointing is not enabled.")
 
+    skip = False
     with mlflow.start_run(
             experiment_id=experiment.experiment_id,
             run_name=mlflow_conf.run_name,
@@ -187,24 +220,46 @@ def mlflow_fit(mlflow_conf, trainer, model, data, flat_conf, test=False):
         if run_id is None:
             mlflow.log_params(flat_conf)
 
-        # we don't know yet if there's a checkpoint
-        ckpt_path = None
+        if run_id is not None:
+            client = MlflowClient(tracking_uri=mlflow_conf["tracking_uri"])
+            run = client.get_run(run_id)
+            if patience is not None:
+                if "wait_count" in run.data.metrics:
+                    if run.data.metrics["wait_count"] >= patience:
+                        logger.info("This model has trained until or beyond the early "
+                                    "stopping patience value. Skipping")
+                        skip = True
 
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            if run_id is not None:
-                ckpt_path = _get_latest_checkpoint(mlflow_conf.tracking_uri,
-                                                   run_id,
-                                                   tmp_dir)
+            if trainer.max_epochs is not None:
+                if "train_loss" in run.data.metrics:
+                    timepoints = client.get_metric_history(run_id, "train_loss")
+                    if len(timepoints) >= trainer.max_epochs:
+                        logger.info("This model has trained until or beyond "
+                                    "max epochs. Skipping")
+                        skip = True
 
-            trainer.fit(model, data, ckpt_path=ckpt_path)
+        if not skip:
+            # we don't know yet if there's a checkpoint
+            ckpt_path = None
+            with tempfile.TemporaryDirectory() as tmp_dir:
+                if run_id is not None:
+                    logger.info("Trying to retrieve checkpoint to resume training")
+                    ckpt_path = _get_latest_checkpoint(mlflow_conf.tracking_uri,
+                                                       run_id,
+                                                       tmp_dir)
 
-            if test:
-                trainer.test(model, data)
+                logger.info("Calling trainer.fit")
+                trainer.fit(model, data, ckpt_path=ckpt_path)
 
+                if test:
+                    logger.info("Calling trainer.test")
+                    trainer.test(model, data)
+
+        mlflow.end_run(status="FINISHED")
 
 
 def mlflow_apply(mlflow_conf, trainer, model, data):
-    experiment, run_id = _mlflow_prep(
+    experiment, run_id, patience = _mlflow_prep(
         mlflow_conf, trainer, model, data, "test")
 
     if run_id is None:
@@ -224,6 +279,9 @@ def mlflow_apply(mlflow_conf, trainer, model, data):
             ckpt_path = _get_latest_checkpoint(mlflow_conf.tracking_uri,
                                                run_id,
                                                tmp_dir)
-
-            trainer.test(model, data, ckpt_path=ckpt_path)
+            if ckpt_path is None:
+                logger.info("No checkpoint found for this run. Skipping.")
+            else:
+                logger.info("Calling trainer.test")
+                trainer.test(model, data, ckpt_path=ckpt_path)
         mlflow.end_run(status="FINISHED")
