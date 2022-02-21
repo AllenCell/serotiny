@@ -15,7 +15,7 @@ requirements = [
     "pyarrow",
     "hydra-core",
     "aicsimageio",
-    "Pillow<7",
+    "Pillow",
     "pytorch-lightning",
     "pytorch-lightning-bolts",
     "torch",
