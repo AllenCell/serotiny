@@ -29,6 +29,7 @@ class BaseVAE(pl.LightningModule):
         latent_dim: Union[int, Sequence[int]],
         beta: float,
         x_label: str,
+        id_label: Optional[str] = None,
         optimizer = torch.optim.Adam,
         loss_mask_label: Optional[str] = None,
         reconstruction_loss: Loss = nn.MSELoss(reduction="none"),
@@ -245,6 +246,14 @@ class BaseVAE(pl.LightningModule):
                 "x": x.detach().cpu(),
             })
 
+        if self.hparams.id_label is not None:
+            if self.hparams.id_label in batch:
+                ids = batch[self.hparams.id_label].detach().cpu()
+                results.update({
+                    self.hparams.id_label: ids,
+                    "id": ids
+                })
+
         return results
 
     def training_step(self, batch, batch_idx):
@@ -262,12 +271,12 @@ class BaseVAE(pl.LightningModule):
             gc.collect()
         self._cached_outputs[split] = outputs
 
-    def train_epoch_end(self, outputs):
-        self._epoch_end("train", outputs)
+    #def train_epoch_end(self, outputs):
+    #    self._epoch_end("train", outputs)
 
 
-    def validation_epoch_end(self, outputs):
-        self._epoch_end("val", outputs)
+    #def validation_epoch_end(self, outputs):
+    #    self._epoch_end("val", outputs)
 
 
     def test_epoch_end(self, outputs):

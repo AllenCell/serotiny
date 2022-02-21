@@ -1,9 +1,11 @@
+import logging
 import pytorch_lightning as pl
 from hydra.utils import instantiate
 from omegaconf import OmegaConf
-import copy
 
 from .mlflow_utils import mlflow_fit, mlflow_apply
+
+logger = logging.getLogger(__name__)
 
 def flatten_config(cfg):
     import pandas as pd
@@ -46,6 +48,7 @@ def _train_or_test(mode, model, data, trainer=None, seed=42,
         import torch
         torch.multiprocessing.set_sharing_strategy(multiprocessing_strategy)
 
+    logger.info("Instantiating model, datamodule and trainer")
     model = instantiate(model)
     data = instantiate(data)
     trainer = instantiate(trainer)
@@ -54,6 +57,7 @@ def _train_or_test(mode, model, data, trainer=None, seed=42,
         if mlflow is not None:
             mlflow_fit(mlflow, trainer, model, data, flat_conf, test)
         else:
+            logger.info("Calling trainer.fit")
             trainer.fit(model, data)
 
 
