@@ -7,7 +7,7 @@ import aicsimageio
 import aicsimageio.transforms as transforms
 from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
 
-import aicsimageprocessing
+# import aicsimageprocessing
 
 ALL_CHANNELS = ["C", "Y", "X", "S", "T", "Z"]
 EMPTY_INDEXES = {channel: 0 for channel in ALL_CHANNELS}
@@ -335,76 +335,76 @@ def change_resolution(
     return data_new.shape
 
 
-def project_2d(
-    path_3d,
-    axis,
-    method,
-    path_2d,
-    channels=None,
-    masks=None,
-    proj_all=False,
-):
-    """
-    Apply 2d projection to 3d image in path given by `path_3d`
+# def project_2d(
+#     path_3d,
+#     axis,
+#     method,
+#     path_2d,
+#     channels=None,
+#     masks=None,
+#     proj_all=False,
+# ):
+#     """
+#     Apply 2d projection to 3d image in path given by `path_3d`
 
-    Parameters
-    ----------
-    path_3d: Union[str, Path]
-        The path to the input OME TIFF file
-    axis: str
-        The axis across which to project
-    method: str
-        The method for the projection
-    path_2d: Union[str, Path]
-        The path in which to save the projection image
-    channels:
-        TODO explain
-    masks:
-        TODO explain
-    proj_all: bool
-        TODO explain
+#     Parameters
+#     ----------
+#     path_3d: Union[str, Path]
+#         The path to the input OME TIFF file
+#     axis: str
+#         The axis across which to project
+#     method: str
+#         The method for the projection
+#     path_2d: Union[str, Path]
+#         The path in which to save the projection image
+#     channels:
+#         TODO explain
+#     masks:
+#         TODO explain
+#     proj_all: bool
+#         TODO explain
 
-    Returns
-    -------
-    projection.shape: Tuple
-        Tuple that contains the image dimensions of output projection
-    """
-    aicsimageio.use_dask(False)
+#     Returns
+#     -------
+#     projection.shape: Tuple
+#         Tuple that contains the image dimensions of output projection
+#     """
+#     aicsimageio.use_dask(False)
 
-    # load the 3d image
-    image_3d = tiff_loader(path_3d, select_channels=channels, channel_masks=masks)
+#     # load the 3d image
+#     image_3d = tiff_loader(path_3d, select_channels=channels, channel_masks=masks)
 
-    # find the argument based on the axis
-    if axis in TRANSFORM_AXIS_MAP:
-        axis_transform = TRANSFORM_AXIS_MAP[axis]
-    else:
-        raise Exception(
-            f"only axes available are {list(TRANSFORM_AXIS_MAP.keys())}, not {axis}"
-        )
+#     # find the argument based on the axis
+#     if axis in TRANSFORM_AXIS_MAP:
+#         axis_transform = TRANSFORM_AXIS_MAP[axis]
+#     else:
+#         raise Exception(
+#             f"only axes available are {list(TRANSFORM_AXIS_MAP.keys())}, not {axis}"
+#         )
 
-    # choose another transform if we aren't doing the Z axis
-    if axis_transform != DEFAULT_TRANSFORM:
-        image_3d = transforms.transpose_to_dims(
-            image_3d, DEFAULT_TRANSFORM, axis_transform
-        )
+#     # choose another transform if we aren't doing the Z axis
+#     if axis_transform != DEFAULT_TRANSFORM:
+#         image_3d = transforms.transpose_to_dims(
+#             image_3d, DEFAULT_TRANSFORM, axis_transform
+#         )
 
-    # project from CZYX to CYX
-    projection = aicsimageprocessing.imgtoprojection(
-        image_3d,
-        proj_all=proj_all,
-        proj_method=method,
-        local_adjust=False,
-        global_adjust=True,
-        colors=CHANNEL_COLORS,
-    )
+#     # project from CZYX to CYX
+#     projection = aicsimageprocessing.imgtoprojection(
+#         image_3d,
+#         proj_all=proj_all,
+#         proj_method=method,
+#         local_adjust=False,
+#         global_adjust=True,
+#         colors=CHANNEL_COLORS,
+#     )
 
-    # Drop size to uint8
-    projection = projection.astype(np.uint8)
+#     # Drop size to uint8
+#     projection = projection.astype(np.uint8)
 
-    # Save to TIFF
-    tiff_writer(projection, path_2d, channels)
+#     # Save to TIFF
+#     tiff_writer(projection, path_2d, channels)
 
-    return projection.shape
+#     return projection.shape
 
 
 def subset_channels(
