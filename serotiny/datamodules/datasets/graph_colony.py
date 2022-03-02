@@ -26,8 +26,7 @@ log = logging.getLogger(__name__)
 
 
 class WholeGraph(InMemoryDataset):
-    url = "792fc26c03054f20a272d87209c924f1"
-
+    # url = "792fc26c03054f20a272d87209c924f1"
     def __init__(
         self,
         root,
@@ -35,6 +34,7 @@ class WholeGraph(InMemoryDataset):
         num_cores,
         single_graph,
         task_dict,
+        url,
         val_manifest=None,
         train_test_split=None,
         subset=None,
@@ -52,6 +52,7 @@ class WholeGraph(InMemoryDataset):
         self.train_test_split = train_test_split
         self.subset = subset
         self.normalize = normalize
+        self.url = url
 
         super(WholeGraph, self).__init__(
             root, transform, pre_transform, pre_filter
@@ -69,37 +70,40 @@ class WholeGraph(InMemoryDataset):
         return ["data.pt"]
 
     def download(self):
-        fms = FileManagementSystem()
-        record = fms.find_one_by_id(self.url)
-        self.df = pd.read_csv(record.path)
+        try:
+            fms = FileManagementSystem()
+            record = fms.find_one_by_id(self.url)
+            self.df = pd.read_csv(record.path)
+        except:
+            self.df = pd.read_csv(self.url)
 
         self.node_cols = filter_columns(self.df.columns.to_list(), **self.node_loader)
 
-        self.df = self.df.loc[self.df["neighbors"].astype(str) != "nan"]
+        self.df = self.df.loc[self.df["neighbors"].astype(str) != "nan"].reset_index(drop=True)
 
-        self.df = self.df.loc[self.df["is_outlier"].isin([False])]
+        # self.df = self.df.loc[self.df["is_outlier"].isin([False])]
 
         pca_df = Path("./") / "pca_df.csv"
         fitted_pca = Path("./") / "fitted_pca.joblib"
 
-        spharm_cols_filter = dict(startswith="NUC_", contains="shcoeff")
+        # Compute PCA on spharm
 
-        cols = filter_columns(self.df.columns, **spharm_cols_filter)
+        # spharm_cols_filter = dict(startswith="NUC_", contains="shcoeff")
 
-        df2 = self.df[cols].copy()
-        df1 = df2.loc[:, (df2 != 0).all()]
-        spharm_cols = df1.columns
+        # cols = filter_columns(self.df.columns, **spharm_cols_filter)
 
-        self.df = self.df.reset_index(drop=True)
+        # df2 = self.df[cols].copy()
+        # df1 = df2.loc[:, (df2 != 0).all()]
+        # spharm_cols = df1.columns
 
-        fit_pca(self.df[spharm_cols], fitted_pca, 8, spharm_cols_filter)
+        # fit_pca(self.df[spharm_cols], fitted_pca, 8, spharm_cols_filter)
 
-        fitted_pca = joblib.load(fitted_pca)
-        pca_df = pd.DataFrame(fitted_pca.transform(self.df[spharm_cols]))
-        pca_df.columns = ["pc_" + str(i) for i in pca_df.columns]
-        pca_df["CellId"] = self.df["CellId"]
+        # fitted_pca = joblib.load(fitted_pca)
+        # pca_df = pd.DataFrame(fitted_pca.transform(self.df[spharm_cols]))
+        # pca_df.columns = ["pc_" + str(i) for i in pca_df.columns]
+        # pca_df["CellId"] = self.df["CellId"]
 
-        self.df = self.df.merge(pca_df, on="CellId")
+        # self.df = self.df.merge(pca_df, on="CellId")
 
         if (self.val_manifest is not None) & (self.val_manifest != "None"):
             self.val_manifest = pd.read_csv(self.val_manifest)
@@ -132,9 +136,10 @@ class WholeGraph(InMemoryDataset):
             else:
                 mask = np.array([True for i in range(size)])
                 self.val_manifest["mask"] = mask
-
+            cols_to_use = list(self.val_manifest.columns.difference(self.df.columns))
+            cols_to_use.append('CellId')
             main_manifest = self.df.merge(
-                self.val_manifest, how="left", left_on="CellId", right_on="CellId"
+                self.val_manifest[cols_to_use], how="left", left_on="CellId", right_on="CellId"
             )
 
             if self.train_test_split:
@@ -162,8 +167,10 @@ class WholeGraph(InMemoryDataset):
             main_manifest[self.target_label] = main_manifest[self.target_label].fillna(
                 10
             )
+            # main_manifest[[self.target_label]] = main_manifest[[self.target_label]].apply(
+            #     lambda x: (x - x.min()) / (x.max() - x.min())
+            # )
 
-        self.mask_df = main_manifest
         if self.normalize:
             norm_cols = ["centroid_x", "centroid_y", "centroid_z"] + self.node_cols
         else:
@@ -172,6 +179,7 @@ class WholeGraph(InMemoryDataset):
             lambda x: (x - x.min()) / (x.max() - x.min())
         )
 
+        self.mask_df = main_manifest
         # norm_cols = ["T_index_x"]
         # self.mask_df[norm_cols] = self.mask_df[norm_cols].apply(
         #     lambda x: (x - x.min()) / (x.max() - x.min())
@@ -271,16 +279,16 @@ class WholeGraph(InMemoryDataset):
                 all_track_edge_attr_multiple_graphs, axis=0
             )
 
-            all_edges = np.concatenate(
-                [all_edges_single_graph, all_track_edges_single_graph], axis=0
-            )
-            all_edge_attributes = np.concatenate(
-                [all_edge_attr_single_graph, all_track_edge_attr_single_graph], axis=0
-            )
+            # all_edges = np.concatenate(
+            #     [all_edges_single_graph, all_track_edges_single_graph], axis=0
+            # )
+            # all_edge_attributes = np.concatenate(
+            #     [all_edge_attr_single_graph, all_track_edge_attr_single_graph], axis=0
+            # )
 
-            all_edges = np.concatenate([all_track_edges_single_graph], axis=0)
+            all_edges = np.concatenate([all_edges_single_graph], axis=0)
             all_edge_attributes = np.concatenate(
-                [all_track_edge_attr_single_graph], axis=0
+                [all_edge_attr_single_graph], axis=0
             )
 
             all_nodes = torch.tensor(
@@ -356,7 +364,8 @@ class WholeGraph(InMemoryDataset):
                 if self.val_manifest is not None:
                     main_manifest = self.mask_df
 
-                    df_sub = main_manifest.loc[main_manifest["T_index" + "_x"] == split]
+                    # df_sub = main_manifest.loc[main_manifest["T_index" + "_x"] == split]
+                    df_sub = main_manifest.loc[main_manifest["T_index"] == split]
                     df_sub = df_sub.reset_index()
                     data.mask = torch.tensor(df_sub["mask"].values, dtype=torch.bool)
 
@@ -510,8 +519,8 @@ def get_track_edges(
     dataframe = dataframe.set_index("CellId")
     for split in groupby_split:
         df3 = dataframe.loc[dataframe[groupby_val] == split]
-        if df3.shape[0] > 10:
-            lags = 10
+        if df3.shape[0] > 1:
+            lags = 1
         else:
             lags = df3.shape[0]
         for lag in range(lags):

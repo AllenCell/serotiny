@@ -55,8 +55,6 @@ class MultipleGraphDatamodule(pl.LightningDataModule):
         validated_manifest: Union[Path, str],
         node_loader: Dict,
         task_dict: dict,
-        model_type: str,
-        dataloader_type: str,
         subset: bool,
     ):
 
@@ -65,7 +63,6 @@ class MultipleGraphDatamodule(pl.LightningDataModule):
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.save_dir = save_dir
-        self.model_type = model_type
         self.node_loader = node_loader
         self.subset = subset
         # To delete later, this is only to get length

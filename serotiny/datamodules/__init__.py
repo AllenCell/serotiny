@@ -7,6 +7,7 @@ from .multiple_graph_datamodule import MultipleGraphDatamodule
 from .trajectory_datamodule import TrajectoryDataModule
 from .trajectory_datamodule_diff_split import TrajectoryDataModule2
 from .synthetic_trajectory_datamodule import SyntheticTrajectoryDataModule
+from .multiple_movie_datamodule import MultipleMovieDatamodule
 
 __all__ = [
     "DummyDatamodule",
@@ -17,4 +18,5 @@ __all__ = [
     "MultipleGraphDatamodule",
     "TrajectoryDataModule",
     "SyntheticTrajectoryDataModule",
+    "MultipleMovieDatamodule",
 ]
