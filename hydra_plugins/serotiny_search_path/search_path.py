@@ -3,7 +3,7 @@ import sys
 
 from hydra.core.config_search_path import ConfigSearchPath
 from hydra.plugins.search_path_plugin import SearchPathPlugin
-from serotiny.ml_ops.project_utils import get_serotiny_project
+from serotiny.ml_ops.utils import get_serotiny_project
 
 class SerotinySearchPath(SearchPathPlugin):
     def manipulate_search_path(self, search_path: ConfigSearchPath) -> None:
