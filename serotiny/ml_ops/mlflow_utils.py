@@ -11,6 +11,8 @@ import mlflow
 from mlflow.tracking import MlflowClient
 from packaging.version import Version
 
+from .utils import flatten_config
+
 logger = logging.getLogger(__name__)
 
 
@@ -181,7 +183,7 @@ def _mlflow_prep(mlflow_conf, trainer, model, data, fit_or_test):
     patience = _get_patience(trainer)
 
     # before this point, argv[0] will contain e.g. "/path/to/exectuable/serotiny train"
-    # because we append "train" or "apply" for presentation purposes in the CLI.
+    # because we append "train" or "test" for presentation purposes in the CLI.
     # however, this causes problems when using tools that need to fork this program
     # e.g. torch's ddp training strategy, and which make use of argv[0] to rerun
     # the program. For that reason, from this point on we remove the suffix, and
@@ -201,9 +203,24 @@ def _mlflow_prep(mlflow_conf, trainer, model, data, fit_or_test):
     return experiment, run_id, patience
 
 
-def mlflow_fit(mlflow_conf, trainer, model, data, flat_conf, test=False):
+def _log_conf(tmp_dir, full_conf, mode):
+    if mode not in ("train", "test", "predict"):
+        raise ValueError(f"Got unexpected mode: '{mode}")
+
+    conf_path = Path(tmp_dir) / f"{mode}_config.yaml"
+    with open(conf_path, "w") as f:
+        OmegaConf.save(config=full_conf, f=f)
+        mlflow.log_artifact(
+            local_path=conf_path,
+            artifact_path="configs"
+        )
+
+
+def mlflow_fit(mlflow_conf, trainer, model, data, full_conf, test=False):
     experiment, run_id, patience = _mlflow_prep(
         mlflow_conf, trainer, model, data, "fit")
+
+    flat_conf = flatten_config(full_conf)
 
     # if run_id has been specified, we're trying to resume
     if run_id is not None and not trainer.checkpoint_callback:
@@ -230,6 +247,7 @@ def mlflow_fit(mlflow_conf, trainer, model, data, flat_conf, test=False):
                                     "stopping patience value. Skipping")
                         skip = True
 
+
             if trainer.max_epochs is not None:
                 if "train_loss" in run.data.metrics:
                     timepoints = client.get_metric_history(run_id, "train_loss")
@@ -248,6 +266,8 @@ def mlflow_fit(mlflow_conf, trainer, model, data, flat_conf, test=False):
                                                        run_id,
                                                        tmp_dir)
 
+                _log_conf(tmp_dir, full_conf, "train")
+
                 logger.info("Calling trainer.fit")
                 trainer.fit(model, data, ckpt_path=ckpt_path)
 
@@ -258,12 +278,12 @@ def mlflow_fit(mlflow_conf, trainer, model, data, flat_conf, test=False):
         mlflow.end_run(status="FINISHED")
 
 
-def mlflow_apply(mlflow_conf, trainer, model, data):
+def mlflow_test(mlflow_conf, trainer, model, data, full_conf):
     experiment, run_id, patience = _mlflow_prep(
         mlflow_conf, trainer, model, data, "test")
 
     if run_id is None:
-        raise ValueError("You're calling serotiny apply but you "
+        raise ValueError("You're calling serotiny test but you "
                          "haven't specified the run_id")
 
     with mlflow.start_run(
@@ -279,6 +299,9 @@ def mlflow_apply(mlflow_conf, trainer, model, data):
             ckpt_path = _get_latest_checkpoint(mlflow_conf.tracking_uri,
                                                run_id,
                                                tmp_dir)
+
+            _log_conf(tmp_dir, full_conf, "test")
+
             if ckpt_path is None:
                 logger.info("No checkpoint found for this run. Skipping.")
             else:
