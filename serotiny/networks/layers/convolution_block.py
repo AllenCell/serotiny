@@ -2,6 +2,8 @@ from typing import Optional, Union, Dict
 from torch import nn
 from torch.nn.utils import spectral_norm
 
+from .skip_connection import SkipConnection
+
 def conv_block(
     in_c: int,
     out_c: int,
@@ -9,6 +11,8 @@ def conv_block(
     padding: int = 0,
     up_conv: bool = False,
     non_linearity: Optional[nn.Module] = None,
+    skip_connection: bool = False,
+    batch_norm: bool = True,
     mode: str = "3d",
 ):
     """
@@ -27,23 +31,30 @@ def conv_block(
     mode:
         Dimensionality of the input data. Can be "2d" or "3d".
     """
+    batch_norm_cls = nn.Identity
     if mode == "2d":
         conv = nn.ConvTranspose2d if up_conv else nn.Conv2d
-        batch_norm = nn.BatchNorm2d
+        if batch_norm:
+            batch_norm_cls = nn.BatchNorm2d
     elif mode == "3d":
         conv = nn.ConvTranspose3d if up_conv else nn.Conv3d
-        batch_norm = nn.BatchNorm3d
+        if batch_norm:
+            batch_norm_cls = nn.BatchNorm3d
     else:
         raise ValueError(f"Mode must be '2d' or '3d'. You passed '{mode}'")
 
     if non_linearity is None:
         non_linearity = nn.ReLU()
 
-    return nn.Sequential(
+    block = nn.Sequential(
         conv(in_c, out_c, kernel_size=kernel_size, padding=padding),
         non_linearity,
-        batch_norm(out_c),
+        batch_norm_cls(out_c),
     )
+
+    if skip_connection:
+        block = SkipConnection(block)
+    return block
 
 
 class ConvBlock(nn.Module):
@@ -55,6 +66,8 @@ class ConvBlock(nn.Module):
         padding: int = 0,
         up_conv: bool = False,
         non_linearity: Optional[nn.Module] = None,
+        skip_connection: bool = False,
+        batch_norm: bool = False,
         mode: str = "3d",
     ):
         """
@@ -82,6 +95,8 @@ class ConvBlock(nn.Module):
             padding=padding,
             up_conv=up_conv,
             non_linearity=non_linearity,
+            batch_norm=batch_norm,
+            skip_connection=skip_connection,
             mode=mode,
         )
 

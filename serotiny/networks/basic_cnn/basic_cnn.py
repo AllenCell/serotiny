@@ -25,6 +25,7 @@ class BasicCNN(nn.Module):
         flat_output: bool = True,
         up_conv: bool = False,
         non_linearity: Optional[nn.Module] = None,
+        skip_connections: Union[bool, Sequence[int]] = False,
         mode: str = "3d",
     ):
         """
@@ -56,10 +57,18 @@ class BasicCNN(nn.Module):
         self.pyramid_pool_splits = pyramid_pool_splits
         self.flat_output = flat_output
 
+        if isinstance(skip_connections, (tuple, list)):
+            self.skip_connections = skip_connections
+        else:
+            if skip_connections:
+                self.skip_connections = tuple(range(len(hidden_channels)))
+            else:
+                self.skip_connections = tuple()
+
         layers = []
 
         _in_channels = in_channels
-        for out_channels in hidden_channels:
+        for ix, out_channels in enumerate(hidden_channels):
             layers.append(
                 conv_block(
                     _in_channels,
@@ -68,6 +77,7 @@ class BasicCNN(nn.Module):
                     up_conv=up_conv,
                     non_linearity=non_linearity,
                     mode=mode,
+                    skip_connection=(ix in self.skip_connections)
                 )
             )
             _in_channels = out_channels
