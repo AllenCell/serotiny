@@ -142,6 +142,7 @@ def _get_config(tracking_uri, run_id, tmp_dir, mode="test"):
 
 
 def load_model_from_checkpoint(tracking_uri, run_id):
+    mlflow.set_tracking_uri(tracking_uri)
     with tempfile.TemporaryDirectory() as tmp_dir:
         ckpt_path = _get_latest_checkpoint(tracking_uri, run_id, tmp_dir)
         if ckpt_path is None:
@@ -151,7 +152,7 @@ def load_model_from_checkpoint(tracking_uri, run_id):
         config = _get_config(tracking_uri, run_id, tmp_dir, mode="train")
 
         with open(config, "r") as f:
-            config = yaml.safe_load(config)
+            config = yaml.safe_load(f)
 
         model_conf = config["model"]
         for k, v in model_conf.items():
@@ -262,7 +263,7 @@ def mlflow_fit(mlflow_conf, trainer, model, data, full_conf, test=False):
     experiment, run_id, patience = _mlflow_prep(
         mlflow_conf, trainer, model, data, "fit")
 
-    flat_conf = flatten_config(full_conf)
+    flat_conf = flatten_config(OmegaConf.to_container(full_conf, resolve=True))
 
     # if run_id has been specified, we're trying to resume
     if run_id is not None and not trainer.checkpoint_callback:

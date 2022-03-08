@@ -4,7 +4,8 @@ from pathlib import Path
 from textwrap import dedent
 
 from omegaconf import OmegaConf
-import nbformat.v4 as nbformat
+import nbformat
+import nbformat.v4 as v4
 
 def get_serotiny_project():
     try:
@@ -66,25 +67,39 @@ def make_notebook(cfg, path):
 
     for subconfig in ["data", "model", "trainer"]:
         cells.append(("markdown", _dedent(f"""
-        Below is the `{config}` config and instantiation. Edit the yaml code
+        Below is the `{subconfig}` config and instantiation. Edit the yaml code
         to change the configuration.
         """
         )))
 
-        cells.append(("code", _dedent(f"""
-        {subconfig} = instantiate(yaml.full_load('''
-        {OmegaConf.to_yaml(cfg[subconfig])}
-        '''
+        cells.append(("code", (
+                f"{subconfig} = instantiate(yaml.full_load('''\n" +
+                OmegaConf.to_yaml(cfg[subconfig]) + "\n" +
+                "'''))\n"
+            )
         ))
-        """
-        )))
+
+    cells.append(("markdown", _dedent(f"""
+    ---
+    The cell below loads a batch from the train dataloader, and prints the
+    available keys.
+    """
+    )))
+
+    cells.append(("code", _dedent(f"""
+    train_dl = data.train_dataloader()
+    train_batch = next(iter(train_dl))
+
+    print(train_batch.keys())
+    """)))
+
 
     cells = [
-        (nbformat.new_code_cell(source) if cell_type == "code" else
-         nbformat.new_markdown_cell(source))
+        (v4.new_code_cell(source) if cell_type == "code" else
+         v4.new_markdown_cell(source))
         for cell_type, source in cells
 
     ]
 
-    notebook = nbformat.new_notebook(cells=cells)
+    notebook = v4.new_notebook(cells=cells)
     nbformat.write(notebook, path)
