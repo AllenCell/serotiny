@@ -1,11 +1,5 @@
 import sys
 import logging
-import pytorch_lightning as pl
-from hydra.utils import instantiate
-from omegaconf import OmegaConf
-
-from .mlflow_utils import mlflow_fit, mlflow_test
-from .utils import make_notebook as mk_notebook
 
 logger = logging.getLogger(__name__)
 
@@ -13,6 +7,11 @@ def _do_model_op(mode, model, data, trainer=None, seed=42,
                  mlflow=None, full_conf={}, test=False,
                  multiprocessing_strategy=None, make_notebook=None,
                  **_):
+
+    import pytorch_lightning as pl
+    from hydra.utils import instantiate
+    from .mlflow_utils import mlflow_fit, mlflow_test
+    from .utils import make_notebook as mk_notebook
 
     if multiprocessing_strategy is not None:
         import torch
@@ -58,6 +57,7 @@ def _do_model_op(mode, model, data, trainer=None, seed=42,
 
 def _do_model_op_wrapper(cfg):
     if isinstance(cfg, dict):
+        from omegaconf import OmegaConf
         cfg = OmegaConf.create(cfg)
 
     _do_model_op(sys.argv[0].split(" ")[1],
