@@ -11,7 +11,6 @@ def conv_block(
     padding: int = 0,
     up_conv: bool = False,
     non_linearity: Optional[nn.Module] = None,
-    skip_connection: bool = False,
     batch_norm: bool = True,
     mode: str = "3d",
 ):
@@ -52,8 +51,6 @@ def conv_block(
         batch_norm_cls(out_c),
     )
 
-    if skip_connection:
-        block = SkipConnection(block)
     return block
 
 
@@ -88,6 +85,7 @@ class ConvBlock(nn.Module):
         """
 
         super().__init__()
+        self.skip_connection = skip_connection
         self.block = conv_block(
             in_c=in_c,
             out_c=out_c,
@@ -96,9 +94,12 @@ class ConvBlock(nn.Module):
             up_conv=up_conv,
             non_linearity=non_linearity,
             batch_norm=batch_norm,
-            skip_connection=skip_connection,
             mode=mode,
         )
 
     def forward(self, x):
-        return self.block(x)
+        if not self.skip_connection:
+            return self.block(x)
+        else:
+            res = self.block(x)
+            return res + nn.functional.interpolate(x, res.shape[2:])

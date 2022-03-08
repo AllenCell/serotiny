@@ -105,6 +105,7 @@ class _ImageVAEDecoder(nn.Module):
         output_channels,
         mode,
         non_linearity,
+        skip_connections,
     ):
         super().__init__()
 
@@ -127,6 +128,7 @@ class _ImageVAEDecoder(nn.Module):
             flat_output=False,
             mode=mode,
             non_linearity=non_linearity,
+            skip_connections=skip_connections
         )
 
     def forward(self, z):

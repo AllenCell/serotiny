@@ -5,7 +5,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from serotiny.networks.layers import conv_block
+from serotiny.networks.layers import ConvBlock
 from serotiny.networks.layers import spatial_pyramid_pool
 
 log = logging.getLogger(__name__)
@@ -70,7 +70,7 @@ class BasicCNN(nn.Module):
         _in_channels = in_channels
         for ix, out_channels in enumerate(hidden_channels):
             layers.append(
-                conv_block(
+                ConvBlock(
                     _in_channels,
                     out_channels,
                     kernel_size=kernel_size,
