@@ -35,6 +35,7 @@ class ImageVAE(BaseVAE):
         prior_mode: str = "isotropic",
         prior_logvar: Optional[Array] = None,
         learn_prior_logvar: bool = False,
+        skip_connections: bool = True,
         mode: str = "3d",
     ):
 
@@ -46,6 +47,7 @@ class ImageVAE(BaseVAE):
             max_pool_layers=max_pool_layers,
             mode=mode,
             non_linearity=non_linearity,
+            skip_connections=skip_connections
         )
         encoder.apply(weight_init)
         nn.utils.spectral_norm(encoder.output)
@@ -68,6 +70,7 @@ class ImageVAE(BaseVAE):
             output_channels=in_channels,
             mode=mode,
             non_linearity=non_linearity,
+            skip_connections=skip_connections
         )
         decoder.apply(weight_init)
         nn.utils.spectral_norm(decoder.linear_decompress)
