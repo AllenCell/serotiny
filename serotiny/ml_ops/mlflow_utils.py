@@ -3,7 +3,10 @@ import logging
 import tempfile
 from pathlib import Path
 
+import yaml
 from omegaconf import OmegaConf
+from hydra.utils import instantiate
+from hydra._internal.utils import _locate
 import pytorch_lightning as pl
 from mlflow.utils.autologging_utils import autologging_integration, safe_patch
 
@@ -39,7 +42,7 @@ def _log_metrics_step(self, trainer, pl_module):
 @autologging_integration("pytorch")
 def patched_autolog(
     log_every_n_epoch=1,
-    log_models=True,
+    log_models=False,  # we handle this
     disable=False,
     exclusive=False,
     disable_for_unsupported_versions=False,
@@ -123,6 +126,45 @@ def _get_latest_checkpoint(tracking_uri, run_id, tmp_dir):
         )
     except:
         return None
+
+
+def _get_config(tracking_uri, run_id, tmp_dir, mode="test"):
+    client = MlflowClient(tracking_uri=tracking_uri)
+
+    try:
+        return client.download_artifacts(
+            run_id=run_id,
+            path=f"configs/{mode}_config.yaml",
+            dst_path=tmp_dir
+        )
+    except:
+        return None
+
+
+def load_model_from_checkpoint(tracking_uri, run_id):
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        ckpt_path = _get_latest_checkpoint(tracking_uri, run_id, tmp_dir)
+        if ckpt_path is None:
+            logger.info("Given run_id doesn't have a checkpoint we can use.")
+            return
+
+        config = _get_config(tracking_uri, run_id, tmp_dir, mode="train")
+
+        with open(config, "r") as f:
+            config = yaml.safe_load(config)
+
+        model_conf = config["model"]
+        for k, v in model_conf.items():
+            try:
+                if isinstance(v, dict):
+                    if "_target_" in v:
+                        model_conf[k] = instantiate(v)
+            except:
+                pass
+
+        model_class = model_conf.pop("_target_")
+        model_class = _locate(model_class)
+        return model_class.load_from_checkpoint(ckpt_path, **model_conf)
 
 
 def _get_patience(trainer):
@@ -296,15 +338,22 @@ def mlflow_test(mlflow_conf, trainer, model, data, full_conf):
         ckpt_path = None
 
         with tempfile.TemporaryDirectory() as tmp_dir:
-            ckpt_path = _get_latest_checkpoint(mlflow_conf.tracking_uri,
-                                               run_id,
-                                               tmp_dir)
-
-            _log_conf(tmp_dir, full_conf, "test")
-
-            if ckpt_path is None:
-                logger.info("No checkpoint found for this run. Skipping.")
+            if (
+                _get_config(mlflow_conf.tracking_uri, run_id, tmp_dir) is not None
+                and not full_conf.get("force", False)
+            ):
+                logger.info("This run has been tested before. If you want to "
+                            "retest it, set ++force=True")
             else:
-                logger.info("Calling trainer.test")
-                trainer.test(model, data, ckpt_path=ckpt_path)
+                ckpt_path = _get_latest_checkpoint(mlflow_conf.tracking_uri,
+                                                   run_id,
+                                                   tmp_dir)
+
+                _log_conf(tmp_dir, full_conf, "test")
+
+                if ckpt_path is None:
+                    logger.info("No checkpoint found for this run. Skipping.")
+                else:
+                    logger.info("Calling trainer.test")
+                    trainer.test(model, data, ckpt_path=ckpt_path)
         mlflow.end_run(status="FINISHED")

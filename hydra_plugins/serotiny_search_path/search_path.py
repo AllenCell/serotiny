@@ -7,7 +7,7 @@ from serotiny.ml_ops.utils import get_serotiny_project
 
 class SerotinySearchPath(SearchPathPlugin):
     def manipulate_search_path(self, search_path: ConfigSearchPath) -> None:
-        if "serotiny" in sys.argv:
+        if "serotiny" in sys.argv[0]:
             if len(list(filter(lambda s: "config-dir" in s or "-cd" in s,
                                sys.argv))) == 0:
                 # look for a .serotiny file in the current directory. if it exists,

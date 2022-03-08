@@ -5,8 +5,8 @@ from pathlib import Path
 import hydra
 from fire import Fire
 from omegaconf import OmegaConf
-from serotiny.ml_ops import train, test
-from serotiny.ml_ops.project_utils import get_serotiny_project
+from serotiny.ml_ops import _do_model_op_wrapper
+from serotiny.ml_ops.utils import get_serotiny_project
 
 import serotiny.cli.image_cli as image_cli
 import serotiny.cli.config_cli as config_cli
@@ -34,11 +34,13 @@ def main():
         return
 
     if mode in ["train", "test"]:
+
         # hydra modes
         sys.argv[0] += f" {mode}"
 
-        func = (train if mode == "train" else test)
-        hydra.main(config_path=None, config_name=mode)(func)()
+        hydra.main(
+            config_path=None, config_name=mode
+        )(_do_model_op_wrapper)()
     else:
         # fire modes
         sys.argv.insert(1, mode)

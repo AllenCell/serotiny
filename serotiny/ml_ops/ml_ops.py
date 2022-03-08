@@ -7,15 +7,19 @@ from .mlflow_utils import mlflow_fit, mlflow_test
 
 logger = logging.getLogger(__name__)
 
-def _do_model_op(mode, model, data, trainer=None, seed=42,
+def _do_model_op(model, data, trainer=None, seed=42,
                  mlflow=None, full_conf={}, test=False,
-                 multiprocessing_strategy=None, **_):
+                 multiprocessing_strategy=None, make_notebook=None,
+                 **_):
 
     pl.seed_everything(seed)
 
     if multiprocessing_strategy is not None:
         import torch
         torch.multiprocessing.set_sharing_strategy(multiprocessing_strategy)
+
+    if make_notebook is not None:
+        make_notebook(full_conf, make_notebook)
 
     logger.info("Instantiating model, datamodule and trainer")
     model = instantiate(model)
@@ -49,22 +53,10 @@ def _do_model_op(mode, model, data, trainer=None, seed=42,
         )
 
 
-def train(cfg):
+def _do_model_op_wrapper(cfg):
     if isinstance(cfg, dict):
         cfg = OmegaConf.create(cfg)
 
-    _do_model_op("train", **cfg, full_conf=cfg)
-
-
-def test(cfg):
-    if isinstance(cfg, dict):
-        cfg = OmegaConf.create(cfg)
-
-    _do_model_op("test", **cfg, full_conf=cfg)
-
-
-def predict(cfg):
-    if isinstance(cfg, dict):
-        cfg = OmegaConf.create(cfg)
-
-    _do_model_op("predict", **cfg, full_conf=cfg)
+    _do_model_op(cfg.hydra.config_name,
+                 **cfg,
+                 full_conf=cfg)

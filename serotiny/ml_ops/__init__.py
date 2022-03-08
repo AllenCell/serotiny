@@ -1,1 +1,1 @@
-from .train_apply import train, apply
+from .ml_ops import _do_model_op_wrapper

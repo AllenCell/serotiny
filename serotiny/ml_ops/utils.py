@@ -1,6 +1,10 @@
 import os
 import sys
 from pathlib import Path
+from textwrap import dedent
+
+from omegaconf import OmegaConf
+import nbformat.v4 as nbformat
 
 def get_serotiny_project():
     try:
@@ -44,3 +48,43 @@ def flatten_config(cfg):
         pd.json_normalize(conf, sep="/")
         .to_dict(orient="records")[0]
     )
+
+def _dedent(s):
+    return dedent(s).strip()
+
+def make_notebook(cfg, path):
+    cells = []
+
+    cells.append(("code", _dedent("""
+    import yaml
+    import pytorch_lightning as pl
+    import torch
+    import torch.nn as nn
+
+    from hydra.utils import instantiate
+    """)))
+
+    for subconfig in ["data", "model", "trainer"]:
+        cells.append(("markdown", _dedent(f"""
+        Below is the `{config}` config and instantiation. Edit the yaml code
+        to change the configuration.
+        """
+        )))
+
+        cells.append(("code", _dedent(f"""
+        {subconfig} = instantiate(yaml.full_load('''
+        {OmegaConf.to_yaml(cfg[subconfig])}
+        '''
+        ))
+        """
+        )))
+
+    cells = [
+        (nbformat.new_code_cell(source) if cell_type == "code" else
+         nbformat.new_markdown_cell(source))
+        for cell_type, source in cells
+
+    ]
+
+    notebook = nbformat.new_notebook(cells=cells)
+    nbformat.write(notebook, path)
