@@ -1,26 +1,25 @@
-import os
 import sys
-from pathlib import Path
 
-import hydra
-from fire import Fire
-from omegaconf import OmegaConf
 from serotiny.ml_ops import _do_model_op_wrapper
 from serotiny.ml_ops.utils import get_serotiny_project
 
-import serotiny.cli.image_cli as image_cli
-import serotiny.cli.config_cli as config_cli
-
 
 def print_help():
-    print("Usage:\n  serotiny COMMAND")
-    print("\nValid COMMAND values:")
-    print("  train - train a model")
-    print("  test - test a model")
-    print("  config - create a config yaml, given a Python class/function")
-    print("  image - image operations")
-    print("\nFor more info on each command do:")
-    print("  serotiny COMMAND --help")
+    from textwrap import dedent
+    print(dedent("""
+    Usage:
+      serotiny COMMAND
+
+    Valid COMMAND values:
+      train - train a model
+      test - test a model
+      config - create a config yaml, given a Python class/function
+      dataframe - utils to manipulate .csv dataframes
+      image - image operations
+
+    For more info on each command do:")
+      serotiny COMMAND --help")
+    """).strip())
 
 
 def main():
@@ -33,20 +32,25 @@ def main():
         print_help()
         return
 
+    # hydra modes
     if mode in ["train", "test"]:
-
-        # hydra modes
+        import hydra
         sys.argv[0] += f" {mode}"
 
-        hydra.main(
-            config_path=None, config_name=mode
-        )(_do_model_op_wrapper)()
+        hydra.main(config_path=None, config_name=mode)(_do_model_op_wrapper)()
+
+    # fire modes
     else:
-        # fire modes
+        import serotiny.cli.image_cli as image_cli
+        import serotiny.cli.config_cli as config_cli
+        from serotiny.cli.dataframe_cli import DataframeTransformCLI as dataframe_cli
+        from fire import Fire
+
         sys.argv.insert(1, mode)
         cli_dict = {
             "config": config_cli,
             "image": image_cli,
+            "dataframe": dataframe_cli,
         }
 
         if mode in cli_dict:

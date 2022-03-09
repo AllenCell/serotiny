@@ -27,6 +27,7 @@ requirements = [
     "furo",
     "fire",
     "mlflow",
+    "makefun",
     "hydra-core@git+https://github.com/facebookresearch/hydra.git",
 ]
 

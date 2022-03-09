@@ -196,7 +196,6 @@ def filter_columns(
                            endswith, contains, excludes)
 
 
-
 def sample_n_each(
     dataframe: pd.DataFrame,
     column: str,
