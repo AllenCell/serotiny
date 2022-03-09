@@ -193,7 +193,7 @@ class BaseVAE(pl.LightningModule):
             kld_loss,
             rcl_per_input_dimension,
             kld_per_latent_dimension,
-        ) = self.calculate_elbo(x, x_hat, mu, logvar)
+        ) = self.calculate_elbo(x, x_hat, mu, logvar, mask=kwargs.get("mask", None))
 
         return (
             x_hat,
