@@ -23,19 +23,30 @@ def print_help():
 
 
 def main():
-    try:
-        mode = sys.argv.pop(1)
-    except:
-        mode = "help"
+    if sys.argv[0].endswith("serotiny"):
+        try:
+            mode = sys.argv.pop(1)
+        except:
+            mode = "help"
+    elif sys.argv[0].endswith("serotiny.train"):
+        mode = "train"
+    elif sys.argv[0].endswith("serotiny.test"):
+        mode = "test"
+    elif sys.argv[0].endswith("serotiny.predict"):
+        mode = "predict"
+    else:
+        raise NotImplementedError(f"Unknown command: '{sys.argv[0]}")
+
 
     if "help" in mode or mode == "-h":
         print_help()
         return
 
     # hydra modes
-    if mode in ["train", "test"]:
+    if mode in ["train", "test", "predict"]:
         import hydra
-        sys.argv[0] += f" {mode}"
+        if sys.argv[0].endswith("serotiny"):
+            sys.argv[0] += f".{mode}"
 
         hydra.main(config_path=None, config_name=mode)(_do_model_op_wrapper)()
 

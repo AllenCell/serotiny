@@ -69,11 +69,11 @@ COMP_WORDBREAKS=$COMP_WORDBREAKS complete -o nospace -o default -F hydra_serotin
     @staticmethod
     def _get_exec() -> str:
         if "train" in sys.argv[0]:
-            return "serotiny train"
+            return "serotiny.train"
         elif "test" in sys.argv[0]:
-            return "serotiny test"
+            return "serotiny.test"
         elif "predict" in sys.argv[0]:
-            raise NotImplementedError
+            return "serotiny.test"
         else:
             return None
 
@@ -86,8 +86,7 @@ COMP_WORDBREAKS=$COMP_WORDBREAKS complete -o nospace -o default -F hydra_serotin
         elif "test" in sys.argv[0]:
             config_name = "test"
         elif "predict" in sys.argv[0]:
-            #config_name = "predict"
-            raise NotImplementedError
+            config_name = "predict"
         else:
             raise RuntimeError("Didn't get a valid config_name. "
                                "(Should be 'train', 'test' or 'predict')")

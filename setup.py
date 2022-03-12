@@ -48,6 +48,9 @@ setup(
     entry_points={
         "console_scripts": [
             "serotiny=serotiny.cli.cli:main",
+            "serotiny.train=serotiny.cli.cli:main",
+            "serotiny.test=serotiny.cli.cli:main",
+            "serotiny.predict=serotiny.cli.cli:main",
         ],
     },
     install_requires=requirements,
