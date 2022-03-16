@@ -13,6 +13,7 @@ def print_help():
     Valid COMMAND values:
       train - train a model
       test - test a model
+      predict - use a trained model to output predictions
       config - create a config yaml, given a Python class/function
       dataframe - utils to manipulate .csv dataframes
       image - image operations

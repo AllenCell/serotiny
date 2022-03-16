@@ -14,7 +14,7 @@ import mlflow
 from mlflow.tracking import MlflowClient
 from packaging.version import Version
 
-from .utils import flatten_config
+from .utils import flatten_config, save_model_predictions
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ def patched_autolog(
     exclusive=False,
     disable_for_unsupported_versions=False,
     silent=False,
-    fit_or_test="fit",
+    mode="fit",
 ):
     """
     Patched mlflow autolog, to enable on_test_epoch_end callbacks and to
@@ -69,7 +69,7 @@ def patched_autolog(
     ):
         _log_metrics_step(self, trainer, pl_module)
 
-    assert fit_or_test in ["fit", "test"]
+    assert mode in ["fit", "test"]
 
     safe_patch("pytorch", _pytorch_autolog.__MLflowPLCallback,
                "on_test_epoch_end", _patched_on_test_epoch_end)
@@ -79,7 +79,7 @@ def patched_autolog(
 
     safe_patch("pytorch", mlflow.pytorch, "autolog", patched_autolog)
 
-    safe_patch("pytorch", pl.Trainer, fit_or_test, _pytorch_autolog.patched_fit,
+    safe_patch("pytorch", pl.Trainer, mode, _pytorch_autolog.patched_fit,
                manage_run=True)
 
     safe_patch("pytorch", pl.Trainer, "save_checkpoint",
@@ -177,18 +177,18 @@ def _get_patience(trainer):
     return None
 
 
-def _mlflow_prep(mlflow_conf, trainer, model, data, fit_or_test):
+def _mlflow_prep(mlflow_conf, trainer, model, data, mode):
     logger.info("Validating and processing MLFlow configuration")
 
     _validate_mlflow_conf(mlflow_conf)
-    assert fit_or_test in ["fit", "test"]
+    assert mode in ["fit", "test", "predict"]
 
     # if autolog arguments aren't given, or are None, set to empty dict
     autolog = (OmegaConf.to_object(mlflow_conf.autolog)
                if hasattr(mlflow_conf, "autolog") else None)
     autolog = (autolog if autolog is not None else {})
-    autolog["fit_or_test"] = fit_or_test
-    if fit_or_test == "test":
+    autolog["mode"] = mode
+    if mode == "test":
         autolog["log_models"] = False
     patched_autolog(**autolog)
 
@@ -241,8 +241,6 @@ def _mlflow_prep(mlflow_conf, trainer, model, data, fit_or_test):
         # error if we try to do it again
         pass
 
-
-
     return experiment, run_id, patience
 
 
@@ -257,6 +255,15 @@ def _log_conf(tmp_dir, full_conf, mode):
             local_path=conf_path,
             artifact_path="configs"
         )
+
+
+def _log_predictions(preds_dir, tracking_uri, run_id):
+    client = MlflowClient(tracking_uri=tracking_uri)
+    client.log_artifacts(
+        run_id=run_id,
+        local_path=preds_dir,
+        artifact_path="predictions"
+    )
 
 
 def mlflow_fit(mlflow_conf, trainer, model, data, full_conf, test=False):
@@ -358,3 +365,34 @@ def mlflow_test(mlflow_conf, trainer, model, data, full_conf):
                     logger.info("Calling trainer.test")
                     trainer.test(model, data, ckpt_path=ckpt_path)
         mlflow.end_run(status="FINISHED")
+
+
+def mlflow_predict(mlflow_conf, trainer, model, data, full_conf):
+    experiment, run_id, patience = _mlflow_prep(
+        mlflow_conf, trainer, model, data, "predict")
+
+    if run_id is None:
+        raise ValueError("You're calling serotiny predict but you "
+                         "haven't specified the run_id")
+
+    # we don't know yet if there's a checkpoint
+    ckpt_path = None
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        ckpt_path = _get_latest_checkpoint(mlflow_conf.tracking_uri,
+                                           run_id,
+                                           tmp_dir)
+
+        _log_conf(tmp_dir, full_conf, "predict")
+
+        if ckpt_path is None:
+            logger.info("No checkpoint found for this run. Skipping.")
+        else:
+            logger.info("Calling trainer.predict")
+            preds = trainer.predict(model, data, ckpt_path=ckpt_path)
+
+            preds_dir = (Path(tmp_dir) / "predictions")
+            preds_dir.mkdir(exist_ok=True)
+
+            save_model_predictions(model, preds, preds_dir)
+            _log_predictions(preds_dir, mlflow_conf["tracking_uri"], run_id)

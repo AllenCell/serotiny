@@ -8,10 +8,12 @@ def _do_model_op(mode, model, data, trainer=None, seed=42,
                  multiprocessing_strategy=None, make_notebook=None,
                  **_):
 
+    from pathlib import Path
     import pytorch_lightning as pl
     from hydra.utils import instantiate
-    from .mlflow_utils import mlflow_fit, mlflow_test
+    from .mlflow_utils import mlflow_fit, mlflow_test, mlflow_predict
     from .utils import make_notebook as mk_notebook
+    from .utils import save_model_predictions
 
     if multiprocessing_strategy is not None:
         import torch
@@ -44,10 +46,17 @@ def _do_model_op(mode, model, data, trainer=None, seed=42,
 
         elif mode == "predict":
             if mlflow is not None and mlflow.get("tracking_uri") is not None:
-                #mlflow_predict(mlflow, trainer, model, data, full_conf=full_conf)
-                raise NotImplementedError
+                mlflow_predict(mlflow, trainer, model, data, full_conf=full_conf)
             else:
-                raise NotImplementedError
+                if "ckpt_path" not in full_conf:
+                    raise NotImplementedError("Cannot `serotiny predict` without "
+                                              "an MLFlow config, or a local ckpt_path.")
+                preds_dir = Path(full_conf.get("predictions_output_dir", "./predictions"))
+                preds_dir.mkdir(exist_ok=True, parents=True)
+
+                ckpt_path = full_conf["ckpt_path"]
+                preds = trainer.predict(model, data, ckpt_path=ckpt_path)
+                save_model_predictions(model, preds, preds_dir)
 
     else:
         raise ValueError(

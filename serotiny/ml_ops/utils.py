@@ -103,3 +103,11 @@ def make_notebook(cfg, path):
 
     notebook = v4.new_notebook(cells=cells)
     nbformat.write(notebook, path)
+
+
+def save_model_predictions(model, preds, output_dir):
+    if hasattr(model, "save_predictions"):
+        model.save_predictions(preds, output_dir)
+    else:
+        import joblib
+        joblib.dump(preds, output_dir / "predictions.joblib.xz")
