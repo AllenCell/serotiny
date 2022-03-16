@@ -7,7 +7,7 @@ from hydra.plugins.completion_plugin import CompletionPlugin
 
 
 def strip_serotiny_call(line: str):
-    regex = r"^serotiny\s*(?:train|test|predict)\s*(.*)"
+    regex = r"^serotiny(?:\s*|\.)(?:train|test|predict)\s*(.*)"
     match = re.match(regex, line)
     if match:
         return match.group(1)
@@ -17,14 +17,10 @@ def strip_serotiny_call(line: str):
 
 class SerotinyCompletion(CompletionPlugin):
     def install(self) -> None:
-        # Record the old rule for uninstalling
-        script = (
-            f"export _HYDRA_OLD_COMP=$(complete -p {self._get_exec()} 2> /dev/null)\n"
-        )
-        script += """hydra_serotiny_bash_completion()
+        script = """hydra_serotiny_bash_completion()
 {
     words=($COMP_LINE)
-    helper="${words[0]} ${words[1]}"
+    helper="serotiny.train"
     EXECUTABLE=($(command -v $helper))
     if [ "$HYDRA_COMP_DEBUG" == "1" ]; then
         printf "EXECUTABLE_FIRST='${EXECUTABLE[0]}'\\n"
@@ -47,14 +43,18 @@ class SerotinyCompletion(CompletionPlugin):
     fi
 }
 COMP_WORDBREAKS=${COMP_WORDBREAKS//=}
-COMP_WORDBREAKS=$COMP_WORDBREAKS complete -o nospace -o default -F hydra_serotiny_bash_completion """
-        print(script + self._get_exec())
+COMP_WORDBREAKS=$COMP_WORDBREAKS complete -o nospace -o default -F hydra_serotiny_bash_completion serotiny train
+COMP_WORDBREAKS=$COMP_WORDBREAKS complete -o nospace -o default -F hydra_serotiny_bash_completion serotiny.train
+COMP_WORDBREAKS=$COMP_WORDBREAKS complete -o nospace -o default -F hydra_serotiny_bash_completion serotiny test
+COMP_WORDBREAKS=$COMP_WORDBREAKS complete -o nospace -o default -F hydra_serotiny_bash_completion serotiny.test
+COMP_WORDBREAKS=$COMP_WORDBREAKS complete -o nospace -o default -F hydra_serotiny_bash_completion serotiny predict
+COMP_WORDBREAKS=$COMP_WORDBREAKS complete -o nospace -o default -F hydra_serotiny_bash_completion serotiny.predict
+"""
+        print(script)
 
 
     def uninstall(self) -> None:
         print("unset hydra_serotiny_bash_completion")
-        print(os.environ.get("_HYDRA_OLD_COMP", ""))
-        print("unset _HYDRA_OLD_COMP")
 
 
     @staticmethod

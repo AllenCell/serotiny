@@ -7,9 +7,10 @@ from serotiny.ml_ops.utils import get_serotiny_project
 
 class SerotinySearchPath(SearchPathPlugin):
     def manipulate_search_path(self, search_path: ConfigSearchPath) -> None:
-        if "serotiny" in sys.argv[0] and "-sc" not in sys.argv:
-            if len(list(filter(lambda s: "config-dir" in s or "-cd" in s,
-                               sys.argv))) == 0:
+        if "serotiny" in sys.argv[0]:
+            if "-sc" in sys.argv and any(["install" in _arg for _arg in sys.argv]):
+                pass
+            elif not any([("config-dir" in _arg or "-cd" in _arg) for _arg in sys.argv]):
                 # look for a .serotiny file in the current directory. if it exists,
                 # it means we're in a serotiny project. the .serotiny file will contain
                 # the corresponding python package name, such that we can retrieve
