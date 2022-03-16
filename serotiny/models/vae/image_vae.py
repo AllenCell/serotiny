@@ -37,6 +37,7 @@ class ImageVAE(BaseVAE):
         learn_prior_logvar: bool = False,
         skip_connections: bool = True,
         mode: str = "3d",
+        cache_outputs: Sequence = ("test",),
     ):
 
         encoder = BasicCNN(
@@ -92,6 +93,7 @@ class ImageVAE(BaseVAE):
             prior_mode=prior_mode,
             prior_logvar=prior_logvar,
             learn_prior_logvar=learn_prior_logvar,
+            cache_outputs=cache_outputs,
         )
 
 class _ImageVAEDecoder(nn.Module):

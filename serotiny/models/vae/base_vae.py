@@ -13,6 +13,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.utilities.parsing import get_init_args
 
 from serotiny.models.utils import find_optimizer
+from serotiny.models.base_model import BaseModel
 
 from serotiny.losses.kl_divergence import diagonal_gaussian_kl, isotropic_gaussian_kl
 
@@ -21,7 +22,7 @@ logger = logging.getLogger("lightning")
 logger.propagate = False
 
 
-class BaseVAE(pl.LightningModule):
+class BaseVAE(BaseModel):
     def __init__(
         self,
         encoder: nn.Module,
@@ -30,7 +31,8 @@ class BaseVAE(pl.LightningModule):
         beta: float,
         x_label: str,
         id_label: Optional[str] = None,
-        optimizer = torch.optim.Adam,
+        optimizer: torch.optim.Optimizer = torch.optim.Adam,
+        cache_outputs: Sequence = ("test",),
         loss_mask_label: Optional[str] = None,
         reconstruction_loss: Loss = nn.MSELoss(reduction="none"),
         reconstruction_reduce: str = "sum",
@@ -43,13 +45,11 @@ class BaseVAE(pl.LightningModule):
 
         Parameters
         ----------
-        encoder: Union[nn.Module, dict]
-            Encoder network. If `dict`, expects a class dict, to be used for
-            instantiating the given class.
-        decoder: Union[nn.Module, str]
-            Decoder network. If `dict`, expects a class dict, to be used for
-            instantiating the given class.
-        optimizer: str
+        encoder: nn.Module
+            Encoder network
+        decoder: nn.Module
+            Decoder network
+        optimizer: torch.optim.Optimizer
             Optimizer to use
         beta: float
             Beta parameter - the weight of the KLD term in the loss function
@@ -69,7 +69,12 @@ class BaseVAE(pl.LightningModule):
         learn_prior_logvar: bool
             Boolean flag to determine whether to learn the prior log-variances
         """
-        super().__init__()
+        super().__init__(
+            x_label=x_label,
+            id_label=id_label,
+            optimizer=optimizer,
+            cache_outputs=cache_outputs,
+        )
 
         frame = inspect.currentframe()
         init_args = get_init_args(frame)
@@ -92,8 +97,6 @@ class BaseVAE(pl.LightningModule):
             prior_logvar = torch.Tensor(prior_logvar)
         self.prior_logvar = prior_logvar
 
-        self.optimizer = optimizer
-
         if prior_mode not in ["isotropic", "anisotropic"]:
             raise NotImplementedError(f"KLD mode '{prior_mode}' not implemented")
 
@@ -114,7 +117,6 @@ class BaseVAE(pl.LightningModule):
         self.encoder_args = inspect.getfullargspec(self.encoder.forward).args
         self.decoder_args = inspect.getfullargspec(self.decoder.forward).args
 
-        self._cached_outputs = dict()
 
     def calculate_elbo(self, x, x_hat, mu, logvar, mask=None):
         rcl_per_input_dimension = self.reconstruction_loss(x_hat, x)
@@ -169,23 +171,27 @@ class BaseVAE(pl.LightningModule):
         eps = torch.randn_like(std)
         return eps.mul(std).add(mu)
 
-    def forward(self, x, **kwargs):
+
+    def forward(self, x, decode=False, compute_loss=False, **kwargs):
         mu_logvar = self.encoder(
             x, **{k: v for k, v in kwargs.items() if k in self.encoder_args}
         )
 
         mu, logvar = torch.split(mu_logvar, mu_logvar.shape[1] // 2, dim=1)
 
-        # logvar is clamped here to avoid gradient explosion, since it
-        # will get exponentiated when calculating kl_divergences
-        #logvar = logvar.clamp(min=0, max=50)
         assert mu.shape == logvar.shape
+
+        if not decode:
+            return mu
 
         z = self.sample_z(mu, logvar)
 
         x_hat = self.decoder(
             z, **{k: v for k, v in kwargs.items() if k in self.decoder_args}
         )
+
+        if not compute_loss:
+            return mu, x_hat
 
         (
             loss,
@@ -223,7 +229,7 @@ class BaseVAE(pl.LightningModule):
             kld_loss,
             rcl_per_input_dimension,
             kld_per_latent_dimension,
-        ) = self.forward(x, **forward_kwargs)
+        ) = self.forward(x, decode=True, compute_loss=True, **forward_kwargs)
 
         self.log(f"{stage} reconstruction loss", reconstruction_loss, logger=logger)
         self.log(f"{stage} kld loss", kld_loss, logger=logger)
@@ -255,40 +261,3 @@ class BaseVAE(pl.LightningModule):
                 })
 
         return results
-
-    def training_step(self, batch, batch_idx):
-        return self._step("train", batch, batch_idx, logger=True)
-
-    def validation_step(self, batch, batch_idx):
-        return self._step("val", batch, batch_idx, logger=True)
-
-    def test_step(self, batch, batch_idx):
-        return self._step("test", batch, batch_idx, logger=False)
-
-    def _epoch_end(self, split, outputs):
-        if split in self._cached_outputs:
-            del self._cached_outputs[split]
-            gc.collect()
-        self._cached_outputs[split] = outputs
-
-    #def train_epoch_end(self, outputs):
-    #    self._epoch_end("train", outputs)
-
-
-    #def validation_epoch_end(self, outputs):
-    #    self._epoch_end("val", outputs)
-
-
-    def test_epoch_end(self, outputs):
-        self._epoch_end("test", outputs)
-
-
-    def configure_optimizers(self):
-        optimizer = self.optimizer(self.parameters())
-        return {
-            "optimizer": optimizer,
-            "monitor": "val_loss",
-            "interval": "epoch",
-            "frequency": 1,
-            "strict": True,
-        }

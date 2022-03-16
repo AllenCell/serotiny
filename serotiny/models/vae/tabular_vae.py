@@ -23,6 +23,7 @@ class TabularVAE(BaseVAE):
         prior_mode: str = "isotropic",
         prior_logvar: Optional[Array] = None,
         learn_prior_logvar: bool = False,
+        cache_outputs: Sequence = ("test",),
     ):
         encoder = MLP(
             x_dim,
@@ -48,4 +49,5 @@ class TabularVAE(BaseVAE):
             prior_mode=prior_mode,
             prior_logvar=prior_logvar,
             learn_prior_logvar=learn_prior_logvar,
+            cache_outputs=cache_outputs,
         )
