@@ -51,7 +51,7 @@ build: ## run tox / run tests and lint
 gen-docs: ## generate Sphinx HTML documentation, including API docs
 	rm -f docs/serotiny*.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ serotiny **/tests/
+	sphinx-apidoc -o docs/ serotiny **/tests/ serotiny/cli serotiny/config
 	touch docs/*.rst
 	$(MAKE) -C docs html
 
