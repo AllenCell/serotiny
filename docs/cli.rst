@@ -51,3 +51,12 @@ like:
     :ref:`serotiny projects section <projects>` to understand what this means)
 
 - ...
+
+Debugging ML operations
+***********************
+
+For the commands in the above section, you can add an argument
+``++make_notebook=/path/to/destination/notebook.ipynb`` to the call, with a path
+to a destination notebook file which will be created and populated with cells
+that mimic the behavior of the respective CLI call, so that you can tinker with
+them and run them one by one.
