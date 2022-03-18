@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 import os
 import logging
 
@@ -11,8 +8,8 @@ import fire
 
 from aics_dask_utils import DistributedHandler
 
-from serotiny.io.data import load_csv
-from serotiny.image import project_2d, png_loader
+from serotiny.io.dataframe import read_dataframe
+from serotiny.io.image import project_2d, png_loader
 
 ###############################################################################
 
@@ -83,7 +80,7 @@ def apply_projection(
 
     print(f"applying projection {projection}")
 
-    dataset = load_csv(dataset_path, [])
+    dataset = read_dataframe(dataset_path, [])
     axis = projection["axis"]
 
     def find_dimensions(png_path):

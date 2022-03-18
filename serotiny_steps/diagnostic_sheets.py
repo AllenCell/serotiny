@@ -1,21 +1,11 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 from pathlib import Path
 from typing import Optional
-import logging
 
 import fire
 import pandas as pd
 
 from actk.steps.diagnostic_sheets import DiagnosticSheets
 from .apply_projection import apply_projection
-
-###############################################################################
-
-log = logging.getLogger(__name__)
-
-###############################################################################
 
 
 def diagnostic_sheets(

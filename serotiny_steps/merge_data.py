@@ -1,37 +1,32 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import logging
 import fire
-
-from serotiny.io.data import load_csv
-
-###############################################################################
-
-log = logging.getLogger(__name__)
-
-###############################################################################
-
 
 def merge_data(dataset_paths, manifest_path, required_fields=None, merge_datasets=None):
     """
     Load a list of dataset csv's, merge them, then write back out to csv.
 
-    dataset_paths - list of paths to dataset csvs.
-    manifest_path - where to write the result.
-    required_fields - dictionary of dataset paths to a list
-    of required fields for that dataset.
-    merge_datasets - list of options to merge successive datasets
-        into a single dataset. As this is
-        defined by an operation between two datasets,
-        there is always (number of datasets - 1)
+    Parameters
+    ----------
+    dataset_paths:
+        list of paths to dataset csvs.
+    manifest_path:
+        where to write the result.
+    required_fields:
+        dictionary of dataset paths to a list of required fields for that dataset.
+    merge_datasets:
+        list of options to merge successive datasets into a single dataset. As this is
+        defined by an operation between two datasets, there is always (number of datasets - 1)
         elements in this list.
     """
+
+    # import here to optimize CLIs / Fire usage
+    from serotiny.io.dataframe import read_dataframe
 
     if not required_fields:
         required_fields = {}
 
-    datasets = [load_csv(path, required_fields.get(path, {})) for path in dataset_paths]
+    datasets = [
+        read_dataframe(path, required_fields.get(path, {})) for path in dataset_paths
+    ]
 
     manifest = datasets[0]
 

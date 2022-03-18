@@ -55,6 +55,7 @@ step_workflow_requirements = [
 requirements = [
     *step_workflow_requirements,
     # project requires
+    "aicsimageio>=4.0.2",
     "numpy",
     "pandas",
     "Pillow",
@@ -70,9 +71,11 @@ requirements = [
     "ray[tune]",
     "brokenaxes",
     "torchio",
-    "aicsshparam>=0.1.1",
-    "aicscytoparam>=0.1.2",
-    "cvapipe_analysis @ git+https://git@github.com/AllenCell/cvapipe_analysis",
+    "hydra-core",
+    "sphinx",
+    "sphinx-rtd-theme",
+    "furo",
+    "aicsshparam"
 ]
 
 extra_requirements = {
@@ -100,17 +103,19 @@ setup(
     description="library and commands for deep learning workflows",
     entry_points={
         "console_scripts": [
-            "apply_projection=serotiny_steps.apply_projection",
-            "change_resolution=serotiny_steps.change_resolution",
-            "diagnostic_sheets=serotiny_steps.diagnostic_sheets",
-            "filter_data=serotiny_steps.filter_data",
-            "merge_data=serotiny_steps.merge_data",
-            "one_hot=serotiny_steps.one_hot",
-            "select_fields=serotiny_steps.select_fields",
-            "split_data=serotiny_steps.split_data",
-            "train_classifier=serotiny_steps.train_classifier",
-            "train_vae=serotiny_steps.train_vae",
-            "tune_model=serotiny_steps.tune_model",
+            "serotiny=serotiny_steps.cli.main:main",
+            "apply_projection=serotiny_steps.apply_projection:main",
+            "change_resolution=serotiny_steps.change_resolution:main",
+            "diagnostic_sheets=serotiny_steps.diagnostic_sheets:main",
+            "filter_data=serotiny_steps.filter_data:main",
+            "merge_data=serotiny_steps.merge_data:main",
+            "one_hot=serotiny_steps.one_hot:main",
+            "select_fields=serotiny_steps.select_fields:main",
+            "split_data=serotiny_steps.split_data:main",
+            "train_classifier=serotiny_steps.train_classifier:main",
+            "train_vae=serotiny_steps.train_vae:main",
+            "train_model=serotiny_steps.train_model:main",
+            "tune_model=serotiny_steps.tune_model:main",
         ],
     },
     install_requires=requirements,
