@@ -1,5 +1,5 @@
-from .pad import ExpandTo, ExpandColumns, PadTo
-from .swap import SwapAxes
 from .crop import CropCenter
+from .normalize import NormalizeAbsolute, NormalizeMean, NormalizeMinMax
+from .pad import ExpandColumns, ExpandTo, PadTo
 from .project import Project
-from .normalize import NormalizeMinMax, NormalizeAbsolute, NormalizeMean
+from .swap import SwapAxes

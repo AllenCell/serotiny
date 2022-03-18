@@ -1,5 +1,6 @@
-from pathlib import Path
 import logging
+from pathlib import Path
+
 from makefun import wraps
 
 logger = logging.getLogger(__name__)
@@ -56,10 +57,8 @@ class PipelineCLI:
         setattr(self, func.__name__, wrapper)
 
     def __str__(self):
-        """
-        Hijack __str__ to store the final result of a pipeline,
-        stored in self._result
-        """
+        """Hijack __str__ to store the final result of a pipeline, stored in
+        self._result."""
 
         if self._output_path is None:
             logger.warning(

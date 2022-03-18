@@ -1,21 +1,15 @@
-from typing import Union, Optional, Sequence
-import gc
-
-import logging
 import inspect
+import logging
+from typing import Optional, Sequence, Union
 
 import numpy as np
 import torch
 import torch.nn as nn
+from pytorch_lightning.utilities.parsing import get_init_args
 from torch.nn.modules.loss import _Loss as Loss
 
-import pytorch_lightning as pl
-from pytorch_lightning.utilities.parsing import get_init_args
-
-from serotiny.models.utils import find_optimizer
-from serotiny.models.base_model import BaseModel
-
 from serotiny.losses.kl_divergence import diagonal_gaussian_kl, isotropic_gaussian_kl
+from serotiny.models.base_model import BaseModel
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]
 logger = logging.getLogger("lightning")
@@ -40,8 +34,7 @@ class BaseVAE(BaseModel):
         prior_logvar: Optional[Array] = None,
         learn_prior_logvar: bool = False,
     ):
-        """
-        Instantiate a basic VAE model
+        """Instantiate a basic VAE model.
 
         Parameters
         ----------

@@ -1,23 +1,23 @@
-from typing import Sequence, Optional
+from typing import Callable, Optional, Sequence, Union
+
 import numpy as np
-from torchvision.transforms import Compose
 
 from serotiny.io.image import image_loader
+
 from .abstract_loader import Loader
 
 
-class Load2DImage(Loader):
-    """
-    Loader class, used to retrieve 2d images from paths given in a dataframe column
-    """
+class LoadImage(Loader):
+    """Loader class, used to retrieve images from paths given in a dataframe column."""
 
     def __init__(
         self,
         column: str,
         file_type: str = "tiff",
         select_channels: Optional[Sequence] = None,
-        transforms: Optional[Sequence] = None,
+        transforms: Optional[Union[Sequence, Callable]] = None,
         reader: str = "aicsimageio.readers.ome_tiff_reader.OmeTiffReader",
+        dtype: np.dtype = np.float32,
     ):
         """
         Parameters
@@ -33,10 +33,14 @@ class Load2DImage(Loader):
         select_channels: Optional[Sequence] = None
             List of channels to include in the loaded image.
 
-        transforms: Optional[Sequence] = None
-            List of transforms to apply upon loading the image. The
-            transforms are provided as a list of configuration dicts,
-            loaded dynamically via serotiny's dynamic import utils
+        transforms: Optional[Union[Sequence, Callable]] = None
+            Transform, or list of transforms to apply upon loading the image.
+
+        reader: str = "aicsimageio.readers.ome_tiff_reader.OmeTiffReader"
+            `aicsimageio` reader to use
+
+        dtype: np.dtype = np.float32
+            dtype to use
 
         """
         super().__init__()
@@ -48,10 +52,13 @@ class Load2DImage(Loader):
             raise NotImplementedError(f"File type {file_type} not supported.")
 
         self.file_type = file_type
+        self.dtype = dtype
 
-        # if transforms is not None:
-        #    transforms = load_multiple(transforms)
-        #    transforms = Compose(transforms)
+        if isinstance(transforms, (list, tuple)):
+            from torchvision.transforms import Compose
+
+            transforms = Compose(transforms)
+
         self.transforms = transforms
 
     def __call__(self, row):
@@ -59,7 +66,7 @@ class Load2DImage(Loader):
             return image_loader(
                 row[self.column],
                 select_channels=self.select_channels,
-                output_dtype=np.float32,
+                output_dtype=self.dtype,
                 transform=self.transforms,
                 reader=self.reader,
             )

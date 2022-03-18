@@ -3,7 +3,7 @@
 
 """The setup script."""
 
-from setuptools import find_packages, setup, find_namespace_packages
+from setuptools import find_namespace_packages, find_packages, setup
 
 with open("README.md") as readme_file:
     readme = readme_file.read()
@@ -34,7 +34,11 @@ requirements = [
 
 setup(
     author="Ryan Spangler, Ritvik Vasan, Guilherme Pires, Caleb Chan, Theo Knijnenburg",
-    author_email="ryan.spangler@alleninstitute.org, ritvik.vasan@alleninstitute.org, guilherme.pires@alleninstitute.org, caleb.chan@alleninstitute.org, theo.knijnenburg@alleninstitute.org",
+    author_email=(
+        "ryan.spangler@alleninstitute.org, ritvik.vasan@alleninstitute.org, "
+        "guilherme.pires@alleninstitute.org, caleb.chan@alleninstitute.org, "
+        "theo.knijnenburg@alleninstitute.org"
+    ),
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Intended Audience :: Developers",

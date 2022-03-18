@@ -1,7 +1,6 @@
 import sys
 
 from serotiny.ml_ops import _do_model_op_wrapper
-from serotiny.ml_ops.utils import get_serotiny_project
 
 
 def print_help():
@@ -32,7 +31,7 @@ def main():
     if sys.argv[0].endswith("serotiny"):
         try:
             mode = sys.argv.pop(1)
-        except:
+        except IndexError:
             mode = "help"
     elif sys.argv[0].endswith("serotiny.train"):
         mode = "train"
@@ -58,10 +57,11 @@ def main():
 
     # fire modes
     else:
-        import serotiny.cli.image_cli as image_cli
-        import serotiny.cli.config_cli as config_cli
-        from serotiny.cli.dataframe_cli import DataframeTransformCLI as dataframe_cli
         from fire import Fire
+
+        import serotiny.cli.config_cli as config_cli
+        import serotiny.cli.image_cli as image_cli
+        from serotiny.cli.dataframe_cli import DataframeTransformCLI as dataframe_cli
 
         sys.argv.insert(1, mode)
         cli_dict = {

@@ -1,11 +1,10 @@
 import os
-import sys
 from pathlib import Path
 from textwrap import dedent
 
-from omegaconf import OmegaConf
 import nbformat
 import nbformat.v4 as v4
+from omegaconf import OmegaConf
 
 
 def get_serotiny_project():
@@ -14,7 +13,7 @@ def get_serotiny_project():
             with open(".serotiny", "r") as f:
                 project_name = f.read().strip()
             return project_name
-    except:
+    except:  # noqa
         pass
 
     return "serotiny"
@@ -32,7 +31,7 @@ def flatten_config(cfg):
             conf.update({f"{k}/{_k}": v for _k, v in sub_conf.items()})
             del conf[k]
             continue
-        except:
+        except:  # noqa
             pass
 
         if isinstance(conf[k], list):
@@ -40,7 +39,7 @@ def flatten_config(cfg):
                 try:
                     sub_conf = flatten_config(el)
                     conf.update({f"{k}/{_k}": v for _k, v in sub_conf.items()})
-                except Exception as e:
+                except:  # noqa
                     conf[f"{k}/{i}"] = el
             del conf[k]
 
@@ -99,7 +98,7 @@ def make_notebook(cfg, path):
         (
             "markdown",
             _dedent(
-                f"""
+                """
     ---
     The cell below loads a batch from the train dataloader, and prints the
     available keys.
@@ -112,7 +111,7 @@ def make_notebook(cfg, path):
         (
             "code",
             _dedent(
-                f"""
+                """
     train_dl = data.train_dataloader()
     train_batch = next(iter(train_dl))
 

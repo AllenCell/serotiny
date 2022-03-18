@@ -1,11 +1,11 @@
-from torch.nn.modules.loss import _Loss as Loss
-
 from torch.distributions.continuous_bernoulli import ContinuousBernoulli
+from torch.nn.modules.loss import _Loss as Loss
 
 
 class CBLogLoss(Loss):
-    """
-    Continuous Bernoulli loss, proposed here: https://arxiv.org/abs/1907.06845
+    """Continuous Bernoulli loss, proposed here:
+
+    https://arxiv.org/abs/1907.06845.
     """
 
     def __init__(self, reduction="sum", mode="probs"):

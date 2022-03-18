@@ -1,13 +1,14 @@
-from typing import Union, Optional, Sequence, Dict
 import logging
+from typing import Optional, Sequence, Union
 
+import numpy as np
 import torch
 import torch.nn as nn
 from torch.nn.modules.loss import _Loss as Loss
-import numpy as np
 
 from serotiny.networks import BasicCNN
 from serotiny.networks.utils import weight_init
+
 from .base_vae import BaseVAE
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]

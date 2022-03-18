@@ -1,9 +1,10 @@
-from typing import Union, Optional, Sequence
+from typing import Optional, Sequence, Union
 
-import torch
 import numpy as np
+import torch
 
 from serotiny.networks.mlp import MLP
+
 from .base_vae import BaseVAE
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]

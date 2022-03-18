@@ -1,17 +1,13 @@
-from typing import Union, Optional, Sequence
 import gc
-
-import logging
 import inspect
+import logging
+from typing import Optional, Sequence, Union
 
 import numpy as np
+import pytorch_lightning as pl
 import torch
 import torch.nn as nn
-
-import pytorch_lightning as pl
 from pytorch_lightning.utilities.parsing import get_init_args
-
-from serotiny.models.utils import find_optimizer
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]
 logger = logging.getLogger("lightning")
@@ -54,8 +50,12 @@ class BaseModel(pl.LightningModule):
     def _step(self, stage, batch, batch_idx, logger):
         raise NotImplementedError
 
-        # Here you should implement the logic for a step in the training/validation/test
-        # process. The stage (training/validation/test) is given by the variable `stage`.
+        # Here you should implement the logic for a step in the
+        # training/validation/test process.
+        # The stage (training/validation/test) is given by the variable `stage`.
+        #
+        # Example:
+        #
         # x = self.parse_batch(batch)
 
         # if self.hparams.id_label is not None:

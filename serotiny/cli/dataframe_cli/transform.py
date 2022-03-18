@@ -1,12 +1,14 @@
 import logging
-from typing import Union, Sequence, Optional, T
-from pathlib import Path
 from inspect import signature
-from makefun import wraps
+from pathlib import Path
+from typing import Optional, Sequence, T, Union
 
 import pandas as pd
+from makefun import wraps
+
 import serotiny.transforms.dataframe as df_transforms
 from serotiny.io.dataframe import read_dataframe
+
 from .._utils import PipelineCLI
 
 PathLike = Union[str, Path]
@@ -91,9 +93,7 @@ def _dataframe_from_disk(func):
 
 
 class DataframeTransformCLI(PipelineCLI):
-    """
-    Apply a transform (or chain of transforms) to a dataframe
-    """
+    """Apply a transform (or chain of transforms) to a dataframe."""
 
     @classmethod
     def _decorate(cls, func):

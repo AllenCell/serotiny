@@ -1,19 +1,17 @@
-import os
+import collections
 import importlib
 import inspect
 import json
-import yaml
-import collections
+import os
 
+import yaml
 from omegaconf import OmegaConf
 from omegaconf._utils import is_primitive_type, split_key
 
 
 def get_obj_from_path(obj_path: str):
-    """
-    Given a class/function/variable path as a string (e.g. some.module.ClassName),
-    retrieve the class/function/variable
-    """
+    """Given a class/function/variable path as a string (e.g. some.module.ClassName),
+    retrieve the class/function/variable."""
     obj_path = obj_path.split(".")
     module = ".".join(obj_path[:-1])
     name = obj_path[-1]
@@ -120,10 +118,12 @@ def add_config(obj_path, dest):
 
 
 def deep_merge(template, merge):
+    """Recursive dict merge, combines values that are lists.
+
+    This mutates template - the contents of merge are added to template
+    (which is also returned). If you want to keep template you could call it
+    like deep_merge(dict(template), merge)
     """
-    Recursive dict merge, combines values that are lists
-    This mutates template - the contents of merge are added to template (which is also returned).
-    If you want to keep template you could call it like deep_merge(dict(template), merge)"""
     for k, v in merge.items():
         if (
             k in template

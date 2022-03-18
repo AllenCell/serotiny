@@ -27,27 +27,16 @@ repos:
     hooks:
       - id: end-of-file-fixer
       - id: trailing-whitespace
-      - id: check-yaml
       - id: check-docstring-first
-      - id: check-executables-have-shebangs
-      - id: check-toml
-      - id: check-case-conflict
-      - id: detect-private-key
 
   - repo: https://github.com/myint/docformatter
     rev: v1.4
     hooks:
       - id: docformatter
-        args: [--in-place, --wrap-summaries=115, --wrap-descriptions=120]
-
-  - repo: https://github.com/PyCQA/isort
-    rev: 5.10.1
-    hooks:
-      - id: isort
-        name: Format imports
+        args: [--in-place, --wrap-summaries=88, --wrap-descriptions=88]
 
   - repo: https://github.com/psf/black
-    rev: 21.12b0
+    rev: 22.1.0
     hooks:
       - id: black
         name: Format code
@@ -64,3 +53,4 @@ repos:
     hooks:
       - id: flake8
         name: Check PEP8
+        args: ['--per-file-ignores=__init__.py:F401']

@@ -1,5 +1,5 @@
-import sys
 import logging
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -19,9 +19,11 @@ def _do_model_op(
 ):
 
     from pathlib import Path
+
     import pytorch_lightning as pl
     from hydra.utils import instantiate
-    from .mlflow_utils import mlflow_fit, mlflow_test, mlflow_predict
+
+    from .mlflow_utils import mlflow_fit, mlflow_predict, mlflow_test
     from .utils import make_notebook as mk_notebook
     from .utils import save_model_predictions
 

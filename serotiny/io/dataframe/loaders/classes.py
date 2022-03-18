@@ -1,11 +1,10 @@
 import torch
+
 from .abstract_loader import Loader
 
 
 class LoadClass(Loader):
-    """
-    Loader class, used to retrieve class values from the dataframe,
-    """
+    """Loader class, used to retrieve class values from the dataframe,"""
 
     def __init__(self, num_classes: int, y_encoded_label: str, binary: bool = False):
         """

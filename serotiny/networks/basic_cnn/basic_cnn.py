@@ -1,12 +1,11 @@
-from typing import Optional, Union, Dict, Sequence
 import logging
+from typing import Optional, Sequence, Union
 
 import numpy as np
 import torch
 import torch.nn as nn
 
-from serotiny.networks.layers import ConvBlock
-from serotiny.networks.layers import spatial_pyramid_pool
+from serotiny.networks.layers import ConvBlock, spatial_pyramid_pool
 
 log = logging.getLogger(__name__)
 
@@ -28,8 +27,7 @@ class BasicCNN(nn.Module):
         skip_connections: Union[bool, Sequence[int]] = False,
         mode: str = "3d",
     ):
-        """
-        Instantiate a 3D CNN
+        """Instantiate a 3D CNN.
 
         Parameters
         ----------

@@ -1,15 +1,14 @@
-from typing import Sequence, Union, Optional
-from pathlib import Path
-
 import re
+from pathlib import Path
+from typing import Optional, Sequence, Union
+
 import pandas as pd
 import pyarrow.parquet
 
 
 def read_parquet(path, include_columns=None):
-    """
-    Read a dataframe stored in a .parquet file, and optionally include
-    only the columns given by `include_columns`
+    """Read a dataframe stored in a .parquet file, and optionally include only the
+    columns given by `include_columns`
 
     Parameters
     ----------
@@ -24,7 +23,6 @@ def read_parquet(path, include_columns=None):
     -------
 
     dataframe: pd.DataFrame
-
     """
     if include_columns is not None:
         schema = pyarrow.parquet.read_schema(path, memory_map=True)
@@ -39,9 +37,8 @@ def read_parquet(path, include_columns=None):
 
 
 def read_csv(path, include_columns=None):
-    """
-    Read a dataframe stored in a .csv file, and optionally include
-    only the columns given by `include_columns`
+    """Read a dataframe stored in a .csv file, and optionally include only the columns
+    given by `include_columns`
 
     Parameters
     ----------
@@ -56,7 +53,6 @@ def read_csv(path, include_columns=None):
     -------
 
     dataframe: pd.DataFrame
-
     """
 
     dataframe = pd.read_csv(path)
@@ -76,8 +72,7 @@ def read_dataframe(
     required_columns: Optional[Sequence[str]] = None,
     include_columns: Optional[Sequence[str]] = None,
 ) -> pd.DataFrame:
-    """
-    Load a dataframe from a .csv or .parquet file, or assert a given pd.DataFrame
+    """Load a dataframe from a .csv or .parquet file, or assert a given pd.DataFrame
     contains the expected required columns.
 
     Parameters
@@ -151,13 +146,10 @@ def filter_columns(
     contains: Optional[str] = None,
     excludes: Optional[str] = None,
 ) -> Sequence[str]:
-    """
-    Filter a list of columns, using a combination of different
-    queries, or a `regex` pattern. If `regex` is supplied it
-    takes precedence and the remaining arguments are ignored.
-    Otherwise, the logical AND of the supplied filters is applied,
-    i.e. the columns that respect all of the supplied conditions
-    are returned.
+    """Filter a list of columns, using a combination of different queries, or a `regex`
+    pattern. If `regex` is supplied it takes precedence and the remaining arguments are
+    ignored. Otherwise, the logical AND of the supplied filters is applied, i.e. the
+    columns that respect all of the supplied conditions are returned.
 
     Parameters
     ----------
@@ -178,7 +170,6 @@ def filter_columns(
 
     excludes: Optional[str] = None
         A substring the matching columns must not contain
-
     """
     if regex is not None:
         return [col for col in columns_to_filter if re.match(regex, col)]

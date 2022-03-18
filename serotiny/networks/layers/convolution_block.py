@@ -1,8 +1,6 @@
-from typing import Optional, Union, Dict
-from torch import nn
-from torch.nn.utils import spectral_norm
+from typing import Optional
 
-from .skip_connection import SkipConnection
+from torch import nn
 
 
 def conv_block(
@@ -15,8 +13,7 @@ def conv_block(
     batch_norm: bool = True,
     mode: str = "3d",
 ):
-    """
-    Util function to instantiate a convolutional block.
+    """Util function to instantiate a convolutional block.
 
     Parameters
     ----------
@@ -68,8 +65,7 @@ class ConvBlock(nn.Module):
         batch_norm: bool = False,
         mode: str = "3d",
     ):
-        """
-        Convolutional block class.
+        """Convolutional block class.
 
         Parameters
         ----------

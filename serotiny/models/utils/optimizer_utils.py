@@ -1,11 +1,10 @@
 import inspect
+
 import torch.optim as opt
 
 
 def find_optimizer(optimizer_name):
-    """
-    Given optimizer name, get it from torch.optim
-    """
+    """Given optimizer name, get it from torch.optim."""
     available_optimizers = []
     for cls_name, cls in opt.__dict__.items():
         if inspect.isclass(cls):
@@ -23,9 +22,7 @@ def find_optimizer(optimizer_name):
 
 
 def find_lr_scheduler(scheduler_name):
-    """
-    Given scheduler name, get it from torch.optim.lr_scheduler
-    """
+    """Given scheduler name, get it from torch.optim.lr_scheduler."""
     available_schedulers = []
     for cls_name, cls in opt.lr_scheduler.__dict__.items():
         if inspect.isclass(cls):

@@ -1,7 +1,8 @@
-from typing import Optional, Sequence, Union
 import re
-import pandas as pd
+from typing import Optional, Sequence, Union
+
 import numpy as np
+import pandas as pd
 
 
 def split_dataframe(
@@ -10,10 +11,8 @@ def split_dataframe(
     val_frac: Optional[float] = None,
     return_splits: bool = True,
 ):
-    """
-    Given a pandas dataframe, perform a train-val-test split and either
-    return three different dataframes, or append a column identifying the
-    split each row belongs to.
+    """Given a pandas dataframe, perform a train-val-test split and either return three
+    different dataframes, or append a column identifying the split each row belongs to.
 
     TODO: extend this to enable balanced / stratified splitting
 
@@ -67,9 +66,8 @@ def split_dataframe(
 def filter_rows(
     dataframe: pd.DataFrame, column: str, values: Sequence, exclude: bool = False
 ):
-    """
-    Filter a dataframe, keeping only the rows where a given
-    column's value is contained in a list of values
+    """Filter a dataframe, keeping only the rows where a given column's value is
+    contained in a list of values.
 
     Parameters
     ----------
@@ -97,13 +95,10 @@ def _filter_columns(
     contains: Optional[str] = None,
     excludes: Optional[str] = None,
 ) -> Sequence[str]:
-    """
-    Filter a list of columns, using a combination of different
-    queries, or a `regex` pattern. If `regex` is supplied it
-    takes precedence and the remaining arguments are ignored.
-    Otherwise, the logical AND of the supplied filters is applied,
-    i.e. the columns that respect all of the supplied conditions
-    are returned.
+    """Filter a list of columns, using a combination of different queries, or a `regex`
+    pattern. If `regex` is supplied it takes precedence and the remaining arguments are
+    ignored. Otherwise, the logical AND of the supplied filters is applied, i.e. the
+    columns that respect all of the supplied conditions are returned.
 
     Parameters
     ----------
@@ -124,7 +119,6 @@ def _filter_columns(
 
     excludes: Optional[str] = None
         A substring the matching columns must not contain
-
     """
     if regex is not None:
         return [col for col in columns_to_filter if re.match(regex, col)]
@@ -152,9 +146,8 @@ def filter_columns(
     excludes: Optional[str] = None,
     regex: Optional[str] = None,
 ):
-    """
-    Select columns in a dataset, using different filtering options.
-    See serotiny.data.dataframe.transforms.filter_columns for more details.
+    """Select columns in a dataset, using different filtering options. See
+    serotiny.data.dataframe.transforms.filter_columns for more details.
 
     Parameters
     ----------
@@ -203,8 +196,7 @@ def sample_n_each(
     force: bool = False,
     seed: int = 42,
 ):
-    """
-    Transform a dataframe to have equal number of rows per value of `column`.
+    """Transform a dataframe to have equal number of rows per value of `column`.
 
     In case a given value of `column` has less than `number` corresponding rows:
     - if `force` is True the corresponding rows are sampled with replacement
@@ -251,9 +243,8 @@ def sample_n_each(
 
 
 def append_one_hot(dataframe: pd.DataFrame, column: str):
-    """
-    Modifies its argument by appending the one hot encoding columns
-    into the given dataframe. Calls function one_hot_encoding
+    """Modifies its argument by appending the one hot encoding columns into the given
+    dataframe. Calls function one_hot_encoding.
 
     Parameters
     -----------
@@ -262,7 +253,6 @@ def append_one_hot(dataframe: pd.DataFrame, column: str):
 
     column: str
         Column to convert into one hot encoding
-
     """
 
     # import here to optimize CLIs / Fire usage
@@ -277,9 +267,8 @@ def append_one_hot(dataframe: pd.DataFrame, column: str):
 
 
 def append_labels_to_integers(dataframe: pd.DataFrame, column: str):
-    """
-    Modifies its argument by appending the integer-encoded values of `column`
-    into the given dataframe.
+    """Modifies its argument by appending the integer-encoded values of `column` into
+    the given dataframe.
 
     Parameters
     -----------
@@ -288,7 +277,6 @@ def append_labels_to_integers(dataframe: pd.DataFrame, column: str):
 
     column: str
         Column to convert into one hot encoding
-
     """
 
     # import here to optimize CLIs / Fire usage
@@ -300,8 +288,7 @@ def append_labels_to_integers(dataframe: pd.DataFrame, column: str):
 
 
 def append_class_weights(dataframe: pd.DataFrame, column: str):
-    """
-    Add class weights (based on `column`) to a dataframe
+    """Add class weights (based on `column`) to a dataframe.
 
     Parameters
     -----------
@@ -310,7 +297,6 @@ def append_class_weights(dataframe: pd.DataFrame, column: str):
 
     column: str
         Column to base the weights on
-
     """
     labels_unique, counts = np.unique(dataframe[column], return_counts=True)
     class_weights = [sum(counts) / c for c in counts]
@@ -321,8 +307,7 @@ def append_class_weights(dataframe: pd.DataFrame, column: str):
 
 
 def make_random_df(columns: Sequence[str] = list("ABCD"), n_rows: int = 100):
-    """
-    Generate a random dataframe. Useful to test data wrangling pipelines.
+    """Generate a random dataframe. Useful to test data wrangling pipelines.
 
     Parameters
     ----------

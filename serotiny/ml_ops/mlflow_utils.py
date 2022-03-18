@@ -1,17 +1,16 @@
-import os
 import logging
+import os
 import tempfile
 from pathlib import Path
 
-import yaml
-from omegaconf import OmegaConf
-from hydra.utils import instantiate
-from hydra._internal.utils import _locate
-import pytorch_lightning as pl
-from mlflow.utils.autologging_utils import autologging_integration, safe_patch
-
 import mlflow
+import pytorch_lightning as pl
+import yaml
+from hydra._internal.utils import _locate
+from hydra.utils import instantiate
 from mlflow.tracking import MlflowClient
+from mlflow.utils.autologging_utils import autologging_integration
+from omegaconf import OmegaConf
 from packaging.version import Version
 
 from .utils import flatten_config, save_model_predictions
@@ -49,13 +48,12 @@ def patched_autolog(
     silent=False,
     mode="fit",
 ):
-    """
-    Patched mlflow autolog, to enable on_test_epoch_end callbacks and to
-    cover trainer.test calls as well
-    """
-    from pytorch_lightning.utilities import rank_zero_only
+    """Patched mlflow autolog, to enable on_test_epoch_end callbacks and to cover
+    trainer.test calls as well."""
+
     import mlflow.pytorch._pytorch_autolog as _pytorch_autolog
     from mlflow.utils.autologging_utils import safe_patch
+    from pytorch_lightning.utilities import rank_zero_only
 
     @rank_zero_only
     def _patched_on_test_epoch_end(
@@ -126,7 +124,7 @@ def _get_latest_checkpoint(tracking_uri, run_id, tmp_dir):
         return client.download_artifacts(
             run_id=run_id, path="checkpoints/latest.ckpt", dst_path=tmp_dir
         )
-    except:
+    except:  # noqa
         return None
 
 
@@ -137,7 +135,7 @@ def _get_config(tracking_uri, run_id, tmp_dir, mode="test"):
         return client.download_artifacts(
             run_id=run_id, path=f"configs/{mode}_config.yaml", dst_path=tmp_dir
         )
-    except:
+    except:  # noqa
         return None
 
 
@@ -160,7 +158,7 @@ def load_model_from_checkpoint(tracking_uri, run_id):
                 if isinstance(v, dict):
                     if "_target_" in v:
                         model_conf[k] = instantiate(v)
-            except:
+            except:  # noqa
                 pass
 
         model_class = model_conf.pop("_target_")
@@ -234,13 +232,14 @@ def _mlflow_prep(mlflow_conf, trainer, model, data, mode):
     # e.g. torch's ddp training strategy, and which make use of argv[0] to rerun
     # the program. For that reason, from this point on we remove the suffix, and
     # re-insert it as the second element in argv
-    import sys
 
     try:
+        import sys
+
         command, suffix = sys.argv[0].split(" ")
         sys.argv[0] = command
         sys.argv.insert(1, suffix)
-    except:
+    except:  # noqa
         # in hydra sweeps, this only needs to be done once and will cause an
         # error if we try to do it again
         pass

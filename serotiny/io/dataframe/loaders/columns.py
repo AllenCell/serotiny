@@ -1,13 +1,12 @@
 from typing import Optional, Sequence
 
 from serotiny.transforms.dataframe.transforms import _filter_columns as filter_columns
+
 from .abstract_loader import Loader
 
 
 class LoadColumn(Loader):
-    """
-    Loader class, used to retrieve fields directly from dataframe columns
-    """
+    """Loader class, used to retrieve fields directly from dataframe columns."""
 
     def __init__(self, column: str):
         """
@@ -26,11 +25,11 @@ class LoadColumn(Loader):
 
 
 class LoadColumns(Loader):
-    """
-    Loader class, used to retrieve fields directly from multiple
-    dataframe columns, concatenating them into an array. It leverages
-    `filter_columns` to enable using simple queries to select the
-    columns to use.
+    """Loader class, used to retrieve fields directly from multiple dataframe columns,
+    concatenating them into an array.
+
+    It leverages `filter_columns` to enable using simple queries to select the columns
+    to use.
     """
 
     def __init__(

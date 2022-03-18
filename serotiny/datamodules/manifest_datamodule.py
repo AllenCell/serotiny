@@ -1,12 +1,11 @@
-from typing import Union, Optional, Dict, Sequence, Callable
-from pathlib import Path
-
 import re
 from itertools import chain
+from pathlib import Path
+from typing import Callable, Dict, Optional, Sequence, Union
+
 import numpy as np
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.exceptions import MisconfigurationException
-
 from torch.utils.data import DataLoader
 
 from serotiny.io.dataframe import DataframeDataset, read_dataframe
@@ -56,11 +55,10 @@ def _parse_loaders(loaders):
 
 
 class ManifestDatamodule(pl.LightningDataModule):
-    """
-    A pytorch lightning datamodule based on manifest files. It can either use
-    a single manifest file, which contains a column based on which a train-val-test
-    split can be made; or it can use three manifest files, one for each fold
-    (train, val, test)
+    """A pytorch lightning datamodule based on manifest files. It can either use a
+    single manifest file, which contains a column based on which a train- val-test split
+    can be made; or it can use three manifest files, one for each fold (train, val,
+    test)
 
     Parameters
     ----------
@@ -93,7 +91,6 @@ class ManifestDatamodule(pl.LightningDataModule):
     drop_last: bool = False
         Whether to drop the last batch (in case the given batch size is the only
         supported)
-
     """
 
     def __init__(

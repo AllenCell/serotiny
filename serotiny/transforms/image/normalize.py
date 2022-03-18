@@ -1,5 +1,5 @@
-import torch
 import numpy as np
+import torch
 
 
 class NormalizeAbsolute:
@@ -18,7 +18,7 @@ class NormalizeMean:
         self.scale = scale
 
     def __call__(self, img, per_dim=None):
-        """Subtract mean, set STD to 1.0
+        """Subtract mean, set STD to 1.0.
 
         Parameters:
           per_dim: normalize along other axes dimensions not equal to per dim

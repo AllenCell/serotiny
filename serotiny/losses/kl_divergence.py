@@ -7,9 +7,8 @@ def diagonal_gaussian_kl(
     logvar1: torch.Tensor,
     logvar2: torch.Tensor,
 ):
-    """
-    Computes the Kullback-Leibler divergence between two diagonal
-    gaussians (not necessarily isotropic). It also works batch-wise.
+    """Computes the Kullback-Leibler divergence between two diagonal gaussians (not
+    necessarily isotropic). It also works batch-wise.
 
     Parameters
     ----------
@@ -36,9 +35,8 @@ def diagonal_gaussian_kl(
 
 
 def isotropic_gaussian_kl(mean, log_var):
-    """
-    Computes the Kullback-Leibler divergence between a diagonal gaussian
-    and an isotropic (0,1) gaussian. It also works batch-wise.
+    """Computes the Kullback-Leibler divergence between a diagonal gaussian and an
+    isotropic (0,1) gaussian. It also works batch-wise.
 
     Parameters
     ----------

@@ -1,20 +1,15 @@
-from typing import Union, Sequence, Optional, Type, Callable
 from pathlib import Path
-
-import sys
-import torch
-import numpy as np
+from typing import Callable, Optional, Sequence, Type, Union
 
 import aicsimageio
+import numpy as np
+import torch
 from aicsimageio.aics_image import _load_reader
 from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
 
 
 def infer_dims(img: aicsimageio.AICSImage):
-    """
-    Given a an AICSImage image, infer the corresponding
-    tiff dimensions.
-    """
+    """Given a an AICSImage image, infer the corresponding tiff dimensions."""
     dims = dict(img.dims.items())
 
     if "S" in dims:
@@ -38,9 +33,8 @@ def image_loader(
     return_channels: bool = False,
     reader: Optional[str] = None,
 ):
-    """
-    Load image from path given by `path`. If the given image doesn't have channel
-    names, `select_channels` must be a list of integers
+    """Load image from path given by `path`. If the given image doesn't have channel
+    names, `select_channels` must be a list of integers.
 
     Parameters
     ----------
@@ -110,8 +104,7 @@ def tiff_writer(
     channel_names: Optional[Sequence] = None,
     dim_order: Optional[str] = None,
 ):
-    """
-    Write an image to disk.
+    """Write an image to disk.
 
     Parameters
     ----------

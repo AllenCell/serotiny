@@ -2,9 +2,7 @@ from torch.utils.data import Dataset
 
 
 class _Row:
-    """
-    Helper class to enable string indexing of numpy arrays
-    """
+    """Helper class to enable string indexing of numpy arrays."""
 
     def __init__(self, array, columns):
         self.array = array
@@ -21,11 +19,10 @@ class _Row:
 
 
 class DataframeDataset(Dataset):
-    """
-    Class to wrap a pandas DataFrame in a pytorch Dataset. In practice, at AICS
-    we use this to wrap manifest dataframes that point to the image files that
-    correspond to a cell. The `loaders` dict contains a loading function for each
-    key, normally consisting of a function to load the contents of a file from a path.
+    """Class to wrap a pandas DataFrame in a pytorch Dataset. In practice, at AICS we
+    use this to wrap manifest dataframes that point to the image files that correspond
+    to a cell. The `loaders` dict contains a loading function for each key, normally
+    consisting of a function to load the contents of a file from a path.
 
     Parameters
     ----------

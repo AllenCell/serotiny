@@ -3,6 +3,7 @@ import sys
 
 from hydra.core.config_search_path import ConfigSearchPath
 from hydra.plugins.search_path_plugin import SearchPathPlugin
+
 from serotiny.ml_ops.utils import get_serotiny_project
 
 

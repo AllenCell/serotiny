@@ -1,14 +1,18 @@
-import os
-import json
-import yaml
 import collections
+import json
+import os
+
+import yaml
 
 
 def deep_merge(template, merge):
+    """Recursive dict merge, combines values that are lists.
+
+    This mutates template - the contents of merge are added to template
+    (which is also returned).
+    If you want to keep template you could call it like
+    deep_merge(dict(template), merge)
     """
-    Recursive dict merge, combines values that are lists
-    This mutates template - the contents of merge are added to template (which is also returned).
-    If you want to keep template you could call it like deep_merge(dict(template), merge)"""
     for k, v in merge.items():
         if (
             k in template

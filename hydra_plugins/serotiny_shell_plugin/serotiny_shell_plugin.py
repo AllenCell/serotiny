@@ -1,6 +1,6 @@
 import os
-import sys
 import re
+import sys
 from typing import Optional
 
 from hydra.plugins.completion_plugin import CompletionPlugin
@@ -49,7 +49,7 @@ COMP_WORDBREAKS=$COMP_WORDBREAKS complete -o nospace -o default -F hydra_serotin
 COMP_WORDBREAKS=$COMP_WORDBREAKS complete -o nospace -o default -F hydra_serotiny_bash_completion serotiny.test
 COMP_WORDBREAKS=$COMP_WORDBREAKS complete -o nospace -o default -F hydra_serotiny_bash_completion serotiny predict
 COMP_WORDBREAKS=$COMP_WORDBREAKS complete -o nospace -o default -F hydra_serotiny_bash_completion serotiny.predict
-"""
+"""  # noqa
         print(script)
 
     def uninstall(self) -> None:

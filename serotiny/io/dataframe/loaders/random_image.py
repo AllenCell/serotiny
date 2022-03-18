@@ -1,13 +1,14 @@
 from typing import Sequence
+
 import numpy as np
 
 from .abstract_loader import Loader
 
 
 class LoadRandomTensor(Loader):
-    """
-    Loader class, used to load a dummy tensor, generated randomly. It
-    ignores the underlying dataframe
+    """Loader class, used to load a dummy tensor, generated randomly.
+
+    It ignores the underlying dataframe
     """
 
     def __init__(
