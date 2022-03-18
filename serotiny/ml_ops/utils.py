@@ -29,7 +29,7 @@ def flatten_config(cfg):
     for k in keys:
         try:
             sub_conf = flatten_config(conf[k])
-            conf.update({f"{k}/{_k}" for k, v in sub_conf.items()})
+            conf.update({f"{k}/{_k}": v for _k, v in sub_conf.items()})
             del conf[k]
             continue
         except:
@@ -39,7 +39,7 @@ def flatten_config(cfg):
             for i, el in enumerate(conf[k]):
                 try:
                     sub_conf = flatten_config(el)
-                    conf.update({f"{k}/{_k}" for k, v in sub_conf.items()})
+                    conf.update({f"{k}/{_k}": v for _k, v in sub_conf.items()})
                 except Exception as e:
                     conf[f"{k}/{i}"] = el
             del conf[k]
