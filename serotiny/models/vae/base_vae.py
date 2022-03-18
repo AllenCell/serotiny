@@ -79,8 +79,11 @@ class BaseVAE(BaseModel):
         frame = inspect.currentframe()
         init_args = get_init_args(frame)
         self.save_hyperparameters(
-            *[arg for arg in init_args
-              if arg not in ["encoder", "decoder", "optimizer"]]
+            *[
+                arg
+                for arg in init_args
+                if arg not in ["encoder", "decoder", "optimizer"]
+            ]
         )
 
         self.reconstruction_reduce = reconstruction_reduce
@@ -116,7 +119,6 @@ class BaseVAE(BaseModel):
 
         self.encoder_args = inspect.getfullargspec(self.encoder.forward).args
         self.decoder_args = inspect.getfullargspec(self.decoder.forward).args
-
 
     def calculate_elbo(self, x, x_hat, mu, logvar, mask=None):
         rcl_per_input_dimension = self.reconstruction_loss(x_hat, x)
@@ -170,7 +172,6 @@ class BaseVAE(BaseModel):
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
         return eps.mul(std).add(mu)
-
 
     def forward(self, x, decode=False, compute_loss=False, **kwargs):
         mu_logvar = self.encoder(
@@ -247,17 +248,16 @@ class BaseVAE(BaseModel):
         }
 
         if stage == "test":
-            results.update({
-                "x_hat": x_hat.detach().cpu(),
-                "x": x.detach().cpu(),
-            })
+            results.update(
+                {
+                    "x_hat": x_hat.detach().cpu(),
+                    "x": x.detach().cpu(),
+                }
+            )
 
         if self.hparams.id_label is not None:
             if self.hparams.id_label in batch:
                 ids = batch[self.hparams.id_label].detach().cpu()
-                results.update({
-                    self.hparams.id_label: ids,
-                    "id": ids
-                })
+                results.update({self.hparams.id_label: ids, "id": ids})
 
         return results

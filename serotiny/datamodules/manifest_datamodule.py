@@ -12,6 +12,7 @@ from torch.utils.data import DataLoader
 from serotiny.io.dataframe import DataframeDataset, read_dataframe
 from serotiny.io.dataframe.loaders.abstract_loader import Loader
 
+
 def _make_single_manifest_splits(manifest_path, loaders, split_column, columns=None):
     dataframe = read_dataframe(manifest_path, columns)
     assert dataframe.dtypes[split_column] == np.dtype("O")
@@ -41,21 +42,17 @@ def _make_multiple_manifest_splits(split_path, loaders, columns=None):
 
 
 def _dict_depth(d):
-    return max(_dict_depth(v) if isinstance(v, dict) else 0
-               for v in d.values()) + 1
+    return max(_dict_depth(v) if isinstance(v, dict) else 0 for v in d.values()) + 1
+
 
 def _parse_loaders(loaders):
     depth = _dict_depth(loaders)
     if depth == 1:
-        loaders = {
-            split: loaders
-            for split in ["train", "valid", "test"]
-        }
+        loaders = {split: loaders for split in ["train", "valid", "test"]}
     elif depth != 2:
         raise ValueError(f"Loaders dict should have depth 1 or 2. Got {depth}")
 
     return loaders
-
 
 
 class ManifestDatamodule(pl.LightningDataModule):
@@ -151,7 +148,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         self._predict_split = "test"
 
     def make_dataloader(self, split, shuffle=False):
-        shuffle = (self.shuffle or shuffle)
+        shuffle = self.shuffle or shuffle
         return DataLoader(
             dataset=self.datasets[split],
             batch_size=self.batch_size,

@@ -6,7 +6,10 @@ from serotiny.ml_ops.utils import get_serotiny_project
 
 def print_help():
     from textwrap import dedent
-    print(dedent("""
+
+    print(
+        dedent(
+            """
     Usage:
       serotiny COMMAND
 
@@ -20,7 +23,9 @@ def print_help():
 
     For more info on each command do:")
       serotiny COMMAND --help")
-    """).strip())
+    """
+        ).strip()
+    )
 
 
 def main():
@@ -38,7 +43,6 @@ def main():
     else:
         raise NotImplementedError(f"Unknown command: '{sys.argv[0]}")
 
-
     if "help" in mode or mode == "-h":
         print_help()
         return
@@ -46,6 +50,7 @@ def main():
     # hydra modes
     if mode in ["train", "test", "predict"]:
         import hydra
+
         if sys.argv[0].endswith("serotiny"):
             sys.argv[0] += f".{mode}"
 
@@ -70,6 +75,6 @@ def main():
         else:
             print_help()
 
+
 if __name__ == "__main__":
     main()
-

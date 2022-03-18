@@ -8,6 +8,7 @@ import collections
 from omegaconf import OmegaConf
 from omegaconf._utils import is_primitive_type, split_key
 
+
 def get_obj_from_path(obj_path: str):
     """
     Given a class/function/variable path as a string (e.g. some.module.ClassName),
@@ -17,6 +18,7 @@ def get_obj_from_path(obj_path: str):
     module = ".".join(obj_path[:-1])
     name = obj_path[-1]
     return getattr(importlib.import_module(module), name)
+
 
 def _create_config(obj, obj_path=None, add_partial=False):
 
@@ -54,7 +56,7 @@ def _create_config(obj, obj_path=None, add_partial=False):
         for arg, default_value in zip(kwargs, sig.kwonlydefaults):
             args_dict[arg] = default_value
 
-    for arg in (sig.args + sig.kwonlyargs):
+    for arg in sig.args + sig.kwonlyargs:
         if arg not in args_dict:
             args_dict[arg] = None
 
@@ -67,13 +69,13 @@ def _create_config(obj, obj_path=None, add_partial=False):
         elif not is_primitive_type(default):
             try:
                 args_dict[arg] = _create_config(
-                    default,
-                    add_partial=inspect.isclass(default)
+                    default, add_partial=inspect.isclass(default)
                 )
             except Exception:
                 args_dict[arg] = f"Unable to give default value of {type(default)}"
 
     return args_dict
+
 
 def create_config(obj_path):
     obj = get_obj_from_path(obj_path)
@@ -98,17 +100,17 @@ def add_config(obj_path, dest):
         dest_config = OmegaConf.load(dest)
         dest_path = split_key(dest_key)
         for step in dest_path[::-1]:
-            config = {step:config}
+            config = {step: config}
 
         dest_config = OmegaConf.merge(dest_config, config)
 
     else:
         dest_config = config
 
-
     prompt_str_suffix = "" if dest_key is None else f":{dest_key}"
-    answer = input(f"This is going to overwrite {dest}{prompt_str_suffix}"
-                    "\nContinue? [Y/n] ")
+    answer = input(
+        f"This is going to overwrite {dest}{prompt_str_suffix}" "\nContinue? [Y/n] "
+    )
     if answer is None or answer.lower().strip() in ["", "yes", "y"]:
         with open(dest, "w") as f:
             f.write(OmegaConf.to_yaml(dest_config))
@@ -118,13 +120,16 @@ def add_config(obj_path, dest):
 
 
 def deep_merge(template, merge):
-    '''
+    """
     Recursive dict merge, combines values that are lists
     This mutates template - the contents of merge are added to template (which is also returned).
-    If you want to keep template you could call it like deep_merge(dict(template), merge)'''
+    If you want to keep template you could call it like deep_merge(dict(template), merge)"""
     for k, v in merge.items():
-        if (k in template and isinstance(template[k], dict)
-                and isinstance(merge[k], collections.Mapping)):
+        if (
+            k in template
+            and isinstance(template[k], dict)
+            and isinstance(merge[k], collections.Mapping)
+        ):
             deep_merge(template[k], merge[k])
         # Removed option to extend the list if there are existing elements:
         # elif k in template and isinstance(template[k], list) and isinstance(v, list):
@@ -133,27 +138,28 @@ def deep_merge(template, merge):
             template[k] = merge[k]
     return template
 
+
 def merge_config(
-    template_path='',
-    merge='',
-    output_path='',
+    template_path="",
+    merge="",
+    output_path="",
 ):
     template_extension = os.path.splitext(template_path)[-1]
-    with open(template_path, 'r') as template_file:
-        if template_extension == '.yaml':
+    with open(template_path, "r") as template_file:
+        if template_extension == ".yaml":
             template = yaml.load(template_file)
-        elif template_extension == '.json':
+        elif template_extension == ".json":
             template = json.load(template_file)
         else:
-            raise Exception(f'format {template_extension} not supported')
+            raise Exception(f"format {template_extension} not supported")
 
     output_extension = os.path.splitext(output_path)[-1]
-    with open(output_path, 'w') as output_file:
+    with open(output_path, "w") as output_file:
         updated = deep_merge(template, merge)
 
-        if output_extension == '.json':
+        if output_extension == ".json":
             json.dump(updated, output_file, indent=4)
-        elif output_extension == '.yaml':
+        elif output_extension == ".yaml":
             yaml.dump(updated, output_file)
         else:
-            raise Exception(f'format {output_extension} not supported')
+            raise Exception(f"format {output_extension} not supported")

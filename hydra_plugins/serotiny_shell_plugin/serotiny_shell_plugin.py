@@ -52,10 +52,8 @@ COMP_WORDBREAKS=$COMP_WORDBREAKS complete -o nospace -o default -F hydra_serotin
 """
         print(script)
 
-
     def uninstall(self) -> None:
         print("unset hydra_serotiny_bash_completion")
-
 
     @staticmethod
     def provides() -> str:
@@ -88,7 +86,9 @@ COMP_WORDBREAKS=$COMP_WORDBREAKS complete -o nospace -o default -F hydra_serotin
         elif "predict" in sys.argv[0]:
             config_name = "predict"
         else:
-            raise RuntimeError("Didn't get a valid config_name. "
-                               "(Should be 'train', 'test' or 'predict')")
+            raise RuntimeError(
+                "Didn't get a valid config_name. "
+                "(Should be 'train', 'test' or 'predict')"
+            )
 
         print(" ".join(self._query(config_name=config_name, line=line)))

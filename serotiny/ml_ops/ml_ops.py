@@ -3,10 +3,20 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-def _do_model_op(mode, model, data, trainer=None, seed=42,
-                 mlflow=None, full_conf={}, test=False,
-                 multiprocessing_strategy=None, make_notebook=None,
-                 **_):
+
+def _do_model_op(
+    mode,
+    model,
+    data,
+    trainer=None,
+    seed=42,
+    mlflow=None,
+    full_conf={},
+    test=False,
+    multiprocessing_strategy=None,
+    make_notebook=None,
+    **_,
+):
 
     from pathlib import Path
     import pytorch_lightning as pl
@@ -17,6 +27,7 @@ def _do_model_op(mode, model, data, trainer=None, seed=42,
 
     if multiprocessing_strategy is not None:
         import torch
+
         torch.multiprocessing.set_sharing_strategy(multiprocessing_strategy)
 
     if mode in ["train", "test", "predict"]:
@@ -41,17 +52,22 @@ def _do_model_op(mode, model, data, trainer=None, seed=42,
             if mlflow is not None and mlflow.get("tracking_uri") is not None:
                 mlflow_test(mlflow, trainer, model, data, full_conf=full_conf)
             else:
-                raise NotImplementedError("Cannot `serotiny test` without "
-                                          "an MLFlow config.")
+                raise NotImplementedError(
+                    "Cannot `serotiny test` without " "an MLFlow config."
+                )
 
         elif mode == "predict":
             if mlflow is not None and mlflow.get("tracking_uri") is not None:
                 mlflow_predict(mlflow, trainer, model, data, full_conf=full_conf)
             else:
                 if "ckpt_path" not in full_conf:
-                    raise NotImplementedError("Cannot `serotiny predict` without "
-                                              "an MLFlow config, or a local ckpt_path.")
-                preds_dir = Path(full_conf.get("predictions_output_dir", "./predictions"))
+                    raise NotImplementedError(
+                        "Cannot `serotiny predict` without "
+                        "an MLFlow config, or a local ckpt_path."
+                    )
+                preds_dir = Path(
+                    full_conf.get("predictions_output_dir", "./predictions")
+                )
                 preds_dir.mkdir(exist_ok=True, parents=True)
 
                 ckpt_path = full_conf["ckpt_path"]
@@ -59,17 +75,18 @@ def _do_model_op(mode, model, data, trainer=None, seed=42,
                 save_model_predictions(model, preds, preds_dir)
 
     else:
-        raise ValueError(
-            f"`mode` must be 'train', 'test' or 'predict'. Got '{mode}'"
-        )
+        raise ValueError(f"`mode` must be 'train', 'test' or 'predict'. Got '{mode}'")
 
 
 def _do_model_op_wrapper(cfg):
     if isinstance(cfg, dict):
         from omegaconf import OmegaConf
+
         cfg = OmegaConf.create(cfg)
 
-    _do_model_op(sys.argv[0].split(".")[-1], # there might be other dots in the
-                                             # executable path, ours is the last
-                 **cfg,
-                 full_conf=cfg)
+    _do_model_op(
+        sys.argv[0].split(".")[-1],  # there might be other dots in the
+        # executable path, ours is the last
+        **cfg,
+        full_conf=cfg,
+    )

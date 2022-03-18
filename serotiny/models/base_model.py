@@ -32,32 +32,33 @@ class BaseModel(pl.LightningModule):
         frame = inspect.currentframe()
         init_args = get_init_args(frame)
         self.save_hyperparameters(
-            *[arg for arg, v in init_args.items()
-              if (isinstance(v, (nn.Module, torch.optim.Optimizer)) or
-                  issubclass(v, (nn.Module, torch.optim.Optimizer)))
-             ]
+            *[
+                arg
+                for arg, v in init_args.items()
+                if (
+                    isinstance(v, (nn.Module, torch.optim.Optimizer))
+                    or issubclass(v, (nn.Module, torch.optim.Optimizer))
+                )
+            ]
         )
 
         self.optimizer = optimizer
         self._cached_outputs = dict()
 
-
     def parse_batch(self, batch):
         return batch[self.hparams.x_label].float()
 
-
     def forward(self, x, **kwargs):
         raise NotImplementedError
-
 
     def _step(self, stage, batch, batch_idx, logger):
         raise NotImplementedError
 
         # Here you should implement the logic for a step in the training/validation/test
         # process. The stage (training/validation/test) is given by the variable `stage`.
-        #x = self.parse_batch(batch)
+        # x = self.parse_batch(batch)
 
-        #if self.hparams.id_label is not None:
+        # if self.hparams.id_label is not None:
         #    if self.hparams.id_label in batch:
         #        ids = batch[self.hparams.id_label].detach().cpu()
         #        results.update({
@@ -65,7 +66,7 @@ class BaseModel(pl.LightningModule):
         #            "id": ids
         #        })
 
-        #return results
+        # return results
 
     def training_step(self, batch, batch_idx):
         return self._step("train", batch, batch_idx, logger=True)

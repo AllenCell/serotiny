@@ -4,6 +4,7 @@ from torch.nn.utils import spectral_norm
 
 from .skip_connection import SkipConnection
 
+
 def conv_block(
     in_c: int,
     out_c: int,

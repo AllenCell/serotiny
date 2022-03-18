@@ -64,9 +64,7 @@ def split_dataframe(
 
 
 def filter_rows(
-    dataframe: pd.DataFrame,
-    column: str, values:
-    Sequence, exclude: bool = False
+    dataframe: pd.DataFrame, column: str, values: Sequence, exclude: bool = False
 ):
     """
     Filter a dataframe, keeping only the rows where a given
@@ -192,8 +190,9 @@ def filter_columns(
                 input.columns.tolist(), regex, startswith, endswith, contains, excludes
             )
             return input[columns]
-    return _filter_columns(input.columns.tolist(), regex, startswith,
-                           endswith, contains, excludes)
+    return _filter_columns(
+        input.columns.tolist(), regex, startswith, endswith, contains, excludes
+    )
 
 
 def sample_n_each(
@@ -267,6 +266,7 @@ def append_one_hot(dataframe: pd.DataFrame, column: str):
 
     # import here to optimize CLIs / Fire usage
     from sklearn.preprocessing import OneHotEncoder
+
     one_hot = OneHotEncoder(sparse=False).fit_transform(dataframe[[column]])
 
     for idx in range(one_hot.shape[1]):
@@ -292,6 +292,7 @@ def append_labels_to_integers(dataframe: pd.DataFrame, column: str):
 
     # import here to optimize CLIs / Fire usage
     from sklearn.preprocessing import LabelEncoder
+
     dataframe[f"{column}_integer"] = LabelEncoder().fit_transform(dataframe[[column]])
 
     return dataframe

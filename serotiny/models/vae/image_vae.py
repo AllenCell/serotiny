@@ -48,7 +48,7 @@ class ImageVAE(BaseVAE):
             max_pool_layers=max_pool_layers,
             mode=mode,
             non_linearity=non_linearity,
-            skip_connections=skip_connections
+            skip_connections=skip_connections,
         )
         encoder.apply(weight_init)
         nn.utils.spectral_norm(encoder.output)
@@ -71,7 +71,7 @@ class ImageVAE(BaseVAE):
             output_channels=in_channels,
             mode=mode,
             non_linearity=non_linearity,
-            skip_connections=skip_connections
+            skip_connections=skip_connections,
         )
         decoder.apply(weight_init)
         nn.utils.spectral_norm(decoder.linear_decompress)
@@ -95,6 +95,7 @@ class ImageVAE(BaseVAE):
             learn_prior_logvar=learn_prior_logvar,
             cache_outputs=cache_outputs,
         )
+
 
 class _ImageVAEDecoder(nn.Module):
     def __init__(
@@ -124,13 +125,14 @@ class _ImageVAEDecoder(nn.Module):
             output_dim=orig_img_size,
             hidden_channels=hidden_channels,
             input_dims=compressed_img_shape,
-            upsample_layers={i: tuple(size) for (i, size) in
-                             enumerate(intermediate_sizes)},
+            upsample_layers={
+                i: tuple(size) for (i, size) in enumerate(intermediate_sizes)
+            },
             up_conv=True,
             flat_output=False,
             mode=mode,
             non_linearity=non_linearity,
-            skip_connections=skip_connections
+            skip_connections=skip_connections,
         )
 
     def forward(self, z):

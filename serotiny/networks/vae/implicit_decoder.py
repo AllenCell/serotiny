@@ -11,10 +11,8 @@ from serotiny.networks.layers import conv_block
 def make_parallelepipeds(input_dims, batch_size=0):
 
     ranges = [
-        torch.arange(-dim // 2, dim // 2 - 1 + (dim % 2 == 0))
-        for dim in input_dims
+        torch.arange(-dim // 2, dim // 2 - 1 + (dim % 2 == 0)) for dim in input_dims
     ]
-
 
     ppiped = torch.stack(torch.meshgrid(*ranges))
 
@@ -22,6 +20,7 @@ def make_parallelepipeds(input_dims, batch_size=0):
         repeats = (len(input_dims) + 1) * [1]
         return ppiped.unsqueeze(0).repeat(batch_size, *repeats)
     return ppiped
+
 
 class ImplicitDecoder(nn.Module):
     def __init__(
@@ -32,7 +31,6 @@ class ImplicitDecoder(nn.Module):
         non_linearity: Optional[nn.Module] = None,
         final_non_linearity: Optional[nn.Module] = None,
         mode: str = "3d",
-
     ):
         super().__init__()
         self.mode = mode
@@ -63,7 +61,6 @@ class ImplicitDecoder(nn.Module):
         if final_non_linearity is None:
             non_linearity = nn.Sigmoid()
 
-
     def forward(self, x, angles, translations, input_dims=None):
         if input_dims is None:
             input_dims = self.input_dims
@@ -73,17 +70,11 @@ class ImplicitDecoder(nn.Module):
         rot_matrices = euler_angles_to_matrix(angles, convention="XYZ")
 
         ppipeds = torch.matmul(ppipeds, rot_matrices)
-        ppipeds = ppipeds + translations.view(x.shape[0], 1,
-                                              *([1] * len(input_dims)))
+        ppipeds = ppipeds + translations.view(x.shape[0], 1, *([1] * len(input_dims)))
 
-        x = (x
-             .view(*x.shape, *([1] * len(input_dims)))
-             .expand(-1, -1, *input_dims)
-        )
+        x = x.view(*x.shape, *([1] * len(input_dims))).expand(-1, -1, *input_dims)
 
         _x = x
         for layer in self.layers:
-            _x = layer(
-                torch.cat((ppipeds, _x))
-            )
+            _x = layer(torch.cat((ppipeds, _x)))
         return self.non_linearity(_x)

@@ -43,8 +43,7 @@ def _store_many_dfs(result, output_path):
 
 
 def _read_one_or_many(
-    input_manifests: OneOrMany[PathLike],
-    merge_col: Optional[str] = None
+    input_manifests: OneOrMany[PathLike], merge_col: Optional[str] = None
 ):
     input_manifest = None
 
@@ -95,6 +94,7 @@ class DataframeTransformCLI(PipelineCLI):
     """
     Apply a transform (or chain of transforms) to a dataframe
     """
+
     @classmethod
     def _decorate(cls, func):
         return _dataframe_from_disk(func)
@@ -115,8 +115,9 @@ class DataframeTransformCLI(PipelineCLI):
             store_methods={
                 pd.DataFrame: _store_one_df,
                 dict: _store_many_dfs,
-            }
+            },
         )
 
-        self._result = (None if input_manifests is None else
-                        _read_one_or_many(input_manifests))
+        self._result = (
+            None if input_manifests is None else _read_one_or_many(input_manifests)
+        )

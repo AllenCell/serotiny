@@ -77,7 +77,7 @@ class BasicCNN(nn.Module):
                     up_conv=up_conv,
                     non_linearity=non_linearity,
                     mode=mode,
-                    skip_connection=(ix in self.skip_connections)
+                    skip_connection=(ix in self.skip_connections),
                 )
             )
             _in_channels = out_channels

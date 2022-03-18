@@ -35,8 +35,9 @@ class NormalizeMean:
 
 
 class NormalizeMinMax:
-    def __init__(self, clip_min=None, clip_max=None, clip_quantile=False,
-                 return_torch=False):
+    def __init__(
+        self, clip_min=None, clip_max=None, clip_quantile=False, return_torch=False
+    ):
         self.clip_min = clip_min
         self.clip_max = clip_max
         self.clip_quantile = clip_quantile

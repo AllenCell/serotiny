@@ -59,8 +59,8 @@ setup(
     include_package_data=True,
     keywords="serotiny",
     name="serotiny",
-    packages=find_namespace_packages(include=["hydra_plugins.*"]) +
-        find_packages(exclude=["tests", "*.tests", "*.tests.*"]),
+    packages=find_namespace_packages(include=["hydra_plugins.*"])
+    + find_packages(exclude=["tests", "*.tests", "*.tests.*"]),
     python_requires=">=3.7",
     test_suite="serotiny/tests",
     url="https://github.com/AllenCellModeling/serotiny",

@@ -17,7 +17,7 @@ class Load2DImage(Loader):
         file_type: str = "tiff",
         select_channels: Optional[Sequence] = None,
         transforms: Optional[Sequence] = None,
-        reader: str = 'aicsimageio.readers.ome_tiff_reader.OmeTiffReader'
+        reader: str = "aicsimageio.readers.ome_tiff_reader.OmeTiffReader",
     ):
         """
         Parameters
@@ -49,7 +49,7 @@ class Load2DImage(Loader):
 
         self.file_type = file_type
 
-        #if transforms is not None:
+        # if transforms is not None:
         #    transforms = load_multiple(transforms)
         #    transforms = Compose(transforms)
         self.transforms = transforms
@@ -61,5 +61,5 @@ class Load2DImage(Loader):
                 select_channels=self.select_channels,
                 output_dtype=np.float32,
                 transform=self.transforms,
-                reader=self.reader
+                reader=self.reader,
             )
