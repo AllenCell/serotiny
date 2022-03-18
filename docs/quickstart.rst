@@ -1,7 +1,7 @@
 Quickstart
 ==========
 
-Create a ``serotiny**-project
+Create a ``serotiny``-project
 *****************************
 
 .. note ::

@@ -28,9 +28,9 @@ to create a ``serotiny`` project as:
    $ cookiecutter https://github.com/AllenCellModeling/serotiny-project-cookiecutter
    project_name [My Project]: A Tiny Project
    package_name [a_tiny_project]:
-   project_description [a simple project**: it's just a tiny project
+   project_description [a simple project]: it's just a tiny project
 
-A folder named ``a_tiny_project** will be created, with the following structure:
+A folder named ``a_tiny_project`` will be created, with the following structure:
 
 ::
 
