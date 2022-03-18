@@ -54,8 +54,6 @@ class MultipleGraphDatamodule(pl.LightningDataModule):
         validated_manifest: Union[Path, str],
         node_loader: Dict,
         task_dict: dict,
-        model_type: str,
-        dataloader_type: str,
         subset: bool,
     ):
 
@@ -64,7 +62,6 @@ class MultipleGraphDatamodule(pl.LightningDataModule):
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.save_dir = save_dir
-        self.model_type = model_type
         self.node_loader = node_loader
         self.subset = subset
         # To delete later, this is only to get length
@@ -80,6 +77,7 @@ class MultipleGraphDatamodule(pl.LightningDataModule):
             subset=subset,
         )
 
+        # dataset = dataset.shuffle()
         self.dataset = dataset
         self.length = len(dataset)
 
@@ -90,13 +88,12 @@ class MultipleGraphDatamodule(pl.LightningDataModule):
         print(f"Number of features: {dataset[0].x.shape[1]}")
         print(f"Number of classes: {dataset.num_classes}")
 
-        val_size = int((len(self.dataset) - int(0.8 * len(self.dataset))) / 2)
+        train_size = int(0.7 * len(self.dataset))
+        val_size = int((len(self.dataset) - train_size) / 2)
 
-        self.train_dataset = self.dataset[: int(0.8 * len(self.dataset))]
-        self.val_dataset = self.dataset[
-            int(0.8 * len(self.dataset)) : int(0.8 * len(self.dataset)) + val_size
-        ]
-        self.test_dataset = self.dataset[int(0.8 * len(self.dataset)) + val_size :]
+        self.train_dataset = self.dataset[:train_size]
+        self.val_dataset = self.dataset[train_size : train_size + val_size]
+        self.test_dataset = self.dataset[train_size + val_size :]
 
         print(f"Number of training graphs: {len(self.train_dataset)}")
         print(f"Number of val graphs: {len(self.val_dataset)}")
@@ -109,7 +106,7 @@ class MultipleGraphDatamodule(pl.LightningDataModule):
         return DataLoader(dataset, self.batch_size, shuffle)
 
     def train_dataloader(self):
-        return self.make_dataloader(self.train_dataset, True)
+        return self.make_dataloader(self.train_dataset, False)
 
     def val_dataloader(self):
         return self.make_dataloader(self.val_dataset, False)

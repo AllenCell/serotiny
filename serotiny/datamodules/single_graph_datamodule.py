@@ -63,6 +63,7 @@ class SingleGraphDatamodule(pl.LightningDataModule):
         model_type: str,
         dataloader_type: str,
         subset: bool,
+        normalize: bool,
     ):
 
         super().__init__()
@@ -73,6 +74,7 @@ class SingleGraphDatamodule(pl.LightningDataModule):
         self.model_type = model_type
         self.node_loader = node_loader
         self.subset = subset
+        self.normalize = normalize
 
         # To delete later, this is only to get length
 
@@ -85,6 +87,7 @@ class SingleGraphDatamodule(pl.LightningDataModule):
             val_manifest=validated_manifest,
             train_test_split=True,
             subset=subset,
+            normalize=normalize,
         )
         data = dataset[0]
         dataset_df = dataset.df
@@ -94,12 +97,51 @@ class SingleGraphDatamodule(pl.LightningDataModule):
         self.node_cols = filter_columns(
             dataset_df.columns.to_list(), **self.node_loader
         )
-        dataset_df[self.node_cols] = dataset_df[self.node_cols].apply(
-            lambda x: (x - x.min()) / (x.max() - x.min())
-        )
 
-        if validated_manifest:
+        # Make sure not all 0 in some columns
+        df2 = dataset_df[self.node_cols].copy()
+        df1 = df2.loc[:, (df2 != 0).all()]
+        self.node_cols = df1.columns
+
+        if self.normalize:
+            dataset_df[self.node_cols] = dataset_df[self.node_cols].apply(
+                lambda x: (x - x.min()) / (x.max() - x.min())
+            )
+
+        if (validated_manifest is not None) & (validated_manifest != "None"):
             main_manifest = dataset.mask_df
+            val_manifest = pd.read_csv(validated_manifest)
+
+            # train test split based on tracks
+            all_val_tracks = val_manifest["track_id"].unique()
+            np.random.shuffle(all_val_tracks)
+            train_tracks = all_val_tracks[: int(0.6 * len(all_val_tracks))]
+            val_test_tracks = np.setdiff1d(all_val_tracks, train_tracks)
+            np.random.shuffle(val_test_tracks)
+            test_tracks = val_test_tracks[: int(0.5 * len(val_test_tracks))]
+            val_tracks = np.setdiff1d(val_test_tracks, test_tracks)
+
+            train_df = val_manifest.loc[val_manifest["track_id"].isin(train_tracks)]
+            val_df = val_manifest.loc[val_manifest["track_id"].isin(val_tracks)]
+            test_df = val_manifest.loc[val_manifest["track_id"].isin(test_tracks)]
+
+            train_df["train_mask"] = True
+            val_df["val_mask"] = True
+            test_df["test_mask"] = True
+
+            val_manifest_with_mask = pd.concat([train_df, val_df, test_df], axis=0)
+            val_manifest_with_mask = val_manifest_with_mask[
+                ["CellId", "train_mask", "val_mask", "test_mask"]
+            ]
+            val_manifest_with_mask = val_manifest_with_mask.replace({np.NaN: False})
+
+            main_manifest = main_manifest.drop(
+                columns=["train_mask", "val_mask", "test_mask"]
+            )
+            main_manifest = main_manifest.merge(
+                val_manifest_with_mask, how="left", left_on="CellId", right_on="CellId"
+            )
+            main_manifest = main_manifest.replace({np.NaN: False})
 
             merged_cols = []
             for col in self.node_cols:
@@ -108,13 +150,14 @@ class SingleGraphDatamodule(pl.LightningDataModule):
                 else:
                     merged_cols.append(col + "_x")
 
-            main_manifest[merged_cols] = main_manifest[merged_cols].apply(
-                lambda x: (x - x.min()) / (x.max() - x.min())
-            )
+            if self.normalize:
+                main_manifest[merged_cols] = main_manifest[merged_cols].apply(
+                    lambda x: (x - x.min()) / (x.max() - x.min())
+                )
             # adding data.x again in case we are using the same dataset
             # but want to change the node cols
             data.x = torch.tensor(
-                main_manifest[merged_cols].values,
+                np.array(main_manifest[merged_cols], dtype=np.float64),
                 dtype=torch.float,
             )
 
@@ -127,8 +170,15 @@ class SingleGraphDatamodule(pl.LightningDataModule):
             data.test_mask = torch.tensor(
                 main_manifest["test_mask"].values, dtype=torch.bool
             )
+
+            save_path = Path(save_dir + "/data")
+            csv_path_mask = save_path / "input_to_graph_with_track_id_split.csv"
+            self.mask_df_with_splits = main_manifest
+            if not csv_path_mask.is_file():
+                main_manifest.to_csv(csv_path_mask)
         else:
             main_manifest = dataset_df.copy()
+
             data.x = torch.tensor(
                 main_manifest[self.node_cols].values,
                 dtype=torch.float,
@@ -181,6 +231,10 @@ class SingleGraphDatamodule(pl.LightningDataModule):
             targets = torch.tensor(main_manifest[target_label], dtype=torch.float)
 
         data.y = targets
+        main_manifest["train_mask"] = train_mask
+        main_manifest["val_mask"] = val_mask
+        main_manifest["test_mask"] = test_mask
+        data.cellid = main_manifest["CellId"].values
         weights = torch.tensor(
             [
                 len(data.y) / i
@@ -192,6 +246,7 @@ class SingleGraphDatamodule(pl.LightningDataModule):
         data.edge_weight = 1.0 / degree(col, data.num_nodes)[col]
 
         self.dataset = dataset
+        self.dataframe = main_manifest
         self.length = len(dataset)
         self.data = data
         self.dataloader_type = dataloader_type
