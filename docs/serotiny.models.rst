@@ -8,7 +8,6 @@ Subpackages
    :maxdepth: 4
 
    serotiny.models.callbacks
-   serotiny.models.deprecated
    serotiny.models.vae
 
 Submodules
@@ -34,6 +33,14 @@ serotiny.models.unet module
 ---------------------------
 
 .. automodule:: serotiny.models.unet
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+serotiny.models.utils module
+----------------------------
+
+.. automodule:: serotiny.models.utils
    :members:
    :undoc-members:
    :show-inheritance:

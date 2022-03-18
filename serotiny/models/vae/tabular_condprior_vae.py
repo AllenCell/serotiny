@@ -3,7 +3,7 @@ Tabular conditional variational autoencoder module, implemented as a
 Pytorch Lightning module
 """
 
-from typing import Sequence, Union
+from typing import Sequence, Union, Optional
 
 import logging
 
@@ -32,7 +32,8 @@ class TabularConditionalPriorVAE(ConditionalPriorVAE):
         lr: float,
         x_label: str,
         c_label: Union[str, int, Sequence[int]],
-        recon_loss: Union[Loss, str] = torch.nn.MSELoss,
+        loss_mask_label: Optional[str] = None,
+        reconstruction_loss: Union[Loss, str] = torch.nn.MSELoss,
         condition_mode: str = "label",
     ):
         """
@@ -101,6 +102,7 @@ class TabularConditionalPriorVAE(ConditionalPriorVAE):
             lr=lr,
             x_label=x_label,
             c_label=c_label,
-            recon_loss=recon_loss,
+            loss_mask_label=loss_mask_label,
+            reconstruction_loss=reconstruction_loss,
             condition_mode=condition_mode,
         )

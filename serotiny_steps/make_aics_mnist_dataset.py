@@ -4,11 +4,6 @@ from pathlib import Path
 
 import fire
 
-import pandas as pd
-from sklearn.preprocessing import LabelEncoder
-
-from serotiny.io.utils import download_quilt_data
-
 
 def cellpath2dict(path):
     """
@@ -21,6 +16,9 @@ def cellpath2dict(path):
 
 
 def _make_aics_mnist_manifest(dataset_path):
+    # import here to optimize CLIs / Fire
+    import pandas as pd
+
     cells = []
     for split in ["train", "test"]:
         _split_path = str((Path(dataset_path) / split) / "*")
@@ -40,11 +38,16 @@ def _make_aics_mnist_manifest(dataset_path):
     return pd.DataFrame(cells)
 
 
-def get_aics_mnist_dataset(data_dir):
+def make_aics_mnist_dataset(data_dir):
     """
     Download AICS MNIST dataset, create the corresponding manifest, and store
     it in a given path
     """
+
+    # import here to optimize CLIs / Fire
+    from sklearn.preprocessing import LabelEncoder
+    from serotiny.io.quilt import download_quilt_data
+
     data_dir = Path(data_dir)
 
     if not (data_dir / "aics_mnist_rgb.tar.gz").exists():
@@ -67,4 +70,4 @@ def get_aics_mnist_dataset(data_dir):
 
 
 if __name__ == "__main__":
-    fire.Fire(get_aics_mnist_dataset)
+    fire.Fire(make_aics_mnist_dataset)

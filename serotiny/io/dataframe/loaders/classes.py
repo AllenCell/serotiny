@@ -7,7 +7,22 @@ class LoadClass(Loader):
     Loader class, used to retrieve class values from the dataframe,
     """
 
-    def __init__(self, num_classes, y_encoded_label, binary=False):
+    def __init__(self, num_classes: int, y_encoded_label: str, binary: bool = False):
+        """
+        Parameters
+        ----------
+        num_classes: int
+            Number of possible class values
+
+        y_encoded_label: str
+            Name of column containing the class value
+
+        binary: bool
+            Flag to determine whether to return class values or
+            one-hot vectors
+
+        """
+
         super().__init__()
         self.num_classes = num_classes
         self.binary = binary

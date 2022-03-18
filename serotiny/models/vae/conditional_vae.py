@@ -31,7 +31,8 @@ class ConditionalVAE(BaseVAE):
         beta: float,
         x_label: str,
         c_label: Union[str, int, Sequence[int]],
-        recon_loss: Union[Loss, str] = torch.nn.MSELoss,
+        loss_mask_label: Optional[str] = None,
+        reconstruction_loss: Union[Loss, str] = torch.nn.MSELoss,
         condition_mode: str = "label",
         prior_mode: str = "isotropic",
         prior_logvar: Optional[Array] = None,
@@ -48,7 +49,7 @@ class ConditionalVAE(BaseVAE):
             Decoder network.
         optimizer: opt.Optimizer
             Optimizer to use
-        recon_loss: Callable
+        reconstruction_loss: Callable
             Loss function for the reconstruction loss term
         lr: float
             Learning rate for training
@@ -77,17 +78,18 @@ class ConditionalVAE(BaseVAE):
         """
 
         super().__init__(
-            encoder,
-            decoder,
-            latent_dim,
-            optimizer,
-            lr,
-            beta,
-            x_label,
-            recon_loss,
-            prior_mode,
-            prior_logvar,
-            learn_prior_logvar,
+            encoder=encoder,
+            decoder=decoder,
+            latent_dim=latent_dim,
+            optimizer=optimizer,
+            lr=lr,
+            beta=beta,
+            x_label=x_label,
+            loss_mask_label=loss_mask_label,
+            reconstruction_loss=reconstruction_loss,
+            prior_mode=prior_mode,
+            prior_logvar=prior_logvar,
+            learn_prior_logvar=learn_prior_logvar,
         )
 
         if condition_mode not in ("channel", "label"):

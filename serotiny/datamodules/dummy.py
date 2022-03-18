@@ -10,7 +10,9 @@ class DummyDataset(Dataset):
     """
     Instantiate a dummy pytorch dataset
 
-    Parameters:
+    Parameters
+    ----------
+
     x_label: str
         Key to retrieve image
 

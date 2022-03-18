@@ -44,14 +44,6 @@ serotiny.io.dataframe.loaders.image3d module
    :undoc-members:
    :show-inheritance:
 
-serotiny.io.dataframe.loaders.utils module
-------------------------------------------
-
-.. automodule:: serotiny.io.dataframe.loaders.utils
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 

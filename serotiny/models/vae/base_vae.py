@@ -11,9 +11,11 @@ from torch.nn.modules.loss import _Loss as Loss
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.parsing import get_init_args
 
-from serotiny.losses.elbo import calculate_elbo
-from serotiny.models._utils import find_optimizer
-from serotiny.utils import init
+from serotiny.models.utils import find_optimizer
+from serotiny.utils import load_config
+from serotiny.utils.dynamic_imports import _bind
+
+from serotiny.losses.kl_divergence import diagonal_gaussian_kl, isotropic_gaussian_kl
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]
 logger = logging.getLogger("lightning")
@@ -27,47 +29,48 @@ class BaseVAE(pl.LightningModule):
         decoder: Union[nn.Module, Dict],
         latent_dim: Union[int, Sequence[int]],
         optimizer: str,
-        lr: float,
         beta: float,
         x_label: str,
-        recon_loss: Union[Loss, Dict] = nn.MSELoss,
+        lr: float = 1e-3,
+        loss_mask_label: Optional[str] = None,
+        reconstruction_loss: Union[Loss, Dict] = nn.MSELoss(reduction="none"),
+        reconstruction_reduce: str = "sum",
         prior_mode: str = "isotropic",
         prior_logvar: Optional[Array] = None,
         learn_prior_logvar: bool = False,
     ):
         """
-                Instantiate a basic VAE model
+        Instantiate a basic VAE model
 
-                Parameters
-                ----------
-                encoder: Union[nn.Module, dict]
-        `           Encoder network. If `dict`, expects a class dict, to be used for
-                    instantiating the given class.
-                decoder: Union[nn.Module, str]
-                    Decoder network. If `dict`, expects a class dict, to be used for
-                    instantiating the given class.
-                optimizer: str
-                    Optimizer to use
-                lr: float
-                    Learning rate for training
-                beta: float
-                    Beta parameter - the weight of the KLD term in the loss function
-                x_label: str
-                    String label used to retrieve X from the batches
-                recon_loss: Loss
-                    Loss to be used for reconstruction. Can be a PyTorch loss or a class
-                    that respects the same interface,
-                    i.e. subclasses torch.nn.modules._Loss
-                prior_mode: str
-                    String to determine which type of prior to use.
-                    (Only "isotropic" and
-                    "anisotropic" currently supported)
-                prior_logvar: Optional[Array]
-                    Array of values to be used as either the fixed value or
-                    initialization
-                    value for the diagonal of the prior covariance matrix
-                learn_prior_logvar: bool
-                    Boolean flag to determine whether to learn the prior log-variances
+        Parameters
+        ----------
+        encoder: Union[nn.Module, dict]
+            Encoder network. If `dict`, expects a class dict, to be used for
+            instantiating the given class.
+        decoder: Union[nn.Module, str]
+            Decoder network. If `dict`, expects a class dict, to be used for
+            instantiating the given class.
+        optimizer: str
+            Optimizer to use
+        lr: float
+            Learning rate for training
+        beta: float
+            Beta parameter - the weight of the KLD term in the loss function
+        x_label: str
+            String label used to retrieve X from the batches
+        reconstruction_loss: Loss
+            Loss to be used for reconstruction. Can be a PyTorch loss or a class
+            that respects the same interface,
+            i.e. subclasses torch.nn.modules._Loss
+        prior_mode: str
+            String to determine which type of prior to use.
+            (Only "isotropic" and
+            "anisotropic" currently supported)
+        prior_logvar: Optional[Array]
+            Array of values to be used as either the fixed value or initialization
+            value for the diagonal of the prior covariance matrix
+        learn_prior_logvar: bool
+            Boolean flag to determine whether to learn the prior log-variances
         """
         super().__init__()
 
@@ -79,14 +82,15 @@ class BaseVAE(pl.LightningModule):
             *[arg for arg in init_args if arg not in ["encoder", "decoder"]]
         )
 
-        if isinstance(recon_loss, dict):
-            recon_loss = init(recon_loss)
+        if isinstance(reconstruction_loss, dict):
+            reconstruction_loss = load_config(reconstruction_loss)
         if isinstance(encoder, dict):
-            encoder = init(encoder)
+            encoder = load_config(encoder)
         if isinstance(decoder, str):
-            decoder = init(decoder)
+            decoder = load_config(decoder)
 
-        self.recon_loss = recon_loss
+        self.reconstruction_reduce = reconstruction_reduce
+        self.reconstruction_loss = reconstruction_loss
         self.encoder = encoder
         self.decoder = decoder
 
@@ -94,7 +98,7 @@ class BaseVAE(pl.LightningModule):
         self.latent_dim = latent_dim
 
         self.prior_mode = prior_mode
-        self.prior_mean = None
+        self.prior_mu = None
         if prior_logvar is not None:
             prior_logvar = torch.Tensor(prior_logvar)
         self.prior_logvar = prior_logvar
@@ -103,7 +107,9 @@ class BaseVAE(pl.LightningModule):
             raise NotImplementedError(f"KLD mode '{prior_mode}' not implemented")
 
         if prior_mode == "anisotropic":
-            self.prior_mean = torch.zeros(self.latent_dim)
+            # with an anisotropic gaussian prior, we allow for the prior log-variance
+            # to be different than all-ones, and additionally to be learned, if desired
+            self.prior_mu = torch.zeros(self.latent_dim)
             if prior_logvar is None:
                 self.prior_logvar = torch.zeros(self.latent_dim)
             else:
@@ -117,11 +123,56 @@ class BaseVAE(pl.LightningModule):
         self.encoder_args = inspect.getfullargspec(self.encoder.forward).args
         self.decoder_args = inspect.getfullargspec(self.decoder.forward).args
 
-    def parse_batch(self, batch, parse_mask):
-        return batch[self.hparams.x_label].float()
+    def calculate_elbo(self, x, x_hat, mu, logvar, mask=None):
+        rcl_per_input_dimension = self.reconstruction_loss(x_hat, x)
+        if mask is not None:
+            rcl_per_input_dimension = rcl_per_input_dimension * mask
+            normalizer = mask.view(mask.shape[0], -1).sum(dim=1)
+        else:
+            normalizer = sum(x.shape[1:])
 
-    def sample_z(self, mu, log_var):
-        std = torch.exp(0.5 * log_var)
+        rcl = (
+            rcl_per_input_dimension
+            # flatten
+            .view(rcl_per_input_dimension.shape[0], -1)
+            # and sum per batch element.
+            .sum(dim=1)
+        )
+
+        if self.reconstruction_reduce == "mean":
+            rcl = rcl / normalizer
+
+        rcl = rcl.mean()
+
+        if self.prior_mode == "isotropic":
+            kld_per_dimension = isotropic_gaussian_kl(mu, logvar)
+        elif self.prior_mode == "anisotropic":
+            prior_mu = ((None if self.prior_mu is None else self.prior_mu.type_as(mu)),)
+            kld_per_dimension = diagonal_gaussian_kl(
+                mu, prior_mu, logvar, self.prior_logvar
+            )
+        else:
+            raise NotImplementedError(f"KLD mode '{self.prior_mode}' not implemented")
+
+        kld = kld_per_dimension.sum(dim=1).mean()
+
+        return (
+            rcl + self.beta * kld,
+            rcl,
+            kld,
+            rcl_per_input_dimension,
+            kld_per_dimension,
+        )
+
+    def parse_batch(self, batch):
+        if self.hparams.loss_mask_label is not None:
+            mask = batch[self.hparams.loss_mask_label].float()
+        else:
+            mask = None
+        return batch[self.hparams.x_label].float(), dict(mask=mask)
+
+    def sample_z(self, mu, logvar):
+        std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
         return eps.mul(std).add(mu)
 
@@ -131,6 +182,10 @@ class BaseVAE(pl.LightningModule):
         )
 
         mu, logvar = torch.split(mu_logvar, mu_logvar.shape[1] // 2, dim=1)
+
+        # logvar is clamped here to avoid gradient explosion, since it
+        # will get exponentiated when calculating kl_divergences
+        #logvar = logvar.clamp(min=0, max=50)
         assert mu.shape == logvar.shape
 
         z = self.sample_z(mu, logvar)
@@ -139,49 +194,28 @@ class BaseVAE(pl.LightningModule):
             z, **{k: v for k, v in kwargs.items() if k in self.decoder_args}
         )
 
-        mask_kwargs = {k: v for k, v in kwargs.items() if k in ["mask"]}
-        target = {v for k, v in kwargs.items() if k in ["target"]}
-
-        if len(target) > 0:
-            x = target.pop()
-
         (
             loss,
-            recon_loss,
+            reconstruction_loss,
             kld_loss,
             rcl_per_input_dimension,
             kld_per_latent_dimension,
-        ) = calculate_elbo(
-            x,
-            x_hat,
-            mu,
-            logvar,
-            self.beta,
-            recon_loss=self.recon_loss,
-            mode=self.prior_mode,
-            prior_mu=(None if self.prior_mean is None else self.prior_mean.type_as(mu)),
-            prior_logvar=self.prior_logvar,
-            **mask_kwargs,
-        )
-        # Batch size = 1 means RCL is summed across batch
-        # Batch size = x.shape[0] means RCL is mean across batch
-        batch_size = x.shape[0]
-        # batch_size = 1
+        ) = self.calculate_elbo(x, x_hat, mu, logvar)
 
         return (
             x_hat,
             mu,
             logvar,
-            loss / batch_size,
-            recon_loss / batch_size,
-            kld_loss / batch_size,
+            loss,
+            reconstruction_loss,
+            kld_loss,
             rcl_per_input_dimension,
             kld_per_latent_dimension,
         )
 
-    def _step(self, stage, batch, batch_idx, logger, parse_mask=None):
+    def _step(self, stage, batch, batch_idx, logger):
+        x = self.parse_batch(batch)
 
-        x = self.parse_batch(batch, parse_mask)
         if isinstance(x, tuple):
             x, forward_kwargs = x
         else:
@@ -192,32 +226,30 @@ class BaseVAE(pl.LightningModule):
             mu,
             _,
             loss,
-            recon_loss,
+            reconstruction_loss,
             kld_loss,
             rcl_per_input_dimension,
-            kld_per_lt_dimension,
+            kld_per_latent_dimension,
         ) = self.forward(x, **forward_kwargs)
 
-        self.log(f"{stage} reconstruction loss", recon_loss, logger=logger)
+        self.log(f"{stage} reconstruction loss", reconstruction_loss, logger=logger)
         self.log(f"{stage} kld loss", kld_loss, logger=logger)
         self.log(f"{stage}_loss", loss, logger=logger)
 
         results = {
             "loss": loss,
             f"{stage}_loss": loss.detach(),  # for epoch end logging purposes
-            "recon_loss": recon_loss.detach(),
+            "reconstruction_loss": reconstruction_loss.detach(),
             "kld_loss": kld_loss.detach(),
             "batch_idx": batch_idx,
         }
 
-        if stage == "test":
-            results.update(
-                {
-                    "mu": mu.detach(),
-                    "kld_per_latent_dimension": kld_per_lt_dimension.detach().float(),
-                    "rcl_per_input_dimension": rcl_per_input_dimension.detach().float(),
-                }
-            )
+        if stage in ("test", "val"):
+            results.update({
+                "mu": mu.detach(),
+                "kld_per_latent_dimension": kld_per_latent_dimension.detach().float(),
+                "rcl_per_input_dimension": rcl_per_input_dimension.detach().float(),
+            })
 
         return results
 
@@ -231,8 +263,17 @@ class BaseVAE(pl.LightningModule):
         return self._step("test", batch, batch_idx, logger=False)
 
     def configure_optimizers(self):
-        optimizer_class = find_optimizer(self.hparams.optimizer)
-        optimizer = optimizer_class(self.parameters(), lr=self.hparams.lr)
+        if isinstance(self.hparams.optimizer, str):
+            optimizer_class = find_optimizer(self.hparams.optimizer)
+            optimizer = optimizer_class(self.parameters(), lr=self.hparams.lr)
+        elif isinstance(self.hparams.optimizer, dict):
+            optimizer = load_config(self.hparams.optimizer)
+            optimizer = optimizer(self.parameters())
+        elif isinstance(self.hparams.optimizer, _bind):
+            optimizer = self.hparams.optimizer(self.parameters())
+
+        else:
+            raise TypeError
 
         return {
             "optimizer": optimizer,

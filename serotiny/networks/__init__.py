@@ -1,4 +1,3 @@
-from ._3d.unet import Unet as Unet3d
-from .sequential import Sequential
+from .unet import Unet3d
 from .mlp import MLP
-# from .gcn import GCN
+from .basic_cnn import BasicCNN

@@ -1,4 +1,4 @@
-from typing import Union, Sequence, Dict
+from typing import Union, Sequence, Dict, Optional
 import logging
 
 import numpy as np
@@ -25,7 +25,8 @@ class ConditionalPriorVAE(ConditionalVAE):
         lr: float,
         x_label: str,
         c_label: Union[str, int, Sequence[int]],
-        recon_loss: Union[Loss, str] = torch.nn.MSELoss,
+        loss_mask_label: Optional[str] = None,
+        reconstruction_loss: Union[Loss, str] = torch.nn.MSELoss,
         condition_mode: str = "label",
     ):
 
@@ -38,7 +39,8 @@ class ConditionalPriorVAE(ConditionalVAE):
             beta=1,
             x_label=x_label,
             c_label=c_label,
-            recon_loss=recon_loss,
+            loss_mask_label=loss_mask_label,
+            reconstruction_loss=reconstruction_loss,
             condition_mode=condition_mode,
             prior_mode="anisotropic",
             prior_logvar=None,

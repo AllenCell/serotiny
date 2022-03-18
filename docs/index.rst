@@ -1,18 +1,23 @@
-Welcome to serotiny's documentation!
-======================================
+serotiny
+========
 
 .. toctree::
    :hidden:
    :maxdepth: 1
    :caption: Contents:
 
-   Overview <self>
+   Home <self>
    installation
+   quickstart
+   cli
+   dynamic_imports
+   image_transforms
+   feature_extraction
+   dataframe_transforms
+   model_zoo
+   example_workflows
    Package modules <modules>
    contributing
-   math
-
-.. mdinclude:: ../README.md
 
 Indices and tables
 ==================

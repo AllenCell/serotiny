@@ -2,7 +2,6 @@ from typing import Sequence
 from pathlib import Path
 
 import pandas as pd
-import multiprocessing as mp
 import pytorch_lightning as pl
 
 from torch.utils.data import DataLoader
@@ -75,13 +74,11 @@ class PatchDatamodule(pl.LightningDataModule):
         return self.make_patch_dataset(manifest)
 
     def make_dataloader(self, dataset):
-        return DataLoader(
-            dataset=dataset,
-            batch_size=self.batch_size)
-            # pin_memory=self.pin_memory,
-            # drop_last=self.drop_last,
-            # num_workers=self.num_workers,
-            # multiprocessing_context=mp.get_context("fork"))
+        return DataLoader(dataset=dataset, batch_size=self.batch_size)
+        # pin_memory=self.pin_memory,
+        # drop_last=self.drop_last,
+        # num_workers=self.num_workers,
+        # multiprocessing_context=mp.get_context("fork"))
 
     def train_dataloader(self):
         return self.make_dataloader(self.train)

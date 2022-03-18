@@ -8,9 +8,7 @@ Subpackages
    :maxdepth: 4
 
    serotiny.networks.classification
-   serotiny.networks.deprecated
    serotiny.networks.layers
-   serotiny.networks.vae
 
 Submodules
 ----------

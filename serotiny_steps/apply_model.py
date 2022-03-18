@@ -3,21 +3,59 @@ import os
 from typing import Dict, List
 
 import fire
-import pytorch_lightning as pl
-
-from serotiny.models.zoo import get_model
-from serotiny.utils import init, load_multiple
-
 
 def apply_model(
-    model_path: str,
+    model_class: str,
+    version_string: str,
     datamodule: Dict,
     trainer: Dict,
     model_zoo: Dict,
     callbacks: Dict,
     gpu_ids: List[int],
     loggers: List[Dict] = [],
+    seed: int = 42,
 ):
+    """
+    Apply a train model to some data
+
+    Parameters
+    ----------
+    model_class: str
+        The "import path" to the model class, e.g. serotiny.models.RegressionModel
+
+    version_string:
+        A version string that uniquely identifies the model within the
+        zoo.
+
+    datamodule: Dict
+        The datamodule configuration
+
+    trainer: Dict
+        The Pytorch Lightning Trainer configuration
+
+    model_zoo: Dict
+        The model zoo configuration, specifying where models shall be loaded from
+
+    callbacks: List[Dict]
+        A list with the configuration of each callback to use
+
+    gpu_ids: List[int]
+        List of GPU ids to use
+
+    loggers: List[Dict]
+        A list with the configuration of each logger to use
+
+    seed:
+        Random seed
+    """
+
+
+    # imports here to optimize CLI / Fire
+    import pytorch_lightning as pl
+    from serotiny.models.zoo import get_model
+    from serotiny.utils import init, load_multiple
+
+    pl.seed_everything(seed)
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"  # see issue #152
     os.environ["CUDA_VISIBLE_DEVICES"] = ",".join([str(id) for id in gpu_ids])
@@ -31,12 +69,12 @@ def apply_model(
     loggers_config = loggers
 
     model_zoo_path = model_zoo_config.get("path")
-    model = get_model(model_path, model_zoo_path)
+    model = get_model(model_class, version_string, model_zoo_path)
 
     datamodule = init(datamodule_config)
     datamodule.setup()
 
-    loggers = path_invocations(loggers_config)
+    loggers = load_multiple(loggers_config)
     callbacks = load_multiple(callbacks_config)
 
     trainer = pl.Trainer(

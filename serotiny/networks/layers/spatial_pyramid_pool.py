@@ -25,7 +25,7 @@ def spatial_pyramid_pool(x, out_pool_sizes):
         elif len(input_dims) == 3:
             maxpool = nn.MaxPool3d
         else:
-            raise ValueError(f"Spatial Pyramid Pool only supports 1, 2, or 3d data")
+            raise ValueError("Spatial Pyramid Pool only supports 1, 2, or 3d data")
         maxpool = maxpool(tuple(wids), stride=tuple(wids), padding=tuple(pads))
 
         out = maxpool(x)

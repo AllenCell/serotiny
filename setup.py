@@ -37,7 +37,23 @@ dev_requirements = [
     "wheel>=0.34.2",
 ]
 
+step_workflow_requirements = [
+    "aics_dask_utils>=0.2.0",
+    "bokeh>=2.1.0",
+    "boto3==1.15",
+    "dask[bag]>=2.19.0",
+    "dask_jobqueue>=0.7.0",
+    "distributed>=2.19.0",
+    "docutils==0.15.2",  # needed for botocore (quilt dependency)
+    "fire",
+    "psutil",
+    "python-dateutil<=2.8.0",  # need <=2.8.0 for quilt3 in step
+    "actk>0.2.0",  # useful functions
+    "dill>=0.3.3",  # pickle dataloader containing lambda functions
+]
+
 requirements = [
+    *step_workflow_requirements,
     # project requires
     "aicsimageio>=4.0.2",
     "numpy",
@@ -45,22 +61,31 @@ requirements = [
     "Pillow",
     "pytorch-lightning",
     "pytorch-lightning-bolts",
+    "torch",
     "torchvision",
     "tqdm",
     "seaborn",
-    "urllib3",
+    "urllib3<1.26",
+    "ray",
+    "hyperopt",
+    "ray[tune]",
     "brokenaxes",
     "torchio",
+    "hydra-core",
     "sphinx",
     "sphinx-rtd-theme",
-    "hydra-core@git+https://github.com/facebookresearch/hydra.git",
+    "furo",
+    "aicsshparam"
 ]
 
 extra_requirements = {
     "setup": setup_requirements,
     "test": test_requirements,
     "dev": dev_requirements,
-    "all": [*requirements, *dev_requirements],
+    "all": [
+        *requirements,
+        *dev_requirements,
+    ],
 }
 
 setup(
@@ -78,6 +103,7 @@ setup(
     description="library and commands for deep learning workflows",
     entry_points={
         "console_scripts": [
+            "serotiny=serotiny_steps.cli.main:main",
             "apply_projection=serotiny_steps.apply_projection:main",
             "change_resolution=serotiny_steps.change_resolution:main",
             "diagnostic_sheets=serotiny_steps.diagnostic_sheets:main",

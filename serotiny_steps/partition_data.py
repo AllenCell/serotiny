@@ -1,20 +1,9 @@
 import os
-import logging
+from typing import Optional, Sequence
 from pathlib import Path
 import fire
 
-from sklearn.model_selection import train_test_split
-
 import pandas as pd
-
-
-from serotiny.io.dataframe import load_csv, append_one_hot
-
-###############################################################################
-
-log = logging.getLogger(__name__)
-
-###############################################################################
 
 
 def reset_index(dataset, index):
@@ -32,21 +21,40 @@ def write_csvs(datasets, output_path):
 def partition_data(
     dataset_path: str,
     output_path: str,
-    partition_size=100,
-    partition_prefix="partition",
-    required_fields=None,
+    partition_size: int = 100,
+    partition_prefix: str = "partition",
+    required_fields: Optional[Sequence[str]] = None,
 ):
-
     """
     Split the incoming data into N sets of output data, where
     each set has `partition_size` elements, generating filenames
     based on `partition_prefix`.
+
+    Parameters
+    ----------
+    dataset_path: str
+        Path to input dataframe file
+
+    output_path: str
+        Path to output dataframe folder
+
+    partition_size: int = 100
+        Size of each partition
+
+    partition_prefix: str = "partition"
+        Prefix to append to each partition's filename
+
+    required_fields: Optional[Sequence[str]] = None
+        Fields to check for existence in the input dataframe
     """
+
+    # import here to optimize CLIs / Fire usage
+    from serotiny.io.dataframe import read_dataframe
 
     if required_fields is None:
         required_fields = {}
 
-    dataset = load_csv(dataset_path, required_fields)
+    dataset = read_dataframe(dataset_path, required_fields)
     partition_count = len(dataset) // partition_size
     remaining = len(dataset) % partition_size
     if remaining > 0:
