@@ -24,7 +24,7 @@ requirements = [
     "fire",
     "mlflow",
     "makefun",
-    "hydra-core@git+https://github.com/facebookresearch/hydra.git",
+    "hydra-core==1.2.0.dev2",
 ]
 
 docs_requirements = [
