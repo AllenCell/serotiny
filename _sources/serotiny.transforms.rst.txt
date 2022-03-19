@@ -9,7 +9,6 @@ Subpackages
 
    serotiny.transforms.dataframe
    serotiny.transforms.image
-   serotiny.transforms.pipeline
 
 Module contents
 ---------------

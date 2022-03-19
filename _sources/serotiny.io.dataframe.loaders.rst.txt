@@ -28,18 +28,10 @@ serotiny.io.dataframe.loaders.columns module
    :undoc-members:
    :show-inheritance:
 
-serotiny.io.dataframe.loaders.image2d module
---------------------------------------------
+serotiny.io.dataframe.loaders.image module
+------------------------------------------
 
-.. automodule:: serotiny.io.dataframe.loaders.image2d
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-serotiny.io.dataframe.loaders.image3d module
---------------------------------------------
-
-.. automodule:: serotiny.io.dataframe.loaders.image3d
+.. automodule:: serotiny.io.dataframe.loaders.image
    :members:
    :undoc-members:
    :show-inheritance:

@@ -10,7 +10,6 @@ Subpackages
    serotiny.networks.basic_cnn
    serotiny.networks.layers
    serotiny.networks.mlp
-   serotiny.networks.unet
    serotiny.networks.utils
 
 Module contents

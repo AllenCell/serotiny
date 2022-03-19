@@ -4,11 +4,11 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" />
 
-    <meta name="generator" content="sphinx-4.3.2, furo 2022.01.02"/>
-        <title>serotiny.transforms.dataframe.transforms - serotiny 0.0.1 documentation</title>
+    <meta name="generator" content="sphinx-4.4.0, furo 2022.03.04"/>
+        <title>serotiny.transforms.dataframe.transforms - serotiny alpha documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=df49af52631e7917044a9c21a57f7b83170a6dd0" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?digest=fade93df149f7c5fedb3ff897f799dc7d283b420" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
     
     
 
@@ -19,16 +19,18 @@
   --color-code-foreground: black;
   
   }
-  body[data-theme="dark"] {
-    --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
-  
-  }
-  @media (prefers-color-scheme: dark) {
-    body:not([data-theme="light"]) {
+  @media not print {
+    body[data-theme="dark"] {
       --color-code-background: #202020;
   --color-code-foreground: #d0d0d0;
   
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
     }
   }
 </style></head>
@@ -40,17 +42,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
   <symbol id="svg-toc" viewBox="0 0 24 24">
     <title>Contents</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path stroke="none" d="M0 0h24v24H0z" />
-      <line x1="4" y1="6" x2="20" y2="6" />
-      <line x1="10" y1="12" x2="20" y2="12" />
-      <line x1="6" y1="18" x2="20" y2="18" />
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
     </svg>
   </symbol>
   <symbol id="svg-menu" viewBox="0 0 24 24">
     <title>Menu</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
       <line x1="3" y1="12" x2="21" y2="12"></line>
       <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -59,14 +57,14 @@
   </symbol>
   <symbol id="svg-arrow-right" viewBox="0 0 24 24">
     <title>Expand</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
       <polyline points="9 18 15 12 9 6"></polyline>
     </svg>
   </symbol>
   <symbol id="svg-sun" viewBox="0 0 24 24">
     <title>Light mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
       <circle cx="12" cy="12" r="5"></circle>
       <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -81,7 +79,7 @@
   </symbol>
   <symbol id="svg-moon" viewBox="0 0 24 24">
     <title>Dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
@@ -89,7 +87,7 @@
   </symbol>
   <symbol id="svg-sun-half" viewBox="0 0 24 24">
     <title>Auto light/dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
       <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
       <circle cx="12" cy="12" r="9" />
@@ -122,7 +120,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../../index.html"><div class="brand">serotiny 0.0.1 documentation</div></a>
+      <a href="../../../../index.html"><div class="brand">serotiny alpha documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -145,7 +143,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../../index.html">
   
   
-  <span class="sidebar-brand-text">serotiny 0.0.1 documentation</span>
+  <span class="sidebar-brand-text">serotiny alpha documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -158,17 +156,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../index.html">Home</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../projects.html">serotiny projects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">serotiny CLI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../dynamic_imports.html">Dynamic imports</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../image_transforms.html">Applying image transforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../feature_extraction.html">Extraction features from images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../dataframe_transforms.html">Dataframe wrangling</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../model_zoo.html">Model zoo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../example_workflows.html">Example workflows</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../../modules.html">Package modules</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../serotiny.html">serotiny package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../../serotiny.datamodules.html">serotiny.datamodules package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../../serotiny.imports.html">serotiny.imports package</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../serotiny.io.html">serotiny.io package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l4 has-children"><a class="reference internal" href="../../../../serotiny.io.dataframe.html">serotiny.io.dataframe package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../../serotiny.io.dataframe.loaders.html">serotiny.io.dataframe.loaders package</a></li>
@@ -177,11 +170,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../../../serotiny.losses.html">serotiny.losses package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../../serotiny.metrics.html">serotiny.metrics package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../serotiny.ml_ops.html">serotiny.ml_ops package</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../serotiny.models.html">serotiny.models package</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.models.callbacks.html">serotiny.models.callbacks package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.models.inference.html">serotiny.models.inference package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.models.unet.html">serotiny.models.unet package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.models.utils.html">serotiny.models.utils package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.models.vae.html">serotiny.models.vae package</a></li>
 </ul>
@@ -190,25 +180,23 @@
 <li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.networks.basic_cnn.html">serotiny.networks.basic_cnn package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.networks.layers.html">serotiny.networks.layers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.networks.mlp.html">serotiny.networks.mlp package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.networks.unet.html">serotiny.networks.unet package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.networks.utils.html">serotiny.networks.utils package</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../serotiny.transforms.html">serotiny.transforms package</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.transforms.dataframe.html">serotiny.transforms.dataframe package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.transforms.image.html">serotiny.transforms.image package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.transforms.pipeline.html">serotiny.transforms.pipeline package</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
 </ul>
 
 </div>
 </div>
+
       </div>
       
     </div>
@@ -216,8 +204,13 @@
   <div class="main">
     <div class="content">
       <div class="article-container">
-        <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -232,9 +225,11 @@
         </div>
         <article role="main">
           <h1>Source code for serotiny.transforms.dataframe.transforms</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 
 <div class="viewcode-block" id="split_dataframe"><a class="viewcode-back" href="../../../../serotiny.transforms.dataframe.html#serotiny.transforms.dataframe.transforms.split_dataframe">[docs]</a><span class="k">def</span> <span class="nf">split_dataframe</span><span class="p">(</span>
@@ -243,10 +238,8 @@
     <span class="n">val_frac</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">return_splits</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">"""</span>
-<span class="sd">    Given a pandas dataframe, perform a train-val-test split and either</span>
-<span class="sd">    return three different dataframes, or append a column identifying the</span>
-<span class="sd">    split each row belongs to.</span>
+    <span class="sd">"""Given a pandas dataframe, perform a train-val-test split and either return three</span>
+<span class="sd">    different dataframes, or append a column identifying the split each row belongs to.</span>
 
 <span class="sd">    TODO: extend this to enable balanced / stratified splitting</span>
 
@@ -286,7 +279,7 @@
     <span class="k">if</span> <span class="n">return_splits</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
             <span class="n">train</span><span class="o">=</span><span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">train_ix</span><span class="p">],</span>
-            <span class="n">val</span><span class="o">=</span><span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">val_ix</span><span class="p">],</span>
+            <span class="n">valid</span><span class="o">=</span><span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">val_ix</span><span class="p">],</span>
             <span class="n">test</span><span class="o">=</span><span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">test_ix</span><span class="p">],</span>
         <span class="p">)</span>
 
@@ -298,13 +291,10 @@
 
 
 <div class="viewcode-block" id="filter_rows"><a class="viewcode-back" href="../../../../serotiny.transforms.dataframe.html#serotiny.transforms.dataframe.transforms.filter_rows">[docs]</a><span class="k">def</span> <span class="nf">filter_rows</span><span class="p">(</span>
-    <span class="n">dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
-    <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span>
-    <span class="n">Sequence</span><span class="p">,</span> <span class="n">exclude</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">exclude</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="p">):</span>
-    <span class="sd">"""</span>
-<span class="sd">    Filter a dataframe, keeping only the rows where a given</span>
-<span class="sd">    column's value is contained in a list of values</span>
+    <span class="sd">"""Filter a dataframe, keeping only the rows where a given column's value is</span>
+<span class="sd">    contained in a list of values.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -332,13 +322,10 @@
     <span class="n">contains</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">excludes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sd">"""</span>
-<span class="sd">    Filter a list of columns, using a combination of different</span>
-<span class="sd">    queries, or a `regex` pattern. If `regex` is supplied it</span>
-<span class="sd">    takes precedence and the remaining arguments are ignored.</span>
-<span class="sd">    Otherwise, the logical AND of the supplied filters is applied,</span>
-<span class="sd">    i.e. the columns that respect all of the supplied conditions</span>
-<span class="sd">    are returned.</span>
+    <span class="sd">"""Filter a list of columns, using a combination of different queries, or a `regex`</span>
+<span class="sd">    pattern. If `regex` is supplied it takes precedence and the remaining arguments are</span>
+<span class="sd">    ignored. Otherwise, the logical AND of the supplied filters is applied, i.e. the</span>
+<span class="sd">    columns that respect all of the supplied conditions are returned.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -359,7 +346,6 @@
 
 <span class="sd">    excludes: Optional[str] = None</span>
 <span class="sd">        A substring the matching columns must not contain</span>
-
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">regex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns_to_filter</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">col</span><span class="p">)]</span>
@@ -387,9 +373,8 @@
     <span class="n">excludes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">regex</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">"""</span>
-<span class="sd">    Select columns in a dataset, using different filtering options.</span>
-<span class="sd">    See serotiny.data.dataframe.transforms.filter_columns for more details.</span>
+    <span class="sd">"""Select columns in a dataset, using different filtering options. See</span>
+<span class="sd">    serotiny.data.dataframe.transforms.filter_columns for more details.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -426,9 +411,9 @@
                 <span class="nb">input</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">regex</span><span class="p">,</span> <span class="n">startswith</span><span class="p">,</span> <span class="n">endswith</span><span class="p">,</span> <span class="n">contains</span><span class="p">,</span> <span class="n">excludes</span>
             <span class="p">)</span>
             <span class="k">return</span> <span class="nb">input</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">_filter_columns</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">regex</span><span class="p">,</span> <span class="n">startswith</span><span class="p">,</span>
-                           <span class="n">endswith</span><span class="p">,</span> <span class="n">contains</span><span class="p">,</span> <span class="n">excludes</span><span class="p">)</span></div>
-
+    <span class="k">return</span> <span class="n">_filter_columns</span><span class="p">(</span>
+        <span class="nb">input</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">regex</span><span class="p">,</span> <span class="n">startswith</span><span class="p">,</span> <span class="n">endswith</span><span class="p">,</span> <span class="n">contains</span><span class="p">,</span> <span class="n">excludes</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="sample_n_each"><a class="viewcode-back" href="../../../../serotiny.transforms.dataframe.html#serotiny.transforms.dataframe.transforms.sample_n_each">[docs]</a><span class="k">def</span> <span class="nf">sample_n_each</span><span class="p">(</span>
@@ -438,8 +423,7 @@
     <span class="n">force</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">42</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">"""</span>
-<span class="sd">    Transform a dataframe to have equal number of rows per value of `column`.</span>
+    <span class="sd">"""Transform a dataframe to have equal number of rows per value of `column`.</span>
 
 <span class="sd">    In case a given value of `column` has less than `number` corresponding rows:</span>
 <span class="sd">    - if `force` is True the corresponding rows are sampled with replacement</span>
@@ -486,9 +470,8 @@
 
 
 <div class="viewcode-block" id="append_one_hot"><a class="viewcode-back" href="../../../../serotiny.transforms.dataframe.html#serotiny.transforms.dataframe.transforms.append_one_hot">[docs]</a><span class="k">def</span> <span class="nf">append_one_hot</span><span class="p">(</span><span class="n">dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="sd">"""</span>
-<span class="sd">    Modifies its argument by appending the one hot encoding columns</span>
-<span class="sd">    into the given dataframe. Calls function one_hot_encoding</span>
+    <span class="sd">"""Modifies its argument by appending the one hot encoding columns into the given</span>
+<span class="sd">    dataframe. Calls function one_hot_encoding.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    -----------</span>
@@ -497,11 +480,11 @@
 
 <span class="sd">    column: str</span>
 <span class="sd">        Column to convert into one hot encoding</span>
-
 <span class="sd">    """</span>
 
     <span class="c1"># import here to optimize CLIs / Fire usage</span>
     <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">OneHotEncoder</span>
+
     <span class="n">one_hot</span> <span class="o">=</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">sparse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[[</span><span class="n">column</span><span class="p">]])</span>
 
     <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">one_hot</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
@@ -511,9 +494,8 @@
 
 
 <div class="viewcode-block" id="append_labels_to_integers"><a class="viewcode-back" href="../../../../serotiny.transforms.dataframe.html#serotiny.transforms.dataframe.transforms.append_labels_to_integers">[docs]</a><span class="k">def</span> <span class="nf">append_labels_to_integers</span><span class="p">(</span><span class="n">dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="sd">"""</span>
-<span class="sd">    Modifies its argument by appending the integer-encoded values of `column`</span>
-<span class="sd">    into the given dataframe.</span>
+    <span class="sd">"""Modifies its argument by appending the integer-encoded values of `column` into</span>
+<span class="sd">    the given dataframe.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    -----------</span>
@@ -522,19 +504,18 @@
 
 <span class="sd">    column: str</span>
 <span class="sd">        Column to convert into one hot encoding</span>
-
 <span class="sd">    """</span>
 
     <span class="c1"># import here to optimize CLIs / Fire usage</span>
     <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">LabelEncoder</span>
+
     <span class="n">dataframe</span><span class="p">[</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">column</span><span class="si">}</span><span class="s2">_integer"</span><span class="p">]</span> <span class="o">=</span> <span class="n">LabelEncoder</span><span class="p">()</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[[</span><span class="n">column</span><span class="p">]])</span>
 
     <span class="k">return</span> <span class="n">dataframe</span></div>
 
 
 <div class="viewcode-block" id="append_class_weights"><a class="viewcode-back" href="../../../../serotiny.transforms.dataframe.html#serotiny.transforms.dataframe.transforms.append_class_weights">[docs]</a><span class="k">def</span> <span class="nf">append_class_weights</span><span class="p">(</span><span class="n">dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="sd">"""</span>
-<span class="sd">    Add class weights (based on `column`) to a dataframe</span>
+    <span class="sd">"""Add class weights (based on `column`) to a dataframe.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    -----------</span>
@@ -543,7 +524,6 @@
 
 <span class="sd">    column: str</span>
 <span class="sd">        Column to base the weights on</span>
-
 <span class="sd">    """</span>
     <span class="n">labels_unique</span><span class="p">,</span> <span class="n">counts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">dataframe</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">class_weights</span> <span class="o">=</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><span class="n">counts</span><span class="p">)</span> <span class="o">/</span> <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">counts</span><span class="p">]</span>
@@ -554,8 +534,7 @@
 
 
 <div class="viewcode-block" id="make_random_df"><a class="viewcode-back" href="../../../../serotiny.transforms.dataframe.html#serotiny.transforms.dataframe.transforms.make_random_df">[docs]</a><span class="k">def</span> <span class="nf">make_random_df</span><span class="p">(</span><span class="n">columns</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="s2">"ABCD"</span><span class="p">),</span> <span class="n">n_rows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">):</span>
-    <span class="sd">"""</span>
-<span class="sd">    Generate a random dataframe. Useful to test data wrangling pipelines.</span>
+    <span class="sd">"""Generate a random dataframe. Useful to test data wrangling pipelines.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -578,11 +557,21 @@
           
           
         </div>
-
-        <div class="related-information">
-              Copyright &#169; 2021 |
-          Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
-          <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
         </div>
         
       </footer>

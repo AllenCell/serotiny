@@ -4,10 +4,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="#" /><link rel="search" title="Search" href="search.html" />
 
-    <meta name="generator" content="sphinx-4.3.2, furo 2022.01.02"/><title>Index - serotiny 0.0.1 documentation</title>
+    <meta name="generator" content="sphinx-4.4.0, furo 2022.03.04"/><title>Index - serotiny alpha documentation</title>
 <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=df49af52631e7917044a9c21a57f7b83170a6dd0" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=fade93df149f7c5fedb3ff897f799dc7d283b420" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
     
     
 
@@ -18,16 +18,18 @@
   --color-code-foreground: black;
   
   }
-  body[data-theme="dark"] {
-    --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
-  
-  }
-  @media (prefers-color-scheme: dark) {
-    body:not([data-theme="light"]) {
+  @media not print {
+    body[data-theme="dark"] {
       --color-code-background: #202020;
   --color-code-foreground: #d0d0d0;
   
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
     }
   }
 </style></head>
@@ -39,17 +41,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
   <symbol id="svg-toc" viewBox="0 0 24 24">
     <title>Contents</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path stroke="none" d="M0 0h24v24H0z" />
-      <line x1="4" y1="6" x2="20" y2="6" />
-      <line x1="10" y1="12" x2="20" y2="12" />
-      <line x1="6" y1="18" x2="20" y2="18" />
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
     </svg>
   </symbol>
   <symbol id="svg-menu" viewBox="0 0 24 24">
     <title>Menu</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
       <line x1="3" y1="12" x2="21" y2="12"></line>
       <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -58,14 +56,14 @@
   </symbol>
   <symbol id="svg-arrow-right" viewBox="0 0 24 24">
     <title>Expand</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
       <polyline points="9 18 15 12 9 6"></polyline>
     </svg>
   </symbol>
   <symbol id="svg-sun" viewBox="0 0 24 24">
     <title>Light mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
       <circle cx="12" cy="12" r="5"></circle>
       <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -80,7 +78,7 @@
   </symbol>
   <symbol id="svg-moon" viewBox="0 0 24 24">
     <title>Dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
@@ -88,7 +86,7 @@
   </symbol>
   <symbol id="svg-sun-half" viewBox="0 0 24 24">
     <title>Auto light/dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
       <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
       <circle cx="12" cy="12" r="9" />
@@ -121,7 +119,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">serotiny 0.0.1 documentation</div></a>
+      <a href="index.html"><div class="brand">serotiny alpha documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -144,7 +142,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">serotiny 0.0.1 documentation</span>
+  <span class="sidebar-brand-text">serotiny alpha documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -157,17 +155,12 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="projects.html">serotiny projects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">serotiny CLI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dynamic_imports.html">Dynamic imports</a></li>
-<li class="toctree-l1"><a class="reference internal" href="image_transforms.html">Applying image transforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="feature_extraction.html">Extraction features from images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dataframe_transforms.html">Dataframe wrangling</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_zoo.html">Model zoo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="example_workflows.html">Example workflows</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="modules.html">Package modules</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="serotiny.html">serotiny package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="serotiny.datamodules.html">serotiny.datamodules package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="serotiny.imports.html">serotiny.imports package</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.io.html">serotiny.io package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l4 has-children"><a class="reference internal" href="serotiny.io.dataframe.html">serotiny.io.dataframe package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.io.dataframe.loaders.html">serotiny.io.dataframe.loaders package</a></li>
@@ -176,11 +169,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="serotiny.losses.html">serotiny.losses package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="serotiny.metrics.html">serotiny.metrics package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.ml_ops.html">serotiny.ml_ops package</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.models.html">serotiny.models package</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.models.callbacks.html">serotiny.models.callbacks package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.models.inference.html">serotiny.models.inference package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.models.unet.html">serotiny.models.unet package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.utils.html">serotiny.models.utils package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.vae.html">serotiny.models.vae package</a></li>
 </ul>
@@ -189,25 +179,23 @@
 <li class="toctree-l4"><a class="reference internal" href="serotiny.networks.basic_cnn.html">serotiny.networks.basic_cnn package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.networks.layers.html">serotiny.networks.layers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.networks.mlp.html">serotiny.networks.mlp package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.unet.html">serotiny.networks.unet package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.networks.utils.html">serotiny.networks.utils package</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.transforms.html">serotiny.transforms package</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.transforms.dataframe.html">serotiny.transforms.dataframe package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.transforms.image.html">serotiny.transforms.image package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.transforms.pipeline.html">serotiny.transforms.pipeline package</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 </ul>
 
 </div>
 </div>
+
       </div>
       
     </div>
@@ -215,8 +203,13 @@
   <div class="main">
     <div class="content">
       <div class="article-container">
-        <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -233,16 +226,20 @@
           
 <section class="genindex-section">
   <h1 id="index">Index</h1>
-  <div class="genindex-jumpbox"><a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#W"><strong>W</strong></a></div>
+  <div class="genindex-jumpbox"><a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#V"><strong>V</strong></a> | <a href="#W"><strong>W</strong></a></div>
 </section>
 <section id="A" class="genindex-section">
   <h2>A</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.align.align_image_2d">align_image_2d() (in module serotiny.transforms.image.align)</a>
+        <li><a href="serotiny.models.vae.html#serotiny.models.vae.base_vae.BaseVAE.allow_zero_length_dataloader_with_multiple_devices">allow_zero_length_dataloader_with_multiple_devices (serotiny.models.vae.base_vae.BaseVAE attribute)</a>
+
+        <ul>
+          <li><a href="serotiny.models.vae.html#serotiny.models.vae.image_vae.ImageVAE.allow_zero_length_dataloader_with_multiple_devices">(serotiny.models.vae.image_vae.ImageVAE attribute)</a>
 </li>
-        <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.feature_extraction.angle">angle() (in module serotiny.transforms.image.feature_extraction)</a>
+          <li><a href="serotiny.models.vae.html#serotiny.models.vae.tabular_vae.TabularVAE.allow_zero_length_dataloader_with_multiple_devices">(serotiny.models.vae.tabular_vae.TabularVAE attribute)</a>
 </li>
+        </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="serotiny.transforms.dataframe.html#serotiny.transforms.dataframe.transforms.append_class_weights">append_class_weights() (in module serotiny.transforms.dataframe.transforms)</a>
@@ -259,19 +256,13 @@
   <h2>B</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.feature_extraction.bbox">bbox() (in module serotiny.transforms.image.feature_extraction)</a>
-</li>
-        <li><a href="serotiny.imports.html#serotiny.imports.dynamic_imports.bind">bind() (in module serotiny.imports.dynamic_imports)</a>
+        <li><a href="serotiny.models.html#serotiny.models.base_model.BaseModel">BaseModel (class in serotiny.models.base_model)</a>
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="serotiny.metrics.html#serotiny.metrics.inception.InceptionV3.BLOCK_INDEX_BY_DIM">BLOCK_INDEX_BY_DIM (serotiny.metrics.inception.InceptionV3 attribute)</a>
-
-        <ul>
-          <li><a href="serotiny.metrics.html#serotiny.metrics.InceptionV3.BLOCK_INDEX_BY_DIM">(serotiny.metrics.InceptionV3 attribute)</a>
+        <li><a href="serotiny.models.vae.html#serotiny.models.vae.base_vae.BaseVAE">BaseVAE (class in serotiny.models.vae.base_vae)</a>
 </li>
-        </ul></li>
-        <li><a href="serotiny.io.html#serotiny.io.buffered_patch_dataset.BufferedPatchDataset">BufferedPatchDataset (class in serotiny.io.buffered_patch_dataset)</a>
+        <li><a href="serotiny.networks.basic_cnn.html#serotiny.networks.basic_cnn.basic_cnn.BasicCNN">BasicCNN (class in serotiny.networks.basic_cnn.basic_cnn)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -281,25 +272,21 @@
   <h2>C</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="serotiny.metrics.html#serotiny.metrics.calculate_blur">calculate_blur() (in module serotiny.metrics)</a>
-
-        <ul>
-          <li><a href="serotiny.metrics.html#serotiny.metrics.calculate_blur.calculate_blur">(in module serotiny.metrics.calculate_blur)</a>
+        <li><a href="serotiny.models.vae.html#serotiny.models.vae.base_vae.BaseVAE.calculate_elbo">calculate_elbo() (serotiny.models.vae.base_vae.BaseVAE method)</a>
 </li>
-        </ul></li>
-        <li><a href="serotiny.metrics.html#serotiny.metrics.calculate_fid">calculate_fid() (in module serotiny.metrics)</a>
-
-        <ul>
-          <li><a href="serotiny.metrics.html#serotiny.metrics.calculate_fid.calculate_fid">(in module serotiny.metrics.calculate_fid)</a>
-</li>
-        </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="serotiny.losses.html#serotiny.losses.continuous_bernoulli.CBLogLoss">CBLogLoss (class in serotiny.losses.continuous_bernoulli)</a>
 </li>
-        <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.feature_extraction.center_of_mass">center_of_mass() (in module serotiny.transforms.image.feature_extraction)</a>
+        <li><a href="serotiny.models.html#serotiny.models.base_model.BaseModel.configure_optimizers">configure_optimizers() (serotiny.models.base_model.BaseModel method)</a>
 </li>
-        <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.resize.CropCenter">CropCenter (class in serotiny.transforms.image.resize)</a>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="serotiny.networks.layers.html#serotiny.networks.layers.convolution_block.conv_block">conv_block() (in module serotiny.networks.layers.convolution_block)</a>
+</li>
+        <li><a href="serotiny.networks.basic_cnn.html#serotiny.networks.basic_cnn.basic_cnn.BasicCNN.conv_forward">conv_forward() (serotiny.networks.basic_cnn.basic_cnn.BasicCNN method)</a>
+</li>
+        <li><a href="serotiny.networks.layers.html#serotiny.networks.layers.convolution_block.ConvBlock">ConvBlock (class in serotiny.networks.layers.convolution_block)</a>
+</li>
+        <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.crop.CropCenter">CropCenter (class in serotiny.transforms.image.crop)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -311,23 +298,9 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="serotiny.io.dataframe.html#serotiny.io.dataframe.dataframe_dataset.DataframeDataset">DataframeDataset (class in serotiny.io.dataframe.dataframe_dataset)</a>
 </li>
-        <li><a href="serotiny.metrics.html#serotiny.metrics.inception.InceptionV3.DEFAULT_BLOCK_INDEX">DEFAULT_BLOCK_INDEX (serotiny.metrics.inception.InceptionV3 attribute)</a>
-
-        <ul>
-          <li><a href="serotiny.metrics.html#serotiny.metrics.InceptionV3.DEFAULT_BLOCK_INDEX">(serotiny.metrics.InceptionV3 attribute)</a>
-</li>
-        </ul></li>
-        <li><a href="serotiny.losses.html#serotiny.losses.kl_divergence.diagonal_gaussian_kl">diagonal_gaussian_kl() (in module serotiny.losses.kl_divergence)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.feature_extraction.dillated_bbox">dillated_bbox() (in module serotiny.transforms.image.feature_extraction)</a>
-</li>
-        <li><a href="serotiny.networks.unet.html#serotiny.networks.unet.double_convolution.DoubleConvolution">DoubleConvolution (class in serotiny.networks.unet.double_convolution)</a>
-</li>
-        <li><a href="serotiny.networks.unet.html#serotiny.networks.unet.unet_downconv.DownConvolution">DownConvolution (class in serotiny.networks.unet.unet_downconv)</a>
-</li>
-        <li><a href="serotiny.io.html#serotiny.io.quilt.download_quilt_data">download_quilt_data() (in module serotiny.io.quilt)</a>
+        <li><a href="serotiny.losses.html#serotiny.losses.kl_divergence.diagonal_gaussian_kl">diagonal_gaussian_kl() (in module serotiny.losses.kl_divergence)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -355,8 +328,12 @@
   <h2>F</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="serotiny.transforms.dataframe.html#serotiny.transforms.dataframe.transforms.filter_columns">filter_columns() (in module serotiny.transforms.dataframe.transforms)</a>
+        <li><a href="serotiny.io.dataframe.html#serotiny.io.dataframe.readers.filter_columns">filter_columns() (in module serotiny.io.dataframe.readers)</a>
+
+        <ul>
+          <li><a href="serotiny.transforms.dataframe.html#serotiny.transforms.dataframe.transforms.filter_columns">(in module serotiny.transforms.dataframe.transforms)</a>
 </li>
+        </ul></li>
         <li><a href="serotiny.transforms.dataframe.html#serotiny.transforms.dataframe.transforms.filter_rows">filter_rows() (in module serotiny.transforms.dataframe.transforms)</a>
 </li>
         <li><a href="serotiny.models.utils.html#serotiny.models.utils.optimizer_utils.find_lr_scheduler">find_lr_scheduler() (in module serotiny.models.utils.optimizer_utils)</a>
@@ -366,47 +343,21 @@
         <li><a href="serotiny.losses.html#serotiny.losses.continuous_bernoulli.CBLogLoss.forward">forward() (serotiny.losses.continuous_bernoulli.CBLogLoss method)</a>
 
         <ul>
-          <li><a href="serotiny.metrics.html#serotiny.metrics.inception.InceptionV3.forward">(serotiny.metrics.inception.InceptionV3 method)</a>
+          <li><a href="serotiny.models.html#serotiny.models.base_model.BaseModel.forward">(serotiny.models.base_model.BaseModel method)</a>
 </li>
-          <li><a href="serotiny.metrics.html#serotiny.metrics.InceptionV3.forward">(serotiny.metrics.InceptionV3 method)</a>
+          <li><a href="serotiny.models.vae.html#serotiny.models.vae.base_vae.BaseVAE.forward">(serotiny.models.vae.base_vae.BaseVAE method)</a>
+</li>
+          <li><a href="serotiny.networks.basic_cnn.html#serotiny.networks.basic_cnn.basic_cnn.BasicCNN.forward">(serotiny.networks.basic_cnn.basic_cnn.BasicCNN method)</a>
+</li>
+          <li><a href="serotiny.networks.layers.html#serotiny.networks.layers.convolution_block.ConvBlock.forward">(serotiny.networks.layers.convolution_block.ConvBlock method)</a>
+</li>
+          <li><a href="serotiny.networks.layers.html#serotiny.networks.layers.skip_connection.SkipConnection.forward">(serotiny.networks.layers.skip_connection.SkipConnection method)</a>
+</li>
+          <li><a href="serotiny.networks.layers.html#serotiny.networks.layers.spatial_pyramid_pool.SpatialPyramidPool.forward">(serotiny.networks.layers.spatial_pyramid_pool.SpatialPyramidPool method)</a>
 </li>
           <li><a href="serotiny.networks.mlp.html#serotiny.networks.mlp.mlp.MLP.forward">(serotiny.networks.mlp.mlp.MLP method)</a>
 </li>
-          <li><a href="serotiny.networks.unet.html#serotiny.networks.unet.double_convolution.DoubleConvolution.forward">(serotiny.networks.unet.double_convolution.DoubleConvolution method)</a>
-</li>
-          <li><a href="serotiny.networks.unet.html#serotiny.networks.unet.unet_3d.Unet3d.forward">(serotiny.networks.unet.unet_3d.Unet3d method)</a>
-</li>
-          <li><a href="serotiny.networks.unet.html#serotiny.networks.unet.unet_downconv.DownConvolution.forward">(serotiny.networks.unet.unet_downconv.DownConvolution method)</a>
-</li>
-          <li><a href="serotiny.networks.unet.html#serotiny.networks.unet.unet_upconv.UpConvolution.forward">(serotiny.networks.unet.unet_upconv.UpConvolution method)</a>
-</li>
         </ul></li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="G" class="genindex-section">
-  <h2>G</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="serotiny.metrics.html#serotiny.metrics.calculate_fid.get_activations">get_activations() (in module serotiny.metrics.calculate_fid)</a>
-</li>
-        <li><a href="serotiny.io.html#serotiny.io.buffered_patch_dataset.BufferedPatchDataset.get_buffer_history">get_buffer_history() (serotiny.io.buffered_patch_dataset.BufferedPatchDataset method)</a>
-</li>
-        <li><a href="serotiny.imports.html#serotiny.imports.dynamic_imports.get_load_method_and_args">get_load_method_and_args() (in module serotiny.imports.dynamic_imports)</a>
-</li>
-        <li><a href="serotiny.html#serotiny.get_module_version">get_module_version() (in module serotiny)</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="serotiny.imports.html#serotiny.imports.dynamic_imports.get_name_and_arguments">get_name_and_arguments() (in module serotiny.imports.dynamic_imports)</a>
-</li>
-        <li><a href="serotiny.imports.html#serotiny.imports.dynamic_imports.get_name_from_path">get_name_from_path() (in module serotiny.imports.dynamic_imports)</a>
-</li>
-        <li><a href="serotiny.io.html#serotiny.io.buffered_patch_dataset.BufferedPatchDataset.get_patch">get_patch() (serotiny.io.buffered_patch_dataset.BufferedPatchDataset method)</a>
-</li>
-        <li><a href="serotiny.io.html#serotiny.io.buffered_patch_dataset.BufferedPatchDataset.get_random_patch">get_random_patch() (serotiny.io.buffered_patch_dataset.BufferedPatchDataset method)</a>
-</li>
     </ul></td>
   </tr></table>
 </section>
@@ -417,21 +368,11 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="serotiny.io.html#serotiny.io.image.image_loader">image_loader() (in module serotiny.io.image)</a>
 </li>
-        <li><a href="serotiny.metrics.html#serotiny.metrics.InceptionV3">InceptionV3 (class in serotiny.metrics)</a>
-
-        <ul>
-          <li><a href="serotiny.metrics.html#serotiny.metrics.inception.InceptionV3">(class in serotiny.metrics.inception)</a>
-</li>
-        </ul></li>
-        <li><a href="serotiny.io.html#serotiny.io.image.infer_dims">infer_dims() (in module serotiny.io.image)</a>
+        <li><a href="serotiny.models.vae.html#serotiny.models.vae.image_vae.ImageVAE">ImageVAE (class in serotiny.models.vae.image_vae)</a>
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="serotiny.imports.html#serotiny.imports.dynamic_imports.init">init() (in module serotiny.imports.dynamic_imports)</a>
-</li>
-        <li><a href="serotiny.io.html#serotiny.io.buffered_patch_dataset.BufferedPatchDataset.insert_new_element_into_buffer">insert_new_element_into_buffer() (serotiny.io.buffered_patch_dataset.BufferedPatchDataset method)</a>
-</li>
-        <li><a href="serotiny.imports.html#serotiny.imports.dynamic_imports.invoke">invoke() (in module serotiny.imports.dynamic_imports)</a>
+        <li><a href="serotiny.io.html#serotiny.io.image.infer_dims">infer_dims() (in module serotiny.io.image)</a>
 </li>
         <li><a href="serotiny.losses.html#serotiny.losses.kl_divergence.isotropic_gaussian_kl">isotropic_gaussian_kl() (in module serotiny.losses.kl_divergence)</a>
 </li>
@@ -443,11 +384,35 @@
   <h2>L</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="serotiny.imports.html#serotiny.imports.dynamic_imports.load_config">load_config() (in module serotiny.imports.dynamic_imports)</a>
+        <li><a href="serotiny.io.dataframe.loaders.html#serotiny.io.dataframe.loaders.LoadClass">LoadClass (class in serotiny.io.dataframe.loaders)</a>
+
+        <ul>
+          <li><a href="serotiny.io.dataframe.loaders.html#serotiny.io.dataframe.loaders.classes.LoadClass">(class in serotiny.io.dataframe.loaders.classes)</a>
 </li>
+        </ul></li>
+        <li><a href="serotiny.io.dataframe.loaders.html#serotiny.io.dataframe.loaders.LoadColumn">LoadColumn (class in serotiny.io.dataframe.loaders)</a>
+
+        <ul>
+          <li><a href="serotiny.io.dataframe.loaders.html#serotiny.io.dataframe.loaders.columns.LoadColumn">(class in serotiny.io.dataframe.loaders.columns)</a>
+</li>
+        </ul></li>
+        <li><a href="serotiny.io.dataframe.loaders.html#serotiny.io.dataframe.loaders.LoadColumns">LoadColumns (class in serotiny.io.dataframe.loaders)</a>
+
+        <ul>
+          <li><a href="serotiny.io.dataframe.loaders.html#serotiny.io.dataframe.loaders.columns.LoadColumns">(class in serotiny.io.dataframe.loaders.columns)</a>
+</li>
+        </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="serotiny.imports.html#serotiny.imports.dynamic_imports.load_multiple">load_multiple() (in module serotiny.imports.dynamic_imports)</a>
+        <li><a href="serotiny.io.dataframe.loaders.html#serotiny.io.dataframe.loaders.abstract_loader.Loader">Loader (class in serotiny.io.dataframe.loaders.abstract_loader)</a>
+</li>
+        <li><a href="serotiny.io.dataframe.loaders.html#serotiny.io.dataframe.loaders.LoadImage">LoadImage (class in serotiny.io.dataframe.loaders)</a>
+
+        <ul>
+          <li><a href="serotiny.io.dataframe.loaders.html#serotiny.io.dataframe.loaders.image.LoadImage">(class in serotiny.io.dataframe.loaders.image)</a>
+</li>
+        </ul></li>
+        <li><a href="serotiny.io.dataframe.loaders.html#serotiny.io.dataframe.loaders.random_image.LoadRandomTensor">LoadRandomTensor (class in serotiny.io.dataframe.loaders.random_image)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -457,10 +422,20 @@
   <h2>M</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="serotiny.datamodules.html#serotiny.datamodules.manifest_datamodule.ManifestDatamodule.make_dataloader">make_dataloader() (serotiny.datamodules.manifest_datamodule.ManifestDatamodule method)</a>
+
+        <ul>
+          <li><a href="serotiny.datamodules.html#serotiny.datamodules.ManifestDatamodule.make_dataloader">(serotiny.datamodules.ManifestDatamodule method)</a>
+</li>
+        </ul></li>
         <li><a href="serotiny.transforms.dataframe.html#serotiny.transforms.dataframe.transforms.make_random_df">make_random_df() (in module serotiny.transforms.dataframe.transforms)</a>
 </li>
-        <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.feature_extraction.min_max">min_max() (in module serotiny.transforms.image.feature_extraction)</a>
+        <li><a href="serotiny.datamodules.html#serotiny.datamodules.ManifestDatamodule">ManifestDatamodule (class in serotiny.datamodules)</a>
+
+        <ul>
+          <li><a href="serotiny.datamodules.html#serotiny.datamodules.manifest_datamodule.ManifestDatamodule">(class in serotiny.datamodules.manifest_datamodule)</a>
 </li>
+        </ul></li>
         <li><a href="serotiny.networks.mlp.html#serotiny.networks.mlp.mlp.MLP">MLP (class in serotiny.networks.mlp.mlp)</a>
 </li>
         <li>
@@ -469,19 +444,31 @@
         <ul>
           <li><a href="serotiny.html#module-serotiny">serotiny</a>
 </li>
-          <li><a href="serotiny.imports.html#module-serotiny.imports">serotiny.imports</a>
+          <li><a href="serotiny.datamodules.html#module-serotiny.datamodules">serotiny.datamodules</a>
 </li>
-          <li><a href="serotiny.imports.html#module-serotiny.imports.dynamic_imports">serotiny.imports.dynamic_imports</a>
+          <li><a href="serotiny.datamodules.html#module-serotiny.datamodules.manifest_datamodule">serotiny.datamodules.manifest_datamodule</a>
 </li>
           <li><a href="serotiny.io.html#module-serotiny.io">serotiny.io</a>
 </li>
-          <li><a href="serotiny.io.html#module-serotiny.io.buffered_patch_dataset">serotiny.io.buffered_patch_dataset</a>
+          <li><a href="serotiny.io.dataframe.html#module-serotiny.io.dataframe">serotiny.io.dataframe</a>
 </li>
           <li><a href="serotiny.io.dataframe.html#module-serotiny.io.dataframe.dataframe_dataset">serotiny.io.dataframe.dataframe_dataset</a>
 </li>
-          <li><a href="serotiny.io.html#module-serotiny.io.image">serotiny.io.image</a>
+          <li><a href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders">serotiny.io.dataframe.loaders</a>
 </li>
-          <li><a href="serotiny.io.html#module-serotiny.io.quilt">serotiny.io.quilt</a>
+          <li><a href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders.abstract_loader">serotiny.io.dataframe.loaders.abstract_loader</a>
+</li>
+          <li><a href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders.classes">serotiny.io.dataframe.loaders.classes</a>
+</li>
+          <li><a href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders.columns">serotiny.io.dataframe.loaders.columns</a>
+</li>
+          <li><a href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders.image">serotiny.io.dataframe.loaders.image</a>
+</li>
+          <li><a href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders.random_image">serotiny.io.dataframe.loaders.random_image</a>
+</li>
+          <li><a href="serotiny.io.dataframe.html#module-serotiny.io.dataframe.readers">serotiny.io.dataframe.readers</a>
+</li>
+          <li><a href="serotiny.io.html#module-serotiny.io.image">serotiny.io.image</a>
 </li>
           <li><a href="serotiny.losses.html#module-serotiny.losses">serotiny.losses</a>
 </li>
@@ -489,33 +476,39 @@
 </li>
           <li><a href="serotiny.losses.html#module-serotiny.losses.kl_divergence">serotiny.losses.kl_divergence</a>
 </li>
-          <li><a href="serotiny.metrics.html#module-serotiny.metrics">serotiny.metrics</a>
+          <li><a href="serotiny.models.html#module-serotiny.models">serotiny.models</a>
 </li>
-          <li><a href="serotiny.metrics.html#module-serotiny.metrics.calculate_blur">serotiny.metrics.calculate_blur</a>
-</li>
-          <li><a href="serotiny.metrics.html#module-serotiny.metrics.calculate_fid">serotiny.metrics.calculate_fid</a>
-</li>
-          <li><a href="serotiny.metrics.html#module-serotiny.metrics.inception">serotiny.metrics.inception</a>
-</li>
-          <li><a href="serotiny.metrics.html#module-serotiny.metrics.pearson">serotiny.metrics.pearson</a>
+          <li><a href="serotiny.models.html#module-serotiny.models.base_model">serotiny.models.base_model</a>
 </li>
           <li><a href="serotiny.models.utils.html#module-serotiny.models.utils">serotiny.models.utils</a>
 </li>
           <li><a href="serotiny.models.utils.html#module-serotiny.models.utils.optimizer_utils">serotiny.models.utils.optimizer_utils</a>
 </li>
+          <li><a href="serotiny.models.vae.html#module-serotiny.models.vae">serotiny.models.vae</a>
+</li>
+          <li><a href="serotiny.models.vae.html#module-serotiny.models.vae.base_vae">serotiny.models.vae.base_vae</a>
+</li>
+          <li><a href="serotiny.models.vae.html#module-serotiny.models.vae.image_vae">serotiny.models.vae.image_vae</a>
+</li>
+          <li><a href="serotiny.models.vae.html#module-serotiny.models.vae.tabular_vae">serotiny.models.vae.tabular_vae</a>
+</li>
+          <li><a href="serotiny.networks.html#module-serotiny.networks">serotiny.networks</a>
+</li>
+          <li><a href="serotiny.networks.basic_cnn.html#module-serotiny.networks.basic_cnn">serotiny.networks.basic_cnn</a>
+</li>
+          <li><a href="serotiny.networks.basic_cnn.html#module-serotiny.networks.basic_cnn.basic_cnn">serotiny.networks.basic_cnn.basic_cnn</a>
+</li>
+          <li><a href="serotiny.networks.layers.html#module-serotiny.networks.layers">serotiny.networks.layers</a>
+</li>
+          <li><a href="serotiny.networks.layers.html#module-serotiny.networks.layers.convolution_block">serotiny.networks.layers.convolution_block</a>
+</li>
+          <li><a href="serotiny.networks.layers.html#module-serotiny.networks.layers.skip_connection">serotiny.networks.layers.skip_connection</a>
+</li>
+          <li><a href="serotiny.networks.layers.html#module-serotiny.networks.layers.spatial_pyramid_pool">serotiny.networks.layers.spatial_pyramid_pool</a>
+</li>
           <li><a href="serotiny.networks.mlp.html#module-serotiny.networks.mlp">serotiny.networks.mlp</a>
 </li>
           <li><a href="serotiny.networks.mlp.html#module-serotiny.networks.mlp.mlp">serotiny.networks.mlp.mlp</a>
-</li>
-          <li><a href="serotiny.networks.unet.html#module-serotiny.networks.unet">serotiny.networks.unet</a>
-</li>
-          <li><a href="serotiny.networks.unet.html#module-serotiny.networks.unet.double_convolution">serotiny.networks.unet.double_convolution</a>
-</li>
-          <li><a href="serotiny.networks.unet.html#module-serotiny.networks.unet.unet_3d">serotiny.networks.unet.unet_3d</a>
-</li>
-          <li><a href="serotiny.networks.unet.html#module-serotiny.networks.unet.unet_downconv">serotiny.networks.unet.unet_downconv</a>
-</li>
-          <li><a href="serotiny.networks.unet.html#module-serotiny.networks.unet.unet_upconv">serotiny.networks.unet.unet_upconv</a>
 </li>
           <li><a href="serotiny.networks.utils.html#module-serotiny.networks.utils">serotiny.networks.utils</a>
 </li>
@@ -529,9 +522,7 @@
 </li>
           <li><a href="serotiny.transforms.image.html#module-serotiny.transforms.image">serotiny.transforms.image</a>
 </li>
-          <li><a href="serotiny.transforms.image.html#module-serotiny.transforms.image.align">serotiny.transforms.image.align</a>
-</li>
-          <li><a href="serotiny.transforms.image.html#module-serotiny.transforms.image.feature_extraction">serotiny.transforms.image.feature_extraction</a>
+          <li><a href="serotiny.transforms.image.html#module-serotiny.transforms.image.crop">serotiny.transforms.image.crop</a>
 </li>
           <li><a href="serotiny.transforms.image.html#module-serotiny.transforms.image.normalize">serotiny.transforms.image.normalize</a>
 </li>
@@ -539,19 +530,9 @@
 </li>
           <li><a href="serotiny.transforms.image.html#module-serotiny.transforms.image.project">serotiny.transforms.image.project</a>
 </li>
-          <li><a href="serotiny.transforms.image.html#module-serotiny.transforms.image.resize">serotiny.transforms.image.resize</a>
-</li>
           <li><a href="serotiny.transforms.image.html#module-serotiny.transforms.image.swap">serotiny.transforms.image.swap</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="serotiny.imports.html#serotiny.imports.dynamic_imports.module_get">module_get() (in module serotiny.imports.dynamic_imports)</a>
-</li>
-        <li><a href="serotiny.imports.html#serotiny.imports.dynamic_imports.module_or_path">module_or_path() (in module serotiny.imports.dynamic_imports)</a>
-</li>
-        <li><a href="serotiny.imports.html#serotiny.imports.dynamic_imports.module_path">module_path() (in module serotiny.imports.dynamic_imports)</a>
-</li>
     </ul></td>
   </tr></table>
 </section>
@@ -562,13 +543,11 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.normalize.NormalizeAbsolute">NormalizeAbsolute (class in serotiny.transforms.image.normalize)</a>
 </li>
-        <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.normalize.NormalizeMean">NormalizeMean (class in serotiny.transforms.image.normalize)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.normalize.NormalizeMinMax">NormalizeMinMax (class in serotiny.transforms.image.normalize)</a>
+        <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.normalize.NormalizeMean">NormalizeMean (class in serotiny.transforms.image.normalize)</a>
 </li>
-        <li><a href="serotiny.networks.unet.html#serotiny.networks.unet.unet_3d.Unet3d.num_output_channels">num_output_channels (serotiny.networks.unet.unet_3d.Unet3d attribute)</a>
+        <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.normalize.NormalizeMinMax">NormalizeMinMax (class in serotiny.transforms.image.normalize)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -580,16 +559,38 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.pad.PadTo">PadTo (class in serotiny.transforms.image.pad)</a>
 </li>
-        <li><a href="serotiny.metrics.html#serotiny.metrics.pearson.pearson_correlation">pearson_correlation() (in module serotiny.metrics.pearson)</a>
+        <li><a href="serotiny.models.html#serotiny.models.base_model.BaseModel.parse_batch">parse_batch() (serotiny.models.base_model.BaseModel method)</a>
+
+        <ul>
+          <li><a href="serotiny.models.vae.html#serotiny.models.vae.base_vae.BaseVAE.parse_batch">(serotiny.models.vae.base_vae.BaseVAE method)</a>
 </li>
-        <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.feature_extraction.percentile">percentile() (in module serotiny.transforms.image.feature_extraction)</a>
-</li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
+        </ul></li>
         <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.swap.Permute">Permute (class in serotiny.transforms.image.swap)</a>
 </li>
-        <li><a href="serotiny.networks.unet.html#serotiny.networks.unet.unet_3d.Unet3d.print_network">print_network() (serotiny.networks.unet.unet_3d.Unet3d method)</a>
+        <li><a href="serotiny.models.vae.html#serotiny.models.vae.base_vae.BaseVAE.precision">precision (serotiny.models.vae.base_vae.BaseVAE attribute)</a>
+
+        <ul>
+          <li><a href="serotiny.models.vae.html#serotiny.models.vae.image_vae.ImageVAE.precision">(serotiny.models.vae.image_vae.ImageVAE attribute)</a>
 </li>
+          <li><a href="serotiny.models.vae.html#serotiny.models.vae.tabular_vae.TabularVAE.precision">(serotiny.models.vae.tabular_vae.TabularVAE attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="serotiny.datamodules.html#serotiny.datamodules.manifest_datamodule.ManifestDatamodule.predict_dataloader">predict_dataloader() (serotiny.datamodules.manifest_datamodule.ManifestDatamodule method)</a>
+
+        <ul>
+          <li><a href="serotiny.datamodules.html#serotiny.datamodules.ManifestDatamodule.predict_dataloader">(serotiny.datamodules.ManifestDatamodule method)</a>
+</li>
+        </ul></li>
+        <li><a href="serotiny.models.vae.html#serotiny.models.vae.base_vae.BaseVAE.prepare_data_per_node">prepare_data_per_node (serotiny.models.vae.base_vae.BaseVAE attribute)</a>
+
+        <ul>
+          <li><a href="serotiny.models.vae.html#serotiny.models.vae.image_vae.ImageVAE.prepare_data_per_node">(serotiny.models.vae.image_vae.ImageVAE attribute)</a>
+</li>
+          <li><a href="serotiny.models.vae.html#serotiny.models.vae.tabular_vae.TabularVAE.prepare_data_per_node">(serotiny.models.vae.tabular_vae.TabularVAE attribute)</a>
+</li>
+        </ul></li>
         <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.project.Project">Project (class in serotiny.transforms.image.project)</a>
 </li>
         <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.pad.pull_to">pull_to() (in module serotiny.transforms.image.pad)</a>
@@ -602,13 +603,15 @@
   <h2>R</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="serotiny.losses.html#serotiny.losses.continuous_bernoulli.CBLogLoss.reduction">reduction (serotiny.losses.continuous_bernoulli.CBLogLoss attribute)</a>
+        <li><a href="serotiny.io.dataframe.html#serotiny.io.dataframe.readers.read_csv">read_csv() (in module serotiny.io.dataframe.readers)</a>
+</li>
+        <li><a href="serotiny.io.dataframe.html#serotiny.io.dataframe.readers.read_dataframe">read_dataframe() (in module serotiny.io.dataframe.readers)</a>
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.resize.ResizeBy">ResizeBy (class in serotiny.transforms.image.resize)</a>
+        <li><a href="serotiny.io.dataframe.html#serotiny.io.dataframe.readers.read_parquet">read_parquet() (in module serotiny.io.dataframe.readers)</a>
 </li>
-        <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.resize.ResizeTo">ResizeTo (class in serotiny.transforms.image.resize)</a>
+        <li><a href="serotiny.losses.html#serotiny.losses.continuous_bernoulli.CBLogLoss.reduction">reduction (serotiny.losses.continuous_bernoulli.CBLogLoss attribute)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -620,7 +623,7 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="serotiny.transforms.dataframe.html#serotiny.transforms.dataframe.transforms.sample_n_each">sample_n_each() (in module serotiny.transforms.dataframe.transforms)</a>
 </li>
-        <li><a href="serotiny.imports.html#serotiny.imports.dynamic_imports.search_modules">search_modules() (in module serotiny.imports.dynamic_imports)</a>
+        <li><a href="serotiny.models.vae.html#serotiny.models.vae.base_vae.BaseVAE.sample_z">sample_z() (serotiny.models.vae.base_vae.BaseVAE method)</a>
 </li>
         <li>
     serotiny
@@ -630,17 +633,17 @@
 </li>
         </ul></li>
         <li>
-    serotiny.imports
+    serotiny.datamodules
 
         <ul>
-          <li><a href="serotiny.imports.html#module-serotiny.imports">module</a>
+          <li><a href="serotiny.datamodules.html#module-serotiny.datamodules">module</a>
 </li>
         </ul></li>
         <li>
-    serotiny.imports.dynamic_imports
+    serotiny.datamodules.manifest_datamodule
 
         <ul>
-          <li><a href="serotiny.imports.html#module-serotiny.imports.dynamic_imports">module</a>
+          <li><a href="serotiny.datamodules.html#module-serotiny.datamodules.manifest_datamodule">module</a>
 </li>
         </ul></li>
         <li>
@@ -651,10 +654,10 @@
 </li>
         </ul></li>
         <li>
-    serotiny.io.buffered_patch_dataset
+    serotiny.io.dataframe
 
         <ul>
-          <li><a href="serotiny.io.html#module-serotiny.io.buffered_patch_dataset">module</a>
+          <li><a href="serotiny.io.dataframe.html#module-serotiny.io.dataframe">module</a>
 </li>
         </ul></li>
         <li>
@@ -665,17 +668,59 @@
 </li>
         </ul></li>
         <li>
+    serotiny.io.dataframe.loaders
+
+        <ul>
+          <li><a href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders">module</a>
+</li>
+        </ul></li>
+        <li>
+    serotiny.io.dataframe.loaders.abstract_loader
+
+        <ul>
+          <li><a href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders.abstract_loader">module</a>
+</li>
+        </ul></li>
+        <li>
+    serotiny.io.dataframe.loaders.classes
+
+        <ul>
+          <li><a href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders.classes">module</a>
+</li>
+        </ul></li>
+        <li>
+    serotiny.io.dataframe.loaders.columns
+
+        <ul>
+          <li><a href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders.columns">module</a>
+</li>
+        </ul></li>
+        <li>
+    serotiny.io.dataframe.loaders.image
+
+        <ul>
+          <li><a href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders.image">module</a>
+</li>
+        </ul></li>
+        <li>
+    serotiny.io.dataframe.loaders.random_image
+
+        <ul>
+          <li><a href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders.random_image">module</a>
+</li>
+        </ul></li>
+        <li>
+    serotiny.io.dataframe.readers
+
+        <ul>
+          <li><a href="serotiny.io.dataframe.html#module-serotiny.io.dataframe.readers">module</a>
+</li>
+        </ul></li>
+        <li>
     serotiny.io.image
 
         <ul>
           <li><a href="serotiny.io.html#module-serotiny.io.image">module</a>
-</li>
-        </ul></li>
-        <li>
-    serotiny.io.quilt
-
-        <ul>
-          <li><a href="serotiny.io.html#module-serotiny.io.quilt">module</a>
 </li>
         </ul></li>
         <li>
@@ -700,38 +745,17 @@
 </li>
         </ul></li>
         <li>
-    serotiny.metrics
+    serotiny.models
 
         <ul>
-          <li><a href="serotiny.metrics.html#module-serotiny.metrics">module</a>
+          <li><a href="serotiny.models.html#module-serotiny.models">module</a>
 </li>
         </ul></li>
         <li>
-    serotiny.metrics.calculate_blur
+    serotiny.models.base_model
 
         <ul>
-          <li><a href="serotiny.metrics.html#module-serotiny.metrics.calculate_blur">module</a>
-</li>
-        </ul></li>
-        <li>
-    serotiny.metrics.calculate_fid
-
-        <ul>
-          <li><a href="serotiny.metrics.html#module-serotiny.metrics.calculate_fid">module</a>
-</li>
-        </ul></li>
-        <li>
-    serotiny.metrics.inception
-
-        <ul>
-          <li><a href="serotiny.metrics.html#module-serotiny.metrics.inception">module</a>
-</li>
-        </ul></li>
-        <li>
-    serotiny.metrics.pearson
-
-        <ul>
-          <li><a href="serotiny.metrics.html#module-serotiny.metrics.pearson">module</a>
+          <li><a href="serotiny.models.html#module-serotiny.models.base_model">module</a>
 </li>
         </ul></li>
         <li>
@@ -749,6 +773,85 @@
 </li>
         </ul></li>
         <li>
+    serotiny.models.vae
+
+        <ul>
+          <li><a href="serotiny.models.vae.html#module-serotiny.models.vae">module</a>
+</li>
+        </ul></li>
+        <li>
+    serotiny.models.vae.base_vae
+
+        <ul>
+          <li><a href="serotiny.models.vae.html#module-serotiny.models.vae.base_vae">module</a>
+</li>
+        </ul></li>
+        <li>
+    serotiny.models.vae.image_vae
+
+        <ul>
+          <li><a href="serotiny.models.vae.html#module-serotiny.models.vae.image_vae">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    serotiny.models.vae.tabular_vae
+
+        <ul>
+          <li><a href="serotiny.models.vae.html#module-serotiny.models.vae.tabular_vae">module</a>
+</li>
+        </ul></li>
+        <li>
+    serotiny.networks
+
+        <ul>
+          <li><a href="serotiny.networks.html#module-serotiny.networks">module</a>
+</li>
+        </ul></li>
+        <li>
+    serotiny.networks.basic_cnn
+
+        <ul>
+          <li><a href="serotiny.networks.basic_cnn.html#module-serotiny.networks.basic_cnn">module</a>
+</li>
+        </ul></li>
+        <li>
+    serotiny.networks.basic_cnn.basic_cnn
+
+        <ul>
+          <li><a href="serotiny.networks.basic_cnn.html#module-serotiny.networks.basic_cnn.basic_cnn">module</a>
+</li>
+        </ul></li>
+        <li>
+    serotiny.networks.layers
+
+        <ul>
+          <li><a href="serotiny.networks.layers.html#module-serotiny.networks.layers">module</a>
+</li>
+        </ul></li>
+        <li>
+    serotiny.networks.layers.convolution_block
+
+        <ul>
+          <li><a href="serotiny.networks.layers.html#module-serotiny.networks.layers.convolution_block">module</a>
+</li>
+        </ul></li>
+        <li>
+    serotiny.networks.layers.skip_connection
+
+        <ul>
+          <li><a href="serotiny.networks.layers.html#module-serotiny.networks.layers.skip_connection">module</a>
+</li>
+        </ul></li>
+        <li>
+    serotiny.networks.layers.spatial_pyramid_pool
+
+        <ul>
+          <li><a href="serotiny.networks.layers.html#module-serotiny.networks.layers.spatial_pyramid_pool">module</a>
+</li>
+        </ul></li>
+        <li>
     serotiny.networks.mlp
 
         <ul>
@@ -760,43 +863,6 @@
 
         <ul>
           <li><a href="serotiny.networks.mlp.html#module-serotiny.networks.mlp.mlp">module</a>
-</li>
-        </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li>
-    serotiny.networks.unet
-
-        <ul>
-          <li><a href="serotiny.networks.unet.html#module-serotiny.networks.unet">module</a>
-</li>
-        </ul></li>
-        <li>
-    serotiny.networks.unet.double_convolution
-
-        <ul>
-          <li><a href="serotiny.networks.unet.html#module-serotiny.networks.unet.double_convolution">module</a>
-</li>
-        </ul></li>
-        <li>
-    serotiny.networks.unet.unet_3d
-
-        <ul>
-          <li><a href="serotiny.networks.unet.html#module-serotiny.networks.unet.unet_3d">module</a>
-</li>
-        </ul></li>
-        <li>
-    serotiny.networks.unet.unet_downconv
-
-        <ul>
-          <li><a href="serotiny.networks.unet.html#module-serotiny.networks.unet.unet_downconv">module</a>
-</li>
-        </ul></li>
-        <li>
-    serotiny.networks.unet.unet_upconv
-
-        <ul>
-          <li><a href="serotiny.networks.unet.html#module-serotiny.networks.unet.unet_upconv">module</a>
 </li>
         </ul></li>
         <li>
@@ -842,17 +908,10 @@
 </li>
         </ul></li>
         <li>
-    serotiny.transforms.image.align
+    serotiny.transforms.image.crop
 
         <ul>
-          <li><a href="serotiny.transforms.image.html#module-serotiny.transforms.image.align">module</a>
-</li>
-        </ul></li>
-        <li>
-    serotiny.transforms.image.feature_extraction
-
-        <ul>
-          <li><a href="serotiny.transforms.image.html#module-serotiny.transforms.image.feature_extraction">module</a>
+          <li><a href="serotiny.transforms.image.html#module-serotiny.transforms.image.crop">module</a>
 </li>
         </ul></li>
         <li>
@@ -877,20 +936,17 @@
 </li>
         </ul></li>
         <li>
-    serotiny.transforms.image.resize
-
-        <ul>
-          <li><a href="serotiny.transforms.image.html#module-serotiny.transforms.image.resize">module</a>
-</li>
-        </ul></li>
-        <li>
     serotiny.transforms.image.swap
 
         <ul>
           <li><a href="serotiny.transforms.image.html#module-serotiny.transforms.image.swap">module</a>
 </li>
         </ul></li>
-        <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.feature_extraction.shcoeffs">shcoeffs() (in module serotiny.transforms.image.feature_extraction)</a>
+        <li><a href="serotiny.networks.layers.html#serotiny.networks.layers.skip_connection.SkipConnection">SkipConnection (class in serotiny.networks.layers.skip_connection)</a>
+</li>
+        <li><a href="serotiny.networks.layers.html#serotiny.networks.layers.spatial_pyramid_pool.spatial_pyramid_pool">spatial_pyramid_pool() (in module serotiny.networks.layers.spatial_pyramid_pool)</a>
+</li>
+        <li><a href="serotiny.networks.layers.html#serotiny.networks.layers.spatial_pyramid_pool.SpatialPyramidPool">SpatialPyramidPool (class in serotiny.networks.layers.spatial_pyramid_pool)</a>
 </li>
         <li><a href="serotiny.transforms.dataframe.html#serotiny.transforms.dataframe.transforms.split_dataframe">split_dataframe() (in module serotiny.transforms.dataframe.transforms)</a>
 </li>
@@ -906,26 +962,54 @@
   <h2>T</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="serotiny.models.vae.html#serotiny.models.vae.tabular_vae.TabularVAE">TabularVAE (class in serotiny.models.vae.tabular_vae)</a>
+</li>
+        <li><a href="serotiny.datamodules.html#serotiny.datamodules.manifest_datamodule.ManifestDatamodule.test_dataloader">test_dataloader() (serotiny.datamodules.manifest_datamodule.ManifestDatamodule method)</a>
+
+        <ul>
+          <li><a href="serotiny.datamodules.html#serotiny.datamodules.ManifestDatamodule.test_dataloader">(serotiny.datamodules.ManifestDatamodule method)</a>
+</li>
+        </ul></li>
+        <li><a href="serotiny.models.html#serotiny.models.base_model.BaseModel.test_epoch_end">test_epoch_end() (serotiny.models.base_model.BaseModel method)</a>
+</li>
+        <li><a href="serotiny.models.html#serotiny.models.base_model.BaseModel.test_step">test_step() (serotiny.models.base_model.BaseModel method)</a>
+</li>
         <li><a href="serotiny.io.html#serotiny.io.image.tiff_writer">tiff_writer() (in module serotiny.io.image)</a>
 </li>
         <li><a href="serotiny.transforms.image.html#serotiny.transforms.image.pad.to_tensor">to_tensor() (in module serotiny.transforms.image.pad)</a>
 </li>
-        <li><a href="serotiny.metrics.html#serotiny.metrics.inception.InceptionV3.training">training (serotiny.metrics.inception.InceptionV3 attribute)</a>
+        <li><a href="serotiny.datamodules.html#serotiny.datamodules.manifest_datamodule.ManifestDatamodule.train_dataloader">train_dataloader() (serotiny.datamodules.manifest_datamodule.ManifestDatamodule method)</a>
 
         <ul>
-          <li><a href="serotiny.metrics.html#serotiny.metrics.InceptionV3.training">(serotiny.metrics.InceptionV3 attribute)</a>
+          <li><a href="serotiny.datamodules.html#serotiny.datamodules.ManifestDatamodule.train_dataloader">(serotiny.datamodules.ManifestDatamodule method)</a>
+</li>
+        </ul></li>
+        <li><a href="serotiny.models.html#serotiny.models.base_model.BaseModel.train_epoch_end">train_epoch_end() (serotiny.models.base_model.BaseModel method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="serotiny.models.html#serotiny.models.base_model.BaseModel.training">training (serotiny.models.base_model.BaseModel attribute)</a>
+
+        <ul>
+          <li><a href="serotiny.models.vae.html#serotiny.models.vae.base_vae.BaseVAE.training">(serotiny.models.vae.base_vae.BaseVAE attribute)</a>
+</li>
+          <li><a href="serotiny.models.vae.html#serotiny.models.vae.image_vae.ImageVAE.training">(serotiny.models.vae.image_vae.ImageVAE attribute)</a>
+</li>
+          <li><a href="serotiny.models.vae.html#serotiny.models.vae.tabular_vae.TabularVAE.training">(serotiny.models.vae.tabular_vae.TabularVAE attribute)</a>
+</li>
+          <li><a href="serotiny.networks.basic_cnn.html#serotiny.networks.basic_cnn.basic_cnn.BasicCNN.training">(serotiny.networks.basic_cnn.basic_cnn.BasicCNN attribute)</a>
+</li>
+          <li><a href="serotiny.networks.layers.html#serotiny.networks.layers.convolution_block.ConvBlock.training">(serotiny.networks.layers.convolution_block.ConvBlock attribute)</a>
+</li>
+          <li><a href="serotiny.networks.layers.html#serotiny.networks.layers.skip_connection.SkipConnection.training">(serotiny.networks.layers.skip_connection.SkipConnection attribute)</a>
+</li>
+          <li><a href="serotiny.networks.layers.html#serotiny.networks.layers.spatial_pyramid_pool.SpatialPyramidPool.training">(serotiny.networks.layers.spatial_pyramid_pool.SpatialPyramidPool attribute)</a>
 </li>
           <li><a href="serotiny.networks.mlp.html#serotiny.networks.mlp.mlp.MLP.training">(serotiny.networks.mlp.mlp.MLP attribute)</a>
 </li>
-          <li><a href="serotiny.networks.unet.html#serotiny.networks.unet.double_convolution.DoubleConvolution.training">(serotiny.networks.unet.double_convolution.DoubleConvolution attribute)</a>
-</li>
-          <li><a href="serotiny.networks.unet.html#serotiny.networks.unet.unet_3d.Unet3d.training">(serotiny.networks.unet.unet_3d.Unet3d attribute)</a>
-</li>
-          <li><a href="serotiny.networks.unet.html#serotiny.networks.unet.unet_downconv.DownConvolution.training">(serotiny.networks.unet.unet_downconv.DownConvolution attribute)</a>
-</li>
-          <li><a href="serotiny.networks.unet.html#serotiny.networks.unet.unet_upconv.UpConvolution.training">(serotiny.networks.unet.unet_upconv.UpConvolution attribute)</a>
-</li>
         </ul></li>
+        <li><a href="serotiny.models.html#serotiny.models.base_model.BaseModel.training_step">training_step() (serotiny.models.base_model.BaseModel method)</a>
+</li>
     </ul></td>
   </tr></table>
 </section>
@@ -934,11 +1018,33 @@
   <h2>U</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="serotiny.networks.unet.html#serotiny.networks.unet.unet_3d.Unet3d">Unet3d (class in serotiny.networks.unet.unet_3d)</a>
+        <li><a href="serotiny.models.vae.html#serotiny.models.vae.base_vae.BaseVAE.use_amp">use_amp (serotiny.models.vae.base_vae.BaseVAE attribute)</a>
+
+        <ul>
+          <li><a href="serotiny.models.vae.html#serotiny.models.vae.image_vae.ImageVAE.use_amp">(serotiny.models.vae.image_vae.ImageVAE attribute)</a>
 </li>
+          <li><a href="serotiny.models.vae.html#serotiny.models.vae.tabular_vae.TabularVAE.use_amp">(serotiny.models.vae.tabular_vae.TabularVAE attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="V" class="genindex-section">
+  <h2>V</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="serotiny.datamodules.html#serotiny.datamodules.manifest_datamodule.ManifestDatamodule.val_dataloader">val_dataloader() (serotiny.datamodules.manifest_datamodule.ManifestDatamodule method)</a>
+
+        <ul>
+          <li><a href="serotiny.datamodules.html#serotiny.datamodules.ManifestDatamodule.val_dataloader">(serotiny.datamodules.ManifestDatamodule method)</a>
+</li>
+        </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="serotiny.networks.unet.html#serotiny.networks.unet.unet_upconv.UpConvolution">UpConvolution (class in serotiny.networks.unet.unet_upconv)</a>
+        <li><a href="serotiny.models.html#serotiny.models.base_model.BaseModel.validation_epoch_end">validation_epoch_end() (serotiny.models.base_model.BaseModel method)</a>
+</li>
+        <li><a href="serotiny.models.html#serotiny.models.base_model.BaseModel.validation_step">validation_step() (serotiny.models.base_model.BaseModel method)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -963,11 +1069,21 @@
           
           
         </div>
-
-        <div class="related-information">
-              Copyright &#169; 2021 |
-          Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
-          <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
         </div>
         
       </footer>

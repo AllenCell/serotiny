@@ -4,18 +4,10 @@ serotiny.transforms.image package
 Submodules
 ----------
 
-serotiny.transforms.image.align module
---------------------------------------
+serotiny.transforms.image.crop module
+-------------------------------------
 
-.. automodule:: serotiny.transforms.image.align
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-serotiny.transforms.image.feature\_extraction module
-----------------------------------------------------
-
-.. automodule:: serotiny.transforms.image.feature_extraction
+.. automodule:: serotiny.transforms.image.crop
    :members:
    :undoc-members:
    :show-inheritance:
@@ -40,14 +32,6 @@ serotiny.transforms.image.project module
 ----------------------------------------
 
 .. automodule:: serotiny.transforms.image.project
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-serotiny.transforms.image.resize module
----------------------------------------
-
-.. automodule:: serotiny.transforms.image.resize
    :members:
    :undoc-members:
    :show-inheritance:

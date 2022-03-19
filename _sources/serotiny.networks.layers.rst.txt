@@ -12,6 +12,14 @@ serotiny.networks.layers.convolution\_block module
    :undoc-members:
    :show-inheritance:
 
+serotiny.networks.layers.skip\_connection module
+------------------------------------------------
+
+.. automodule:: serotiny.networks.layers.skip_connection
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 serotiny.networks.layers.spatial\_pyramid\_pool module
 ------------------------------------------------------
 

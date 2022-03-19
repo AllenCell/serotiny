@@ -8,10 +8,9 @@ Subpackages
    :maxdepth: 4
 
    serotiny.datamodules
-   serotiny.imports
    serotiny.io
    serotiny.losses
-   serotiny.metrics
+   serotiny.ml_ops
    serotiny.models
    serotiny.networks
    serotiny.transforms

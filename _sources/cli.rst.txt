@@ -1,62 +1,67 @@
 serotiny CLI
 ============
 
-``serotiny`` comes with a CLI to make it's use straightforward. The CLI has
-multiple modules, for different functionalities. You can append ``- --help``
-to any module in the command-line, to obtain more information
-(note the first dash. I'm working on making that unnecessary).
+``serotiny`` comes with a CLI to make its use straightforward. The CLI has
+multiple modules, for different functionalities. You can append ``--help``
+to any module in the command-line, to obtain more information.
 
 * ``serotiny``
 
-  * ``model`` : model training and inference
-
-    * ``train`` : model training
-
-    * ``predict`` : inference / prediction
-
-  * ``dataframe`` : dataframe wrangling utils
-
-    * ``transform`` : dataframe transform operations
-
-    * ``merge``: merge multiple dataframes
-
-    * ``partition`` : break one dataframe into chunks
-
-  * ``image``
-
-    * ``transform`` : define and apply image transform pipelines
-
-    * ``feature_extraction``
-
-  * ``misc``
+  * ``train`` : model training
+  * ``test`` : model testing/evaluation
+  * ``predict`` : inference / prediction
+  * ``dataframe`` : dataframe wrangling utils. See more :ref:`here <df_wrangling>`
+  * ``image`` : utils to get info about image files
+  * ``config`` : utils to interact with config files
 
 
-Passing config dicts in CLI
-***************************
+ML operations: train, test, predict
+*******************************
 
-Some of the CLI scripts take in dictionaries as input parameters. However,
-for complex enough scenarios, it can be quite cumbersome to enter a dictionary
-in the command line. For that reason, wherever a config dict is accepted, it
-is also possible to pass it a path to a YAML file which contains the desired
-config:
+These commands run in the context of :ref:`serotiny projects <projects>`. In that
+section you'll learn how to create and configure your ``serotiny`` projects. Once
+you've done so, you can use these commands to train/test/predict with the models
+you specified in your project. For example:
+
 ::
 
-   $ serotiny model train --model=model.yaml: ...
+   $ serotiny train \
+   model=a_model_config \
+   data=a_datamodule_config \
+   trainer=default \ # you can omit this line if you're using the default config
+   mlflow=default \  # you can omit this line if you're using the default config
+   ++model.latent_dim=11 \ # if you want to override a particular value, you can do so
+   ++trainer.max_epochs=50 \
+   ++seed=13
 
-Note the colon after the filename. This is how the CLI knows to interpret this
-argument as a loadable config file, and not just pass it as a string to the
-underlying function.
+Note the arguments starting with ``++argument=...``. This is the syntax to use
+when you want to override a config argument coming from your config files. You
+can also use it to add additional arguments which aren't specified in your config
+files (e.g. ``seed`` is by default not given in the config files). The reason
+behind this initially intimidating syntax is because these commands are
+``hydra`` scripts under the hood. That means you can use
+`hydra's overrides syntax <https://hydra.cc/docs/next/advanced/override_grammar/basic/>`_
+to change config parameters, as well as leverage any additional hydra functionality
+like:
 
-If you don't want to have a file per config dict, and prefer having all your
-configurations in a single file, you can also specify a field in your YAML
-file to be passed. Use "dot-notation" to specify nested fields:
-::
+- Multi-runs and launchers
 
-   $ serotiny model train --model=config.yaml:train.model ...
+  - Just add the ``-m`` flag and the intended sweeps in the command line
 
-Finally, you might be in one of the two situations above, but still want to
-override or add an argument to your configuration. You can do that by adding
-"dot-notation" overrides at the end of your command:
-::
+- Tab completion (only on Bash)
 
-   $ serotiny model train --model=config.yaml:train.model ... model.latent_dimensions=10 model.input_channels=4
+  - Run ``eval "$(serotiny train -sc install=serotiny_bash)"``. You now have tab
+    completion in serotiny projects in that shell session! (Useful when you have
+    many config options for each config group - see the
+    :ref:`serotiny projects section <projects>` to understand what this means)
+
+- ...
+
+Debugging ML operations
+***********************
+
+For the commands in the above section, you can add an argument
+``++make_notebook=/path/to/destination/notebook.ipynb`` to the call, with a path
+to a destination notebook file which will be created and populated with cells
+that mimic the behavior of the respective CLI call, so that you can tinker with
+them and run them one by one.

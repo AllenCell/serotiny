@@ -4,14 +4,6 @@ serotiny.networks.utils package
 Submodules
 ----------
 
-serotiny.networks.utils.sequential module
------------------------------------------
-
-.. automodule:: serotiny.networks.utils.sequential
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 serotiny.networks.utils.weight\_init module
 -------------------------------------------
 

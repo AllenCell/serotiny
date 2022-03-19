@@ -2,13 +2,14 @@
 <html class="no-js">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny CLI" href="cli.html" /><link rel="prev" title="Installation" href="installation.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny projects" href="projects.html" /><link rel="prev" title="Installation" href="installation.html" />
 
-    <meta name="generator" content="sphinx-4.3.2, furo 2022.01.02"/>
-        <title>Quickstart - serotiny 0.0.1 documentation</title>
+    <meta name="generator" content="sphinx-4.4.0, furo 2022.03.04"/>
+        <title>Quickstart - serotiny alpha documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=df49af52631e7917044a9c21a57f7b83170a6dd0" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=fade93df149f7c5fedb3ff897f799dc7d283b420" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
     
     
 
@@ -19,16 +20,18 @@
   --color-code-foreground: black;
   
   }
-  body[data-theme="dark"] {
-    --color-code-background: #202020;
-  --color-code-foreground: #d0d0d0;
-  
-  }
-  @media (prefers-color-scheme: dark) {
-    body:not([data-theme="light"]) {
+  @media not print {
+    body[data-theme="dark"] {
       --color-code-background: #202020;
   --color-code-foreground: #d0d0d0;
   
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
     }
   }
 </style></head>
@@ -40,17 +43,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
   <symbol id="svg-toc" viewBox="0 0 24 24">
     <title>Contents</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path stroke="none" d="M0 0h24v24H0z" />
-      <line x1="4" y1="6" x2="20" y2="6" />
-      <line x1="10" y1="12" x2="20" y2="12" />
-      <line x1="6" y1="18" x2="20" y2="18" />
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
     </svg>
   </symbol>
   <symbol id="svg-menu" viewBox="0 0 24 24">
     <title>Menu</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
       <line x1="3" y1="12" x2="21" y2="12"></line>
       <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -59,14 +58,14 @@
   </symbol>
   <symbol id="svg-arrow-right" viewBox="0 0 24 24">
     <title>Expand</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
       <polyline points="9 18 15 12 9 6"></polyline>
     </svg>
   </symbol>
   <symbol id="svg-sun" viewBox="0 0 24 24">
     <title>Light mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
       <circle cx="12" cy="12" r="5"></circle>
       <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -81,7 +80,7 @@
   </symbol>
   <symbol id="svg-moon" viewBox="0 0 24 24">
     <title>Dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
       <path stroke="none" d="M0 0h24v24H0z" fill="none" />
       <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
@@ -89,7 +88,7 @@
   </symbol>
   <symbol id="svg-sun-half" viewBox="0 0 24 24">
     <title>Auto light/dark mode</title>
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
       <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
       <circle cx="12" cy="12" r="9" />
@@ -122,7 +121,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">serotiny 0.0.1 documentation</div></a>
+      <a href="index.html"><div class="brand">serotiny alpha documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -145,7 +144,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">serotiny 0.0.1 documentation</span>
+  <span class="sidebar-brand-text">serotiny alpha documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -158,17 +157,12 @@
 <li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="projects.html">serotiny projects</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">serotiny CLI</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dynamic_imports.html">Dynamic imports</a></li>
-<li class="toctree-l1"><a class="reference internal" href="image_transforms.html">Applying image transforms</a></li>
-<li class="toctree-l1"><a class="reference internal" href="feature_extraction.html">Extraction features from images</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dataframe_transforms.html">Dataframe wrangling</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model_zoo.html">Model zoo</a></li>
-<li class="toctree-l1"><a class="reference internal" href="example_workflows.html">Example workflows</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="modules.html">Package modules</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="serotiny.html">serotiny package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l3"><a class="reference internal" href="serotiny.datamodules.html">serotiny.datamodules package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="serotiny.imports.html">serotiny.imports package</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.io.html">serotiny.io package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l4 has-children"><a class="reference internal" href="serotiny.io.dataframe.html">serotiny.io.dataframe package</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.io.dataframe.loaders.html">serotiny.io.dataframe.loaders package</a></li>
@@ -177,11 +171,8 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="serotiny.losses.html">serotiny.losses package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="serotiny.metrics.html">serotiny.metrics package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.ml_ops.html">serotiny.ml_ops package</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.models.html">serotiny.models package</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.models.callbacks.html">serotiny.models.callbacks package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.models.inference.html">serotiny.models.inference package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.models.unet.html">serotiny.models.unet package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.utils.html">serotiny.models.utils package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.vae.html">serotiny.models.vae package</a></li>
 </ul>
@@ -190,25 +181,23 @@
 <li class="toctree-l4"><a class="reference internal" href="serotiny.networks.basic_cnn.html">serotiny.networks.basic_cnn package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.networks.layers.html">serotiny.networks.layers package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.networks.mlp.html">serotiny.networks.mlp package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.networks.unet.html">serotiny.networks.unet package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.networks.utils.html">serotiny.networks.utils package</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.transforms.html">serotiny.transforms package</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.transforms.dataframe.html">serotiny.transforms.dataframe package</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.transforms.image.html">serotiny.transforms.image package</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.transforms.pipeline.html">serotiny.transforms.pipeline package</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 </ul>
 
 </div>
 </div>
+
       </div>
       
     </div>
@@ -216,8 +205,13 @@
   <div class="main">
     <div class="content">
       <div class="article-container">
-        <div class="content-icon-container">
-          <div class="theme-toggle-container theme-toggle-content">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -231,40 +225,89 @@
           </label>
         </div>
         <article role="main">
-          <div class="section" id="quickstart">
-<h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="train-a-model">
-<h2>Train a model<a class="headerlink" href="#train-a-model" title="Permalink to this headline">¶</a></h2>
-<p>(Assuming one YAML file containing all the configs)</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ serotiny model train \
---model=config.yaml:model \
---datamodule=config.yaml:datamodule \
---trainer=config.yaml:trainer \
---model_zoo=config.yaml:model_zoo \
+          <section id="quickstart">
+<h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">#</a></h1>
+<section id="create-a-serotiny-project">
+<h2>Create a <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>-project<a class="headerlink" href="#create-a-serotiny-project" title="Permalink to this headline">#</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><code class="docutils literal notranslate"><span class="pre">serotiny</span></code> is mostly meant to be used in the context of <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>-projects.
+For a more detailed explanation of what these are, see the <a class="reference internal" href="projects.html#projects"><span class="std std-ref">serotiny projects
+section</span></a> of the documentation.</p>
+</div>
+<p>Using <a class="reference external" href="https://github.com/AllenCellModeling/serotiny-project-cookiecutter">our cookiecutter template</a>,
+create a <code class="docutils literal notranslate"><span class="pre">serotiny</span></code> project:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cookiecutter https://github.com/AllenCellModeling/serotiny-project-cookiecutter
 </pre></div>
 </div>
+<p>You will be prompted for a couple details about your project. Assuming you called
+it “a tiny project”, a folder named <code class="docutils literal notranslate"><span class="pre">a_tiny_project</span></code> will be created, with
+the following structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>.
+├── a_tiny_project
+│   └── config
+│       ├── data
+│       ├── mlflow
+│       ├── model
+│       ├── trainer
+│       │   └── callbacks
+│       ├── train.yaml
+│       ├── test.yaml
+│       └── predict.yaml
+├── MANIFEST.in
+└── setup.py
+</pre></div>
 </div>
-<div class="section" id="load-a-trained-model">
-<h2>Load a trained model<a class="headerlink" href="#load-a-trained-model" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">serotiny.models.zoo</span> <span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">get_trainer_at_checkpoint</span><span class="p">,</span> <span class="n">_get_checkpoint</span>
+<p>This is an installable Python package. You can add modules to it, inside
+<code class="docutils literal notranslate"><span class="pre">a_tiny_project</span></code>, according to your needs.</p>
+</section>
+<section id="setup-the-configs">
+<h2>Setup the configs<a class="headerlink" href="#setup-the-configs" title="Permalink to this headline">#</a></h2>
+<p>Update the <code class="docutils literal notranslate"><span class="pre">default.yaml</span></code> files you’ll find in the subdirectories of
+<code class="docutils literal notranslate"><span class="pre">a_tiny_project/config</span></code>. They should contain commented examples of what
+kinds of classes you can define there. These make use of hydra’s functionality
+to instantiate Python objects from a YAML configuration. See <a class="reference external" href="https://hydra.cc/docs/next/advanced/instantiate_objects/overview/">here</a></p>
+</section>
+<section id="get-a-mlflow-server-running">
+<h2>Get a MLFlow server running<a class="headerlink" href="#get-a-mlflow-server-running" title="Permalink to this headline">#</a></h2>
+<p>Refer to <a class="reference external" href="https://mlflow.org">the MLFlow docs</a> for this. Once you have it
+running, adjust the relevant configuration in
+<code class="docutils literal notranslate"><span class="pre">a_tiny_project/config/mlflow/default.yaml</span></code></p>
+</section>
+<section id="train-a-model">
+<h2>Train a model<a class="headerlink" href="#train-a-model" title="Permalink to this headline">#</a></h2>
+<p>You’re ready to train a model! You can override configuration parameters in the
+CLI call, using
+<a class="reference external" href="https://hydra.cc/docs/next/advanced/override_grammar/basic/">hydra’s overrides syntax</a>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ serotiny train
+</pre></div>
+</div>
+<p>Assuming appropriate configuration, you should see the results of your model
+training on MLFlow</p>
+</section>
+<section id="load-a-trained-model">
+<h2>Load a trained model<a class="headerlink" href="#load-a-trained-model" title="Permalink to this headline">#</a></h2>
+<p>Identify the run id for the model you just trained. You can now load it e.g. in
+a Jupyter Notebook by doing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">serotiny.ml_ops.mlflow_utils</span> <span class="kn">import</span> <span class="n">load_model_from_checkpoint</span>
 
-<span class="n">model</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="n">model_path</span><span class="p">,</span> <span class="n">model_id</span><span class="p">,</span> <span class="n">model_zoo_path</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">load_model_from_checkpoint</span><span class="p">(</span><span class="n">THE_TRACKING_URI</span><span class="p">,</span> <span class="n">THE_RUN_ID</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
         </article>
       </div>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="cli.html">
+          <a class="next-page" href="projects.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">serotiny CLI</div>
+                <div class="title">serotiny projects</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -280,15 +323,21 @@
               </div>
             </a>
         </div>
-
-        <div class="related-information">
-              Copyright &#169; 2021 |
-          Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
-          <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
-            | <a class="muted-link" href="_sources/quickstart.rst.txt"
-               rel="nofollow">
-              Show Source
-            </a>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2021
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
         </div>
         
       </footer>
@@ -306,6 +355,9 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Quickstart</a><ul>
+<li><a class="reference internal" href="#create-a-serotiny-project">Create a <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>-project</a></li>
+<li><a class="reference internal" href="#setup-the-configs">Setup the configs</a></li>
+<li><a class="reference internal" href="#get-a-mlflow-server-running">Get a MLFlow server running</a></li>
 <li><a class="reference internal" href="#train-a-model">Train a model</a></li>
 <li><a class="reference internal" href="#load-a-trained-model">Load a trained model</a></li>
 </ul>

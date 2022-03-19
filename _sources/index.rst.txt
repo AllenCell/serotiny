@@ -1,6 +1,12 @@
 serotiny
 ========
 
+``serotiny`` is a framework and set of tools to structure, configure and drive deep
+learning projects. It leverages `hydra <https://hydra.cc>`_ for configuration and
+execution, `Pytorch Lightning <https://pytorchlightning.ai>`_
+for neural net training/testing/prediction, and `MLFlow <https://mlflow.org>`_
+for experiment tracking and artifact management.
+
 .. toctree::
    :hidden:
    :maxdepth: 1
@@ -9,15 +15,10 @@ serotiny
    Home <self>
    installation
    quickstart
+   projects
    cli
-   dynamic_imports
-   image_transforms
-   feature_extraction
    dataframe_transforms
-   model_zoo
-   example_workflows
    Package modules <modules>
-   contributing
 
 Indices and tables
 ==================

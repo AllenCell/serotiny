@@ -7,11 +7,19 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   serotiny.models.callbacks
-   serotiny.models.inference
-   serotiny.models.unet
    serotiny.models.utils
    serotiny.models.vae
+
+Submodules
+----------
+
+serotiny.models.base\_model module
+----------------------------------
+
+.. automodule:: serotiny.models.base_model
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------
