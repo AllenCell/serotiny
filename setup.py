@@ -9,7 +9,6 @@ with open("README.md") as readme_file:
     readme = readme_file.read()
 
 requirements = [
-    # project requires
     "numpy",
     "pandas",
     "pyarrow",
@@ -22,13 +21,16 @@ requirements = [
     "tqdm",
     "seaborn",
     "urllib3",
-    "sphinx",
-    "sphinx-rtd-theme",
-    "furo",
     "fire",
     "mlflow",
     "makefun",
     "hydra-core@git+https://github.com/facebookresearch/hydra.git",
+]
+
+docs_requirements = [
+    "sphinx",
+    "furo",
+    "m2r2",
 ]
 
 
@@ -40,9 +42,6 @@ setup(
         "theo.knijnenburg@alleninstitute.org"
     ),
     classifiers=[
-        "Development Status :: 2 - Pre-Alpha",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
         "Natural Language :: English",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
@@ -57,7 +56,7 @@ setup(
             "serotiny.predict=serotiny.cli.cli:main",
         ],
     },
-    install_requires=requirements,
+    install_requires=requirements + docs_requirements,
     long_description=readme,
     long_description_content_type="text/markdown",
     include_package_data=True,
@@ -66,10 +65,9 @@ setup(
     packages=find_namespace_packages(include=["hydra_plugins.*"])
     + find_packages(exclude=["tests", "*.tests", "*.tests.*"]),
     python_requires=">=3.7",
-    test_suite="serotiny/tests",
     url="https://github.com/AllenCellModeling/serotiny",
     # Do not edit this string manually, always use bumpversion
     # Details in CONTRIBUTING.rst
-    version="0.0.0",
+    version="alpha",
     zip_safe=False,
 )

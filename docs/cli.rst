@@ -18,7 +18,7 @@ to any module in the command-line, to obtain more information.
 ML operations: train, test, predict
 *******************************
 
-These commands run in the context of `serotiny projects <projects>`. In that
+These commands run in the context of :ref:`serotiny projects <projects>`. In that
 section you'll learn how to create and configure your ``serotiny`` projects. Once
 you've done so, you can use these commands to train/test/predict with the models
 you specified in your project. For example:
@@ -34,7 +34,12 @@ you specified in your project. For example:
    ++trainer.max_epochs=50 \
    ++seed=13
 
-These commands are ``hydra`` scripts under the hood. That means you can use
+Note the arguments starting with ``++argument=...``. This is the syntax to use
+when you want to override a config argument coming from your config files. You
+can also use it to add additional arguments which aren't specified in your config
+files (e.g. ``seed`` is by default not given in the config files). The reason
+behind this initially intimidating syntax is because these commands are
+``hydra`` scripts under the hood. That means you can use
 `hydra's overrides syntax <https://hydra.cc/docs/next/advanced/override_grammar/basic/>`_
 to change config parameters, as well as leverage any additional hydra functionality
 like:
