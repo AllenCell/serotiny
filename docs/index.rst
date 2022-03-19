@@ -19,9 +19,3 @@ for experiment tracking and artifact management.
    cli
    dataframe_transforms
    Package modules <modules>
-
-Indices and tables
-==================
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
