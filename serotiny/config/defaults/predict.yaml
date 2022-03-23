@@ -1,0 +1,9 @@
+defaults:
+  - _self_
+  - base
+  - model: default
+  - data: default
+  - trainer: default
+  - mlflow: default
+
+task: predict
