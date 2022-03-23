@@ -33,7 +33,7 @@ class BaseModel(pl.LightningModule):
                 for arg, v in init_args.items()
                 if (
                     isinstance(v, (nn.Module, torch.optim.Optimizer))
-                    or issubclass(v, (nn.Module, torch.optim.Optimizer))
+                    or issubclass(type(v), (nn.Module, torch.optim.Optimizer))
                 )
             ]
         )
