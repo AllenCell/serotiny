@@ -25,6 +25,7 @@ requirements = [
     "mlflow",
     "makefun",
     "hydra-core==1.2.0.dev2",
+    "cookiecutter",
 ]
 
 docs_requirements = [
