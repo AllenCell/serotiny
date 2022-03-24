@@ -100,5 +100,4 @@ class BaseModel(pl.LightningModule):
             "monitor": "val_loss",
             "interval": "epoch",
             "frequency": 1,
-            "strict": True,
         }
