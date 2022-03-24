@@ -95,8 +95,8 @@ class ConvBlock(nn.Module):
         )
 
     def forward(self, x):
-        if not self.skip_connection:
-            return self.block(x)
-        else:
-            res = self.block(x)
+        res = self.block(x)
+        if self.skip_connection and (res.shape[1] == x.shape[1]):
             return res + nn.functional.interpolate(x, res.shape[2:])
+        else:
+            return res
