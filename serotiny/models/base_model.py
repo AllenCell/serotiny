@@ -6,12 +6,21 @@ from typing import Optional, Sequence, Union
 import numpy as np
 import pytorch_lightning as pl
 import torch
-import torch.nn as nn
 from pytorch_lightning.utilities.parsing import get_init_args
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]
 logger = logging.getLogger("lightning")
 logger.propagate = False
+
+
+def _is_primitive(value):
+    if isinstance(value, (type(None), bool, str, int, float)):
+        return True
+
+    if isinstance(value, (tuple, list)):
+        return all(_is_primitive(el) for el in value)
+
+    return False
 
 
 class BaseModel(pl.LightningModule):
@@ -28,14 +37,7 @@ class BaseModel(pl.LightningModule):
         frame = inspect.currentframe()
         init_args = get_init_args(frame)
         self.save_hyperparameters(
-            *[
-                arg
-                for arg, v in init_args.items()
-                if (
-                    isinstance(v, (nn.Module, torch.optim.Optimizer))
-                    or issubclass(type(v), (nn.Module, torch.optim.Optimizer))
-                )
-            ]
+            *[arg for arg, v in init_args.items() if _is_primitive(v)]
         )
 
         self.optimizer = optimizer
