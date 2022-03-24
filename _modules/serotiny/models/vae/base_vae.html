@@ -289,22 +289,10 @@
 <span class="sd">        learn_prior_logvar: bool</span>
 <span class="sd">            Boolean flag to determine whether to learn the prior log-variances</span>
 <span class="sd">        """</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">x_label</span><span class="o">=</span><span class="n">x_label</span><span class="p">,</span>
-            <span class="n">id_label</span><span class="o">=</span><span class="n">id_label</span><span class="p">,</span>
-            <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
-            <span class="n">cache_outputs</span><span class="o">=</span><span class="n">cache_outputs</span><span class="p">,</span>
-        <span class="p">)</span>
 
         <span class="n">frame</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span>
         <span class="n">init_args</span> <span class="o">=</span> <span class="n">get_init_args</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">save_hyperparameters</span><span class="p">(</span>
-            <span class="o">*</span><span class="p">[</span>
-                <span class="n">arg</span>
-                <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">init_args</span>
-                <span class="k">if</span> <span class="n">arg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"encoder"</span><span class="p">,</span> <span class="s2">"decoder"</span><span class="p">,</span> <span class="s2">"optimizer"</span><span class="p">]</span>
-            <span class="p">]</span>
-        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">init_args</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">reconstruction_reduce</span> <span class="o">=</span> <span class="n">reconstruction_reduce</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reconstruction_loss</span> <span class="o">=</span> <span class="n">reconstruction_loss</span>
