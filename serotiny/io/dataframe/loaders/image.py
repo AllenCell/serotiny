@@ -1,5 +1,6 @@
 from typing import Callable, Optional, Sequence, Union
 
+from omegaconf import ListConfig
 import numpy as np
 
 from serotiny.io.image import image_loader
@@ -54,7 +55,7 @@ class LoadImage(Loader):
         self.file_type = file_type
         self.dtype = dtype
 
-        if isinstance(transforms, (list, tuple)):
+        if isinstance(transforms, (list, tuple, ListConfig)):
             from torchvision.transforms import Compose
 
             transforms = Compose(transforms)
