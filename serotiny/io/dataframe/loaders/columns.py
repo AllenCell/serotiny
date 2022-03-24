@@ -86,7 +86,7 @@ class LoadColumns(Loader):
                 or (regex is not None)
             )
         else:
-            self.columns = set(columns)
+            self.columns = list(set(columns))
 
     def _filter_columns(self, columns_to_filter):
         if self.columns is None:

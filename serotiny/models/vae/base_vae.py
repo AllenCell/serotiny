@@ -62,22 +62,10 @@ class BaseVAE(BaseModel):
         learn_prior_logvar: bool
             Boolean flag to determine whether to learn the prior log-variances
         """
-        super().__init__(
-            x_label=x_label,
-            id_label=id_label,
-            optimizer=optimizer,
-            cache_outputs=cache_outputs,
-        )
 
         frame = inspect.currentframe()
         init_args = get_init_args(frame)
-        self.save_hyperparameters(
-            *[
-                arg
-                for arg in init_args
-                if arg not in ["encoder", "decoder", "optimizer"]
-            ]
-        )
+        super().__init__(**init_args)
 
         self.reconstruction_reduce = reconstruction_reduce
         self.reconstruction_loss = reconstruction_loss
