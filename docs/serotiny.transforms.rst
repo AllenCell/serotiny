@@ -1,6 +1,11 @@
 serotiny.transforms package
 ===========================
 
+.. automodule:: serotiny.transforms
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
@@ -9,11 +14,3 @@ Subpackages
 
    serotiny.transforms.dataframe
    serotiny.transforms.image
-
-Module contents
----------------
-
-.. automodule:: serotiny.transforms
-   :members:
-   :undoc-members:
-   :show-inheritance:

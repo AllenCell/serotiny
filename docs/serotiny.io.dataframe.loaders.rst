@@ -1,53 +1,19 @@
 serotiny.io.dataframe.loaders package
 =====================================
 
-Submodules
-----------
-
-serotiny.io.dataframe.loaders.abstract\_loader module
------------------------------------------------------
-
-.. automodule:: serotiny.io.dataframe.loaders.abstract_loader
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-serotiny.io.dataframe.loaders.classes module
---------------------------------------------
-
-.. automodule:: serotiny.io.dataframe.loaders.classes
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-serotiny.io.dataframe.loaders.columns module
---------------------------------------------
-
-.. automodule:: serotiny.io.dataframe.loaders.columns
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-serotiny.io.dataframe.loaders.image module
-------------------------------------------
-
-.. automodule:: serotiny.io.dataframe.loaders.image
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-serotiny.io.dataframe.loaders.random\_image module
---------------------------------------------------
-
-.. automodule:: serotiny.io.dataframe.loaders.random_image
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
 .. automodule:: serotiny.io.dataframe.loaders
    :members:
    :undoc-members:
    :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   serotiny.io.dataframe.loaders.abstract_loader
+   serotiny.io.dataframe.loaders.classes
+   serotiny.io.dataframe.loaders.columns
+   serotiny.io.dataframe.loaders.image
+   serotiny.io.dataframe.loaders.random_image

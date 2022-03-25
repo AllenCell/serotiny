@@ -49,7 +49,7 @@ napoleon_use_ivar = True
 napoleon_use_param = False
 
 # Control autodoc
-autoclass_content = "init"  # include init doc with class
+autoclass_content = "both"  # include init doc with class
 autodoc_inherit_docstrings = (
     False  # don't inherit docstrings from parent classes by default
 )
