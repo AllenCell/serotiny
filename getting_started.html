@@ -320,12 +320,19 @@ file for it too, where the value for the <code class="docutils literal notransla
 Each configuration file in this group should contain a <code class="docutils literal notranslate"><span class="pre">hydra</span></code> specification of a
 <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/extensions/datamodules.html?highlight=datamodule">LightiningDatamodule</a> datamodule class.</p>
 <p>As of now, we only provide a
-<code class="xref py py-class docutils literal notranslate"><span class="pre">ManifestDatamodule</span> <span class="pre">class</span></code> as
+<a class="reference internal" href="serotiny.datamodules.html#serotiny.datamodules.ManifestDatamodule" title="serotiny.datamodules.ManifestDatamodule"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManifestDatamodule</span> <span class="pre">class</span></code></a> as
 part of <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>, which is a class that works on top of what we call manifest
 files. These are <code class="docutils literal notranslate"><span class="pre">.csv</span></code> files which describe a dataset, and for which we have
 <a class="reference internal" href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders" title="serotiny.io.dataframe.loaders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">loader</span> <span class="pre">classes</span></code></a> which consume values
 from the dataframe, either directly, or e.g. by reading file paths.</p>
-<p>Alternatively, you can write and instantiate your own custom datamodule class instead.</p>
+<p>Alternatively, you can write and instantiate your own custom datamodule class instead,
+or use one developed by someone else.</p>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>Pytorch Lightning has a collection of datamodules
+(and other useful building blocks) in a package called <code class="docutils literal notranslate"><span class="pre">lightning-bolts</span></code> which you
+can install via <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">lightning-bolts</span></code>. See <a class="reference external" href="https://lightning-bolts.readthedocs.io/en/latest/">here</a> for more info about it.</p>
+</div>
 <p>One (incomplete) example of a datamodule instantiation could be:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_target_</span><span class="p">:</span> <span class="n">serotiny</span><span class="o">.</span><span class="n">datamodules</span><span class="o">.</span><span class="n">ManifestDatamodule</span>
 
