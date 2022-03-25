@@ -116,13 +116,20 @@ Each configuration file in this group should contain a ``hydra`` specification o
 `LightiningDatamodule <https://pytorch-lightning.readthedocs.io/en/latest/extensions/datamodules.html?highlight=datamodule>`_ datamodule class.
 
 As of now, we only provide a
-:py:class:`ManifestDatamodule class <serotiny.datamodule.ManifestDatamodule>` as
+:py:class:`ManifestDatamodule class <serotiny.datamodules.ManifestDatamodule>` as
 part of ``serotiny``, which is a class that works on top of what we call manifest
 files. These are ``.csv`` files which describe a dataset, and for which we have
 :py:mod:`loader classes <serotiny.io.dataframe.loaders>` which consume values
 from the dataframe, either directly, or e.g. by reading file paths.
 
-Alternatively, you can write and instantiate your own custom datamodule class instead.
+Alternatively, you can write and instantiate your own custom datamodule class instead,
+or use one developed by someone else.
+
+.. seealso::
+
+   Pytorch Lightning has a collection of datamodules
+   (and other useful building blocks) in a package called ``lightning-bolts`` which you
+   can install via ``$ pip install lightning-bolts``. See `here <https://lightning-bolts.readthedocs.io/en/latest/>`_ for more info about it.
 
 One (incomplete) example of a datamodule instantiation could be:
 
