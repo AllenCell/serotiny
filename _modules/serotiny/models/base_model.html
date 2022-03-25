@@ -262,6 +262,9 @@
 
         <span class="n">frame</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">currentframe</span><span class="p">()</span>
         <span class="n">init_args</span> <span class="o">=</span> <span class="n">get_init_args</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_back</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span> <span class="o">==</span> <span class="s2">"__init__"</span><span class="p">:</span>
+            <span class="c1"># if this was called from a subclass's init</span>
+            <span class="n">init_args</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">get_init_args</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">f_back</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">save_hyperparameters</span><span class="p">(</span>
             <span class="o">*</span><span class="p">[</span><span class="n">arg</span> <span class="k">for</span> <span class="n">arg</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">init_args</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">_is_primitive</span><span class="p">(</span><span class="n">v</span><span class="p">)]</span>
         <span class="p">)</span>
