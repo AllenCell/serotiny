@@ -18,7 +18,8 @@ to any module in the command-line, to obtain more information.
 ML operations: train, test, predict
 ***********************************
 
-These commands run in the context of :ref:`serotiny projects <projects>`. In that
+These commands run in the context of serotiny projects. In the
+:ref:`Getting started <getting_started>`
 section you'll learn how to create and configure your ``serotiny`` projects. Once
 you've done so, you can use these commands to train/test/predict with the models
 you specified in your project. For example:
@@ -53,7 +54,7 @@ like:
   - Run ``eval "$(serotiny train -sc install=serotiny_bash)"``. You now have tab
     completion in serotiny projects in that shell session! (Useful when you have
     many config options for each config group - see the
-    :ref:`serotiny projects section <projects>` to understand what this means)
+    :ref:`Getting started section <getting_started>` to understand what this means)
 
 - ...
 

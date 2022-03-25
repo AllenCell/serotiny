@@ -48,6 +48,16 @@ A folder named ``a_tiny_project`` will be created, with the following structure:
    ├── MANIFEST.in
    └── setup.py
 
+This folder structure is a valid, installable python package. That fact will be
+useful later when you want to add custom models and datamodules to your project,
+and refer to them in the configuration files, as you will see ahead.
+
+To install your python project, you can run:
+
+::
+
+   $ pip install -e a_tiny_project
+
 
 Configuration
 *************
@@ -92,6 +102,11 @@ An (incomplete) example of a possible model config could be:
       _target_: torch.optim.Adam
       lr: 1e-3
 
+If you developed your own architecture and want to use it, you can create a config
+file for it too, where the value for the ``_target_`` key would be something like
+``a_tiny_project.models.MyCustomModel`` - assuming your project is called
+``a_tiny_project``, and that it has a module callled ``models`` which contains a
+``LightningModule`` subclass, called ``MyCustomModel``.
 
 **The** ``data`` **config group**
 #################################

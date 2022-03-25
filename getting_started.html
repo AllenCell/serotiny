@@ -262,6 +262,13 @@ project_description [a simple project]: it's just a tiny project
 └── setup.py
 </pre></div>
 </div>
+<p>This folder structure is a valid, installable python package. That fact will be
+useful later when you want to add custom models and datamodules to your project,
+and refer to them in the configuration files, as you will see ahead.</p>
+<p>To install your python project, you can run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install -e a_tiny_project
+</pre></div>
+</div>
 </section>
 <section id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">#</a></h2>
@@ -301,6 +308,11 @@ Each configuration file in this group should contain a <code class="docutils lit
   <span class="n">lr</span><span class="p">:</span> <span class="mf">1e-3</span>
 </pre></div>
 </div>
+<p>If you developed your own architecture and want to use it, you can create a config
+file for it too, where the value for the <code class="docutils literal notranslate"><span class="pre">_target_</span></code> key would be something like
+<code class="docutils literal notranslate"><span class="pre">a_tiny_project.models.MyCustomModel</span></code> - assuming your project is called
+<code class="docutils literal notranslate"><span class="pre">a_tiny_project</span></code>, and that it has a module callled <code class="docutils literal notranslate"><span class="pre">models</span></code> which contains a
+<code class="docutils literal notranslate"><span class="pre">LightningModule</span></code> subclass, called <code class="docutils literal notranslate"><span class="pre">MyCustomModel</span></code>.</p>
 </section>
 <section id="the-data-config-group">
 <h3><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">data</span></code> <strong>config group</strong><a class="headerlink" href="#the-data-config-group" title="Permalink to this headline">#</a></h3>
