@@ -1,6 +1,11 @@
 serotiny package
 ================
 
+.. automodule:: serotiny
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
@@ -14,11 +19,3 @@ Subpackages
    serotiny.models
    serotiny.networks
    serotiny.transforms
-
-Module contents
----------------
-
-.. automodule:: serotiny
-   :members:
-   :undoc-members:
-   :show-inheritance:

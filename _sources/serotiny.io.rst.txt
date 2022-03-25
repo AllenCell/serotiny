@@ -1,6 +1,11 @@
 serotiny.io package
 ===================
 
+.. automodule:: serotiny.io
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
@@ -12,18 +17,7 @@ Subpackages
 Submodules
 ----------
 
-serotiny.io.image module
-------------------------
+.. toctree::
+   :maxdepth: 4
 
-.. automodule:: serotiny.io.image
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: serotiny.io
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   serotiny.io.image
