@@ -7,7 +7,7 @@ One of ``serotiny``'s main purposes is to standardize the structure of ML projec
 at our organization. For that, we created `a cookiecutter template <https://github.com/AllenCellModeling/serotiny-project-cookiecutter>`_
 for ``serotiny`` projects, which makes it easier to get started with the right structure in place.
 
-``serotiny`` has ML CLI, with commands which recognize when they are run
+``serotiny`` has a ML CLI, with commands which recognize when they are run
 from within a serotiny project and are thus able to make use of and
 interact with each projects configuration, as you will see ahead.
 
