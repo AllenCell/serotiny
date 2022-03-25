@@ -1,4 +1,5 @@
 import sys
+import os
 
 from serotiny.ml_ops import _do_model_op_wrapper
 
@@ -53,6 +54,7 @@ def main():
         if sys.argv[0].endswith("serotiny"):
             sys.argv[0] += f".{mode}"
 
+        os.environ["HYDRA_FULL_ERROR"] = "1"
         hydra.main(config_path=None, config_name=mode)(_do_model_op_wrapper)()
 
     # fire modes
