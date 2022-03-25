@@ -1,4 +1,4 @@
-from typing import Callable, Optional, Sequence, Union
+from typing import Callable, Optional, Sequence, Union, Type
 
 from omegaconf import ListConfig
 import numpy as np
@@ -18,7 +18,8 @@ class LoadImage(Loader):
         select_channels: Optional[Sequence] = None,
         transforms: Optional[Union[Sequence, Callable]] = None,
         reader: str = "aicsimageio.readers.ome_tiff_reader.OmeTiffReader",
-        dtype: np.dtype = np.float32,
+        dtype: Optional[Union[str, Type[np.number]]] = None,
+        load_as_torch: bool = True,
     ):
         """
         Parameters
@@ -41,13 +42,19 @@ class LoadImage(Loader):
             `aicsimageio` reader to use
 
         dtype: np.dtype = np.float32
-            dtype to use
+            dtype to use. see https://numpy.org/doc/stable/reference/generated/numpy.ndarray.astype.html  # noqa
+            for more info on this
+
+        load_as_torch: bool = True
+            Whether to load the image as a torch tensor rather than a numpy
+            array. Some transforms require this.
 
         """
         super().__init__()
         self.column = column
         self.select_channels = select_channels
         self.reader = reader
+        self.load_as_torch = load_as_torch
 
         if file_type not in ("tiff"):
             raise NotImplementedError(f"File type {file_type} not supported.")
@@ -70,4 +77,5 @@ class LoadImage(Loader):
                 output_dtype=self.dtype,
                 transform=self.transforms,
                 reader=self.reader,
+                return_as_torch=self.load_as_torch,
             )
