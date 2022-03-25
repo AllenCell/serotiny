@@ -69,6 +69,6 @@ setup(
     url="https://github.com/AllenCellModeling/serotiny",
     # Do not edit this string manually, always use bumpversion
     # Details in CONTRIBUTING.rst
-    version="alpha",
+    version="0.0.0",
     zip_safe=False,
 )
