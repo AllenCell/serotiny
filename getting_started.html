@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny projects" href="projects.html" /><link rel="prev" title="Installation" href="installation.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny CLI" href="cli.html" /><link rel="prev" title="Installation" href="installation.html" />
 
     <meta name="generator" content="sphinx-4.4.0, furo 2022.03.04"/>
-        <title>Quickstart - serotiny alpha documentation</title>
+        <title>Getting started - serotiny alpha documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -156,8 +156,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Home</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Quickstart</a></li>
-<li class="toctree-l1"><a class="reference internal" href="projects.html">serotiny projects</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Getting started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">serotiny CLI</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dataframe_transforms.html">Dataframe wrangling</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="modules.html">Package modules</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -225,24 +224,29 @@
           </label>
         </div>
         <article role="main">
-          <section id="quickstart">
-<h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline">#</a></h1>
-<section id="create-a-serotiny-project">
-<h2>Create a <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>-project<a class="headerlink" href="#create-a-serotiny-project" title="Permalink to this headline">#</a></h2>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p><code class="docutils literal notranslate"><span class="pre">serotiny</span></code> is mostly meant to be used in the context of <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>-projects.
-For a more detailed explanation of what these are, see the <a class="reference internal" href="projects.html#projects"><span class="std std-ref">serotiny projects
-section</span></a> of the documentation.</p>
-</div>
+          <section id="getting-started">
+<span id="id1"></span><h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">#</a></h1>
+<p>One of <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>’s main purposes is to standardize the structure of ML projects
+at our organization. For that, we created <a class="reference external" href="https://github.com/AllenCellModeling/serotiny-project-cookiecutter">a cookiecutter template</a>
+for <code class="docutils literal notranslate"><span class="pre">serotiny</span></code> projects, which makes it easier to get started with the right structure in place.</p>
+<p><code class="docutils literal notranslate"><span class="pre">serotiny</span></code> has ML CLI, with commands which recognize when they are run
+from within a serotiny project and are thus able to make use of and
+interact with each projects configuration, as you will see ahead.</p>
+<p>We recommend becoming familiar with <a class="reference external" href="https://hydra.cc">hydra</a> to better understand
+the inner workings of serotiny projects. We rely heavily on <code class="docutils literal notranslate"><span class="pre">hydra</span></code>’s functionality
+to <a class="reference external" href="https://hydra.cc/docs/advanced/instantiate_objects/overview/">instantiate Python objects from YAML configurations</a>,
+as well as its general framework to configure applications in a modular fashion.</p>
+<section id="project-structure">
+<h2>Project structure<a class="headerlink" href="#project-structure" title="Permalink to this headline">#</a></h2>
 <p>Using <a class="reference external" href="https://github.com/AllenCellModeling/serotiny-project-cookiecutter">our cookiecutter template</a>,
-create a <code class="docutils literal notranslate"><span class="pre">serotiny</span></code> project:</p>
+you can create a <code class="docutils literal notranslate"><span class="pre">serotiny</span></code> project as:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cookiecutter https://github.com/AllenCellModeling/serotiny-project-cookiecutter
+project_name [My Project]: A Tiny Project
+package_name [a_tiny_project]:
+project_description [a simple project]: it's just a tiny project
 </pre></div>
 </div>
-<p>You will be prompted for a couple details about your project. Assuming you called
-it “a tiny project”, a folder named <code class="docutils literal notranslate"><span class="pre">a_tiny_project</span></code> will be created, with
-the following structure:</p>
+<p>A folder named <code class="docutils literal notranslate"><span class="pre">a_tiny_project</span></code> will be created, with the following structure:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>.
 ├── a_tiny_project
 │   └── config
@@ -258,37 +262,139 @@ the following structure:</p>
 └── setup.py
 </pre></div>
 </div>
-<p>This is an installable Python package. You can add modules to it, inside
-<code class="docutils literal notranslate"><span class="pre">a_tiny_project</span></code>, according to your needs.</p>
 </section>
-<section id="setup-the-configs">
-<h2>Setup the configs<a class="headerlink" href="#setup-the-configs" title="Permalink to this headline">#</a></h2>
-<p>Update the <code class="docutils literal notranslate"><span class="pre">default.yaml</span></code> files you’ll find in the subdirectories of
-<code class="docutils literal notranslate"><span class="pre">a_tiny_project/config</span></code>. They should contain commented examples of what
-kinds of classes you can define there. These make use of hydra’s functionality
-to instantiate Python objects from a YAML configuration. See <a class="reference external" href="https://hydra.cc/docs/next/advanced/instantiate_objects/overview/">here</a></p>
+<section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">#</a></h2>
+<p>From the above structure we should note the following:</p>
+<ul class="simple">
+<li><p>There are three “top-level” YAML files: <code class="docutils literal notranslate"><span class="pre">train.yaml</span></code>, <code class="docutils literal notranslate"><span class="pre">test.yaml</span></code>, <code class="docutils literal notranslate"><span class="pre">predict.yaml</span></code></p>
+<ul>
+<li><p>These stand for each of the available ML operations, and each correspond to a different
+CLI call and a <code class="docutils literal notranslate"><span class="pre">hydra</span></code> “config name”</p></li>
+</ul>
+</li>
+<li><p>There are 5 configuration groups, each of which can be modularly and independently
+configured.</p>
+<ul>
+<li><p>Under each of these configuration groups, you can add YAML files
+which correspond to a specific way in which to configure that group. E.g.
+under <code class="docutils literal notranslate"><span class="pre">model</span></code> you might have different architectures, under <code class="docutils literal notranslate"><span class="pre">data</span></code> you
+may have different datasets, and so on.</p></li>
+</ul>
+</li>
+<li><p>This modular form of configuration will make it trivial to swap different configuration
+blocks in and out.</p></li>
+</ul>
+<section id="the-model-config-group">
+<h3><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">model</span></code> <strong>config group</strong><a class="headerlink" href="#the-model-config-group" title="Permalink to this headline">#</a></h3>
+<p>This is where the available models for training will be specified.
+Each configuration file in this group should contain a <code class="docutils literal notranslate"><span class="pre">hydra</span></code> specification of a <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.core.LightningModule.html">(LightningModule)</a> model class.</p>
+<p>An (incomplete) example of a possible model config could be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_target_</span><span class="p">:</span> <span class="n">serotiny</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">TabularVAE</span>
+<span class="n">x_dim</span><span class="p">:</span> <span class="mi">100</span>
+<span class="n">latent_dim</span><span class="p">:</span> <span class="mi">16</span>
+<span class="n">hidden_layers</span><span class="p">:</span> <span class="p">[</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">]</span>
+<span class="n">x_label</span><span class="p">:</span> <span class="s2">"x"</span>
+<span class="n">optimizer</span><span class="p">:</span>
+  <span class="n">_partial_</span><span class="p">:</span> <span class="n">true</span>
+  <span class="n">_target_</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span>
+  <span class="n">lr</span><span class="p">:</span> <span class="mf">1e-3</span>
+</pre></div>
+</div>
 </section>
-<section id="get-a-mlflow-server-running">
-<h2>Get a MLFlow server running<a class="headerlink" href="#get-a-mlflow-server-running" title="Permalink to this headline">#</a></h2>
-<p>Refer to <a class="reference external" href="https://mlflow.org">the MLFlow docs</a> for this. Once you have it
-running, adjust the relevant configuration in
-<code class="docutils literal notranslate"><span class="pre">a_tiny_project/config/mlflow/default.yaml</span></code></p>
+<section id="the-data-config-group">
+<h3><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">data</span></code> <strong>config group</strong><a class="headerlink" href="#the-data-config-group" title="Permalink to this headline">#</a></h3>
+<p>This is where the available datasets for training will be specified.
+Each configuration file in this group should contain a <code class="docutils literal notranslate"><span class="pre">hydra</span></code> specification of a
+<a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/extensions/datamodules.html?highlight=datamodule">LightiningDatamodule</a> datamodule class.</p>
+<p>As of now, we only provide a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ManifestDatamodule</span> <span class="pre">class</span></code> as
+part of <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>, which is a class that works on top of what we call manifest
+files. These are <code class="docutils literal notranslate"><span class="pre">.csv</span></code> files which describe a dataset, and for which we have
+<a class="reference internal" href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders" title="serotiny.io.dataframe.loaders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">loader</span> <span class="pre">classes</span></code></a> which consume values
+from the dataframe, either directly, or e.g. by reading file paths.</p>
+<p>Alternatively, you can write and instantiate your own custom datamodule class instead.</p>
+<p>One (incomplete) example of a datamodule instantiation could be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_target_</span><span class="p">:</span> <span class="n">serotiny</span><span class="o">.</span><span class="n">datamodules</span><span class="o">.</span><span class="n">ManifestDatamodule</span>
+
+<span class="n">path</span><span class="p">:</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">a</span><span class="o">/</span><span class="n">csv</span><span class="o">/</span><span class="n">file</span><span class="o">.</span><span class="n">csv</span>
+<span class="n">batch_size</span><span class="p">:</span> <span class="mi">64</span>
+<span class="n">num_workers</span><span class="p">:</span> <span class="mi">1</span>
+<span class="n">loaders</span><span class="p">:</span>
+  <span class="n">x</span><span class="p">:</span>
+    <span class="n">_target_</span><span class="p">:</span> <span class="n">serotiny</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">loaders</span><span class="o">.</span><span class="n">LoadColumns</span>
+    <span class="n">startswith</span><span class="p">:</span> <span class="n">feature_</span>
+
+<span class="n">split_column</span><span class="p">:</span> <span class="s2">"split"</span>
+</pre></div>
+</div>
+</section>
+<section id="the-trainer-config-group">
+<h3><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">trainer</span></code> <strong>config group</strong><a class="headerlink" href="#the-trainer-config-group" title="Permalink to this headline">#</a></h3>
+<p>Each configuration file in this group should contain a <code class="docutils literal notranslate"><span class="pre">hydra</span></code> specification of a <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.trainer.trainer.Trainer.html">Trainer</a></p>
+<p>This is the class that governs the training/testing/prediction process. See the
+Pytorch Lightning docs for more on its available parameters and functionality.</p>
+</section>
+<section id="the-trainer-callbacks-config-group">
+<h3><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">trainer/callbacks</span></code> <strong>config group</strong><a class="headerlink" href="#the-trainer-callbacks-config-group" title="Permalink to this headline">#</a></h3>
+<p>Each configuration file in this group should contain a list of <code class="docutils literal notranslate"><span class="pre">hydra</span></code> specifications of
+<a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.trainer.trainer.Trainer.html">Callbacks</a>
+you want to use during training/testing.</p>
+<p>Callbacks are our recommended way of adding functionality to the train/eval loop,
+like computing metrics and artifacts, using early-stopping, etc. For functionality
+that is project specific, we recommend you implement these as part of your
+newly created serotiny project. For general functionality, you can leverage
+callbacks from the Pytorch Lightning community, and/or contribute them to
+either <code class="docutils literal notranslate"><span class="pre">serotiny</span></code> or Pytorch Lightning.</p>
+<p>An example of a list of callbacks would be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="n">_target_</span><span class="p">:</span> <span class="n">pytorch_lightning</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">EarlyStopping</span>
+  <span class="n">monitor</span><span class="p">:</span> <span class="n">val_loss</span>
+  <span class="n">patience</span><span class="p">:</span> <span class="mi">5</span>
+  <span class="n">min_delta</span><span class="p">:</span> <span class="mf">0.1</span>
+
+<span class="o">-</span> <span class="n">_target_</span><span class="p">:</span> <span class="n">a_tiny_project</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">YourCustomCallback</span>
+  <span class="n">param1</span><span class="p">:</span> <span class="s2">"a"</span>
+  <span class="n">param2</span><span class="p">:</span> <span class="s2">"b"</span>
+  <span class="n">more_params</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="the-mlflow-config-group">
+<h3><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">mlflow</span></code> <strong>config group</strong><a class="headerlink" href="#the-mlflow-config-group" title="Permalink to this headline">#</a></h3>
+<p>This should contain a couple parameters to configure the usage of an MLFlow
+server. At the very least, you should specify <code class="docutils literal notranslate"><span class="pre">tracking_uri</span></code> and set it
+to the URL of your MLFlow server. Additionally, when running a training/testing
+run, you’ll have to specify the <code class="docutils literal notranslate"><span class="pre">experiment_name</span></code> and <code class="docutils literal notranslate"><span class="pre">run_name</span></code> either
+here or in the command line. The way you do this depends on how you intend to
+organize your ML runs, but one propose way is to have different config files with
+different experiment names and a run name which is automatically computed from
+other config values, using <a class="reference external" href="https://omegaconf.readthedocs.io/en/latest/usage.html#variable-interpolation">OmegaConf’s interpolation syntax</a></p>
+<p>This assumes you have a running MLFlow server. You can give that a shot by running:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mlflow server --backend-store-uri /a/path/to/store/mlflow/data -p 1234
+</pre></div>
+</div>
+<p>This will start an MLFlow server on port 1234, and store its data on <code class="docutils literal notranslate"><span class="pre">/a/path/to/store/mlflow/data</span></code>.</p>
+<p>Check <a class="reference external" href="https://mlflow.org">the MLFlow docs</a> for more info on this.</p>
+</section>
 </section>
 <section id="train-a-model">
 <h2>Train a model<a class="headerlink" href="#train-a-model" title="Permalink to this headline">#</a></h2>
-<p>You’re ready to train a model! You can override configuration parameters in the
-CLI call, using
+<p>With the above configurations in place, you should be ready to train a model.
+You can override configuration parameters in the CLI call, using
 <a class="reference external" href="https://hydra.cc/docs/next/advanced/override_grammar/basic/">hydra’s overrides syntax</a>.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ serotiny train
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ serotiny train model=your_model_config_name data=your_data_config_name \
+++seed=1337 ++trainer.max_epochs=10 ++trainer.enable_checkpointing=True \
 </pre></div>
 </div>
+<p>Note the selection of the model and data configurations. If you omit these,
+<code class="docutils literal notranslate"><span class="pre">serotiny</span></code> will use the corresponding  <code class="docutils literal notranslate"><span class="pre">default.yaml</span></code> configurations.</p>
 <p>Assuming appropriate configuration, you should see the results of your model
 training on MLFlow</p>
 </section>
 <section id="load-a-trained-model">
 <h2>Load a trained model<a class="headerlink" href="#load-a-trained-model" title="Permalink to this headline">#</a></h2>
-<p>Identify the run id for the model you just trained. You can now load it e.g. in
-a Jupyter Notebook by doing:</p>
+<p>On MLFlow’s dashboard, identify the run id for the model you just trained.
+You can now load it e.g. in a Jupyter Notebook by doing:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">serotiny.ml_ops.mlflow_utils</span> <span class="kn">import</span> <span class="n">load_model_from_checkpoint</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">load_model_from_checkpoint</span><span class="p">(</span><span class="n">THE_TRACKING_URI</span><span class="p">,</span> <span class="n">THE_RUN_ID</span><span class="p">)</span>
@@ -302,12 +408,12 @@ a Jupyter Notebook by doing:</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="projects.html">
+          <a class="next-page" href="cli.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">serotiny projects</div>
+                <div class="title">serotiny CLI</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -354,10 +460,16 @@ a Jupyter Notebook by doing:</p>
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Quickstart</a><ul>
-<li><a class="reference internal" href="#create-a-serotiny-project">Create a <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>-project</a></li>
-<li><a class="reference internal" href="#setup-the-configs">Setup the configs</a></li>
-<li><a class="reference internal" href="#get-a-mlflow-server-running">Get a MLFlow server running</a></li>
+<li><a class="reference internal" href="#">Getting started</a><ul>
+<li><a class="reference internal" href="#project-structure">Project structure</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li><a class="reference internal" href="#the-model-config-group"><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">model</span></code> <strong>config group</strong></a></li>
+<li><a class="reference internal" href="#the-data-config-group"><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">data</span></code> <strong>config group</strong></a></li>
+<li><a class="reference internal" href="#the-trainer-config-group"><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">trainer</span></code> <strong>config group</strong></a></li>
+<li><a class="reference internal" href="#the-trainer-callbacks-config-group"><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">trainer/callbacks</span></code> <strong>config group</strong></a></li>
+<li><a class="reference internal" href="#the-mlflow-config-group"><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">mlflow</span></code> <strong>config group</strong></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#train-a-model">Train a model</a></li>
 <li><a class="reference internal" href="#load-a-trained-model">Load a trained model</a></li>
 </ul>

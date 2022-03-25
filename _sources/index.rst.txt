@@ -14,8 +14,7 @@ for experiment tracking and artifact management.
 
    Home <self>
    installation
-   quickstart
-   projects
+   getting_started
    cli
    dataframe_transforms
    Package modules <modules>

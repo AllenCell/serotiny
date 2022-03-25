@@ -16,7 +16,7 @@ to any module in the command-line, to obtain more information.
 
 
 ML operations: train, test, predict
-*******************************
+***********************************
 
 These commands run in the context of :ref:`serotiny projects <projects>`. In that
 section you'll learn how to create and configure your ``serotiny`` projects. Once
