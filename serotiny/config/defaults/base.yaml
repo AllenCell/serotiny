@@ -2,6 +2,7 @@ defaults:
   - _self_
 
 output_root: /tmp/serotiny_${uuid:}
+seed: 42
 
 hydra:
   run:
