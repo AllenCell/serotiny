@@ -7,9 +7,10 @@ One of ``serotiny``'s main purposes is to standardize the structure of ML projec
 at our organization. For that, we created `a cookiecutter template <https://github.com/AllenCellModeling/serotiny-project-cookiecutter>`_
 for ``serotiny`` projects, which makes it easier to get started with the right structure in place.
 
-``serotiny`` has a ML CLI, with commands which recognize when they are run
-from within a serotiny project and are thus able to make use of and
-interact with each projects configuration, as you will see ahead.
+``serotiny`` has a command-line interface, with machine-learning related
+commands which recognize when they are run from within a serotiny project and
+are thus able to make use of and interact with each projects configuration, as
+you will see ahead.
 
 We recommend becoming familiar with `hydra <https://hydra.cc>`_ to better understand
 the inner workings of serotiny projects. We rely heavily on ``hydra``'s functionality
@@ -69,8 +70,9 @@ From the above structure we should note the following:
   - These stand for each of the available ML operations, and each correspond to a different
     CLI call and a ``hydra`` "config name"
 
-- There are 5 configuration groups, each of which can be modularly and independently
-  configured.
+- There are 5 configuration groups (``data``, ``model``, ``trainer``,
+  ``trainer/callbacks``, ``mlflow``), each of which can be modularly and
+  independently configured.
 
   - Under each of these configuration groups, you can add YAML files
     which correspond to a specific way in which to configure that group. E.g.
@@ -137,7 +139,9 @@ One (incomplete) example of a datamodule instantiation could be:
 
     _target_: serotiny.datamodules.ManifestDatamodule
 
-    path: /path/to/a/csv/file.csv
+    path: /path/to/a/csv/file.csv # this can either be the path to a .csv file
+                                  # or a folder with 3 .csv files named
+                                  # "train.csv", "valid.csv", "test.csv"
     batch_size: 64
     num_workers: 1
     loaders:
@@ -188,24 +192,62 @@ An example of a list of callbacks would be:
 **The** ``mlflow`` **config group**
 ###################################
 
-This should contain a couple parameters to configure the usage of an MLFlow
-server. At the very least, you should specify ``tracking_uri`` and set it
-to the URL of your MLFlow server. Additionally, when running a training/testing
-run, you'll have to specify the ``experiment_name`` and ``run_name`` either
-here or in the command line. The way you do this depends on how you intend to
-organize your ML runs, but one propose way is to have different config files with
-different experiment names and a run name which is automatically computed from
-other config values, using `OmegaConf's interpolation syntax <https://omegaconf.readthedocs.io/en/latest/usage.html#variable-interpolation>`_
+This config should contain a couple parameters to configure the usage of an MLFlow
+server. The three required parameters are: ``tracking_uri``, ``experiment_name``,
+``run_name``.  In MLFlow, an "experiment" is a set
+of "runs" - e.g. it might be a set of training runs for the same architecture
+with different hyperparameters. Unlike MLFlow, ``serotiny`` expects run names
+to be unique (under a given experiment name). We use this notion to, for example,
+restart failed training runs.
 
-This assumes you have a running MLFlow server. You can give that a shot by running:
+Like any parameter in a ``serotiny`` call, the MLFlow parameters can either be set
+in the config file or in the command-line. The value ``tracking_uri`` is likely
+going to remain throughout your project, whereas the ``experiment_name`` and
+``run_name`` might change with each different run. For that reason, we recommend
+setting the ``tracking_uri`` argument in ``config/mlflow/default.yaml`` and
+setting ``experiment_name`` and ``run_name`` in the command-line, by doing:
+
+::
+
+   $ serotiny train ... ++mlflow.experiment_name="Your experiment name" \
+   ++mlflow.run_name="your run name"
+
+
+Additionally, in scenarios such as parameter sweeps, it might be useful to
+programatically set the ``run_name`` as a function of some other configuration
+values. In that case, you can set ``run_name`` in the config file and use
+`OmegaConf's interpolation syntax <https://omegaconf.readthedocs.io/en/latest/usage.html#variable-interpolation>`_
+to construct a ``run_name`` string that is unique for each of your sweep values,
+like:
+
+::
+
+   ...
+
+   run_name = ${model.input_size}_${data.batch_size}_${seed}_${trainer.max_epochs}
+
+   ...
+
+.. important::
+
+   Remember: ``serotiny`` expects ``run_name`` to be unique for each run under
+   a given experiment, so if your interpolation logic doesn't generate different
+   run names, you will end up always operating over the same run, which is not
+   what you want.
+
+
+Finally, all of the above assumes you have a running MLFlow server.
+Check `the MLFlow docs <https://mlflow.org>`_ for more info on this.
+
+To just test it out, you can try running:
 
 ::
 
    $ mlflow server --backend-store-uri /a/path/to/store/mlflow/data -p 1234
 
-This will start an MLFlow server on port 1234, and store its data on ``/a/path/to/store/mlflow/data``.
+This will start an MLFlow server on port 1234, and store
+its data on ``/a/path/to/store/mlflow/data``.
 
-Check `the MLFlow docs <https://mlflow.org>`_ for more info on this.
 
 Train a model
 *************

@@ -284,9 +284,10 @@
 <p>One of <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>’s main purposes is to standardize the structure of ML projects
 at our organization. For that, we created <a class="reference external" href="https://github.com/AllenCellModeling/serotiny-project-cookiecutter">a cookiecutter template</a>
 for <code class="docutils literal notranslate"><span class="pre">serotiny</span></code> projects, which makes it easier to get started with the right structure in place.</p>
-<p><code class="docutils literal notranslate"><span class="pre">serotiny</span></code> has a ML CLI, with commands which recognize when they are run
-from within a serotiny project and are thus able to make use of and
-interact with each projects configuration, as you will see ahead.</p>
+<p><code class="docutils literal notranslate"><span class="pre">serotiny</span></code> has a command-line interface, with machine-learning related
+commands which recognize when they are run from within a serotiny project and
+are thus able to make use of and interact with each projects configuration, as
+you will see ahead.</p>
 <p>We recommend becoming familiar with <a class="reference external" href="https://hydra.cc">hydra</a> to better understand
 the inner workings of serotiny projects. We rely heavily on <code class="docutils literal notranslate"><span class="pre">hydra</span></code>’s functionality
 to <a class="reference external" href="https://hydra.cc/docs/advanced/instantiate_objects/overview/">instantiate Python objects from YAML configurations</a>,
@@ -335,8 +336,9 @@ and refer to them in the configuration files, as you will see ahead.</p>
 CLI call and a <code class="docutils literal notranslate"><span class="pre">hydra</span></code> “config name”</p></li>
 </ul>
 </li>
-<li><p>There are 5 configuration groups, each of which can be modularly and independently
-configured.</p>
+<li><p>There are 5 configuration groups (<code class="docutils literal notranslate"><span class="pre">data</span></code>, <code class="docutils literal notranslate"><span class="pre">model</span></code>, <code class="docutils literal notranslate"><span class="pre">trainer</span></code>,
+<code class="docutils literal notranslate"><span class="pre">trainer/callbacks</span></code>, <code class="docutils literal notranslate"><span class="pre">mlflow</span></code>), each of which can be modularly and
+independently configured.</p>
 <ul>
 <li><p>Under each of these configuration groups, you can add YAML files
 which correspond to a specific way in which to configure that group. E.g.
@@ -391,7 +393,9 @@ can install via <code class="docutils literal notranslate"><span class="pre">$</
 <p>One (incomplete) example of a datamodule instantiation could be:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_target_</span><span class="p">:</span> <span class="n">serotiny</span><span class="o">.</span><span class="n">datamodules</span><span class="o">.</span><span class="n">ManifestDatamodule</span>
 
-<span class="n">path</span><span class="p">:</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">a</span><span class="o">/</span><span class="n">csv</span><span class="o">/</span><span class="n">file</span><span class="o">.</span><span class="n">csv</span>
+<span class="n">path</span><span class="p">:</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">a</span><span class="o">/</span><span class="n">csv</span><span class="o">/</span><span class="n">file</span><span class="o">.</span><span class="n">csv</span> <span class="c1"># this can either be the path to a .csv file</span>
+                              <span class="c1"># or a folder with 3 .csv files named</span>
+                              <span class="c1"># "train.csv", "valid.csv", "test.csv"</span>
 <span class="n">batch_size</span><span class="p">:</span> <span class="mi">64</span>
 <span class="n">num_workers</span><span class="p">:</span> <span class="mi">1</span>
 <span class="n">loaders</span><span class="p">:</span>
@@ -435,20 +439,51 @@ either <code class="docutils literal notranslate"><span class="pre">serotiny</sp
 </section>
 <section id="the-mlflow-config-group">
 <h3><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">mlflow</span></code> <strong>config group</strong><a class="headerlink" href="#the-mlflow-config-group" title="Permalink to this headline">#</a></h3>
-<p>This should contain a couple parameters to configure the usage of an MLFlow
-server. At the very least, you should specify <code class="docutils literal notranslate"><span class="pre">tracking_uri</span></code> and set it
-to the URL of your MLFlow server. Additionally, when running a training/testing
-run, you’ll have to specify the <code class="docutils literal notranslate"><span class="pre">experiment_name</span></code> and <code class="docutils literal notranslate"><span class="pre">run_name</span></code> either
-here or in the command line. The way you do this depends on how you intend to
-organize your ML runs, but one propose way is to have different config files with
-different experiment names and a run name which is automatically computed from
-other config values, using <a class="reference external" href="https://omegaconf.readthedocs.io/en/latest/usage.html#variable-interpolation">OmegaConf’s interpolation syntax</a></p>
-<p>This assumes you have a running MLFlow server. You can give that a shot by running:</p>
+<p>This config should contain a couple parameters to configure the usage of an MLFlow
+server. The three required parameters are: <code class="docutils literal notranslate"><span class="pre">tracking_uri</span></code>, <code class="docutils literal notranslate"><span class="pre">experiment_name</span></code>,
+<code class="docutils literal notranslate"><span class="pre">run_name</span></code>.  In MLFlow, an “experiment” is a set
+of “runs” - e.g. it might be a set of training runs for the same architecture
+with different hyperparameters. Unlike MLFlow, <code class="docutils literal notranslate"><span class="pre">serotiny</span></code> expects run names
+to be unique (under a given experiment name). We use this notion to, for example,
+restart failed training runs.</p>
+<p>Like any parameter in a <code class="docutils literal notranslate"><span class="pre">serotiny</span></code> call, the MLFlow parameters can either be set
+in the config file or in the command-line. The value <code class="docutils literal notranslate"><span class="pre">tracking_uri</span></code> is likely
+going to remain throughout your project, whereas the <code class="docutils literal notranslate"><span class="pre">experiment_name</span></code> and
+<code class="docutils literal notranslate"><span class="pre">run_name</span></code> might change with each different run. For that reason, we recommend
+setting the <code class="docutils literal notranslate"><span class="pre">tracking_uri</span></code> argument in <code class="docutils literal notranslate"><span class="pre">config/mlflow/default.yaml</span></code> and
+setting <code class="docutils literal notranslate"><span class="pre">experiment_name</span></code> and <code class="docutils literal notranslate"><span class="pre">run_name</span></code> in the command-line, by doing:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ serotiny train ... ++mlflow.experiment_name="Your experiment name" \
+++mlflow.run_name="your run name"
+</pre></div>
+</div>
+<p>Additionally, in scenarios such as parameter sweeps, it might be useful to
+programatically set the <code class="docutils literal notranslate"><span class="pre">run_name</span></code> as a function of some other configuration
+values. In that case, you can set <code class="docutils literal notranslate"><span class="pre">run_name</span></code> in the config file and use
+<a class="reference external" href="https://omegaconf.readthedocs.io/en/latest/usage.html#variable-interpolation">OmegaConf’s interpolation syntax</a>
+to construct a <code class="docutils literal notranslate"><span class="pre">run_name</span></code> string that is unique for each of your sweep values,
+like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>...
+
+run_name = ${model.input_size}_${data.batch_size}_${seed}_${trainer.max_epochs}
+
+...
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Remember: <code class="docutils literal notranslate"><span class="pre">serotiny</span></code> expects <code class="docutils literal notranslate"><span class="pre">run_name</span></code> to be unique for each run under
+a given experiment, so if your interpolation logic doesn’t generate different
+run names, you will end up always operating over the same run, which is not
+what you want.</p>
+</div>
+<p>Finally, all of the above assumes you have a running MLFlow server.
+Check <a class="reference external" href="https://mlflow.org">the MLFlow docs</a> for more info on this.</p>
+<p>To just test it out, you can try running:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mlflow server --backend-store-uri /a/path/to/store/mlflow/data -p 1234
 </pre></div>
 </div>
-<p>This will start an MLFlow server on port 1234, and store its data on <code class="docutils literal notranslate"><span class="pre">/a/path/to/store/mlflow/data</span></code>.</p>
-<p>Check <a class="reference external" href="https://mlflow.org">the MLFlow docs</a> for more info on this.</p>
+<p>This will start an MLFlow server on port 1234, and store
+its data on <code class="docutils literal notranslate"><span class="pre">/a/path/to/store/mlflow/data</span></code>.</p>
 </section>
 </section>
 <section id="train-a-model">
