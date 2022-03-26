@@ -224,7 +224,7 @@ like:
 
    ...
 
-   run_name = ${model.input_size}_${data.batch_size}_${seed}_${trainer.max_epochs}
+   run_name: ${model.input_size}_${data.batch_size}_${seed}_${trainer.max_epochs}
 
    ...
 
