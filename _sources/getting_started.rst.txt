@@ -105,8 +105,9 @@ An (incomplete) example of a possible model config could be:
       lr: 1e-3
 
 
+
 Bring your own architecture
----------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you developed your own architecture and want to use it, you can create a config
 file for it too, where the value for the ``_target_`` key would be something like
@@ -138,11 +139,12 @@ instantiate ``BasicModel``, and supply it with the following arguments:
 
 An example of a configuration for this would be:
 
+
 ::
 
    _target_: serotiny.models.BasicModel
    x_label: image
-   y_label: class
+   y_label: target
    network:
      _target_: a_tiny_project.networks.MyCustomNetwork
      param1: a
@@ -150,6 +152,8 @@ An example of a configuration for this would be:
      param3: [3,3,3]
    loss:
      _target_: torch.nn.CrossEntropyLoss
+
+
 
 This example assumes you have a project called ``a_tiny_project``, with a submodule
 called ``networks``, which contains a PyTorch ``nn.Module`` called ``MyCustomNetwork``.
