@@ -366,10 +366,8 @@ Each configuration file in this group should contain a <code class="docutils lit
   <span class="n">lr</span><span class="p">:</span> <span class="mf">1e-3</span>
 </pre></div>
 </div>
-</section>
-</section>
 <section id="bring-your-own-architecture">
-<h2>Bring your own architecture<a class="headerlink" href="#bring-your-own-architecture" title="Permalink to this headline">#</a></h2>
+<h4>Bring your own architecture<a class="headerlink" href="#bring-your-own-architecture" title="Permalink to this headline">#</a></h4>
 <p>If you developed your own architecture and want to use it, you can create a config
 file for it too, where the value for the <code class="docutils literal notranslate"><span class="pre">_target_</span></code> key would be something like
 <code class="docutils literal notranslate"><span class="pre">a_tiny_project.models.MyCustomModel</span></code> - assuming your project is called
@@ -424,6 +422,8 @@ required parsing</p></li>
 here that the previous two methods get called. If you require a bit more logic
 to drive your model training/evaluation this is where you’d implement it.</p></li>
 </ul>
+</section>
+</section>
 <section id="the-data-config-group">
 <h3><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">data</span></code> <strong>config group</strong><a class="headerlink" href="#the-data-config-group" title="Permalink to this headline">#</a></h3>
 <p>This is where the available datasets for training will be specified.
@@ -625,10 +625,10 @@ You can now load it e.g. in a Jupyter Notebook by doing:</p>
 <li><a class="reference internal" href="#">Getting started</a><ul>
 <li><a class="reference internal" href="#project-structure">Project structure</a></li>
 <li><a class="reference internal" href="#configuration">Configuration</a><ul>
-<li><a class="reference internal" href="#the-model-config-group"><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">model</span></code> <strong>config group</strong></a></li>
+<li><a class="reference internal" href="#the-model-config-group"><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">model</span></code> <strong>config group</strong></a><ul>
+<li><a class="reference internal" href="#bring-your-own-architecture">Bring your own architecture</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#bring-your-own-architecture">Bring your own architecture</a><ul>
 <li><a class="reference internal" href="#the-data-config-group"><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">data</span></code> <strong>config group</strong></a></li>
 <li><a class="reference internal" href="#the-trainer-config-group"><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">trainer</span></code> <strong>config group</strong></a></li>
 <li><a class="reference internal" href="#the-trainer-callbacks-config-group"><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">trainer/callbacks</span></code> <strong>config group</strong></a></li>
