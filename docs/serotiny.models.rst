@@ -22,3 +22,4 @@ Submodules
    :maxdepth: 4
 
    serotiny.models.base_model
+   serotiny.models.basic_model

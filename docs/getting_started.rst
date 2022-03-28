@@ -104,8 +104,9 @@ An (incomplete) example of a possible model config could be:
       _target**: torch.optim.Adam
       lr: 1e-3
 
+
 Bring your own architecture
-***************************
+---------------------------
 
 If you developed your own architecture and want to use it, you can create a config
 file for it too, where the value for the ``_target_`` key would be something like
