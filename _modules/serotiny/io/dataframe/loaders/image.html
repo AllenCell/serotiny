@@ -204,6 +204,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../../serotiny.models.base_model.html">serotiny.models.base_model module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../serotiny.models.basic_model.html">serotiny.models.basic_model module</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../../serotiny.networks.html">serotiny.networks package</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -290,7 +291,8 @@
 
 
 <div class="viewcode-block" id="LoadImage"><a class="viewcode-back" href="../../../../../serotiny.io.dataframe.loaders.image.html#serotiny.io.dataframe.loaders.LoadImage">[docs]</a><span class="k">class</span> <span class="nc">LoadImage</span><span class="p">(</span><span class="n">Loader</span><span class="p">):</span>
-    <span class="sd">"""Loader class, used to retrieve images from paths given in a dataframe column."""</span>
+    <span class="sd">"""Loader class, used to retrieve images from paths given in a dataframe</span>
+<span class="sd">    column."""</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -298,7 +300,7 @@
         <span class="n">file_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"tiff"</span><span class="p">,</span>
         <span class="n">select_channels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">transforms</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Sequence</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">reader</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"aicsimageio.readers.ome_tiff_reader.OmeTiffReader"</span><span class="p">,</span>
+        <span class="n">reader</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">load_as_torch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
@@ -319,7 +321,7 @@
 <span class="sd">        transforms: Optional[Union[Sequence, Callable]] = None</span>
 <span class="sd">            Transform, or list of transforms to apply upon loading the image.</span>
 
-<span class="sd">        reader: str = "aicsimageio.readers.ome_tiff_reader.OmeTiffReader"</span>
+<span class="sd">        reader: Optional[str] = None</span>
 <span class="sd">            `aicsimageio` reader to use</span>
 
 <span class="sd">        dtype: np.dtype = np.float32</span>

@@ -205,6 +205,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.base_model.html">serotiny.models.base_model module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.models.basic_model.html">serotiny.models.basic_model module</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.networks.html">serotiny.networks package</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -285,10 +286,10 @@
 <dt class="sig sig-object py" id="serotiny.datamodules.ManifestDatamodule">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.datamodules.</span></span><span class="sig-name descname"><span class="pre">ManifestDatamodule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/datamodules/manifest_datamodule.html#ManifestDatamodule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.datamodules.ManifestDatamodule" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytorch_lightning.core.datamodule.LightningDataModule</span></code></p>
-<p>A pytorch lightning datamodule based on manifest files. It can either use a
-single manifest file, which contains a column based on which a train- val-test split
-can be made; or it can use three manifest files, one for each fold (train, val,
-test)</p>
+<p>A pytorch lightning datamodule based on manifest files. It can either
+use a single manifest file, which contains a column based on which a train-
+val- test split can be made; or it can use three manifest files, one for
+each fold (train, val, test)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

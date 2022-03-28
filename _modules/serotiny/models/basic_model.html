@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
-        <title>serotiny.losses.kl_divergence - serotiny 0.0.a0 documentation</title>
+        <title>serotiny.models.basic_model - serotiny 0.0.a0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -279,57 +279,84 @@
           </label>
         </div>
         <article role="main">
-          <h1>Source code for serotiny.losses.kl_divergence</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">torch</span>
+          <h1>Source code for serotiny.models.basic_model</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">from</span> <span class="nn">torch.nn.modules.loss</span> <span class="kn">import</span> <span class="n">_Loss</span> <span class="k">as</span> <span class="n">Loss</span>
+
+<span class="kn">from</span> <span class="nn">.base_model</span> <span class="kn">import</span> <span class="n">BaseModel</span>
+
+<span class="n">Array</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span>
 
 
-<div class="viewcode-block" id="diagonal_gaussian_kl"><a class="viewcode-back" href="../../../serotiny.losses.kl_divergence.html#serotiny.losses.kl_divergence.diagonal_gaussian_kl">[docs]</a><span class="k">def</span> <span class="nf">diagonal_gaussian_kl</span><span class="p">(</span>
-    <span class="n">mu1</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">mu2</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">logvar1</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
-    <span class="n">logvar2</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
-<span class="p">):</span>
-    <span class="sd">"""Computes the Kullback-Leibler divergence between two diagonal gaussians (not</span>
-<span class="sd">    necessarily isotropic). It also works batch-wise.</span>
+<div class="viewcode-block" id="BasicModel"><a class="viewcode-back" href="../../../serotiny.models.basic_model.html#serotiny.models.basic_model.BasicModel">[docs]</a><span class="k">class</span> <span class="nc">BasicModel</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="sd">"""A minimal Pytorch Lightning wrapper around generic Pytorch models."""</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    mu1: torch.Tensor</span>
-<span class="sd">        Mean of the first gaussian (or batch of first gaussians)</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">network</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
+        <span class="n">loss</span><span class="p">:</span> <span class="n">Loss</span><span class="p">,</span>
+        <span class="n">x_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"x"</span><span class="p">,</span>
+        <span class="n">y_label</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"y"</span><span class="p">,</span>
+        <span class="n">optimizer</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        network: nn.Module</span>
+<span class="sd">            The network to wrap</span>
+<span class="sd">        loss: Loss</span>
+<span class="sd">            The loss function to optimize for</span>
+<span class="sd">        x_label: str = "x"</span>
+<span class="sd">            The key used to retrieve the input from dataloader batches</span>
+<span class="sd">        y_label: str = "y"</span>
+<span class="sd">            The key used to retrieve the target from dataloader batches</span>
+<span class="sd">        optimizer: torch.optim.Optimizer = torch.optim.Adam</span>
+<span class="sd">            The optimizer class</span>
+<span class="sd">        """</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">network</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span>
 
-<span class="sd">    mu2: torch.Tensor</span>
-<span class="sd">        Mean of the second gaussian (or batch of second gaussians)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_squeeze_y</span> <span class="o">=</span> <span class="kc">False</span>
 
-<span class="sd">    logvar1: torch.Tensor</span>
-<span class="sd">        Log-variance of the first gaussian (or batch of first gaussians)</span>
+<div class="viewcode-block" id="BasicModel.parse_batch"><a class="viewcode-back" href="../../../serotiny.models.basic_model.html#serotiny.models.basic_model.BasicModel.parse_batch">[docs]</a>    <span class="k">def</span> <span class="nf">parse_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">x_label</span><span class="p">],</span> <span class="n">batch</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">y_label</span><span class="p">])</span></div>
 
-<span class="sd">    logvar2: torch.Tensor</span>
-<span class="sd">        Log-variance of the second gaussian (or batch of second gaussians)</span>
-<span class="sd">    """</span>
-    <span class="n">mu_diff</span> <span class="o">=</span> <span class="n">mu2</span> <span class="o">-</span> <span class="n">mu1</span>
+<div class="viewcode-block" id="BasicModel.forward"><a class="viewcode-back" href="../../../serotiny.models.basic_model.html#serotiny.models.basic_model.BasicModel.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">network</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-    <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span>
-        <span class="p">(</span><span class="n">logvar2</span> <span class="o">-</span> <span class="n">logvar1</span><span class="p">)</span>
-        <span class="o">+</span> <span class="p">(</span><span class="n">logvar1</span> <span class="o">-</span> <span class="n">logvar2</span><span class="p">)</span><span class="o">.</span><span class="n">exp</span><span class="p">()</span>
-        <span class="o">+</span> <span class="p">(</span><span class="n">mu_diff</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">logvar2</span><span class="o">.</span><span class="n">exp</span><span class="p">())</span>
-        <span class="o">+</span> <span class="o">-</span><span class="mi">1</span>
-    <span class="p">)</span></div>
+    <span class="k">def</span> <span class="nf">_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
 
+        <span class="n">yhat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-<div class="viewcode-block" id="isotropic_gaussian_kl"><a class="viewcode-back" href="../../../serotiny.losses.kl_divergence.html#serotiny.losses.kl_divergence.isotropic_gaussian_kl">[docs]</a><span class="k">def</span> <span class="nf">isotropic_gaussian_kl</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">log_var</span><span class="p">):</span>
-    <span class="sd">"""Computes the Kullback-Leibler divergence between a diagonal gaussian and an</span>
-<span class="sd">    isotropic (0,1) gaussian. It also works batch-wise.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_squeeze_y</span><span class="p">:</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">yhat</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">squeeze</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">yhat</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">RuntimeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss</span><span class="p">(</span><span class="n">yhat</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">squeeze</span><span class="p">())</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_squeeze_y</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">inner_err</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">inner_err</span> <span class="kn">from</span> <span class="nn">err</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">err</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    mu: torch.Tensor</span>
-<span class="sd">        Mean of the gaussian (or batch of gaussians)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2"> loss"</span><span class="p">,</span> <span class="n">loss</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span>
 
-<span class="sd">    logvar: torch.Tensor</span>
-<span class="sd">        Log-variance of the gaussian (or batch of gaussians)</span>
-<span class="sd">    """</span>
-
-    <span class="k">return</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">log_var</span> <span class="o">-</span> <span class="n">mean</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">log_var</span><span class="o">.</span><span class="n">exp</span><span class="p">())</span></div>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">"loss"</span><span class="p">:</span> <span class="n">loss</span><span class="p">,</span>
+            <span class="s2">"yhat"</span><span class="p">:</span> <span class="n">yhat</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span>
+            <span class="s2">"y"</span><span class="p">:</span> <span class="n">y</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span>
+        <span class="p">}</span></div>
 </pre></div>
         </article>
       </div>

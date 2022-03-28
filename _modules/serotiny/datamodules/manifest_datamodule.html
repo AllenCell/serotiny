@@ -204,6 +204,7 @@
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="../../../serotiny.models.base_model.html">serotiny.models.base_model module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.models.basic_model.html">serotiny.models.basic_model module</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../serotiny.networks.html">serotiny.networks package</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -282,7 +283,7 @@
 <span></span><span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -357,10 +358,10 @@
 
 
 <div class="viewcode-block" id="ManifestDatamodule"><a class="viewcode-back" href="../../../serotiny.datamodules.manifest_datamodule.html#serotiny.datamodules.ManifestDatamodule">[docs]</a><span class="k">class</span> <span class="nc">ManifestDatamodule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
-    <span class="sd">"""A pytorch lightning datamodule based on manifest files. It can either use a</span>
-<span class="sd">    single manifest file, which contains a column based on which a train- val-test split</span>
-<span class="sd">    can be made; or it can use three manifest files, one for each fold (train, val,</span>
-<span class="sd">    test)</span>
+    <span class="sd">"""A pytorch lightning datamodule based on manifest files. It can either</span>
+<span class="sd">    use a single manifest file, which contains a column based on which a train-</span>
+<span class="sd">    val- test split can be made; or it can use three manifest files, one for</span>
+<span class="sd">    each fold (train, val, test)</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -390,12 +391,9 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
-        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">loaders</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">Loader</span><span class="p">],</span>
         <span class="n">split_column</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">collate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">dataloader_kwargs</span><span class="p">,</span>
     <span class="p">):</span>
 
