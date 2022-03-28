@@ -9,7 +9,8 @@ from .abstract_loader import Loader
 
 
 class LoadImage(Loader):
-    """Loader class, used to retrieve images from paths given in a dataframe column."""
+    """Loader class, used to retrieve images from paths given in a dataframe
+    column."""
 
     def __init__(
         self,
@@ -17,7 +18,7 @@ class LoadImage(Loader):
         file_type: str = "tiff",
         select_channels: Optional[Sequence] = None,
         transforms: Optional[Union[Sequence, Callable]] = None,
-        reader: str = "aicsimageio.readers.ome_tiff_reader.OmeTiffReader",
+        reader: Optional[str] = None,
         dtype: Optional[Union[str, Type[np.number]]] = None,
         load_as_torch: bool = True,
     ):
@@ -38,7 +39,7 @@ class LoadImage(Loader):
         transforms: Optional[Union[Sequence, Callable]] = None
             Transform, or list of transforms to apply upon loading the image.
 
-        reader: str = "aicsimageio.readers.ome_tiff_reader.OmeTiffReader"
+        reader: Optional[str] = None
             `aicsimageio` reader to use
 
         dtype: np.dtype = np.float32
