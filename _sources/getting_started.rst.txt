@@ -126,7 +126,7 @@ If your task boils down to:
 - Computing "yhat" with your network (e.g classify the input)
 - Computing a loss value based on "y" and "yhat" (e.g calculate the cross-entropy loss)
 
-then ``serotiny``'s :py:class:`<serotiny.models.BasicModel>` is likely
+then ``serotiny``'s :py:class:`BasicModel class <serotiny.models.BasicModel>` is likely
 enough for your needs and you don't need to write a new class. You can simply
 instantiate ``BasicModel``, and supply it with the following arguments:
 
