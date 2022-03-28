@@ -1,7 +1,7 @@
 import gc
 import inspect
 import logging
-from typing import Optional, Sequence, Union
+from typing import Sequence, Union
 
 import numpy as np
 import pytorch_lightning as pl
@@ -24,14 +24,7 @@ def _is_primitive(value):
 
 
 class BaseModel(pl.LightningModule):
-    def __init__(
-        self,
-        x_label: str = "x",
-        id_label: str = Optional[None],
-        optimizer: torch.optim.Optimizer = torch.optim.Adam,
-        cache_outputs: Sequence = ("test",),
-        **kwargs
-    ):
+    def __init__(self, **kwargs):
         super().__init__()
 
         frame = inspect.currentframe()
@@ -43,11 +36,12 @@ class BaseModel(pl.LightningModule):
             *[arg for arg, v in init_args.items() if _is_primitive(v)]
         )
 
-        self.optimizer = optimizer
+        self.optimizer = init_args.get("optimizer", torch.optim.Adam)
+        self.cache_outputs = init_args.get("cache_outputs", ("test",))
         self._cached_outputs = dict()
 
     def parse_batch(self, batch):
-        return batch[self.hparams.x_label].float()
+        raise NotImplementedError
 
     def forward(self, x, **kwargs):
         raise NotImplementedError
@@ -83,7 +77,7 @@ class BaseModel(pl.LightningModule):
         return self._step("test", batch, batch_idx, logger=False)
 
     def _epoch_end(self, split, outputs):
-        if split in self.hparams.cache_outputs:
+        if split in self.cache_outputs:
             if split in self._cached_outputs:
                 del self._cached_outputs[split]
                 gc.collect()
