@@ -1,4 +1,5 @@
 from typing import Optional, Sequence
+import numpy as np
 
 from serotiny.transforms.dataframe.transforms import _filter_columns as filter_columns
 
@@ -6,9 +7,10 @@ from .abstract_loader import Loader
 
 
 class LoadColumn(Loader):
-    """Loader class, used to retrieve fields directly from dataframe columns."""
+    """Loader class, used to retrieve fields directly from dataframe
+    columns."""
 
-    def __init__(self, column: str):
+    def __init__(self, column: str, dtype: str = "float"):
         """
         Parameters
         ----------
@@ -19,17 +21,18 @@ class LoadColumn(Loader):
         super().__init__()
 
         self.column = column
+        self.dtype = np.dtype(dtype).type
 
     def __call__(self, row):
-        return row[self.column]
+        return self.dtype(row[self.column])
 
 
 class LoadColumns(Loader):
-    """Loader class, used to retrieve fields directly from multiple dataframe columns,
-    concatenating them into an array.
+    """Loader class, used to retrieve fields directly from multiple dataframe
+    columns, concatenating them into an array.
 
-    It leverages `filter_columns` to enable using simple queries to select the columns
-    to use.
+    It leverages `filter_columns` to enable using simple queries to select the
+    columns to use.
     """
 
     def __init__(
