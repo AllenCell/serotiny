@@ -52,9 +52,10 @@ class ImageVAE(BaseVAE):
             non_linearity=non_linearity,
             skip_connections=skip_connections,
             batch_norm=batch_norm,
+            final_non_linearity=nn.Threshold(6, 6),
         )
         encoder.apply(weight_init)
-        nn.utils.spectral_norm(encoder.output)
+        nn.utils.spectral_norm(encoder.output[0])
 
         dummy_out, intermediate_sizes = encoder.conv_forward(
             torch.zeros(1, in_channels, *input_dims), return_sizes=True
