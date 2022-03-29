@@ -25,7 +25,7 @@ class ImageVAE(BaseVAE):
         max_pool_layers: Sequence[int],
         input_dims: Sequence[int],
         x_label: str,
-        optimizer: torch.optim.Adam,
+        optimizer: torch.optim.Optimizer = torch.optim.Adam,
         beta: float = 1.0,
         id_label: Optional[str] = None,
         non_linearity: Optional[nn.Module] = None,
