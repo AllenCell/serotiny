@@ -25,6 +25,7 @@ class BasicCNN(nn.Module):
         up_conv: bool = False,
         non_linearity: Optional[nn.Module] = None,
         skip_connections: Union[bool, Sequence[int]] = False,
+        batch_norm: bool = True,
         mode: str = "3d",
     ):
         """Instantiate a 3D CNN.
@@ -76,6 +77,7 @@ class BasicCNN(nn.Module):
                     non_linearity=non_linearity,
                     mode=mode,
                     skip_connection=(ix in self.skip_connections),
+                    batch_norm=batch_norm,
                 )
             )
             _in_channels = out_channels

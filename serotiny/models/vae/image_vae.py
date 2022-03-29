@@ -37,6 +37,7 @@ class ImageVAE(BaseVAE):
         prior_logvar: Optional[Array] = None,
         learn_prior_logvar: bool = False,
         skip_connections: bool = True,
+        batch_norm: bool = True,
         mode: str = "3d",
         cache_outputs: Sequence = ("test",),
     ):
@@ -50,6 +51,7 @@ class ImageVAE(BaseVAE):
             mode=mode,
             non_linearity=non_linearity,
             skip_connections=skip_connections,
+            batch_norm=batch_norm,
         )
         encoder.apply(weight_init)
         nn.utils.spectral_norm(encoder.output)
@@ -73,6 +75,7 @@ class ImageVAE(BaseVAE):
             mode=mode,
             non_linearity=non_linearity,
             skip_connections=skip_connections,
+            batch_norm=batch_norm,
         )
         decoder.apply(weight_init)
         nn.utils.spectral_norm(decoder.linear_decompress)
@@ -110,6 +113,7 @@ class _ImageVAEDecoder(nn.Module):
         mode,
         non_linearity,
         skip_connections,
+        batch_norm,
     ):
         super().__init__()
 
@@ -134,6 +138,7 @@ class _ImageVAEDecoder(nn.Module):
             mode=mode,
             non_linearity=non_linearity,
             skip_connections=skip_connections,
+            batch_norm=batch_norm,
         )
 
     def forward(self, z):
