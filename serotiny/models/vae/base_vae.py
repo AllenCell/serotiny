@@ -103,7 +103,7 @@ class BaseVAE(BaseModel):
             rcl_per_input_dimension = rcl_per_input_dimension * mask
             normalizer = mask.view(mask.shape[0], -1).sum(dim=1)
         else:
-            normalizer = sum(x.shape[1:])
+            normalizer = np.prod(x.shape[1:])
 
         rcl = (
             rcl_per_input_dimension
