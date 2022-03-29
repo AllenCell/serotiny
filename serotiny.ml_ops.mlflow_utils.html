@@ -280,8 +280,36 @@
           </label>
         </div>
         <article role="main">
-          <section id="serotiny-ml-ops-mlflow-utils-module">
-<h1>serotiny.ml_ops.mlflow_utils module<a class="headerlink" href="#serotiny-ml-ops-mlflow-utils-module" title="Permalink to this headline">#</a></h1>
+          <section id="module-serotiny.ml_ops.mlflow_utils">
+<span id="serotiny-ml-ops-mlflow-utils-module"></span><h1>serotiny.ml_ops.mlflow_utils module<a class="headerlink" href="#module-serotiny.ml_ops.mlflow_utils" title="Permalink to this headline">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="serotiny.ml_ops.mlflow_utils.load_model_from_checkpoint">
+<span class="sig-prename descclassname"><span class="pre">serotiny.ml_ops.mlflow_utils.</span></span><span class="sig-name descname"><span class="pre">load_model_from_checkpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tracking_uri</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">run_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/ml_ops/mlflow_utils.html#load_model_from_checkpoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.ml_ops.mlflow_utils.load_model_from_checkpoint" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="serotiny.ml_ops.mlflow_utils.mlflow_fit">
+<span class="sig-prename descclassname"><span class="pre">serotiny.ml_ops.mlflow_utils.</span></span><span class="sig-name descname"><span class="pre">mlflow_fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mlflow_conf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_conf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/ml_ops/mlflow_utils.html#mlflow_fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.ml_ops.mlflow_utils.mlflow_fit" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="serotiny.ml_ops.mlflow_utils.mlflow_predict">
+<span class="sig-prename descclassname"><span class="pre">serotiny.ml_ops.mlflow_utils.</span></span><span class="sig-name descname"><span class="pre">mlflow_predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mlflow_conf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_conf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/ml_ops/mlflow_utils.html#mlflow_predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.ml_ops.mlflow_utils.mlflow_predict" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="serotiny.ml_ops.mlflow_utils.mlflow_test">
+<span class="sig-prename descclassname"><span class="pre">serotiny.ml_ops.mlflow_utils.</span></span><span class="sig-name descname"><span class="pre">mlflow_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mlflow_conf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trainer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_conf</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/ml_ops/mlflow_utils.html#mlflow_test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.ml_ops.mlflow_utils.mlflow_test" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="serotiny.ml_ops.mlflow_utils.patched_autolog">
+<span class="sig-prename descclassname"><span class="pre">serotiny.ml_ops.mlflow_utils.</span></span><span class="sig-name descname"><span class="pre">patched_autolog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">log_every_n_epoch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclusive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable_for_unsupported_versions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">silent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fit'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/ml_ops/mlflow_utils.html#patched_autolog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.ml_ops.mlflow_utils.patched_autolog" title="Permalink to this definition">#</a></dt>
+<dd><div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Autologging is known to be compatible with the following package versions: <code class="docutils literal notranslate"><span class="pre">1.0.5</span></code> &lt;= <code class="docutils literal notranslate"><span class="pre">pytorch-lightning</span></code> &lt;= <code class="docutils literal notranslate"><span class="pre">1.5.10</span></code>. Autologging may not succeed when used with package versions outside of this range.</p>
+</div>
+<dl class="simple">
+<dt>Patched mlflow autolog, to enable on_test_epoch_end callbacks and to cover</dt><dd><p>trainer.test calls as well.</p>
+</dd>
+</dl>
+</dd></dl>
 </section>
 
         </article>
