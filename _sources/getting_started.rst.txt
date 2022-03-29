@@ -100,8 +100,8 @@ An (incomplete) example of a possible model config could be:
     hidden_layers: [32, 32, 32]
     x_label: "x"
     optimizer:
-      _partial**: true
-      _target**: torch.optim.Adam
+      _partial_: true
+      _target_: torch.optim.Adam
       lr: 1e-3
 
 
