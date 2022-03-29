@@ -347,7 +347,7 @@
     <span class="k">def</span> <span class="nf">_patched_on_train_batch_end</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="n">pl_module</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="n">_log_metrics_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="n">pl_module</span><span class="p">)</span>
 
-    <span class="k">assert</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"fit"</span><span class="p">,</span> <span class="s2">"test"</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"fit"</span><span class="p">,</span> <span class="s2">"test"</span><span class="p">,</span> <span class="s2">"predict"</span><span class="p">]</span>
 
     <span class="n">safe_patch</span><span class="p">(</span>
         <span class="s2">"pytorch"</span><span class="p">,</span>
