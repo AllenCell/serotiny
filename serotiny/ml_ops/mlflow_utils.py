@@ -275,7 +275,7 @@ def mlflow_fit(mlflow_conf, trainer, model, data, full_conf, test=False):
     # if run_id has been specified, we're trying to resume
     if run_id is not None and not trainer.checkpoint_callback:
         raise ValueError(
-            "You're trying to resume training, but " "checkpointing is not enabled."
+            "You're trying to resume training, but checkpointing is not enabled."
         )
 
     skip = False
