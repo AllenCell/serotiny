@@ -65,7 +65,7 @@ def patched_autolog(
     def _patched_on_train_batch_end(original, self, trainer, pl_module, *args):
         _log_metrics_step(self, trainer, pl_module)
 
-    assert mode in ["fit", "test"]
+    assert mode in ["fit", "test", "predict"]
 
     safe_patch(
         "pytorch",
