@@ -48,8 +48,8 @@ def patched_autolog(
     silent=False,
     mode="fit",
 ):
-    """Patched mlflow autolog, to enable on_test_epoch_end callbacks and to cover
-    trainer.test calls as well."""
+    """Patched mlflow autolog, to enable on_test_epoch_end callbacks and to
+    cover trainer.test calls as well."""
 
     import mlflow.pytorch._pytorch_autolog as _pytorch_autolog
     from mlflow.utils.autologging_utils import safe_patch
@@ -206,8 +206,9 @@ def _mlflow_prep(mlflow_conf, trainer, model, data, mode):
         for run_info in mlflow.list_run_infos(experiment_id=experiment.experiment_id):
             run_tags = mlflow.get_run(run_info.run_id).data.tags
 
-            if run_tags["mlflow.runName"] == run_name:
-                runs.append(run_info.run_id)
+            if "mlflow.runName" in run_tags:
+                if run_tags["mlflow.runName"] == run_name:
+                    runs.append(run_info.run_id)
 
         if len(runs) > 1:
             raise ValueError(
@@ -385,22 +386,32 @@ def mlflow_predict(mlflow_conf, trainer, model, data, full_conf):
             "You're calling serotiny predict but you " "haven't specified the run_id"
         )
 
-    # we don't know yet if there's a checkpoint
-    ckpt_path = None
+    with mlflow.start_run(
+        experiment_id=experiment.experiment_id,
+        run_name=mlflow_conf.run_name,
+        run_id=run_id,
+        nested=(run_id is not None),
+    ):
 
-    with tempfile.TemporaryDirectory() as tmp_dir:
-        ckpt_path = _get_latest_checkpoint(mlflow_conf.tracking_uri, run_id, tmp_dir)
+        # we don't know yet if there's a checkpoint
+        ckpt_path = None
 
-        _log_conf(tmp_dir, full_conf, "predict")
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            ckpt_path = _get_latest_checkpoint(
+                mlflow_conf.tracking_uri, run_id, tmp_dir
+            )
 
-        if ckpt_path is None:
-            logger.info("No checkpoint found for this run. Skipping.")
-        else:
-            logger.info("Calling trainer.predict")
-            preds = trainer.predict(model, data, ckpt_path=ckpt_path)
+            _log_conf(tmp_dir, full_conf, "predict")
 
-            preds_dir = Path(tmp_dir) / "predictions"
-            preds_dir.mkdir(exist_ok=True)
+            if ckpt_path is None:
+                logger.info("No checkpoint found for this run. Skipping.")
+            else:
+                logger.info("Calling trainer.predict")
+                preds = trainer.predict(model, data, ckpt_path=ckpt_path)
 
-            save_model_predictions(model, preds, preds_dir)
-            _log_predictions(preds_dir, mlflow_conf["tracking_uri"], run_id)
+                preds_dir = Path(tmp_dir) / "predictions"
+                preds_dir.mkdir(exist_ok=True)
+
+                save_model_predictions(model, preds, preds_dir)
+                _log_predictions(preds_dir, mlflow_conf["tracking_uri"], run_id)
+        mlflow.end_run(status="FINISHED")
