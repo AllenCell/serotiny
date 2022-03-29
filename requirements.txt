@@ -3,6 +3,7 @@ fire==0.4.0
 hydra-core>=1.2.0.dev2
 joblib==1.1.0
 makefun==1.13.1
+mlflow>=1.23.1
 nbformat==5.2.0
 numpy==1.22.3
 omegaconf==2.1.1
