@@ -261,7 +261,7 @@ def _log_conf(tmp_dir, full_conf, mode):
 def _log_predictions(preds_dir, tracking_uri, run_id):
     client = MlflowClient(tracking_uri=tracking_uri)
     client.log_artifacts(
-        run_id=run_id, local_path=preds_dir, artifact_path="predictions"
+        run_id=run_id, local_dir=preds_dir, artifact_path="predictions"
     )
 
 
