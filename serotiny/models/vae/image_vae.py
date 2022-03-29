@@ -26,7 +26,7 @@ class ImageVAE(BaseVAE):
         max_pool_layers: Sequence[int],
         input_dims: Sequence[int],
         x_label: str,
-        optimizer: torch.optim.Adam,
+        optimizer: torch.optim.Optimizer = torch.optim.Adam,
         beta: float = 1.0,
         id_label: Optional[str] = None,
         non_linearity: Optional[nn.Module] = None,
@@ -38,6 +38,7 @@ class ImageVAE(BaseVAE):
         prior_logvar: Optional[Array] = None,
         learn_prior_logvar: bool = False,
         skip_connections: bool = True,
+        batch_norm: bool = True,
         mode: str = "3d",
         cache_outputs: Sequence = ("test",),
     ):
@@ -51,9 +52,11 @@ class ImageVAE(BaseVAE):
             mode=mode,
             non_linearity=non_linearity,
             skip_connections=skip_connections,
+            batch_norm=batch_norm,
+            final_non_linearity=nn.Threshold(6, 6),
         )
         encoder.apply(weight_init)
-        nn.utils.spectral_norm(encoder.output)
+        nn.utils.spectral_norm(encoder.output[0])
 
         dummy_out, intermediate_sizes = encoder.conv_forward(
             torch.zeros(1, in_channels, *input_dims), return_sizes=True
@@ -74,6 +77,7 @@ class ImageVAE(BaseVAE):
             mode=mode,
             non_linearity=non_linearity,
             skip_connections=skip_connections,
+            batch_norm=batch_norm,
         )
         decoder.apply(weight_init)
         nn.utils.spectral_norm(decoder.linear_decompress)

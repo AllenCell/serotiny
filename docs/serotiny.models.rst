@@ -1,6 +1,11 @@
 serotiny.models package
 =======================
 
+.. automodule:: serotiny.models
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
@@ -13,18 +18,8 @@ Subpackages
 Submodules
 ----------
 
-serotiny.models.base\_model module
-----------------------------------
+.. toctree::
+   :maxdepth: 4
 
-.. automodule:: serotiny.models.base_model
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: serotiny.models
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   serotiny.models.base_model
+   serotiny.models.basic_model

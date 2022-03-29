@@ -8,32 +8,14 @@ from setuptools import find_namespace_packages, find_packages, setup
 with open("README.md") as readme_file:
     readme = readme_file.read()
 
-requirements = [
-    "numpy",
-    "pandas",
-    "pyarrow",
-    "aicsimageio",
-    "Pillow",
-    "pytorch-lightning",
-    "pytorch-lightning-bolts",
-    "torch",
-    "torchvision",
-    "tqdm",
-    "seaborn",
-    "urllib3",
-    "fire",
-    "mlflow",
-    "makefun",
-    "hydra-core==1.2.0.dev2",
-    "cookiecutter",
-]
+with open("requirements.txt") as reqs_file:
+    requirements = reqs_file.read().strip().splitlines()
 
 docs_requirements = [
     "sphinx",
     "furo",
     "m2r2",
 ]
-
 
 setup(
     author="Ryan Spangler, Ritvik Vasan, Guilherme Pires, Caleb Chan, Theo Knijnenburg",
@@ -69,6 +51,6 @@ setup(
     url="https://github.com/AllenCellModeling/serotiny",
     # Do not edit this string manually, always use bumpversion
     # Details in CONTRIBUTING.rst
-    version="alpha",
+    version="0.0.a0",
     zip_safe=False,
 )

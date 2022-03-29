@@ -5,7 +5,6 @@ from typing import Optional, Sequence, Union
 import numpy as np
 import torch
 import torch.nn as nn
-from pytorch_lightning.utilities.parsing import get_init_args
 from torch.nn.modules.loss import _Loss as Loss
 
 from serotiny.losses.kl_divergence import diagonal_gaussian_kl, isotropic_gaussian_kl
@@ -62,10 +61,7 @@ class BaseVAE(BaseModel):
         learn_prior_logvar: bool
             Boolean flag to determine whether to learn the prior log-variances
         """
-
-        frame = inspect.currentframe()
-        init_args = get_init_args(frame)
-        super().__init__(**init_args)
+        super().__init__()
 
         self.reconstruction_reduce = reconstruction_reduce
         self.reconstruction_loss = reconstruction_loss
@@ -107,7 +103,7 @@ class BaseVAE(BaseModel):
             rcl_per_input_dimension = rcl_per_input_dimension * mask
             normalizer = mask.view(mask.shape[0], -1).sum(dim=1)
         else:
-            normalizer = sum(x.shape[1:])
+            normalizer = np.prod(x.shape[1:])
 
         rcl = (
             rcl_per_input_dimension

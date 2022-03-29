@@ -1,7 +1,7 @@
 import re
 from itertools import chain
 from pathlib import Path
-from typing import Callable, Dict, Optional, Sequence, Union
+from typing import Dict, Optional, Sequence, Union
 
 import numpy as np
 import pandas as pd
@@ -76,10 +76,10 @@ def _parse_loaders(loaders):
 
 
 class ManifestDatamodule(pl.LightningDataModule):
-    """A pytorch lightning datamodule based on manifest files. It can either use a
-    single manifest file, which contains a column based on which a train- val-test split
-    can be made; or it can use three manifest files, one for each fold (train, val,
-    test)
+    """A pytorch lightning datamodule based on manifest files. It can either
+    use a single manifest file, which contains a column based on which a train-
+    val- test split can be made; or it can use three manifest files, one for
+    each fold (train, val, test)
 
     Parameters
     ----------
@@ -109,12 +109,9 @@ class ManifestDatamodule(pl.LightningDataModule):
     def __init__(
         self,
         path: Union[Path, str],
-        batch_size: int,
-        num_workers: int,
         loaders: Union[Dict, Loader],
         split_column: Optional[Union[Path, str]] = None,
         columns: Optional[Sequence[str]] = None,
-        collate: Optional[Callable] = None,
         **dataloader_kwargs,
     ):
 

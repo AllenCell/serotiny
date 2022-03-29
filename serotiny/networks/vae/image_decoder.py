@@ -17,6 +17,7 @@ class ImageDecoder(nn.Module):
         mode,
         non_linearity,
         skip_connections,
+        batch_norm,
     ):
         super().__init__()
 
@@ -41,6 +42,7 @@ class ImageDecoder(nn.Module):
             mode=mode,
             non_linearity=non_linearity,
             skip_connections=skip_connections,
+            batch_norm=batch_norm,
         )
 
     def forward(self, z):

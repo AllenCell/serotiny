@@ -1,6 +1,11 @@
 serotiny.io.dataframe package
 =============================
 
+.. automodule:: serotiny.io.dataframe
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
@@ -12,26 +17,8 @@ Subpackages
 Submodules
 ----------
 
-serotiny.io.dataframe.dataframe\_dataset module
------------------------------------------------
+.. toctree::
+   :maxdepth: 4
 
-.. automodule:: serotiny.io.dataframe.dataframe_dataset
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-serotiny.io.dataframe.readers module
-------------------------------------
-
-.. automodule:: serotiny.io.dataframe.readers
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: serotiny.io.dataframe
-   :members:
-   :undoc-members:
-   :show-inheritance:
+   serotiny.io.dataframe.dataframe_dataset
+   serotiny.io.dataframe.readers

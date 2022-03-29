@@ -1,6 +1,11 @@
 serotiny.networks package
 =========================
 
+.. automodule:: serotiny.networks
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Subpackages
 -----------
 
@@ -11,11 +16,3 @@ Subpackages
    serotiny.networks.layers
    serotiny.networks.mlp
    serotiny.networks.utils
-
-Module contents
----------------
-
-.. automodule:: serotiny.networks
-   :members:
-   :undoc-members:
-   :show-inheritance:

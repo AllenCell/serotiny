@@ -1,7 +1,11 @@
 import logging
 import sys
+import uuid
+
+from omegaconf import OmegaConf
 
 logger = logging.getLogger(__name__)
+OmegaConf.register_new_resolver("uuid", lambda: str(uuid.uuid4()))
 
 
 def _do_model_op(
@@ -82,8 +86,6 @@ def _do_model_op(
 
 def _do_model_op_wrapper(cfg):
     if isinstance(cfg, dict):
-        from omegaconf import OmegaConf
-
         cfg = OmegaConf.create(cfg)
 
     _do_model_op(

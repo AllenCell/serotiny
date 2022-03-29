@@ -28,9 +28,10 @@ def infer_dims(img: aicsimageio.AICSImage):
 def image_loader(
     path,
     select_channels: Optional[Union[Sequence[int], Sequence[str]]] = None,
-    output_dtype: Optional[Type[np.number]] = None,
+    output_dtype: Optional[Union[str, Type[np.number]]] = None,
     transform: Optional[Callable] = None,
     return_channels: bool = False,
+    return_as_torch: bool = True,
     reader: Optional[str] = None,
 ):
     """Load image from path given by `path`. If the given image doesn't have channel
@@ -54,6 +55,9 @@ def image_loader(
     return_channels: bool = False
         Flag to determine whether to return a channel-index map when loading
         the image. This is only useful when channels have names
+
+    return_as_torch: bool = True
+        Flag to determine whether to return the resulting image as a torch.Tensor
     """
 
     if reader is not None:
@@ -91,6 +95,11 @@ def image_loader(
 
     if transform:
         data = transform(data)
+
+    if return_as_torch:
+        import torch
+
+        data = torch.tensor(data)
 
     if return_channels:
         return data, channel_map
