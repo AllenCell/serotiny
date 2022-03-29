@@ -76,6 +76,9 @@ class BaseModel(pl.LightningModule):
     def test_step(self, batch, batch_idx):
         return self._step("test", batch, batch_idx, logger=False)
 
+    def predict_step(self, batch, batch_idx):
+        return self._step("predict", batch, batch_idx, logger=False)
+
     def _epoch_end(self, split, outputs):
         if split in self.cache_outputs:
             if split in self._cached_outputs:
