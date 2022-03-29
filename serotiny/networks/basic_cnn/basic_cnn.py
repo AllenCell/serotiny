@@ -24,6 +24,7 @@ class BasicCNN(nn.Module):
         flat_output: bool = True,
         up_conv: bool = False,
         non_linearity: Optional[nn.Module] = None,
+        final_non_linearity: Optional[nn.Module] = None,
         skip_connections: Union[bool, Sequence[int]] = False,
         batch_norm: bool = True,
         mode: str = "3d",
@@ -110,7 +111,10 @@ class BasicCNN(nn.Module):
         log.info(f"Determined 'compressed size': {compressed_size} for CNN")
 
         if flat_output:
-            self.output = nn.Linear(compressed_size, output_dim)
+            self.output = nn.Sequential(
+                nn.Linear(compressed_size, output_dim),
+                nn.Identity() if final_non_linearity is None else final_non_linearity,
+            )
 
     def conv_forward(self, x, return_sizes=False):
         if return_sizes:
