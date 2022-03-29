@@ -68,7 +68,7 @@ class BasicModel(BaseModel):
                 else:
                     raise err
 
-        self.log(f"{stage} loss", loss.detach(), logger=logger)
+        self.log(f"{stage}_loss", loss.detach(), logger=logger)
 
         return {
             "loss": loss,
