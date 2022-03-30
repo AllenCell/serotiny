@@ -13,25 +13,32 @@ from serotiny.io.dataframe import DataframeDataset, read_dataframe
 from serotiny.io.dataframe.loaders.abstract_loader import Loader
 
 
-def _make_single_manifest_splits(manifest_path, loaders, split_column, columns=None):
+def _make_single_manifest_splits(
+    manifest_path, loaders, split_column, columns=None, just_inference=False
+):
     dataframe = read_dataframe(manifest_path, columns)
-    assert dataframe.dtypes[split_column] == np.dtype("O")
+    if not just_inference:
+        assert dataframe.dtypes[split_column] == np.dtype("O")
 
     split_names = dataframe[split_column].unique().tolist()
-    assert set(split_names).issubset({"train", "valid", "test"})
+    if not just_inference:
+        assert set(split_names).issubset({"train", "valid", "test"})
 
-    datasets = {
-        split: DataframeDataset(
-            dataframe.loc[dataframe[split_column] == split].copy(), loaders[split]
-        )
-        for split in ["train", "valid", "test"]
-    }
+    if not just_inference:
+        datasets = {
+            split: DataframeDataset(
+                dataframe.loc[dataframe[split_column] == split].copy(), loaders[split]
+            )
+            for split in ["train", "valid", "test"]
+        }
 
     datasets["predict"] = DataframeDataset(dataframe.copy(), loaders["predict"])
     return datasets
 
 
-def _make_multiple_manifest_splits(split_path, loaders, columns=None):
+def _make_multiple_manifest_splits(
+    split_path, loaders, columns=None, just_inference=False
+):
     split_path = Path(split_path)
     datasets = {}
     predict_df = []
@@ -40,7 +47,8 @@ def _make_multiple_manifest_splits(split_path, loaders, columns=None):
         mode = re.findall(r"(.*)\.(?:csv|parquet)", fpath.name)[0]
         dataframe = read_dataframe(fpath, required_columns=columns)
         dataset = DataframeDataset(dataframe, loaders=loaders[mode])
-        datasets[mode] = dataset
+        if not just_inference:
+            datasets[mode] = dataset
         predict_df.append(dataframe.copy())
 
     predict_df = pd.concat(predict_df)
@@ -78,32 +86,15 @@ def _parse_loaders(loaders):
 class ManifestDatamodule(pl.LightningDataModule):
     """A pytorch lightning datamodule based on manifest files. It can either
     use a single manifest file, which contains a column based on which a train-
-    val- test split can be made; or it can use three manifest files, one for
-    each fold (train, val, test)
+    val-test split can be made; or it can use three manifest files, one for
+    each fold (train, val, test).
 
-    Parameters
-    ----------
-    path: Union[Path, str]
-        Path to a manifest file
+    Additionally, if it is only going to be used for prediction/testing, a flag
+    `just_inference` can be set to True so the splits are ignored and the whole
+    dataset is used.
 
-    loaders: Union[Dict, Loader]
-        Loader specifications for each given split.
-
-    split_column: Optional[str] = None
-        Name of a column in the dataset which can be used to create train, val, test
-        splits.
-
-    columns: Optional[Sequence[str]] = None
-        List of columns to load from the dataset, in case it's a parquet file.
-        If None, load everything.
-
-    dataloader_kwargs:
-        Additional keyword arguments are passed to the
-        torch.utils.data.DataLoader class when instantiating it (aside from
-        `shuffle` which is only used for the train dataloader).
-        Among these args are `num_workers`, `batch_size`, `shuffle`, etc.
-        See the PyTorch docs for more info on these args:
-        https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader
+    The `predict_datamodule` is simply constructed from the whole dataset,
+    regardless of the value of `just_inference`.
     """
 
     def __init__(
@@ -112,8 +103,39 @@ class ManifestDatamodule(pl.LightningDataModule):
         loaders: Union[Dict, Loader],
         split_column: Optional[Union[Path, str]] = None,
         columns: Optional[Sequence[str]] = None,
+        just_inference: bool = False,
         **dataloader_kwargs,
     ):
+        """
+        Parameters
+        ----------
+        path: Union[Path, str]
+            Path to a manifest file
+
+        loaders: Union[Dict, Loader]
+            Loader specifications for each given split.
+
+        split_column: Optional[str] = None
+            Name of a column in the dataset which can be used to create train, val, test
+            splits.
+
+        columns: Optional[Sequence[str]] = None
+            List of columns to load from the dataset, in case it's a parquet file.
+            If None, load everything.
+
+        just_inference: bool = False
+            Whether this datamodule will be used for just inference
+            (testing/prediction).
+            If so, the splits are ignored and the whole dataset is used.
+
+        dataloader_kwargs:
+            Additional keyword arguments are passed to the
+            torch.utils.data.DataLoader class when instantiating it (aside from
+            `shuffle` which is only used for the train dataloader).
+            Among these args are `num_workers`, `batch_size`, `shuffle`, etc.
+            See the PyTorch docs for more info on these args:
+            https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader
+        """
 
         super().__init__()
         self.path = path
@@ -128,18 +150,21 @@ class ManifestDatamodule(pl.LightningDataModule):
         # manifests - one per split. otherwise, we assume it is the path to a single
         # manifest file, which is expected to have a
         if path.is_dir():
-            self.datasets = _make_multiple_manifest_splits(path, loaders, columns)
+            self.datasets = _make_multiple_manifest_splits(
+                path, loaders, columns, just_inference
+            )
         else:
-            if split_column is None:
+            if split_column is None and not just_inference:
                 raise MisconfigurationException(
                     "When using a single manifest file, it must have a "
                     "split column, to use for train-val-test splitting."
                 )
 
             self.datasets = _make_single_manifest_splits(
-                path, loaders, split_column, columns
+                path, loaders, split_column, columns, just_inference
             )
 
+        self.just_inference = just_inference
         self.dataloader_kwargs = dataloader_kwargs
 
     def make_dataloader(self, split):
@@ -149,13 +174,27 @@ class ManifestDatamodule(pl.LightningDataModule):
         return DataLoader(dataset=self.datasets[split], **kwargs)
 
     def train_dataloader(self):
+        if self.just_inference:
+            raise TypeError(
+                "This datamodule was configured with `just_inference=True`, "
+                "so it doesn't have a train_dataloader and can't be "
+                "used for training."
+            )
         return self.make_dataloader("train")
 
     def val_dataloader(self):
+        if self.just_inference:
+            raise TypeError(
+                "This datamodule was configured with `just_inference=True`, "
+                "so it doesn't have a train_dataloader and can't be "
+                "used for training."
+            )
+
         return self.make_dataloader("valid")
 
     def test_dataloader(self):
-        return self.make_dataloader("test")
+        split = "predict" if self.just_inference else "test"
+        return self.make_dataloader(split)
 
     def predict_dataloader(self):
         return self.make_dataloader("predict")
