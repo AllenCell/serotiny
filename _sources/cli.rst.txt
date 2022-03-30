@@ -45,11 +45,14 @@ behind this initially intimidating syntax is because these commands are
 to change config parameters, as well as leverage any additional hydra functionality
 like:
 
-- Multi-runs and launchers
+- Multi-runs and launchers (check `the relevant section of the hydra docs
+  <https://hydra.cc/docs/next/tutorials/basic/running_your_app/multi-run/#--multirun--m-from-the-command-line>`_)
 
   - Just add the ``-m`` flag and the intended sweeps in the command line
 
-- Tab completion (only on Bash)
+- Tab completion (only on Bash) (check `the relevant section of the hydra docs
+  <https://hydra.cc/docs/next/tutorials/basic/running_your_app/tab_completion/>`_)
+
 
   - Run ``eval "$(serotiny train -sc install=serotiny_bash)"``. You now have tab
     completion in serotiny projects in that shell session! (Useful when you have

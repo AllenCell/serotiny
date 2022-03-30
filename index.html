@@ -132,7 +132,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -274,7 +274,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -285,10 +285,25 @@
 <p><code class="docutils literal notranslate"><span class="pre">serotiny</span></code> is a framework and set of tools to structure, configure and drive deep
 learning projects. It integrates <a class="reference external" href="https://hydra.cc">hydra</a> for configuration and
 execution, <a class="reference external" href="https://pytorchlightning.ai">Pytorch Lightning</a>
-for neural net training/testing/prediction, and <a class="reference external" href="https://mlflow.org">MLFlow</a>
+for neural net training/testing/prediction, and <a href="#id1"><span class="problematic" id="id2">`</span></a>MLFlow &lt;<a class="reference external" href="https://mlflow.org">https://mlflow.org</a>&gt;**_
 for experiment tracking and artifact management.</p>
+<section id="intro">
+<h2>Intro<a class="headerlink" href="#intro" title="Permalink to this headline">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">serotiny</span></code> was developed with the intention of streamlining the lifecycle of
+Deep Learning projects at <a class="reference external" href="https://www.allencell.org/">AICS</a> . It achieves this
+goal by:</p>
+<ul class="simple">
+<li><p>Standardizing the structure of DL projects</p></li>
+<li><p>Relying on the modularity afforded by this standard structure to make DL projects highly
+configurable, using <a class="reference external" href="https://hydra.cc">hydra</a> as the framework for configuration</p></li>
+<li><p>Making it easy to adopt best-practices by tightly integrating with MLFlow for
+experiment tracking and artifact management</p></li>
+</ul>
+<p>In doing so, DL projects become reproducible, easy to collaborate on and can
+benefit from general tooling.</p>
 <div class="toctree-wrapper compound">
 </div>
+</section>
 </section>
 
         </article>
@@ -326,8 +341,27 @@ for experiment tracking and artifact management.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">serotiny</a><ul>
+<li><a class="reference internal" href="#intro">Intro</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
