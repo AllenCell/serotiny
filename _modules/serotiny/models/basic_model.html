@@ -350,7 +350,7 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">err</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2"> loss"</span><span class="p">,</span> <span class="n">loss</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">_loss"</span><span class="p">,</span> <span class="n">loss</span><span class="o">.</span><span class="n">detach</span><span class="p">(),</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">"loss"</span><span class="p">:</span> <span class="n">loss</span><span class="p">,</span>

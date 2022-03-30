@@ -553,6 +553,29 @@ You can override configuration parameters in the CLI call, using
 <p>Assuming appropriate configuration, you should see the results of your model
 training on MLFlow</p>
 </section>
+<section id="use-a-trained-model-to-make-predictions">
+<h2>Use a trained model to make predictions<a class="headerlink" href="#use-a-trained-model-to-make-predictions" title="Permalink to this headline">#</a></h2>
+<p>Assuming you have a trained model, under a run named <code class="docutils literal notranslate"><span class="pre">some_run</span></code> under some
+MLFlow experiment, you can use that model to make predictions ony any datamodule
+with a <code class="docutils literal notranslate"><span class="pre">predict_dataloader</span></code>. (<code class="docutils literal notranslate"><span class="pre">serotiny</span></code>’s
+<a class="reference internal" href="serotiny.datamodules.html#serotiny.datamodules.ManifestDatamodule" title="serotiny.datamodules.ManifestDatamodule"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManifestDatamodule</span> <span class="pre">class</span></code></a>
+has one).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ serotiny predict model=... data=... ++mlflow.run_name=some_run
+</pre></div>
+</div>
+<p>If you want to implement custom logic to save your model’s predictions, you
+should override/implement the <code class="docutils literal notranslate"><span class="pre">save_predictions</span></code> method for your model class.
+This method takes <code class="docutils literal notranslate"><span class="pre">preds</span></code> and <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> as inputs, where <code class="docutils literal notranslate"><span class="pre">preds</span></code> is the
+result of calling <code class="docutils literal notranslate"><span class="pre">trainer.predict</span></code> (see more about it
+<a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/common/trainer.html#predict">here</a>)
+and <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> is a temporary directory in which you should save the information
+in <code class="docutils literal notranslate"><span class="pre">preds</span></code>. This will generally be a list where each element is the return
+value of your model’s <code class="docutils literal notranslate"><span class="pre">predict_step</span></code> or <code class="docutils literal notranslate"><span class="pre">forward</span></code> methods for each batch.</p>
+<p>If you call <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">serotiny</span> <span class="pre">predict</span></code> and don’t implement a custom <code class="docutils literal notranslate"><span class="pre">save_predictions</span></code>
+method, predictions will simply be dumped using <code class="docutils literal notranslate"><span class="pre">joblib.dump</span></code>
+(see <a class="reference external" href="https://joblib.readthedocs.io/en/latest/generated/joblib.dump.html">here</a>)
+and compressed with XZ.</p>
+</section>
 <section id="load-a-trained-model">
 <h2>Load a trained model<a class="headerlink" href="#load-a-trained-model" title="Permalink to this headline">#</a></h2>
 <p>On MLFlow’s dashboard, identify the run id for the model you just trained.
@@ -636,6 +659,7 @@ You can now load it e.g. in a Jupyter Notebook by doing:</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#train-a-model">Train a model</a></li>
+<li><a class="reference internal" href="#use-a-trained-model-to-make-predictions">Use a trained model to make predictions</a></li>
 <li><a class="reference internal" href="#load-a-trained-model">Load a trained model</a></li>
 </ul>
 </li>

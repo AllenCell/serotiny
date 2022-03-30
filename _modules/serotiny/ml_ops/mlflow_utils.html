@@ -330,8 +330,8 @@
     <span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">mode</span><span class="o">=</span><span class="s2">"fit"</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">"""Patched mlflow autolog, to enable on_test_epoch_end callbacks and to cover</span>
-<span class="sd">    trainer.test calls as well."""</span>
+    <span class="sd">"""Patched mlflow autolog, to enable on_test_epoch_end callbacks and to</span>
+<span class="sd">    cover trainer.test calls as well."""</span>
 
     <span class="kn">import</span> <span class="nn">mlflow.pytorch._pytorch_autolog</span> <span class="k">as</span> <span class="nn">_pytorch_autolog</span>
     <span class="kn">from</span> <span class="nn">mlflow.utils.autologging_utils</span> <span class="kn">import</span> <span class="n">safe_patch</span>
@@ -488,8 +488,9 @@
         <span class="k">for</span> <span class="n">run_info</span> <span class="ow">in</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">list_run_infos</span><span class="p">(</span><span class="n">experiment_id</span><span class="o">=</span><span class="n">experiment</span><span class="o">.</span><span class="n">experiment_id</span><span class="p">):</span>
             <span class="n">run_tags</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">run_info</span><span class="o">.</span><span class="n">run_id</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tags</span>
 
-            <span class="k">if</span> <span class="n">run_tags</span><span class="p">[</span><span class="s2">"mlflow.runName"</span><span class="p">]</span> <span class="o">==</span> <span class="n">run_name</span><span class="p">:</span>
-                <span class="n">runs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">run_info</span><span class="o">.</span><span class="n">run_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">"mlflow.runName"</span> <span class="ow">in</span> <span class="n">run_tags</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">run_tags</span><span class="p">[</span><span class="s2">"mlflow.runName"</span><span class="p">]</span> <span class="o">==</span> <span class="n">run_name</span><span class="p">:</span>
+                    <span class="n">runs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">run_info</span><span class="o">.</span><span class="n">run_id</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">runs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -542,7 +543,7 @@
 <span class="k">def</span> <span class="nf">_log_predictions</span><span class="p">(</span><span class="n">preds_dir</span><span class="p">,</span> <span class="n">tracking_uri</span><span class="p">,</span> <span class="n">run_id</span><span class="p">):</span>
     <span class="n">client</span> <span class="o">=</span> <span class="n">MlflowClient</span><span class="p">(</span><span class="n">tracking_uri</span><span class="o">=</span><span class="n">tracking_uri</span><span class="p">)</span>
     <span class="n">client</span><span class="o">.</span><span class="n">log_artifacts</span><span class="p">(</span>
-        <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span> <span class="n">local_path</span><span class="o">=</span><span class="n">preds_dir</span><span class="p">,</span> <span class="n">artifact_path</span><span class="o">=</span><span class="s2">"predictions"</span>
+        <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span> <span class="n">local_dir</span><span class="o">=</span><span class="n">preds_dir</span><span class="p">,</span> <span class="n">artifact_path</span><span class="o">=</span><span class="s2">"predictions"</span>
     <span class="p">)</span>
 
 
@@ -556,7 +557,7 @@
     <span class="c1"># if run_id has been specified, we're trying to resume</span>
     <span class="k">if</span> <span class="n">run_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">trainer</span><span class="o">.</span><span class="n">checkpoint_callback</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">"You're trying to resume training, but "</span> <span class="s2">"checkpointing is not enabled."</span>
+            <span class="s2">"You're trying to resume training, but checkpointing is not enabled."</span>
         <span class="p">)</span>
 
     <span class="n">skip</span> <span class="o">=</span> <span class="kc">False</span>
@@ -667,25 +668,35 @@
             <span class="s2">"You're calling serotiny predict but you "</span> <span class="s2">"haven't specified the run_id"</span>
         <span class="p">)</span>
 
-    <span class="c1"># we don't know yet if there's a checkpoint</span>
-    <span class="n">ckpt_path</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span>
+        <span class="n">experiment_id</span><span class="o">=</span><span class="n">experiment</span><span class="o">.</span><span class="n">experiment_id</span><span class="p">,</span>
+        <span class="n">run_name</span><span class="o">=</span><span class="n">mlflow_conf</span><span class="o">.</span><span class="n">run_name</span><span class="p">,</span>
+        <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span>
+        <span class="n">nested</span><span class="o">=</span><span class="p">(</span><span class="n">run_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">),</span>
+    <span class="p">):</span>
 
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_dir</span><span class="p">:</span>
-        <span class="n">ckpt_path</span> <span class="o">=</span> <span class="n">_get_latest_checkpoint</span><span class="p">(</span><span class="n">mlflow_conf</span><span class="o">.</span><span class="n">tracking_uri</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">)</span>
+        <span class="c1"># we don't know yet if there's a checkpoint</span>
+        <span class="n">ckpt_path</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="n">_log_conf</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">full_conf</span><span class="p">,</span> <span class="s2">"predict"</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_dir</span><span class="p">:</span>
+            <span class="n">ckpt_path</span> <span class="o">=</span> <span class="n">_get_latest_checkpoint</span><span class="p">(</span>
+                <span class="n">mlflow_conf</span><span class="o">.</span><span class="n">tracking_uri</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">tmp_dir</span>
+            <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">ckpt_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"No checkpoint found for this run. Skipping."</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Calling trainer.predict"</span><span class="p">)</span>
-            <span class="n">preds</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ckpt_path</span><span class="o">=</span><span class="n">ckpt_path</span><span class="p">)</span>
+            <span class="n">_log_conf</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">full_conf</span><span class="p">,</span> <span class="s2">"predict"</span><span class="p">)</span>
 
-            <span class="n">preds_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"predictions"</span>
-            <span class="n">preds_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ckpt_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"No checkpoint found for this run. Skipping."</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Calling trainer.predict"</span><span class="p">)</span>
+                <span class="n">preds</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ckpt_path</span><span class="o">=</span><span class="n">ckpt_path</span><span class="p">)</span>
 
-            <span class="n">save_model_predictions</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">preds</span><span class="p">,</span> <span class="n">preds_dir</span><span class="p">)</span>
-            <span class="n">_log_predictions</span><span class="p">(</span><span class="n">preds_dir</span><span class="p">,</span> <span class="n">mlflow_conf</span><span class="p">[</span><span class="s2">"tracking_uri"</span><span class="p">],</span> <span class="n">run_id</span><span class="p">)</span></div>
+                <span class="n">preds_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"predictions"</span>
+                <span class="n">preds_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+                <span class="n">save_model_predictions</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">preds</span><span class="p">,</span> <span class="n">preds_dir</span><span class="p">)</span>
+                <span class="n">_log_predictions</span><span class="p">(</span><span class="n">preds_dir</span><span class="p">,</span> <span class="n">mlflow_conf</span><span class="p">[</span><span class="s2">"tracking_uri"</span><span class="p">],</span> <span class="n">run_id</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">end_run</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s2">"FINISHED"</span><span class="p">)</span></div>
 </pre></div>
         </article>
       </div>
