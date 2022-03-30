@@ -329,6 +329,33 @@ Note the selection of the model and data configurations. If you omit these,
 Assuming appropriate configuration, you should see the results of your model
 training on MLFlow
 
+Use a trained model to make predictions
+***************************************
+
+Assuming you have a trained model, under a run named ``some_run`` under some
+MLFlow experiment, you can use that model to make predictions ony any datamodule
+with a ``predict_dataloader``. (``serotiny``'s
+:py:class:`ManifestDatamodule class <serotiny.datamodules.ManifestDatamodule>`
+has one).
+
+::
+
+   $ serotiny predict model=... data=... ++mlflow.run_name=some_run
+
+If you want to implement custom logic to save your model's predictions, you
+should override/implement the ``save_predictions`` method for your model class.
+This method takes ``preds`` and ``output_dir`` as inputs, where ``preds`` is the
+result of calling ``trainer.predict`` (see more about it
+`here <https://pytorch-lightning.readthedocs.io/en/latest/common/trainer.html#predict>`_)
+and ``output_dir`` is a temporary directory in which you should save the information
+in ``preds``. This will generally be a list where each element is the return
+value of your model's ``predict_step`` or ``forward`` methods for each batch.
+
+If you call ``$ serotiny predict`` and don't implement a custom ``save_predictions``
+method, predictions will simply be dumped using ``joblib.dump``
+(see `here <https://joblib.readthedocs.io/en/latest/generated/joblib.dump.html>`_)
+and compressed with XZ.
+
 Load a trained model
 ********************
 
