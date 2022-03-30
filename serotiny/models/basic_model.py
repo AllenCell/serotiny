@@ -1,4 +1,4 @@
-from typing import Sequence, Union
+from typing import Sequence, Union, Optional, Callable
 
 import numpy as np
 import torch
@@ -20,6 +20,7 @@ class BasicModel(BaseModel):
         x_label: str = "x",
         y_label: str = "y",
         optimizer: torch.optim.Optimizer = torch.optim.Adam,
+        save_predictions: Optional[Callable] = None,
         **kwargs,
     ):
         """
@@ -35,12 +36,19 @@ class BasicModel(BaseModel):
             The key used to retrieve the target from dataloader batches
         optimizer: torch.optim.Optimizer = torch.optim.Adam
             The optimizer class
+        save_predictions: Optional[Callable] = None
+            A function to save the results of `serotiny predict`
         """
         super().__init__()
         self.network = network
         self.loss = loss
 
         self._squeeze_y = False
+
+        if save_predictions is not None:
+            self.save_predictions = lambda _, preds, output_dir: (
+                save_predictions(preds, output_dir)
+            )
 
     def parse_batch(self, batch):
         return (batch[self.hparams.x_label], batch[self.hparams.y_label])
