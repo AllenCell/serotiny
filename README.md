@@ -2,7 +2,7 @@
 
 `serotiny` is a framework and set of tools to structure, configure and drive deep
 learning projects, developed with the intention of streamlining the lifecycle of
-deep learning projects at [AICS](https://www.allencell.org/).
+deep learning projects at [Allen Institute for Cell Science](https://www.allencell.org/).
 
 It achieves this goal by:
 
