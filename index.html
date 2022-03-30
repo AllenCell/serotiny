@@ -283,24 +283,30 @@
           <section id="serotiny">
 <h1>serotiny<a class="headerlink" href="#serotiny" title="Permalink to this headline">#</a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">serotiny</span></code> is a framework and set of tools to structure, configure and drive deep
-learning projects. It integrates <a class="reference external" href="https://hydra.cc">hydra</a> for configuration and
-execution, <a class="reference external" href="https://pytorchlightning.ai">Pytorch Lightning</a>
-for neural net training/testing/prediction, and <a href="#id1"><span class="problematic" id="id2">`</span></a>MLFlow &lt;<a class="reference external" href="https://mlflow.org">https://mlflow.org</a>&gt;**_
-for experiment tracking and artifact management.</p>
-<section id="intro">
-<h2>Intro<a class="headerlink" href="#intro" title="Permalink to this headline">#</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">serotiny</span></code> was developed with the intention of streamlining the lifecycle of
-Deep Learning projects at <a class="reference external" href="https://www.allencell.org/">AICS</a> . It achieves this
-goal by:</p>
+learning projects, developed with the intention of streamlining the lifecycle of
+deep learning projects at <a class="reference external" href="https://www.allencell.org/">AICS</a>.</p>
+<p>It achieves this goal by:</p>
 <ul class="simple">
 <li><p>Standardizing the structure of DL projects</p></li>
 <li><p>Relying on the modularity afforded by this standard structure to make DL projects highly
 configurable, using <a class="reference external" href="https://hydra.cc">hydra</a> as the framework for configuration</p></li>
-<li><p>Making it easy to adopt best-practices by tightly integrating with MLFlow for
-experiment tracking and artifact management</p></li>
+<li><p>Making it easy to adopt best-practices and latest-developments in DL infrastructure
+by tightly integrating with</p>
+<ul>
+<li><p><a class="reference external" href="https://pytorchlightning.ai">Pytorch Lightning</a> for neural net training/testing/prediction</p></li>
+<li><p><a class="reference external" href="https://mlflow.org">MLFlow</a> for experiment tracking and artifact management</p></li>
+</ul>
+</li>
 </ul>
 <p>In doing so, DL projects become reproducible, easy to collaborate on and can
-benefit from general tooling.</p>
+benefit from general and powerful tooling.</p>
+<section id="getting-started">
+<h2>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">#</a></h2>
+<p>Check our <a class="reference external" href="https://allencellmodeling.github.io/serotiny/getting_started.html">getting started</a>
+page to get started, and learn how training a DL model can be as simple as:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>$ serotiny train <span class="nv">data</span><span class="o">=</span>my_dataset <span class="nv">model</span><span class="o">=</span>my_model
+</pre></div>
+</div>
 <div class="toctree-wrapper compound">
 </div>
 </section>
@@ -354,7 +360,7 @@ benefit from general tooling.</p>
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">serotiny</a><ul>
-<li><a class="reference internal" href="#intro">Intro</a></li>
+<li><a class="reference internal" href="#getting-started">Getting started</a></li>
 </ul>
 </li>
 </ul>
