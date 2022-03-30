@@ -429,13 +429,7 @@ to drive your model training/evaluation this is where you’d implement it.</p><
 <p>This is where the available datasets for training will be specified.
 Each configuration file in this group should contain a <code class="docutils literal notranslate"><span class="pre">hydra</span></code> specification of a
 <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/extensions/datamodules.html?highlight=datamodule">LightiningDatamodule</a> datamodule class.</p>
-<p>As of now, we only provide a
-<a class="reference internal" href="serotiny.datamodules.html#serotiny.datamodules.ManifestDatamodule" title="serotiny.datamodules.ManifestDatamodule"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManifestDatamodule</span> <span class="pre">class</span></code></a> as
-part of <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>, which is a class that works on top of what we call manifest
-files. These are <code class="docutils literal notranslate"><span class="pre">.csv</span></code> files which describe a dataset, and for which we have
-<a class="reference internal" href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders" title="serotiny.io.dataframe.loaders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">loader</span> <span class="pre">classes</span></code></a> which consume values
-from the dataframe, either directly, or e.g. by reading file paths.</p>
-<p>Alternatively, you can write and instantiate your own custom datamodule class instead,
+<p>You can write and instantiate your own custom datamodule class instead,
 or use one developed by someone else.</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -443,22 +437,98 @@ or use one developed by someone else.</p>
 (and other useful building blocks) in a package called <code class="docutils literal notranslate"><span class="pre">lightning-bolts</span></code> which you
 can install via <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">lightning-bolts</span></code>. See <a class="reference external" href="https://lightning-bolts.readthedocs.io/en/latest/">here</a> for more info about it.</p>
 </div>
-<p>One (incomplete) example of a datamodule instantiation could be:</p>
+<section id="the-manifestdatamodule">
+<h4>The ManifestDatamodule<a class="headerlink" href="#the-manifestdatamodule" title="Permalink to this headline">#</a></h4>
+<p>At AICS we usually center our datasets around a “manifest file” - a <code class="docutils literal notranslate"><span class="pre">.csv</span></code> file
+where each row normally corresponds to a cell, and each column corresponds to a
+feature of that cell and/or a path to a file (normally an image file) related to
+that cell. To work with such datasets, we created a
+<a class="reference internal" href="serotiny.datamodules.html#serotiny.datamodules.ManifestDatamodule" title="serotiny.datamodules.ManifestDatamodule"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManifestDatamodule</span> <span class="pre">class</span></code></a>.</p>
+<p>This datamodule expects the manifest to be given either as a path to a folder
+with three files - <code class="docutils literal notranslate"><span class="pre">train.csv</span></code>, <code class="docutils literal notranslate"><span class="pre">valid.csv</span></code>, <code class="docutils literal notranslate"><span class="pre">test.csv</span></code> - or a single
+<code class="docutils literal notranslate"><span class="pre">.csv</span></code> file containing a column called <code class="docutils literal notranslate"><span class="pre">split_column</span></code> - whose values can be
+<code class="docutils literal notranslate"><span class="pre">train</span></code>, <code class="docutils literal notranslate"><span class="pre">test</span></code>, <code class="docutils literal notranslate"><span class="pre">valid</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you are configuring a <code class="docutils literal notranslate"><span class="pre">ManifestDatamodule</span></code> which will only be used for
+predicting/testing (i.e., you will only be calling <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">serotiny</span> <span class="pre">predict</span></code> or
+<code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">serotiny</span> <span class="pre">test</span></code> on it), you can set the flag <code class="docutils literal notranslate"><span class="pre">just_inference</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code>
+which will tell it to ignore the splits and simply use the whole dataset. This
+is the default behavior when you call <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">serotiny</span> <span class="pre">predict</span></code>, but if you set
+<code class="docutils literal notranslate"><span class="pre">just_inference</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code> your manifest isn’t even required to have a
+<code class="docutils literal notranslate"><span class="pre">split_column</span></code>.</p>
+</div>
+<p>To load data from these manifest files, the <code class="docutils literal notranslate"><span class="pre">ManifestDatamodule</span></code> uses
+<a class="reference internal" href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders" title="serotiny.io.dataframe.loaders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">loader</span> <span class="pre">classes</span></code></a> which consume values
+from the dataframe, either directly, or e.g. by reading file paths.</p>
+<p>For example, if we have a <code class="docutils literal notranslate"><span class="pre">manifest.csv</span></code> file whose first few rows look like:</p>
+<div class="table-wrapper"><table class="docutils align-default">
+<colgroup>
+<col style="width: 20%"/>
+<col style="width: 20%"/>
+<col style="width: 20%"/>
+<col style="width: 20%"/>
+<col style="width: 20%"/>
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>cell_id</p></th>
+<th class="head"><p>image_path</p></th>
+<th class="head"><p>volume</p></th>
+<th class="head"><p>cell_type</p></th>
+<th class="head"><p>split_column</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>/path/to/file1.png</p></td>
+<td><p>10</p></td>
+<td><p>small</p></td>
+<td><p>train</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>/path/to/file2.png</p></td>
+<td><p>30</p></td>
+<td><p>big</p></td>
+<td><p>train</p></td>
+</tr>
+<tr class="row-even"><td><p>3</p></td>
+<td><p>/path/to/file3.png</p></td>
+<td><p>20</p></td>
+<td><p>medium</p></td>
+<td><p>valid</p></td>
+</tr>
+</tbody>
+</table></div>
+<p>An example of a compatible datamodule instantiation could be:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_target_</span><span class="p">:</span> <span class="n">serotiny</span><span class="o">.</span><span class="n">datamodules</span><span class="o">.</span><span class="n">ManifestDatamodule</span>
 
-<span class="n">path</span><span class="p">:</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">a</span><span class="o">/</span><span class="n">csv</span><span class="o">/</span><span class="n">file</span><span class="o">.</span><span class="n">csv</span> <span class="c1"># this can either be the path to a .csv file</span>
-                              <span class="c1"># or a folder with 3 .csv files named</span>
-                              <span class="c1"># "train.csv", "valid.csv", "test.csv"</span>
+<span class="n">path</span><span class="p">:</span> <span class="o">/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">a</span><span class="o">/</span><span class="n">csv</span><span class="o">/</span><span class="n">manifest</span><span class="o">.</span><span class="n">csv</span>
+
 <span class="n">batch_size</span><span class="p">:</span> <span class="mi">64</span>
 <span class="n">num_workers</span><span class="p">:</span> <span class="mi">1</span>
 <span class="n">loaders</span><span class="p">:</span>
-  <span class="n">x</span><span class="p">:</span>
-    <span class="n">_target_</span><span class="p">:</span> <span class="n">serotiny</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">loaders</span><span class="o">.</span><span class="n">LoadColumns</span>
-    <span class="n">startswith</span><span class="p">:</span> <span class="n">feature_</span>
+  <span class="nb">id</span><span class="p">:</span>
+    <span class="n">_target_</span><span class="p">:</span> <span class="n">serotiny</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">loaders</span><span class="o">.</span><span class="n">LoadColumn</span>
+    <span class="n">column</span><span class="p">:</span> <span class="n">cell_id</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="nb">int</span>
+  <span class="n">image</span><span class="p">:</span>
+    <span class="n">_target_</span><span class="p">:</span> <span class="n">serotiny</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">loaders</span><span class="o">.</span><span class="n">LoadImage</span>
+    <span class="n">column</span><span class="p">:</span> <span class="n">image_path</span>
+    <span class="n">select_channels</span><span class="p">:</span> <span class="p">[</span><span class="s1">'dna'</span><span class="p">]</span>
+  <span class="n">volume</span><span class="p">:</span>
+    <span class="n">_target_</span><span class="p">:</span> <span class="n">serotiny</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">loaders</span><span class="o">.</span><span class="n">LoadColumn</span>
+    <span class="n">column</span><span class="p">:</span> <span class="n">volume</span>
+    <span class="n">dtype</span><span class="p">:</span> <span class="nb">float</span>
 
 <span class="n">split_column</span><span class="p">:</span> <span class="s2">"split"</span>
 </pre></div>
 </div>
+<p>A <code class="docutils literal notranslate"><span class="pre">ManifestDatamodule</span></code> instantiated with this configuration
+would produce batches containing <code class="docutils literal notranslate"><span class="pre">id</span></code>, <code class="docutils literal notranslate"><span class="pre">image</span></code> and <code class="docutils literal notranslate"><span class="pre">volume</span></code>.</p>
+<p>Check the docs of the
+<a class="reference internal" href="serotiny.datamodules.html#serotiny.datamodules.ManifestDatamodule" title="serotiny.datamodules.ManifestDatamodule"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManifestDatamodule</span> <span class="pre">class</span></code></a> and
+the <a class="reference internal" href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders" title="serotiny.io.dataframe.loaders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">loader</span> <span class="pre">classes</span></code></a> for more info.</p>
+</section>
 </section>
 <section id="the-trainer-config-group">
 <h3><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">trainer</span></code> <strong>config group</strong><a class="headerlink" href="#the-trainer-config-group" title="Permalink to this headline">#</a></h3>
@@ -537,6 +607,8 @@ Check <a class="reference external" href="https://mlflow.org">the MLFlow docs</a
 </div>
 <p>This will start an MLFlow server on port 1234, and store
 its data on <code class="docutils literal notranslate"><span class="pre">/a/path/to/store/mlflow/data</span></code>.</p>
+<p>If you just want to use <code class="docutils literal notranslate"><span class="pre">serotiny</span></code> without its MLFlow integration, you should
+change the value of <code class="docutils literal notranslate"><span class="pre">mlflow.tracking_uri</span></code> to <code class="docutils literal notranslate"><span class="pre">null</span></code>.</p>
 </section>
 </section>
 <section id="train-a-model">
@@ -551,7 +623,12 @@ You can override configuration parameters in the CLI call, using
 <p>Note the selection of the model and data configurations. If you omit these,
 <code class="docutils literal notranslate"><span class="pre">serotiny</span></code> will use the corresponding  <code class="docutils literal notranslate"><span class="pre">default.yaml</span></code> configurations.</p>
 <p>Assuming appropriate configuration, you should see the results of your model
-training on MLFlow</p>
+training on MLFlow.</p>
+<p>For the commands in the above section, you can add an argument
+<code class="docutils literal notranslate"><span class="pre">++make_notebook=/path/to/destination/notebook.ipynb</span></code> to the call, with a path
+to a destination notebook file which will be created and populated with cells
+that mimic the behavior of the respective CLI call, so that you can tinker with
+them and run them one by one.</p>
 </section>
 <section id="use-a-trained-model-to-make-predictions">
 <h2>Use a trained model to make predictions<a class="headerlink" href="#use-a-trained-model-to-make-predictions" title="Permalink to this headline">#</a></h2>
@@ -652,7 +729,10 @@ You can now load it e.g. in a Jupyter Notebook by doing:</p>
 <li><a class="reference internal" href="#bring-your-own-architecture">Bring your own architecture</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#the-data-config-group"><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">data</span></code> <strong>config group</strong></a></li>
+<li><a class="reference internal" href="#the-data-config-group"><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">data</span></code> <strong>config group</strong></a><ul>
+<li><a class="reference internal" href="#the-manifestdatamodule">The ManifestDatamodule</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#the-trainer-config-group"><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">trainer</span></code> <strong>config group</strong></a></li>
 <li><a class="reference internal" href="#the-trainer-callbacks-config-group"><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">trainer/callbacks</span></code> <strong>config group</strong></a></li>
 <li><a class="reference internal" href="#the-mlflow-config-group"><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">mlflow</span></code> <strong>config group</strong></a></li>

@@ -295,25 +295,32 @@
 <span class="kn">from</span> <span class="nn">serotiny.io.dataframe.loaders.abstract_loader</span> <span class="kn">import</span> <span class="n">Loader</span>
 
 
-<span class="k">def</span> <span class="nf">_make_single_manifest_splits</span><span class="p">(</span><span class="n">manifest_path</span><span class="p">,</span> <span class="n">loaders</span><span class="p">,</span> <span class="n">split_column</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_make_single_manifest_splits</span><span class="p">(</span>
+    <span class="n">manifest_path</span><span class="p">,</span> <span class="n">loaders</span><span class="p">,</span> <span class="n">split_column</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">just_inference</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">):</span>
     <span class="n">dataframe</span> <span class="o">=</span> <span class="n">read_dataframe</span><span class="p">(</span><span class="n">manifest_path</span><span class="p">,</span> <span class="n">columns</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">dtypes</span><span class="p">[</span><span class="n">split_column</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">"O"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">just_inference</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">dtypes</span><span class="p">[</span><span class="n">split_column</span><span class="p">]</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">"O"</span><span class="p">)</span>
 
     <span class="n">split_names</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">[</span><span class="n">split_column</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-    <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">split_names</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">({</span><span class="s2">"train"</span><span class="p">,</span> <span class="s2">"valid"</span><span class="p">,</span> <span class="s2">"test"</span><span class="p">})</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">just_inference</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">split_names</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">({</span><span class="s2">"train"</span><span class="p">,</span> <span class="s2">"valid"</span><span class="p">,</span> <span class="s2">"test"</span><span class="p">})</span>
 
-    <span class="n">datasets</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">split</span><span class="p">:</span> <span class="n">DataframeDataset</span><span class="p">(</span>
-            <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dataframe</span><span class="p">[</span><span class="n">split_column</span><span class="p">]</span> <span class="o">==</span> <span class="n">split</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">loaders</span><span class="p">[</span><span class="n">split</span><span class="p">]</span>
-        <span class="p">)</span>
-        <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"train"</span><span class="p">,</span> <span class="s2">"valid"</span><span class="p">,</span> <span class="s2">"test"</span><span class="p">]</span>
-    <span class="p">}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">just_inference</span><span class="p">:</span>
+        <span class="n">datasets</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">split</span><span class="p">:</span> <span class="n">DataframeDataset</span><span class="p">(</span>
+                <span class="n">dataframe</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dataframe</span><span class="p">[</span><span class="n">split_column</span><span class="p">]</span> <span class="o">==</span> <span class="n">split</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">loaders</span><span class="p">[</span><span class="n">split</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"train"</span><span class="p">,</span> <span class="s2">"valid"</span><span class="p">,</span> <span class="s2">"test"</span><span class="p">]</span>
+        <span class="p">}</span>
 
     <span class="n">datasets</span><span class="p">[</span><span class="s2">"predict"</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataframeDataset</span><span class="p">(</span><span class="n">dataframe</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">loaders</span><span class="p">[</span><span class="s2">"predict"</span><span class="p">])</span>
     <span class="k">return</span> <span class="n">datasets</span>
 
 
-<span class="k">def</span> <span class="nf">_make_multiple_manifest_splits</span><span class="p">(</span><span class="n">split_path</span><span class="p">,</span> <span class="n">loaders</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_make_multiple_manifest_splits</span><span class="p">(</span>
+    <span class="n">split_path</span><span class="p">,</span> <span class="n">loaders</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">just_inference</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">):</span>
     <span class="n">split_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">split_path</span><span class="p">)</span>
     <span class="n">datasets</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">predict_df</span> <span class="o">=</span> <span class="p">[]</span>
@@ -322,7 +329,8 @@
         <span class="n">mode</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">"(.*)\.(?:csv|parquet)"</span><span class="p">,</span> <span class="n">fpath</span><span class="o">.</span><span class="n">name</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">dataframe</span> <span class="o">=</span> <span class="n">read_dataframe</span><span class="p">(</span><span class="n">fpath</span><span class="p">,</span> <span class="n">required_columns</span><span class="o">=</span><span class="n">columns</span><span class="p">)</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">DataframeDataset</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">loaders</span><span class="o">=</span><span class="n">loaders</span><span class="p">[</span><span class="n">mode</span><span class="p">])</span>
-        <span class="n">datasets</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">just_inference</span><span class="p">:</span>
+            <span class="n">datasets</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span>
         <span class="n">predict_df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dataframe</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
 
     <span class="n">predict_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">predict_df</span><span class="p">)</span>
@@ -360,32 +368,15 @@
 <div class="viewcode-block" id="ManifestDatamodule"><a class="viewcode-back" href="../../../serotiny.datamodules.manifest_datamodule.html#serotiny.datamodules.ManifestDatamodule">[docs]</a><span class="k">class</span> <span class="nc">ManifestDatamodule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningDataModule</span><span class="p">):</span>
     <span class="sd">"""A pytorch lightning datamodule based on manifest files. It can either</span>
 <span class="sd">    use a single manifest file, which contains a column based on which a train-</span>
-<span class="sd">    val- test split can be made; or it can use three manifest files, one for</span>
-<span class="sd">    each fold (train, val, test)</span>
+<span class="sd">    val-test split can be made; or it can use three manifest files, one for</span>
+<span class="sd">    each fold (train, val, test).</span>
 
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    path: Union[Path, str]</span>
-<span class="sd">        Path to a manifest file</span>
+<span class="sd">    Additionally, if it is only going to be used for prediction/testing, a flag</span>
+<span class="sd">    `just_inference` can be set to True so the splits are ignored and the whole</span>
+<span class="sd">    dataset is used.</span>
 
-<span class="sd">    loaders: Union[Dict, Loader]</span>
-<span class="sd">        Loader specifications for each given split.</span>
-
-<span class="sd">    split_column: Optional[str] = None</span>
-<span class="sd">        Name of a column in the dataset which can be used to create train, val, test</span>
-<span class="sd">        splits.</span>
-
-<span class="sd">    columns: Optional[Sequence[str]] = None</span>
-<span class="sd">        List of columns to load from the dataset, in case it's a parquet file.</span>
-<span class="sd">        If None, load everything.</span>
-
-<span class="sd">    dataloader_kwargs:</span>
-<span class="sd">        Additional keyword arguments are passed to the</span>
-<span class="sd">        torch.utils.data.DataLoader class when instantiating it (aside from</span>
-<span class="sd">        `shuffle` which is only used for the train dataloader).</span>
-<span class="sd">        Among these args are `num_workers`, `batch_size`, `shuffle`, etc.</span>
-<span class="sd">        See the PyTorch docs for more info on these args:</span>
-<span class="sd">        https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader</span>
+<span class="sd">    The `predict_datamodule` is simply constructed from the whole dataset,</span>
+<span class="sd">    regardless of the value of `just_inference`.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -394,8 +385,39 @@
         <span class="n">loaders</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="n">Loader</span><span class="p">],</span>
         <span class="n">split_column</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">just_inference</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="o">**</span><span class="n">dataloader_kwargs</span><span class="p">,</span>
     <span class="p">):</span>
+        <span class="sd">"""</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path: Union[Path, str]</span>
+<span class="sd">            Path to a manifest file</span>
+
+<span class="sd">        loaders: Union[Dict, Loader]</span>
+<span class="sd">            Loader specifications for each given split.</span>
+
+<span class="sd">        split_column: Optional[str] = None</span>
+<span class="sd">            Name of a column in the dataset which can be used to create train, val, test</span>
+<span class="sd">            splits.</span>
+
+<span class="sd">        columns: Optional[Sequence[str]] = None</span>
+<span class="sd">            List of columns to load from the dataset, in case it's a parquet file.</span>
+<span class="sd">            If None, load everything.</span>
+
+<span class="sd">        just_inference: bool = False</span>
+<span class="sd">            Whether this datamodule will be used for just inference</span>
+<span class="sd">            (testing/prediction).</span>
+<span class="sd">            If so, the splits are ignored and the whole dataset is used.</span>
+
+<span class="sd">        dataloader_kwargs:</span>
+<span class="sd">            Additional keyword arguments are passed to the</span>
+<span class="sd">            torch.utils.data.DataLoader class when instantiating it (aside from</span>
+<span class="sd">            `shuffle` which is only used for the train dataloader).</span>
+<span class="sd">            Among these args are `num_workers`, `batch_size`, `shuffle`, etc.</span>
+<span class="sd">            See the PyTorch docs for more info on these args:</span>
+<span class="sd">            https://pytorch.org/docs/stable/data.html#torch.utils.data.DataLoader</span>
+<span class="sd">        """</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
@@ -410,18 +432,21 @@
         <span class="c1"># manifests - one per split. otherwise, we assume it is the path to a single</span>
         <span class="c1"># manifest file, which is expected to have a</span>
         <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">_make_multiple_manifest_splits</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">loaders</span><span class="p">,</span> <span class="n">columns</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">_make_multiple_manifest_splits</span><span class="p">(</span>
+                <span class="n">path</span><span class="p">,</span> <span class="n">loaders</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="n">just_inference</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">split_column</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">split_column</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">just_inference</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">MisconfigurationException</span><span class="p">(</span>
                     <span class="s2">"When using a single manifest file, it must have a "</span>
                     <span class="s2">"split column, to use for train-val-test splitting."</span>
                 <span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">_make_single_manifest_splits</span><span class="p">(</span>
-                <span class="n">path</span><span class="p">,</span> <span class="n">loaders</span><span class="p">,</span> <span class="n">split_column</span><span class="p">,</span> <span class="n">columns</span>
+                <span class="n">path</span><span class="p">,</span> <span class="n">loaders</span><span class="p">,</span> <span class="n">split_column</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="n">just_inference</span>
             <span class="p">)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">just_inference</span> <span class="o">=</span> <span class="n">just_inference</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dataloader_kwargs</span> <span class="o">=</span> <span class="n">dataloader_kwargs</span>
 
 <div class="viewcode-block" id="ManifestDatamodule.make_dataloader"><a class="viewcode-back" href="../../../serotiny.datamodules.manifest_datamodule.html#serotiny.datamodules.ManifestDatamodule.make_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">make_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">split</span><span class="p">):</span>
@@ -431,13 +456,27 @@
         <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">split</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ManifestDatamodule.train_dataloader"><a class="viewcode-back" href="../../../serotiny.datamodules.manifest_datamodule.html#serotiny.datamodules.ManifestDatamodule.train_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">just_inference</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">"This datamodule was configured with `just_inference=True`, "</span>
+                <span class="s2">"so it doesn't have a train_dataloader and can't be "</span>
+                <span class="s2">"used for training."</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_dataloader</span><span class="p">(</span><span class="s2">"train"</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ManifestDatamodule.val_dataloader"><a class="viewcode-back" href="../../../serotiny.datamodules.manifest_datamodule.html#serotiny.datamodules.ManifestDatamodule.val_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">val_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">just_inference</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s2">"This datamodule was configured with `just_inference=True`, "</span>
+                <span class="s2">"so it doesn't have a train_dataloader and can't be "</span>
+                <span class="s2">"used for training."</span>
+            <span class="p">)</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_dataloader</span><span class="p">(</span><span class="s2">"valid"</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ManifestDatamodule.test_dataloader"><a class="viewcode-back" href="../../../serotiny.datamodules.manifest_datamodule.html#serotiny.datamodules.ManifestDatamodule.test_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_dataloader</span><span class="p">(</span><span class="s2">"test"</span><span class="p">)</span></div>
+        <span class="n">split</span> <span class="o">=</span> <span class="s2">"predict"</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">just_inference</span> <span class="k">else</span> <span class="s2">"test"</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_dataloader</span><span class="p">(</span><span class="n">split</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ManifestDatamodule.predict_dataloader"><a class="viewcode-back" href="../../../serotiny.datamodules.manifest_datamodule.html#serotiny.datamodules.ManifestDatamodule.predict_dataloader">[docs]</a>    <span class="k">def</span> <span class="nf">predict_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_dataloader</span><span class="p">(</span><span class="s2">"predict"</span><span class="p">)</span></div></div>
