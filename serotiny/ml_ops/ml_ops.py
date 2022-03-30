@@ -58,9 +58,13 @@ def _do_model_op(
             if mlflow is not None and mlflow.get("tracking_uri") is not None:
                 mlflow_test(mlflow, trainer, model, data, full_conf=full_conf)
             else:
-                raise NotImplementedError(
-                    "Cannot `serotiny test` without " "an MLFlow config."
-                )
+                if "ckpt_path" not in full_conf:
+                    raise NotImplementedError(
+                        "Cannot `serotiny test` without "
+                        "an MLFlow config, or a local ckpt_path."
+                    )
+                ckpt_path = full_conf["ckpt_path"]
+                trainer.test(model, data, ckpt_path=ckpt_path)
 
         elif mode == "predict":
             if mlflow is not None and mlflow.get("tracking_uri") is not None:
