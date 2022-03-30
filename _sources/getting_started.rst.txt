@@ -192,10 +192,10 @@ or use one developed by someone else.
 The ManifestDatamodule
 ^^^^^^^^^^^^^^^^^^^^^^
 
-At AICS we usually center our datasets around a "manifest file" - a ``.csv`` file
-where each row normally corresponds to a cell, and each column corresponds to a
-feature of that cell and/or a path to a file (normally an image file) related to
-that cell. To work with such datasets, we created a
+At the Allen Institute for Cell Science we usually center our datasets around
+a "manifest file" - a ``.csv`` file where each row normally corresponds to a cell,
+and each column corresponds to a feature of that cell and/or a path to a file
+(normally an image file) related to that cell. To work with such datasets, we created a
 :py:class:`ManifestDatamodule class <serotiny.datamodules.ManifestDatamodule>`.
 
 This datamodule expects the manifest to be given either as a path to a folder
