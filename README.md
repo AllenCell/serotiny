@@ -1,5 +1,18 @@
 # serotiny
 
+While going about the work of building deep learning projects, several simultaneous problems seemed to emerge:
+
+* How do we reuse as much work from previous projects as possible, and focus on building the part of the project that makes it distinct?
+* How can we automate the generation of new models that are based on existing models, but vary in a crucial yet non-trivial way?
+* When generating a multiplicity of related models, how can we keep all of the results, predictions, and analyses straight?
+* How can the results from any number of trainings and predictions be compared and integrated in an insightful yet generally applicable way?
+
+Serotiny arose from the need to address these issues and convert the complexity of deep learning projects into something simple, reproducible, configurable, and automatable at scale.
+
+Serotiny is still a work-in-progress, but as we go along the solutions to these problems become more clear. Maybe you've run into similar situations? We'd love to hear from you.
+
+## Overview
+
 `serotiny` is a framework and set of tools to structure, configure and drive deep
 learning projects, developed with the intention of streamlining the lifecycle of
 deep learning projects at [Allen Institute for Cell Science](https://www.allencell.org/).
