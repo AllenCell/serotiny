@@ -3,6 +3,7 @@ import sys
 import uuid
 
 from omegaconf import OmegaConf
+from hydra.utils import get_original_cwd
 
 logger = logging.getLogger(__name__)
 OmegaConf.register_new_resolver("uuid", lambda: str(uuid.uuid4()))
@@ -75,8 +76,10 @@ def _do_model_op(
                         "Cannot `serotiny predict` without "
                         "an MLFlow config, or a local ckpt_path."
                     )
+
+                preds_dir_default = Path(get_original_cwd()) / "predictions"
                 preds_dir = Path(
-                    full_conf.get("predictions_output_dir", "./predictions")
+                    full_conf.get("predictions_output_dir", preds_dir_default)
                 )
                 preds_dir.mkdir(exist_ok=True, parents=True)
 
