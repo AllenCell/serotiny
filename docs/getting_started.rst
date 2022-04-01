@@ -403,10 +403,30 @@ and ``output_dir`` is a temporary directory in which you should save the informa
 in ``preds``. This will generally be a list where each element is the return
 value of your model's ``predict_step`` or ``forward`` methods for each batch.
 
-If you call ``$ serotiny predict`` and don't implement a custom ``save_predictions``
+If you're using ``serotiny's`` :py:class:`BasicModel class <serotiny.models.basic_model.BasicModel>``
+then you can pass it a custom ``save_predictions`` function when you instantiate it
+by doing something like:
+
+::
+
+   ...
+
+   save_predictions:
+     _target_: a_tiny_project.some_module.your_save_predictions_function
+     _partial_: true
+
+   ...
+
+If you call ``$ serotiny predict`` and don't implement/provide a ``save_predictions``
 method, predictions will simply be dumped using ``joblib.dump``
 (see `here <https://joblib.readthedocs.io/en/latest/generated/joblib.dump.html>`_)
 and compressed with XZ.
+
+Finally, if you're using ``$ serotiny predict`` with an MLFlow configuration,
+results will be stored there. Otherwise, you additionally should supply a
+``predictions_output_dir`` argument in the command-line call, otherwise the results
+will be stored in a ``predictions`` folder inside the path where you ran the
+command from.
 
 Load a trained model
 ********************
