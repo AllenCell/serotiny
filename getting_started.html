@@ -651,10 +651,27 @@ result of calling <code class="docutils literal notranslate"><span class="pre">t
 and <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> is a temporary directory in which you should save the information
 in <code class="docutils literal notranslate"><span class="pre">preds</span></code>. This will generally be a list where each element is the return
 value of your model’s <code class="docutils literal notranslate"><span class="pre">predict_step</span></code> or <code class="docutils literal notranslate"><span class="pre">forward</span></code> methods for each batch.</p>
-<p>If you call <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">serotiny</span> <span class="pre">predict</span></code> and don’t implement a custom <code class="docutils literal notranslate"><span class="pre">save_predictions</span></code>
+<p>If you’re using <code class="docutils literal notranslate"><span class="pre">serotiny's</span></code> <code class="xref py py-class docutils literal notranslate"><span class="pre">BasicModel</span> <span class="pre">class</span> <span class="pre">&lt;serotiny.models.basic_model.BasicModel&gt;`</span></code>
+then you can pass it a custom <code class="docutils literal notranslate"><span class="pre">save_predictions</span></code> function when you instantiate it
+by doing something like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">...</span>
+
+<span class="n">save_predictions</span><span class="p">:</span>
+  <span class="n">_target_</span><span class="p">:</span> <span class="n">a_tiny_project</span><span class="o">.</span><span class="n">some_module</span><span class="o">.</span><span class="n">your_save_predictions_function</span>
+  <span class="n">_partial_</span><span class="p">:</span> <span class="n">true</span>
+
+<span class="o">...</span>
+</pre></div>
+</div>
+<p>If you call <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">serotiny</span> <span class="pre">predict</span></code> and don’t implement/provide a <code class="docutils literal notranslate"><span class="pre">save_predictions</span></code>
 method, predictions will simply be dumped using <code class="docutils literal notranslate"><span class="pre">joblib.dump</span></code>
 (see <a class="reference external" href="https://joblib.readthedocs.io/en/latest/generated/joblib.dump.html">here</a>)
 and compressed with XZ.</p>
+<p>Finally, if you’re using <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">serotiny</span> <span class="pre">predict</span></code> with an MLFlow configuration,
+results will be stored there. Otherwise, you additionally should supply a
+<code class="docutils literal notranslate"><span class="pre">predictions_output_dir</span></code> argument in the command-line call, otherwise the results
+will be stored in a <code class="docutils literal notranslate"><span class="pre">predictions</span></code> folder inside the path where you ran the
+command from.</p>
 </section>
 <section id="load-a-trained-model">
 <h2>Load a trained model<a class="headerlink" href="#load-a-trained-model" title="Permalink to this headline">#</a></h2>

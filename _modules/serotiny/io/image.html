@@ -297,17 +297,23 @@
     <span class="sd">"""Given a an AICSImage image, infer the corresponding tiff dimensions."""</span>
     <span class="n">dims</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">dims</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
 
-    <span class="k">if</span> <span class="s2">"S"</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">dims</span><span class="p">[</span><span class="s2">"S"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Expected image with no S dimensions"</span><span class="p">)</span>
-    <span class="k">if</span> <span class="s2">"T"</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">dims</span><span class="p">[</span><span class="s2">"T"</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Expected image with no T dimensions"</span><span class="p">)</span>
-
+    <span class="k">if</span> <span class="n">dims</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"T"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Expected image with no T dimensions"</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="s2">"X"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="s2">"Y"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Expected image with height and width"</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="s2">"CYX"</span> <span class="k">if</span> <span class="n">dims</span><span class="p">[</span><span class="s2">"Z"</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">"CZYX"</span></div>
+    <span class="k">if</span> <span class="n">dims</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"S"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">dims</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"C"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Can't handle S dimension &gt; 1 AND C dimension &gt; 1"</span><span class="p">)</span>
+
+    <span class="n">zero_dims</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"T"</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="s2">"YX"</span>
+    <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="s2">"ZCS"</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dims</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">zero_dims</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="n">dim</span> <span class="o">+</span> <span class="n">order</span>
+
+    <span class="k">return</span> <span class="n">order</span><span class="p">,</span> <span class="n">zero_dims</span></div>
 
 
 <div class="viewcode-block" id="image_loader"><a class="viewcode-back" href="../../../serotiny.io.image.html#serotiny.io.image.image_loader">[docs]</a><span class="k">def</span> <span class="nf">image_loader</span><span class="p">(</span>
@@ -319,8 +325,8 @@
     <span class="n">return_as_torch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">reader</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">"""Load image from path given by `path`. If the given image doesn't have channel</span>
-<span class="sd">    names, `select_channels` must be a list of integers.</span>
+    <span class="sd">"""Load image from path given by `path`. If the given image doesn't have</span>
+<span class="sd">    channel names, `select_channels` must be a list of integers.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -364,12 +370,11 @@
     <span class="n">loaded_channels</span> <span class="o">=</span> <span class="n">select_channels</span>
     <span class="n">loaded_channels_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">channel_names</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span> <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">loaded_channels</span><span class="p">]</span>
 
-    <span class="n">dims</span> <span class="o">=</span> <span class="n">infer_dims</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+    <span class="n">order</span><span class="p">,</span> <span class="n">zero_dims</span> <span class="o">=</span> <span class="n">infer_dims</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="s2">"Z"</span> <span class="ow">in</span> <span class="n">dims</span><span class="p">:</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">get_image_data</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">S</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">C</span><span class="o">=</span><span class="n">loaded_channels_idx</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">get_image_data</span><span class="p">(</span><span class="n">dims</span><span class="p">,</span> <span class="n">Z</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">S</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">C</span><span class="o">=</span><span class="n">loaded_channels_idx</span><span class="p">)</span>
+    <span class="n">first_dim</span> <span class="o">=</span> <span class="p">{</span><span class="n">order</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">loaded_channels_idx</span><span class="p">}</span> <span class="k">if</span> <span class="n">order</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"S"</span><span class="p">,</span> <span class="s2">"C"</span><span class="p">]</span> <span class="k">else</span> <span class="p">{}</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">get_image_data</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="o">**</span><span class="n">zero_dims</span><span class="p">,</span> <span class="o">**</span><span class="n">first_dim</span><span class="p">)</span>
 
     <span class="n">channel_map</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">channel_name</span><span class="p">:</span> <span class="n">index</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">channel_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">loaded_channels</span><span class="p">)</span>
