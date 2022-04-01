@@ -8,7 +8,7 @@ class CBLogLoss(Loss):
     https://arxiv.org/abs/1907.06845.
     """
 
-    def __init__(self, reduction="sum", mode="probs"):
+    def __init__(self, reduction="mean", mode="probs"):
         super(CBLogLoss, self).__init__(None, None, reduction)
         self.mode = mode
 
@@ -17,11 +17,15 @@ class CBLogLoss(Loss):
         # the trick with the dictionary allows us to use either `probs` or `logits`
         log_probs = ContinuousBernoulli(**{self.mode: input}).log_prob(target)
 
+        # sum per input-element log loss
+        log_probs = log_probs.view(log_probs.shape[0], -1).sum(axis=1)
+
+        # reduce across batch dimension
         if self.reduction == "none":
             return -log_probs
         elif self.reduction == "sum":
-            return -log_probs.view(log_probs.shape[0], -1).sum(axis=1)
+            return -log_probs.sum()
         elif self.reduction == "mean":
-            return -log_probs.view(log_probs.shape[0], -1).mean(axis=1)
+            return -log_probs.mean()
         else:
             raise NotImplementedError(f"Unavailable reduction type: {self.reduction}")
