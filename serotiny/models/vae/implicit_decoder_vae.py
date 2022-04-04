@@ -54,7 +54,7 @@ class ImplicitDecoderVAE(BaseVAE):
             skip_connections=skip_connections,
         )
         encoder.apply(weight_init)
-        nn.utils.spectral_norm(encoder.output)
+        nn.utils.spectral_norm(encoder.output[0])
 
         decoder = ImplicitDecoder(
             latent_dims=latent_dim,
