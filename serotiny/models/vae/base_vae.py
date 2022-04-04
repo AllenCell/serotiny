@@ -154,7 +154,6 @@ class BaseVAE(BaseModel):
         mu_logvar = self.encoder(
             x, **{k: v for k, v in kwargs.items() if k in self.encoder_args}
         )
-
         mu, logvar = torch.split(mu_logvar, mu_logvar.shape[1] // 2, dim=1)
 
         assert mu.shape == logvar.shape
