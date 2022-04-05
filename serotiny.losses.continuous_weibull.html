@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny.losses.kl_divergence module" href="serotiny.losses.kl_divergence.html" /><link rel="prev" title="serotiny.losses.continuous_bernoulli module" href="serotiny.losses.continuous_bernoulli.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny.ml_ops package" href="serotiny.ml_ops.html" /><link rel="prev" title="serotiny.losses.continuous_bernoulli module" href="serotiny.losses.continuous_bernoulli.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
         <title>serotiny.losses.continuous_weibull module - serotiny 0.0.a0 documentation</title>
@@ -188,7 +188,6 @@
 <li class="toctree-l3 current has-children"><a class="reference internal" href="serotiny.losses.html">serotiny.losses package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="serotiny.losses.continuous_bernoulli.html">serotiny.losses.continuous_bernoulli module</a></li>
 <li class="toctree-l4 current current-page"><a class="current reference internal" href="#">serotiny.losses.continuous_weibull module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.losses.kl_divergence.html">serotiny.losses.kl_divergence module</a></li>
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.ml_ops.html">serotiny.ml_ops package</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -203,6 +202,11 @@
 </ul>
 </li>
 <li class="toctree-l4 has-children"><a class="reference internal" href="serotiny.models.vae.html">serotiny.models.vae package</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" role="switch" type="checkbox"/><label for="toctree-checkbox-11"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5 has-children"><a class="reference internal" href="serotiny.models.vae.priors.html">serotiny.models.vae.priors package</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l6"><a class="reference internal" href="serotiny.models.vae.priors.abstract_prior.html">serotiny.models.vae.priors.abstract_prior module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="serotiny.models.vae.priors.gaussian.html">serotiny.models.vae.priors.gaussian module</a></li>
+</ul>
+</li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.image_vae.html">serotiny.models.vae.image_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.tabular_vae.html">serotiny.models.vae.tabular_vae module</a></li>
@@ -212,33 +216,33 @@
 <li class="toctree-l4"><a class="reference internal" href="serotiny.models.basic_model.html">serotiny.models.basic_model module</a></li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.networks.html">serotiny.networks package</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l4 has-children"><a class="reference internal" href="serotiny.networks.basic_cnn.html">serotiny.networks.basic_cnn package</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.networks.html">serotiny.networks package</a><input class="toctree-checkbox" id="toctree-checkbox-13" name="toctree-checkbox-13" role="switch" type="checkbox"/><label for="toctree-checkbox-13"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="serotiny.networks.basic_cnn.html">serotiny.networks.basic_cnn package</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.networks.basic_cnn.basic_cnn.html">serotiny.networks.basic_cnn.basic_cnn module</a></li>
 </ul>
 </li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="serotiny.networks.layers.html">serotiny.networks.layers package</a><input class="toctree-checkbox" id="toctree-checkbox-14" name="toctree-checkbox-14" role="switch" type="checkbox"/><label for="toctree-checkbox-14"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="serotiny.networks.layers.html">serotiny.networks.layers package</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" role="switch" type="checkbox"/><label for="toctree-checkbox-15"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.networks.layers.convolution_block.html">serotiny.networks.layers.convolution_block module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.networks.layers.skip_connection.html">serotiny.networks.layers.skip_connection module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.networks.layers.spatial_pyramid_pool.html">serotiny.networks.layers.spatial_pyramid_pool module</a></li>
 </ul>
 </li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="serotiny.networks.mlp.html">serotiny.networks.mlp package</a><input class="toctree-checkbox" id="toctree-checkbox-15" name="toctree-checkbox-15" role="switch" type="checkbox"/><label for="toctree-checkbox-15"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="serotiny.networks.mlp.html">serotiny.networks.mlp package</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" role="switch" type="checkbox"/><label for="toctree-checkbox-16"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.networks.mlp.mlp.html">serotiny.networks.mlp.mlp module</a></li>
 </ul>
 </li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="serotiny.networks.utils.html">serotiny.networks.utils package</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" role="switch" type="checkbox"/><label for="toctree-checkbox-16"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="serotiny.networks.utils.html">serotiny.networks.utils package</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" role="switch" type="checkbox"/><label for="toctree-checkbox-17"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.networks.utils.weight_init.html">serotiny.networks.utils.weight_init module</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.transforms.html">serotiny.transforms package</a><input class="toctree-checkbox" id="toctree-checkbox-17" name="toctree-checkbox-17" role="switch" type="checkbox"/><label for="toctree-checkbox-17"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l4 has-children"><a class="reference internal" href="serotiny.transforms.dataframe.html">serotiny.transforms.dataframe package</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" role="switch" type="checkbox"/><label for="toctree-checkbox-18"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.transforms.html">serotiny.transforms package</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" role="switch" type="checkbox"/><label for="toctree-checkbox-18"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="serotiny.transforms.dataframe.html">serotiny.transforms.dataframe package</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" role="switch" type="checkbox"/><label for="toctree-checkbox-19"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.transforms.dataframe.transforms.html">serotiny.transforms.dataframe.transforms module</a></li>
 </ul>
 </li>
-<li class="toctree-l4 has-children"><a class="reference internal" href="serotiny.transforms.image.html">serotiny.transforms.image package</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" role="switch" type="checkbox"/><label for="toctree-checkbox-19"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="serotiny.transforms.image.html">serotiny.transforms.image package</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" role="switch" type="checkbox"/><label for="toctree-checkbox-20"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.transforms.image.crop.html">serotiny.transforms.image.crop module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.transforms.image.normalize.html">serotiny.transforms.image.normalize module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.transforms.image.pad.html">serotiny.transforms.image.pad module</a></li>
@@ -284,27 +288,8 @@
           </label>
         </div>
         <article role="main">
-          <section id="module-serotiny.losses.continuous_weibull">
-<span id="serotiny-losses-continuous-weibull-module"></span><h1>serotiny.losses.continuous_weibull module<a class="headerlink" href="#module-serotiny.losses.continuous_weibull" title="Permalink to this headline">#</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="serotiny.losses.continuous_weibull.WeibullLogLoss">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.losses.continuous_weibull.</span></span><span class="sig-name descname"><span class="pre">WeibullLogLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sum'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'explicit'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/losses/continuous_weibull.html#WeibullLogLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.losses.continuous_weibull.WeibullLogLoss" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.loss._Loss</span></code></p>
-<p>Continuous Bernoulli loss, proposed here:</p>
-<p><a class="reference external" href="https://arxiv.org/abs/1907.06845">https://arxiv.org/abs/1907.06845</a>.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="serotiny.losses.continuous_weibull.WeibullLogLoss.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/losses/continuous_weibull.html#WeibullLogLoss.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.losses.continuous_weibull.WeibullLogLoss.forward" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="serotiny.losses.continuous_weibull.WeibullLogLoss.reduction">
-<span class="sig-name descname"><span class="pre">reduction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#serotiny.losses.continuous_weibull.WeibullLogLoss.reduction" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-</dd></dl>
-<dl class="py function">
-<dt class="sig sig-object py" id="serotiny.losses.continuous_weibull.weibull_log_probs">
-<span class="sig-prename descclassname"><span class="pre">serotiny.losses.continuous_weibull.</span></span><span class="sig-name descname"><span class="pre">weibull_log_probs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/losses/continuous_weibull.html#weibull_log_probs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.losses.continuous_weibull.weibull_log_probs" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+          <section id="serotiny-losses-continuous-weibull-module">
+<h1>serotiny.losses.continuous_weibull module<a class="headerlink" href="#serotiny-losses-continuous-weibull-module" title="Permalink to this headline">#</a></h1>
 </section>
 
         </article>
@@ -312,12 +297,12 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="serotiny.losses.kl_divergence.html">
+          <a class="next-page" href="serotiny.ml_ops.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">serotiny.losses.kl_divergence module</div>
+                <div class="title">serotiny.ml_ops package</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
