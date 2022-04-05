@@ -6,6 +6,7 @@ import torch
 from serotiny.networks.mlp import MLP
 
 from .base_vae import BaseVAE
+from .priors import Prior
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]
 
@@ -21,9 +22,7 @@ class TabularVAE(BaseVAE):
         loss_mask_label: Optional[str] = None,
         optimizer=torch.optim.Adam,
         beta: float = 1.0,
-        prior_mode: str = "isotropic",
-        prior_logvar: Optional[Array] = None,
-        learn_prior_logvar: bool = False,
+        priors: Optional[Sequence[Prior]] = None,
         cache_outputs: Sequence = ("test",),
     ):
         encoder = MLP(
@@ -47,8 +46,6 @@ class TabularVAE(BaseVAE):
             id_label=id_label,
             loss_mask_label=loss_mask_label,
             beta=beta,
-            prior_mode=prior_mode,
-            prior_logvar=prior_logvar,
-            learn_prior_logvar=learn_prior_logvar,
+            priors=priors,
             cache_outputs=cache_outputs,
         )
