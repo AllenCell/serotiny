@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny.losses.continuous_weibull module" href="serotiny.losses.continuous_weibull.html" /><link rel="prev" title="serotiny.losses package" href="serotiny.losses.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny.losses.kl_divergence module" href="serotiny.losses.kl_divergence.html" /><link rel="prev" title="serotiny.losses.continuous_bernoulli module" href="serotiny.losses.continuous_bernoulli.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
-        <title>serotiny.losses.continuous_bernoulli module - serotiny 0.0.a0 documentation</title>
+        <title>serotiny.losses.continuous_weibull module - serotiny 0.0.a0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -186,8 +186,8 @@
 </ul>
 </li>
 <li class="toctree-l3 current has-children"><a class="reference internal" href="serotiny.losses.html">serotiny.losses package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l4 current current-page"><a class="current reference internal" href="#">serotiny.losses.continuous_bernoulli module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="serotiny.losses.continuous_weibull.html">serotiny.losses.continuous_weibull module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.losses.continuous_bernoulli.html">serotiny.losses.continuous_bernoulli module</a></li>
+<li class="toctree-l4 current current-page"><a class="current reference internal" href="#">serotiny.losses.continuous_weibull module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.losses.kl_divergence.html">serotiny.losses.kl_divergence module</a></li>
 </ul>
 </li>
@@ -284,23 +284,27 @@
           </label>
         </div>
         <article role="main">
-          <section id="module-serotiny.losses.continuous_bernoulli">
-<span id="serotiny-losses-continuous-bernoulli-module"></span><h1>serotiny.losses.continuous_bernoulli module<a class="headerlink" href="#module-serotiny.losses.continuous_bernoulli" title="Permalink to this headline">#</a></h1>
+          <section id="module-serotiny.losses.continuous_weibull">
+<span id="serotiny-losses-continuous-weibull-module"></span><h1>serotiny.losses.continuous_weibull module<a class="headerlink" href="#module-serotiny.losses.continuous_weibull" title="Permalink to this headline">#</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="serotiny.losses.continuous_bernoulli.CBLogLoss">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.losses.continuous_bernoulli.</span></span><span class="sig-name descname"><span class="pre">CBLogLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mean'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'probs'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/losses/continuous_bernoulli.html#CBLogLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.losses.continuous_bernoulli.CBLogLoss" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="serotiny.losses.continuous_weibull.WeibullLogLoss">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.losses.continuous_weibull.</span></span><span class="sig-name descname"><span class="pre">WeibullLogLoss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sum'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'explicit'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/losses/continuous_weibull.html#WeibullLogLoss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.losses.continuous_weibull.WeibullLogLoss" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">torch.nn.modules.loss._Loss</span></code></p>
 <p>Continuous Bernoulli loss, proposed here:</p>
 <p><a class="reference external" href="https://arxiv.org/abs/1907.06845">https://arxiv.org/abs/1907.06845</a>.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="serotiny.losses.continuous_bernoulli.CBLogLoss.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/losses/continuous_bernoulli.html#CBLogLoss.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.losses.continuous_bernoulli.CBLogLoss.forward" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="serotiny.losses.continuous_weibull.WeibullLogLoss.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/losses/continuous_weibull.html#WeibullLogLoss.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.losses.continuous_weibull.WeibullLogLoss.forward" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="serotiny.losses.continuous_bernoulli.CBLogLoss.reduction">
-<span class="sig-name descname"><span class="pre">reduction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#serotiny.losses.continuous_bernoulli.CBLogLoss.reduction" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="serotiny.losses.continuous_weibull.WeibullLogLoss.reduction">
+<span class="sig-name descname"><span class="pre">reduction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#serotiny.losses.continuous_weibull.WeibullLogLoss.reduction" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 </dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="serotiny.losses.continuous_weibull.weibull_log_probs">
+<span class="sig-prename descclassname"><span class="pre">serotiny.losses.continuous_weibull.</span></span><span class="sig-name descname"><span class="pre">weibull_log_probs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/losses/continuous_weibull.html#weibull_log_probs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.losses.continuous_weibull.weibull_log_probs" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
 </section>
 
         </article>
@@ -308,23 +312,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="serotiny.losses.continuous_weibull.html">
+          <a class="next-page" href="serotiny.losses.kl_divergence.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">serotiny.losses.continuous_weibull module</div>
+                <div class="title">serotiny.losses.kl_divergence module</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="serotiny.losses.html">
+          <a class="prev-page" href="serotiny.losses.continuous_bernoulli.html">
               <svg><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">serotiny.losses package</div>
+                <div class="title">serotiny.losses.continuous_bernoulli module</div>
                 
               </div>
             </a>

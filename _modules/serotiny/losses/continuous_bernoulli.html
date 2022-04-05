@@ -186,6 +186,7 @@
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../serotiny.losses.html">serotiny.losses package</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../serotiny.losses.continuous_bernoulli.html">serotiny.losses.continuous_bernoulli module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.losses.continuous_weibull.html">serotiny.losses.continuous_weibull module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../serotiny.losses.kl_divergence.html">serotiny.losses.kl_divergence module</a></li>
 </ul>
 </li>
@@ -293,7 +294,7 @@
 <span class="sd">    https://arxiv.org/abs/1907.06845.</span>
 <span class="sd">    """</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="s2">"sum"</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"probs"</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="s2">"mean"</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"probs"</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">CBLogLoss</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">reduction</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
 
@@ -302,12 +303,16 @@
         <span class="c1"># the trick with the dictionary allows us to use either `probs` or `logits`</span>
         <span class="n">log_probs</span> <span class="o">=</span> <span class="n">ContinuousBernoulli</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span> <span class="nb">input</span><span class="p">})</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
 
+        <span class="c1"># sum per input-element log loss</span>
+        <span class="n">log_probs</span> <span class="o">=</span> <span class="n">log_probs</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">log_probs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># reduce across batch dimension</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">"none"</span><span class="p">:</span>
             <span class="k">return</span> <span class="o">-</span><span class="n">log_probs</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">"sum"</span><span class="p">:</span>
-            <span class="k">return</span> <span class="o">-</span><span class="n">log_probs</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">log_probs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">log_probs</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduction</span> <span class="o">==</span> <span class="s2">"mean"</span><span class="p">:</span>
-            <span class="k">return</span> <span class="o">-</span><span class="n">log_probs</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">log_probs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">return</span> <span class="o">-</span><span class="n">log_probs</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unavailable reduction type: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">reduction</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span></div></div>
 </pre></div>

@@ -186,6 +186,7 @@
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../serotiny.losses.html">serotiny.losses package</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.losses.continuous_bernoulli.html">serotiny.losses.continuous_bernoulli module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.losses.continuous_weibull.html">serotiny.losses.continuous_weibull module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.losses.kl_divergence.html">serotiny.losses.kl_divergence module</a></li>
 </ul>
 </li>
@@ -439,7 +440,6 @@
         <span class="n">mu_logvar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span>
             <span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_args</span><span class="p">}</span>
         <span class="p">)</span>
-
         <span class="n">mu</span><span class="p">,</span> <span class="n">logvar</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">mu_logvar</span><span class="p">,</span> <span class="n">mu_logvar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="k">assert</span> <span class="n">mu</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">logvar</span><span class="o">.</span><span class="n">shape</span>
