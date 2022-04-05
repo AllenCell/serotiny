@@ -40,6 +40,7 @@ class ImageVAE(BaseVAE):
         batch_norm: bool = True,
         mode: str = "3d",
         cache_outputs: Sequence = ("test",),
+        final_non_linearity: nn.Module = nn.Threshold(6, 6),
     ):
 
         encoder = BasicCNN(
@@ -52,7 +53,7 @@ class ImageVAE(BaseVAE):
             non_linearity=non_linearity,
             skip_connections=skip_connections,
             batch_norm=batch_norm,
-            final_non_linearity=nn.Threshold(6, 6),
+            final_non_linearity=final_non_linearity,
         )
         encoder.apply(weight_init)
         nn.utils.spectral_norm(encoder.output[0])
