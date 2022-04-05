@@ -1,11 +1,12 @@
 import torch
 import torch.nn as nn
+import numpy as np
 
-from .abstract_prior import Prior, _full_slice
+from .abstract_prior import Prior
 
 
 class IsotropicGaussianPrior(Prior):
-    def __init__(self, indices=_full_slice):
+    def __init__(self, indices=None):
         super().__init__()
 
     @classmethod
@@ -35,7 +36,7 @@ class IsotropicGaussianPrior(Prior):
     def sample(cls, mean, logvar):
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
-        return eps.meanl(std).add(mean)
+        return eps.mul(std).add(mean)
 
     def forward(self, z, mode="kl", **kwargs):
         mean_logvar = z[self.indices]
@@ -50,7 +51,7 @@ class IsotropicGaussianPrior(Prior):
 class DiagonalGaussianPrior(IsotropicGaussianPrior):
     def __init__(
         self,
-        indices=_full_slice,
+        indices=None,
         mean=None,
         logvar=None,
         learn_mean=False,
@@ -59,17 +60,20 @@ class DiagonalGaussianPrior(IsotropicGaussianPrior):
     ):
         super().__init__()
 
-        if dimension is not None:
-            self.dimension = dimension
-        elif hasattr(indices, "__len__"):
-            self.dimension = len(indices)
-        else:
-            raise ValueError(
-                "If you don't specify `indices` you must ", "specify `dimension`"
-            )
+        if None in [logvar, mean]:
+            if dimension is not None:
+                self.dimension = dimension
+            elif hasattr(indices, "__len__"):
+                self.dimension = len(indices)
+            else:
+                raise ValueError(
+                    "If you don't specify `indices` you must ", "specify `dimension`"
+                )
 
         if logvar is None:
             logvar = torch.zeros(self.dimension)
+        else:
+            logvar = torch.tensor(np.fromiter(logvar, dtype=float))
 
         if learn_logvar:
             logvar = nn.Parameter(logvar, requires_grad=True)
@@ -78,6 +82,8 @@ class DiagonalGaussianPrior(IsotropicGaussianPrior):
 
         if mean is None:
             mean = torch.zeros(self.dimension)
+        else:
+            mean = torch.tensor(np.fromiter(mean, dtype=float))
 
         if learn_mean:
             mean = nn.Parameter(mean, requires_grad=True)
