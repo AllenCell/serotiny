@@ -33,7 +33,7 @@ class BaseModel(pl.LightningModule):
             # if this was called from a subclass's init
             init_args.update(get_init_args(frame.f_back))
         self.save_hyperparameters(
-            *[arg for arg, v in init_args.items() if _is_primitive(v)]
+            ignore=[arg for arg, v in init_args.items() if not _is_primitive(v)]
         )
 
         self.optimizer = init_args.get("optimizer", torch.optim.Adam)
