@@ -13,4 +13,4 @@ Submodules
    :maxdepth: 4
 
    serotiny.losses.continuous_bernoulli
-   serotiny.losses.kl_divergence
+   serotiny.losses.continuous_weibull
