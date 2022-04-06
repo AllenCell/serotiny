@@ -178,8 +178,7 @@ class BaseVAE(BaseModel):
             rcl_per_input_dimension,
             kld_per_latent_dimension,
         ) = self.calculate_elbo(x, x_hat, mu, logvar, mask=kwargs.get("mask", None))
-        # import ipdb
-        # ipdb.set_trace()
+
         return (
             x_hat,
             mu,

@@ -38,7 +38,8 @@ class ImplicitDecoder(nn.Module):
             non_linearity = nn.ReLU()
 
         if final_non_linearity is None:
-            final_non_linearity = nn.SiLU()
+            # final_non_linearity = nn.SiLU()
+            final_non_linearity = nn.Identity()
         self.final_non_linearity = final_non_linearity
 
         layers = []
@@ -87,4 +88,5 @@ class ImplicitDecoder(nn.Module):
                 _x = res + _x[:, self._mode :]
             else:
                 _x = res
-        return self.final_non_linearity(x)
+
+        return self.final_non_linearity(_x)
