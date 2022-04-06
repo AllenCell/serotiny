@@ -13,76 +13,6 @@ from serotiny.io.dataframe import DataframeDataset, read_dataframe
 from serotiny.io.dataframe.loaders.abstract_loader import Loader
 
 
-def _make_single_manifest_splits(
-    manifest_path, loaders, split_column, columns=None, just_inference=False
-):
-    dataframe = read_dataframe(manifest_path, columns)
-    if not just_inference:
-        assert dataframe.dtypes[split_column] == np.dtype("O")
-
-    split_names = dataframe[split_column].unique().tolist()
-    if not just_inference:
-        assert set(split_names).issubset({"train", "valid", "test"})
-
-    if not just_inference:
-        datasets = {
-            split: DataframeDataset(
-                dataframe.loc[dataframe[split_column] == split].copy(), loaders[split]
-            )
-            for split in ["train", "valid", "test"]
-        }
-
-    datasets["predict"] = DataframeDataset(dataframe.copy(), loaders["predict"])
-    return datasets
-
-
-def _make_multiple_manifest_splits(
-    split_path, loaders, columns=None, just_inference=False
-):
-    split_path = Path(split_path)
-    datasets = {}
-    predict_df = []
-
-    for fpath in chain(split_path.glob("*.csv"), split_path.glob("*.parquet")):
-        mode = re.findall(r"(.*)\.(?:csv|parquet)", fpath.name)[0]
-        dataframe = read_dataframe(fpath, required_columns=columns)
-        dataset = DataframeDataset(dataframe, loaders=loaders[mode])
-        if not just_inference:
-            datasets[mode] = dataset
-        predict_df.append(dataframe.copy())
-
-    predict_df = pd.concat(predict_df)
-    datasets["predict"] = DataframeDataset(predict_df, loaders=loaders["predict"])
-
-    return datasets
-
-
-def _dict_depth(d):
-    return max(_dict_depth(v) if isinstance(v, dict) else 0 for v in d.values()) + 1
-
-
-def _parse_loaders(loaders):
-    depth = _dict_depth(loaders)
-    if depth == 1:
-        loaders = {split: loaders for split in ["train", "valid", "test", "predict"]}
-    elif depth != 2:
-        raise ValueError(f"Loaders dict should have depth 1 or 2. Got {depth}")
-
-    for k in loaders:
-        if isinstance(loaders[k], str):
-            assert loaders[k] in loaders
-            loaders[k] = loaders[loaders[k]]
-
-    for split in ["train", "valid", "test"]:
-        if split not in loaders:
-            raise ValueError(f"'{split}' missing from loaders dict.")
-
-    if "predict" not in loaders:
-        loaders["predict"] = loaders["test"]
-
-    return loaders
-
-
 class ManifestDatamodule(pl.LightningDataModule):
     """A pytorch lightning datamodule based on manifest files. It can either
     use a single manifest file, which contains a column based on which a train-
@@ -198,3 +128,90 @@ class ManifestDatamodule(pl.LightningDataModule):
 
     def predict_dataloader(self):
         return self.make_dataloader("predict")
+
+
+def _get_canonical_split_name(split):
+    for canon in ["train", "val", "test"]:
+        if split.startswith(canon):
+            return canon
+    raise ValueError
+
+
+def _make_single_manifest_splits(
+    manifest_path, loaders, split_column, columns=None, just_inference=False
+):
+    dataframe = read_dataframe(manifest_path, columns)
+    if not just_inference:
+        assert dataframe.dtypes[split_column] == np.dtype("O")
+
+    split_names = dataframe[split_column].unique().tolist()
+    if not just_inference:
+        assert set(split_names).issubset(
+            {"train", "training", "valid", "val", "validation", "test", "testing"}
+        )
+
+    if split_column != "split":
+        dataframe["split"] = dataframe[split_column].apply(_get_canonical_split_name)
+
+    if not just_inference:
+        datasets = {}
+        for split in ["train", "val", "test"]:
+            datasets[split] = DataframeDataset(
+                dataframe.loc[dataframe["split"].str.startswith(split)].copy(),
+                loaders[split],
+            )
+
+    datasets["predict"] = DataframeDataset(dataframe.copy(), loaders["predict"])
+    return datasets
+
+
+def _make_multiple_manifest_splits(
+    split_path, loaders, columns=None, just_inference=False
+):
+    split_path = Path(split_path)
+    datasets = {}
+    predict_df = []
+
+    for fpath in chain(split_path.glob("*.csv"), split_path.glob("*.parquet")):
+        split = re.findall(r"(.*)\.(?:csv|parquet)", fpath.name)[0]
+        split = _get_canonical_split_name(split)
+        dataframe = read_dataframe(fpath, required_columns=columns)
+        dataframe["split"] = split
+        dataset = DataframeDataset(dataframe, loaders=loaders[split])
+        if not just_inference:
+            datasets[split] = dataset
+        predict_df.append(dataframe.copy())
+
+    predict_df = pd.concat(predict_df)
+    datasets["predict"] = DataframeDataset(predict_df, loaders=loaders["predict"])
+
+    return datasets
+
+
+def _dict_depth(d):
+    return max(_dict_depth(v) if isinstance(v, dict) else 0 for v in d.values()) + 1
+
+
+def _parse_loaders(loaders):
+    depth = _dict_depth(loaders)
+    if depth == 1:
+        loaders = {split: loaders for split in ["train", "val", "test", "predict"]}
+    elif depth != 2:
+        raise ValueError(f"Loaders dict should have depth 1 or 2. Got {depth}")
+
+    for k, v in loaders.items():
+        loaders[_get_canonical_split_name(k)] = v
+
+    for k in loaders:
+        if isinstance(loaders[k], str):
+            assert loaders[k] in loaders
+            loaders[k] = loaders[loaders[k]]
+
+    for split in ["train", "val", "test"]:
+        if split not in loaders:
+            raise ValueError(f"'{split}' missing from loaders dict.")
+
+    if "predict" not in loaders:
+        loaders["predict"] = loaders["test"]
+
+    return loaders
