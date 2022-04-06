@@ -31,8 +31,8 @@ class ImplicitDecoder(nn.Module):
     ):
         super().__init__()
         self.mode = mode
+        self._mode = 3 if mode == "3d" else 2
         self.latent_dims = latent_dims
-        _mode = 3 if mode == "3d" else 2
 
         if non_linearity is None:
             non_linearity = nn.ReLU()
@@ -42,10 +42,10 @@ class ImplicitDecoder(nn.Module):
 
         layers = []
         _in_channels = latent_dims
-        for ix, out_channels in enumerate(hidden_channels):
+        for out_channels in hidden_channels:
             layers.append(
                 conv_block(
-                    _in_channels + (_mode if ix == 0 else 0),
+                    _in_channels + self._mode,
                     out_channels,
                     kernel_size=1,
                     up_conv=False,
@@ -76,11 +76,14 @@ class ImplicitDecoder(nn.Module):
         x = x.view(*x.shape, *([1] * len(input_dims)))
         x = x.expand(-1, -1, *input_dims)
 
-        x = torch.cat((ppipeds, x), axis=1)
+        _x = x
         for layer in self.layers:
-            res = layer(x)
-            if res.shape[1] == x.shape[1]:
-                x = res + x
+            res = layer(torch.cat((ppipeds, _x), axis=1))
+
+            # if output and input dimensions match (minus the size of the coordinates)
+            if res.shape[1] == (_x.shape[1] - self._mode):
+                # skip connection, excluding the coordinates
+                _x = res + _x[:, self._mode :]
             else:
-                x = res
+                _x = res
         return self.final_non_linearity(x)
