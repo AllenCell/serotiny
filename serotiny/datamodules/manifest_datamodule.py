@@ -131,8 +131,8 @@ class ManifestDatamodule(pl.LightningDataModule):
 
 
 def _get_canonical_split_name(split):
-    for canon in ["train", "val", "test"]:
-        if split.startswith(canon):
+    for canon in ["train", "val", "test", "predict"]:
+        if split.startswith(canon) or canon.startswith(split):
             return canon
     raise ValueError
 
