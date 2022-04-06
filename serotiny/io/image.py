@@ -28,6 +28,10 @@ def infer_dims(img: aicsimageio.AICSImage):
         else:
             order = dim + order
 
+    if "C" not in order and "S" not in order:
+        order = "C" + order
+        del zero_dims["C"]
+
     return order, zero_dims
 
 
