@@ -111,10 +111,11 @@ class BasicCNN(nn.Module):
         log.info(f"Determined 'compressed size': {compressed_size} for CNN")
 
         if flat_output:
-            self.output = nn.Sequential(
-                nn.Linear(compressed_size, output_dim),
-                nn.Identity() if final_non_linearity is None else final_non_linearity,
-            )
+            # self.output = nn.Sequential(
+            #     nn.Linear(compressed_size, output_dim),
+            #     nn.Identity() if final_non_linearity is None else final_non_linearity,
+            # )
+            self.output = nn.Linear(compressed_size, output_dim)
 
     def conv_forward(self, x, return_sizes=False):
         if return_sizes:
