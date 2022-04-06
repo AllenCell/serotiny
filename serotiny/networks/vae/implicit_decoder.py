@@ -42,10 +42,10 @@ class ImplicitDecoder(nn.Module):
 
         layers = []
         _in_channels = latent_dims
-        for out_channels in hidden_channels:
+        for ix, out_channels in enumerate(hidden_channels):
             layers.append(
                 conv_block(
-                    _in_channels + _mode,
+                    _in_channels + (_mode if ix == 0 else 0),
                     out_channels,
                     kernel_size=1,
                     up_conv=False,
@@ -76,7 +76,7 @@ class ImplicitDecoder(nn.Module):
         x = x.view(*x.shape, *([1] * len(input_dims)))
         x = x.expand(-1, -1, *input_dims)
 
-        _x = x
+        x = torch.cat((ppipeds, x), axis=1)
         for layer in self.layers:
-            _x = layer(torch.cat((ppipeds, _x), axis=1))
-        return self.final_non_linearity(_x)
+            x = layer(x) + x
+        return self.final_non_linearity(x)
