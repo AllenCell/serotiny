@@ -78,5 +78,9 @@ class ImplicitDecoder(nn.Module):
 
         x = torch.cat((ppipeds, x), axis=1)
         for layer in self.layers:
-            x = layer(x) + x
+            res = layer(x)
+            if res.shape[1] == x.shape[1]:
+                x = res + x
+            else:
+                x = res
         return self.final_non_linearity(x)
