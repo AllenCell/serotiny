@@ -9,6 +9,7 @@ from torch.nn.modules.loss import _Loss as Loss
 from serotiny.networks import BasicCNN
 from serotiny.networks.vae import ImplicitDecoder
 from serotiny.networks.utils import weight_init
+import torch.nn.functional as F
 
 from .base_vae import BaseVAE
 
@@ -41,6 +42,7 @@ class ImplicitDecoderVAE(BaseVAE):
         skip_connections: bool = True,
         mode: str = "3d",
         cache_outputs: Sequence = ("test",),
+        temperature: Optional[float] = 5e-3,
     ):
 
         encoder = BasicCNN(
@@ -51,15 +53,17 @@ class ImplicitDecoderVAE(BaseVAE):
             max_pool_layers=max_pool_layers,
             mode=mode,
             non_linearity=non_linearity,
+            # final_non_linearity=torch.nn.Sigmoid(),
             skip_connections=skip_connections,
         )
         encoder.apply(weight_init)
-        nn.utils.spectral_norm(encoder.output[0])
+        nn.utils.spectral_norm(encoder.output)
 
         decoder = ImplicitDecoder(
             latent_dims=latent_dim,
             hidden_channels=decoder_hidden_channels,
-            non_linearity=decoder_non_linearity,
+            non_linearity=non_linearity,
+            final_non_linearity=decoder_non_linearity,
             mode=mode,
         )
         decoder.apply(weight_init)
@@ -68,7 +72,7 @@ class ImplicitDecoderVAE(BaseVAE):
             decoder = nn.Sequential(decoder, decoder_non_linearity)
 
         self._current_step = 0
-        self._temperature = 1e-4
+        self._temperature = temperature
 
         super().__init__(
             encoder=encoder,
@@ -88,20 +92,21 @@ class ImplicitDecoderVAE(BaseVAE):
         )
 
     def _current_decoding_dims(self, orig_dims):
-        self._current_step = max(self._current_step, self.global_step)
+        if self._temperature is not None:
+            self._current_step = max(self._current_step, self.global_step)
 
-        # TODO: add more flexibility for "scale scheduling"
-        scale = 1 - 0.5 * np.exp(-self._temperature * self._current_step)
+            # TODO: add more flexibility for "scale scheduling"
+            scale = 1 - 0.5 * np.exp(-self._temperature * self._current_step)
+        else:
+            scale = 1
         return [int(scale * dim) for dim in orig_dims]
-
+            
     def calculate_elbo(self, x, x_hat, mu, logvar, mask=None):
-        upsample = nn.Upsample(size=x.shape[2:])
-        x_hat = upsample(x_hat)
+        x_hat = F.interpolate(x_hat, size=x.shape[2:])
         return super().calculate_elbo(x, x_hat, mu, logvar, mask)
 
     def parse_batch(self, batch):
         x, kwargs = super().parse_batch(batch)
 
         kwargs["input_dims"] = self._current_decoding_dims(x.shape[2:])
-
         return x, kwargs
