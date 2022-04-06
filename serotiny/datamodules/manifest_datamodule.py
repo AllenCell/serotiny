@@ -120,7 +120,7 @@ class ManifestDatamodule(pl.LightningDataModule):
                 "used for training."
             )
 
-        return self.make_dataloader("valid")
+        return self.make_dataloader("val")
 
     def test_dataloader(self):
         split = "predict" if self.just_inference else "test"
