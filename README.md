@@ -32,11 +32,30 @@ benefit from general and powerful tooling.
 
 ## Getting started
 
-Check our [getting started](https://allencellmodeling.github.io/serotiny/getting_started.html)
-page to get started, and learn how training a DL model can be as simple as:
+For more information, check our [documentation](https://allencellmodeling.github.io/serotiny),
+or jump straight into our [getting started](https://allencellmodeling.github.io/serotiny/getting_started.html)
+page, and learn how training a DL model can be as simple as:
 
 ``` sh
 
 $ serotiny train data=my_dataset model=my_model
 
+```
+
+## Authors
+
+- Guilherme Pires @colobas
+- Ryan Spangler @prismofeverything
+- Ritvik Vasan @ritvikvasan
+- Caleb Chan @calebium
+- Theo Knijnenburg @tknijnen
+- Nick Gomez @gomeznick86
+
+## Citing
+
+If you find serotiny useful, please cite this repository as:
+
+```
+Serotiny Authors (2022). Serotiny: a framework of tools to structure, configure and drive deep learning projects [Computer software]. GitHub. https://github.com/AllenCellModeling/serotiny
+Free software: BSD-3-Clause
 ```
