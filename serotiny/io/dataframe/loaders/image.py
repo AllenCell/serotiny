@@ -1,6 +1,5 @@
 from typing import Callable, Optional, Sequence, Union, Type
 
-from omegaconf import ListConfig
 import numpy as np
 
 from serotiny.io.image import image_loader
@@ -17,7 +16,7 @@ class LoadImage(Loader):
         column: str,
         file_type: str = "tiff",
         select_channels: Optional[Sequence] = None,
-        transforms: Optional[Union[Sequence, Callable]] = None,
+        transform: Optional[Callable] = None,
         reader: Optional[str] = None,
         dtype: Optional[Union[str, Type[np.number]]] = None,
         load_as_torch: bool = True,
@@ -36,8 +35,8 @@ class LoadImage(Loader):
         select_channels: Optional[Sequence] = None
             List of channels to include in the loaded image.
 
-        transforms: Optional[Union[Sequence, Callable]] = None
-            Transform, or list of transforms to apply upon loading the image.
+        transform: Optional[Callable] = None
+            Transform to apply upon loading the image.
 
         reader: Optional[str] = None
             `aicsimageio` reader to use
@@ -62,13 +61,7 @@ class LoadImage(Loader):
 
         self.file_type = file_type
         self.dtype = dtype
-
-        if isinstance(transforms, (list, tuple, ListConfig)):
-            from torchvision.transforms import Compose
-
-            transforms = Compose(transforms)
-
-        self.transforms = transforms
+        self.transform = transform
 
     def __call__(self, row):
         if self.file_type == "tiff":
@@ -76,7 +69,7 @@ class LoadImage(Loader):
                 row[self.column],
                 select_channels=self.select_channels,
                 output_dtype=self.dtype,
-                transform=self.transforms,
+                transform=self.transform,
                 reader=self.reader,
                 return_as_torch=self.load_as_torch,
             )
