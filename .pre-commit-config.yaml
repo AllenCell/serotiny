@@ -54,3 +54,5 @@ repos:
       - id: flake8
         name: Check PEP8
         args: ['--per-file-ignores=__init__.py:F401']
+        entry: pflake8
+        additional_dependencies: [pyproject-flake8]

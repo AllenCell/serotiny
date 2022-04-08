@@ -32,8 +32,8 @@ benefit from general and powerful tooling.
 
 ## Getting started
 
-For more information, check our [documentation](https://allencellmodeling.github.io/serotiny),
-or jump straight into our [getting started](https://allencellmodeling.github.io/serotiny/getting_started.html)
+For more information, check our [documentation](https://allencell.github.io/serotiny),
+or jump straight into our [getting started](https://allencell.github.io/serotiny/getting_started.html)
 page, and learn how training a DL model can be as simple as:
 
 ``` sh

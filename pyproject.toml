@@ -1,0 +1,84 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "serotiny"
+version = "0.0.a0"
+homepage = "https://allencell.github.io/serotiny"
+documentation = "https://allencell.github.io/serotiny"
+repository = "https://github.com/AllenCell/serotiny"
+description = "A framework of tools to structure, configure and drive deep learning projects"
+authors = [
+    "Guilherme Pires <guilherme.pires@alleninstitute.org>",
+    "Ryan Spangler <ryan.spangler@alleninstitute.org>",
+    "Ritvik Vasan <ritvik.vasan@alleninstitute.org>",
+    "Theo Knijnenburg <theo.knijnenburg@alleninstitute.org>",
+    "Nick Gomez <nick.gomez@alleninstitute.org>",
+    "Caleb Chan <caleb.chan@alleninstitute.org>",
+]
+license = "BSD-3"
+readme = "README.md"
+packages = [
+    { include = "serotiny" },
+    { include = "hydra_plugins" }
+]
+include = [
+    "LICENSE",
+    "**/*.yaml",
+    "**/*.json"
+]
+exclude = [
+    "**/*.pyc",
+    "**/__pycache__"
+]
+classifiers = [
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+torch = ">=1.7.1"
+fire = "0.4.0"
+makefun = "1.13.1"
+hydra-core = ">=1.2.0.dev2"
+joblib = "1.1.0"
+mlflow = ">=1.23.1"
+nbformat = "5.2.0"
+omegaconf = "2.1.1"
+packaging = "20.9"
+pyarrow = "7.0.0"
+pytorch-lightning = ">=1.5.0"
+PyYAML = "6.0"
+scikit-learn = "1.0.2"
+aicsimageio = "4.6.4"
+numpy = ">=1.18"
+pandas = ">=1.1"
+
+[tool.poetry.dev-dependencies]
+
+[tool.poetry.scripts]
+serotiny = "serotiny.cli.cli:main"
+"serotiny.train" = "serotiny.cli.cli:main"
+"serotiny.test" = "serotiny.cli.cli:main"
+"serotiny.predict" = "serotiny.cli.cli:main"
+
+[tool.poetry.extras]
+docs = [
+    "sphinx",
+    "furo",
+    "m2r2",
+]
+
+[tool.flake8]
+exclude = "docs/"
+ignore = [
+	"E203",
+	"E402",
+	"W291",
+	"W503"
+]
+max-line-length = 88
