@@ -403,7 +403,7 @@ and ``output_dir`` is a temporary directory in which you should save the informa
 in ``preds``. This will generally be a list where each element is the return
 value of your model's ``predict_step`` or ``forward`` methods for each batch.
 
-If you're using ``serotiny's`` :py:class:`BasicModel class <serotiny.models.basic_model.BasicModel>``
+If you're using ``serotiny's`` :py:class:`BasicModel class <serotiny.models.basic_model.BasicModel>`
 then you can pass it a custom ``save_predictions`` function when you instantiate it
 by doing something like:
 
