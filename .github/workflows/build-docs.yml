@@ -18,7 +18,7 @@ jobs:
     - name: Install Dependencies
       run: |
         pip install --upgrade pip poetry
-        poetry install --extras "docs"
+        poetry install --extras docs
     - name: Generate Docs
       run: |
         make gen-docs

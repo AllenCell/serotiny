@@ -57,6 +57,9 @@ scikit-learn = "1.0.2"
 aicsimageio = "4.6.4"
 numpy = ">=1.18"
 pandas = ">=1.1"
+sphinx = {version="*", optional=true}
+furo = {version="*", optional=true}
+m2r2 = {version="*", optional=true}
 
 [tool.poetry.dev-dependencies]
 
