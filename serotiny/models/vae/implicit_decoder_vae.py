@@ -42,7 +42,7 @@ class ImplicitDecoderVAE(BaseVAE):
         skip_connections: bool = True,
         mode: str = "3d",
         cache_outputs: Sequence = ("test",),
-        temperature: Optional[float] = 5e-3,
+        temperature: Optional[float] = None,
     ):
 
         encoder = BasicCNN(
@@ -68,9 +68,6 @@ class ImplicitDecoderVAE(BaseVAE):
         )
         decoder.apply(weight_init)
 
-        if decoder_non_linearity is not None:
-            decoder = nn.Sequential(decoder, decoder_non_linearity)
-
         self._current_step = 0
         self._temperature = temperature
 
@@ -91,19 +88,38 @@ class ImplicitDecoderVAE(BaseVAE):
             cache_outputs=cache_outputs,
         )
 
+        if decoder_non_linearity is not None:
+            self.decoder_non_linearity = decoder_non_linearity
+        else:
+            self.decoder_non_linearity = nn.Identity()
+
     def _current_decoding_dims(self, orig_dims):
         if self._temperature is not None:
             self._current_step = max(self._current_step, self.global_step)
 
             # TODO: add more flexibility for "scale scheduling"
-            scale = 1 - 0.5 * np.exp(-self._temperature * self._current_step)
+            self._scale = 1 - 0.5 * np.exp(-self._temperature * self._current_step)
         else:
-            scale = 1
-        return [int(scale * dim) for dim in orig_dims]
+            self._scale = 1
+        return [int(self._scale * dim) for dim in orig_dims]
             
     def calculate_elbo(self, x, x_hat, mu, logvar, mask=None):
         x_hat = F.interpolate(x_hat, size=x.shape[2:])
         return super().calculate_elbo(x, x_hat, mu, logvar, mask)
+
+    def log_metrics(self, stage, reconstruction_loss, kld_loss, loss, logger):
+        self.log(f"{stage} reconstruction loss", reconstruction_loss, logger=logger)
+        self.log(f"{stage} kld loss", kld_loss, logger=logger)
+        self.log(f"{stage}_loss", loss, logger=logger)
+        self.log(f"{stage}_scale", self._scale, logger=logger)
+
+    def decode(self, mu, logvar, **kwargs):
+        z = self.sample_z(mu, logvar)
+        x_hat = self.decoder_non_linearity(self.decoder(
+            z, **{k: v for k, v in kwargs.items() if k in self.decoder_args}
+        ))
+
+        return z, x_hat
 
     def parse_batch(self, batch):
         x, kwargs = super().parse_batch(batch)
