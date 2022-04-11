@@ -21,8 +21,7 @@ jobs:
         poetry install --extras docs
     - name: Generate Docs
       run: |
-        poetry shell
-        make gen-docs
+        poetry run make gen-docs
         # touch docs/_build/html/.nojekyll
     - name: Publish Docs
       uses: JamesIves/github-pages-deploy-action@releases/v3
