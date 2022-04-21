@@ -270,8 +270,6 @@ def mlflow_fit(mlflow_conf, trainer, model, data, full_conf, test=False):
         mlflow_conf, trainer, model, data, "fit"
     )
 
-    flat_conf = flatten_config(OmegaConf.to_container(full_conf, resolve=True))
-
     # if run_id has been specified, we're trying to resume
     if run_id is not None and not trainer.checkpoint_callback:
         raise ValueError(
@@ -287,7 +285,11 @@ def mlflow_fit(mlflow_conf, trainer, model, data, full_conf, test=False):
     ):
 
         if run_id is None:
-            mlflow.log_params(flat_conf)
+            params_to_log = mlflow_conf.get("params_to_log", None)
+            if params_to_log is not None:
+                mlflow.log_params(
+                    flatten_config(OmegaConf.to_container(params_to_log, resolve=True))
+                )
 
         if run_id is not None:
             client = MlflowClient(tracking_uri=mlflow_conf["tracking_uri"])
