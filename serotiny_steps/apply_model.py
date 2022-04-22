@@ -23,7 +23,7 @@ def apply_model(
 ):
     if configfile:
         with open(configfile, "r") as yaml_cf:
-            config = yaml.load(yaml_cf)
+            config = yaml.safe_load(yaml_cf)
 
     if config:
         model_class = config.get("model_class")

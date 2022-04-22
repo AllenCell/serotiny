@@ -28,7 +28,7 @@ def merge_config(
     template_extension = os.path.splitext(template_path)[-1]
     with open(template_path, 'r') as template_file:
         if template_extension == '.yaml':
-            template = yaml.load(template_file)
+            template = yaml.safe_load(template_file)
         elif template_extension == '.json':
             template = json.load(template_file)
         else:

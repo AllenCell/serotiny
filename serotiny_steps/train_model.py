@@ -41,7 +41,7 @@ def train_model(
 
     if configfile:
         with open(configfile, "r") as yaml_cf:
-            config = yaml.load(yaml_cf)
+            config = yaml.safe_load(yaml_cf)
 
     if config:
         model_config = config.get("model", {})
