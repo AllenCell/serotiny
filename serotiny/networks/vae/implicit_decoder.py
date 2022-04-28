@@ -38,7 +38,8 @@ class ImplicitDecoder(nn.Module):
             non_linearity = nn.ReLU()
 
         if final_non_linearity is None:
-            self.final_non_linearity = nn.SiLU()
+            final_non_linearity = nn.SiLU()
+        self.final_non_linearity = final_non_linearity
 
         layers = []
         _in_channels = latent_dims

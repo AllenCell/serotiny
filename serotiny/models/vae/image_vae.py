@@ -56,7 +56,7 @@ class ImageVAE(BaseVAE):
             final_non_linearity=final_non_linearity,
         )
         encoder.apply(weight_init)
-        nn.utils.spectral_norm(encoder.output[0])
+        nn.utils.spectral_norm(encoder.output)
 
         dummy_out, intermediate_sizes = encoder.conv_forward(
             torch.zeros(1, in_channels, *input_dims), return_sizes=True
