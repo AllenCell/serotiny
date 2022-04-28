@@ -104,12 +104,13 @@ def _do_model_op_wrapper(cfg):
             # try getting it from the config. this might be
             # needed for runs on distributed clusters like ray
             mode = cfg.mode
-        except (AttributeError, KeyError):
+        except (AttributeError, KeyError) as e:
             logger.error(
                 f"serotiny was misconfigured. Unable to infer "
                 f"mode from either config or sys.argv:\n"
                 f"{sys.argv}"
             )
+            raise e
 
     _do_model_op(
         mode,
