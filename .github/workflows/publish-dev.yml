@@ -16,7 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: install poetry and build
-        run: pip install poetry && poetry version "$(poetry version -s).dev2" && poetry build
+        run: pip install poetry && poetry version "$(poetry version -s).dev3" && poetry build
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@master
         with:
