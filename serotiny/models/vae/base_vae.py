@@ -15,6 +15,17 @@ logger = logging.getLogger("lightning")
 logger.propagate = False
 
 
+def get_args(encoder):
+    args = []
+    if isinstance(encoder, nn.Sequential):
+        for i in range(len(encoder)):
+            args.append(inspect.getfullargspec(encoder[i].forward).args)
+        args = [item for sublist in args for item in sublist]
+    else:
+        args = inspect.getfullargspec(encoder.forward).args
+    return args
+
+
 class BaseVAE(BaseModel):
     def __init__(
         self,
@@ -72,6 +83,7 @@ class BaseVAE(BaseModel):
 
     def calculate_elbo(self, x, x_hat, z, mask=None):
         rcl_per_input_dimension = self.reconstruction_loss(x_hat, x)
+
         if mask is not None:
             rcl_per_input_dimension = rcl_per_input_dimension * mask
             normalizer = mask.view(mask.shape[0], -1).sum(dim=1)
@@ -112,22 +124,29 @@ class BaseVAE(BaseModel):
             mask = None
         return batch[self.hparams.x_label].float(), dict(mask=mask)
 
-    def forward(self, x, decode=False, compute_loss=False, **kwargs):
-        z = self.encoder(
+    def sample_z(self, z):
+        return torch.cat([prior(z, mode="sample") for prior in self.priors], dim=1)
+
+    def encode(self, x, **kwargs):
+        return self.encoder(
             x, **{k: v for k, v in kwargs.items() if k in self.encoder_args}
         )
 
-        if not decode:
-            return z
-
-        sampled_z = torch.cat([prior(z, mode="sample") for prior in self.priors], dim=1)
-
-        x_hat = self.decoder(
-            sampled_z, **{k: v for k, v in kwargs.items() if k in self.decoder_args}
+    def decode(self, z, **kwargs):
+        return self.decoder(
+            z, **{k: v for k, v in kwargs.items() if k in self.decoder_args}
         )
 
+    def forward(self, x, decode=False, compute_loss=False, **kwargs):
+        z_params = self.encode(x, **kwargs)
+        if not decode:
+            return z_params
+
+        z = self.sample_z(z_params)
+        x_hat = self.decode(z, **kwargs)
+
         if not compute_loss:
-            return z, x_hat
+            return x_hat, z, z_params
 
         (
             loss,
@@ -135,7 +154,7 @@ class BaseVAE(BaseModel):
             kld_loss,
             rcl_per_input_dimension,
             kld_per_latent_dimension,
-        ) = self.calculate_elbo(x, x_hat, z, mask=kwargs.get("mask", None))
+        ) = self.calculate_elbo(x, x_hat, z_params, mask=kwargs.get("mask", None))
 
         return (
             x_hat,
@@ -146,6 +165,11 @@ class BaseVAE(BaseModel):
             rcl_per_input_dimension,
             kld_per_latent_dimension,
         )
+
+    def log_metrics(self, stage, reconstruction_loss, kld_loss, loss, logger):
+        self.log(f"{stage} reconstruction loss", reconstruction_loss, logger=logger)
+        self.log(f"{stage} kld loss", kld_loss, logger=logger)
+        self.log(f"{stage}_loss", loss, logger=logger)
 
     def _step(self, stage, batch, batch_idx, logger):
         x = self.parse_batch(batch)
@@ -165,9 +189,7 @@ class BaseVAE(BaseModel):
             kld_per_latent_dimension,
         ) = self.forward(x, decode=True, compute_loss=True, **forward_kwargs)
 
-        self.log(f"{stage} reconstruction loss", reconstruction_loss, logger=logger)
-        self.log(f"{stage} kld loss", kld_loss, logger=logger)
-        self.log(f"{stage}_loss", loss, logger=logger)
+        self.log_metrics(stage, reconstruction_loss, kld_loss, loss, logger)
 
         results = {
             "loss": loss,
