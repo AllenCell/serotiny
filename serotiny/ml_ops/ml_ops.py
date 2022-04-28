@@ -95,9 +95,24 @@ def _do_model_op_wrapper(cfg):
     if isinstance(cfg, dict):
         cfg = OmegaConf.create(cfg)
 
+    # there might be other dots in the
+    # executable path, ours is the last
+    mode = sys.argv[0].split(".")[-1]
+    if mode not in ["train", "predict", "test"]:
+        try:
+            # if we can't get mode from the command line,
+            # try getting it from the config. this might be
+            # needed for runs on distributed clusters like ray
+            mode = cfg.mode
+        except (AttributeError, KeyError):
+            logger.error(
+                f"serotiny was misconfigured. Unable to infer "
+                f"mode from either config or sys.argv:\n"
+                f"{sys.argv}"
+            )
+
     _do_model_op(
-        sys.argv[0].split(".")[-1],  # there might be other dots in the
-        # executable path, ours is the last
+        mode,
         **cfg,
         full_conf=cfg,
     )
