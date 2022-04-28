@@ -7,40 +7,40 @@ import torch.nn as nn
 from torch.nn.modules.loss import _Loss as Loss
 
 from serotiny.networks import BasicCNN
-from serotiny.networks.vae import ImageDecoder
+from serotiny.networks.vae import ImplicitDecoder
 from serotiny.networks.utils import weight_init
 
 from .base_vae import BaseVAE
-from .priors import Prior
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]
 logger = logging.getLogger("lightning")
 logger.propagate = False
 
 
-class ImageVAE(BaseVAE):
+class ImplicitDecoderVAE(BaseVAE):
     def __init__(
         self,
         latent_dim: Union[int, Sequence[int]],
         in_channels: int,
         hidden_channels: Sequence[int],
+        decoder_hidden_channels: Sequence[int],
         max_pool_layers: Sequence[int],
         input_dims: Sequence[int],
         x_label: str,
-        optimizer: torch.optim.Optimizer = torch.optim.Adam,
         beta: float = 1.0,
+        optimizer=torch.optim.Adam,
         id_label: Optional[str] = None,
         non_linearity: Optional[nn.Module] = None,
         decoder_non_linearity: Optional[nn.Module] = None,
         loss_mask_label: Optional[str] = None,
         reconstruction_loss: Loss = nn.MSELoss(reduction="none"),
         reconstruction_reduce: str = "mean",
+        prior_mode: str = "isotropic",
+        prior_logvar: Optional[Array] = None,
+        learn_prior_logvar: bool = False,
         skip_connections: bool = True,
-        batch_norm: bool = True,
         mode: str = "3d",
-        priors: Optional[Sequence[Prior]] = None,
         cache_outputs: Sequence = ("test",),
-        final_non_linearity: nn.Module = nn.Threshold(6, 6),
     ):
 
         encoder = BasicCNN(
@@ -52,38 +52,23 @@ class ImageVAE(BaseVAE):
             mode=mode,
             non_linearity=non_linearity,
             skip_connections=skip_connections,
-            batch_norm=batch_norm,
-            final_non_linearity=final_non_linearity,
         )
         encoder.apply(weight_init)
-        nn.utils.spectral_norm(encoder.output[0])
+        nn.utils.spectral_norm(encoder.output)
 
-        dummy_out, intermediate_sizes = encoder.conv_forward(
-            torch.zeros(1, in_channels, *input_dims), return_sizes=True
-        )
-
-        compressed_img_shape = dummy_out.shape[2:]
-
-        intermediate_sizes = [input_dims] + intermediate_sizes[:-1]
-        intermediate_sizes = intermediate_sizes[::-1]
-
-        decoder = ImageDecoder(
-            compressed_img_shape=compressed_img_shape,
-            hidden_channels=list(reversed(hidden_channels)),
-            intermediate_sizes=intermediate_sizes,
-            latent_dim=latent_dim,
-            output_dims=tuple(input_dims),
-            output_channels=in_channels,
+        decoder = ImplicitDecoder(
+            latent_dims=latent_dim,
+            hidden_channels=decoder_hidden_channels,
+            non_linearity=decoder_non_linearity,
             mode=mode,
-            non_linearity=non_linearity,
-            skip_connections=skip_connections,
-            batch_norm=batch_norm,
         )
         decoder.apply(weight_init)
-        nn.utils.spectral_norm(decoder.linear_decompress)
 
         if decoder_non_linearity is not None:
             decoder = nn.Sequential(decoder, decoder_non_linearity)
+
+        self._current_step = 0
+        self._temperature = 1e-4
 
         super().__init__(
             encoder=encoder,
@@ -96,6 +81,27 @@ class ImageVAE(BaseVAE):
             beta=beta,
             reconstruction_loss=reconstruction_loss,
             reconstruction_reduce=reconstruction_reduce,
-            priors=priors,
+            prior_mode=prior_mode,
+            prior_logvar=prior_logvar,
+            learn_prior_logvar=learn_prior_logvar,
             cache_outputs=cache_outputs,
         )
+
+    def _current_decoding_dims(self, orig_dims):
+        self._current_step = max(self._current_step, self.global_step)
+
+        # TODO: add more flexibility for "scale scheduling"
+        scale = 1 - 0.5 * np.exp(-self._temperature * self._current_step)
+        return [int(scale * dim) for dim in orig_dims]
+
+    def calculate_elbo(self, x, x_hat, mu, logvar, mask=None):
+        upsample = nn.Upsample(size=x.shape[2:])
+        x_hat = upsample(x_hat)
+        return super().calculate_elbo(x, x_hat, mu, logvar, mask)
+
+    def parse_batch(self, batch):
+        x, kwargs = super().parse_batch(batch)
+
+        kwargs["input_dims"] = self._current_decoding_dims(x.shape[2:])
+
+        return x, kwargs
