@@ -6,7 +6,7 @@ seed: 42
 
 hydra:
   run:
-    dir: ${output_root}/${task}/${now:%Y-%m-%d}/${now:%H-%M-%S_%f}
+    dir: ${output_root}/${mode}/${now:%Y-%m-%d}/${now:%H-%M-%S_%f}
   sweep:
-    dir: ${output_root}/${task}/${now:%Y-%m-%d}
+    dir: ${output_root}/${mode}/${now:%Y-%m-%d}
     subdir: ${now:%H-%M-%S_%f}
