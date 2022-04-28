@@ -7,7 +7,7 @@ from .abstract_prior import Prior
 
 class IsotropicGaussianPrior(Prior):
     def __init__(self, indices=None):
-        super().__init__()
+        super().__init__(indices)
 
     @classmethod
     def kl_divergence(cls, mean, logvar, reduction="sum"):
@@ -39,7 +39,7 @@ class IsotropicGaussianPrior(Prior):
         return eps.mul(std).add(mean)
 
     def forward(self, z, mode="kl", **kwargs):
-        mean_logvar = z[self.indices]
+        mean_logvar = z[:, self.indices]
         mean, logvar = torch.split(mean_logvar, mean_logvar.shape[1] // 2, dim=1)
 
         if mode == "kl":
@@ -58,7 +58,7 @@ class DiagonalGaussianPrior(IsotropicGaussianPrior):
         learn_logvar=False,
         dimension=None,
     ):
-        super().__init__()
+        super().__init__(indices)
 
         if None in [logvar, mean]:
             if dimension is not None:
@@ -126,7 +126,7 @@ class DiagonalGaussianPrior(IsotropicGaussianPrior):
             return kl.sum(dim=-1)
 
     def forward(self, z, mode="kl", **kwargs):
-        mean_logvar = z[self.indices]
+        mean_logvar = z[:, self.indices]
         mean, logvar = torch.split(mean_logvar, mean_logvar.shape[1] // 2, dim=1)
 
         if mode == "kl":
