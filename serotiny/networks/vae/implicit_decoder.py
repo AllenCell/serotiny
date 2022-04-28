@@ -44,10 +44,10 @@ class ImplicitDecoder(nn.Module):
 
         layers = []
         _in_channels = latent_dims
-        for out_channels in hidden_channels:
+        for index, out_channels in enumerate(hidden_channels):
             layers.append(
                 conv_block(
-                    _in_channels + self._mode,
+                    _in_channels + self._mode + (self.latent_dims if index != 0 else 0),
                     out_channels,
                     kernel_size=1,
                     up_conv=False,
@@ -59,8 +59,8 @@ class ImplicitDecoder(nn.Module):
 
         self.layers = nn.ModuleList(layers)
 
-    def forward(self, x, input_dims=(10, 10, 10), angles=None, translations=None):
-        ppipeds = make_parallelepipeds(input_dims, batch_size=x.shape[0])
+    def forward(self, z, input_dims=(10, 10, 10), angles=None, translations=None):
+        ppipeds = make_parallelepipeds(input_dims, batch_size=z.shape[0])
 
         if angles is not None:
             pass
@@ -73,19 +73,21 @@ class ImplicitDecoder(nn.Module):
             #      x.shape[0], 1, *([1] * len(input_dims))
             #  )
 
-        ppipeds = ppipeds.to(x.device)
+        ppipeds = ppipeds.to(z.device)
 
-        x = x.view(*x.shape, *([1] * len(input_dims)))
-        x = x.expand(-1, -1, *input_dims)
+        z = z.view(*z.shape, *([1] * len(input_dims)))
+        z = z.expand(-1, -1, *input_dims)
 
-        _x = x
-        for layer in self.layers:
-            res = layer(torch.cat((ppipeds, _x), axis=1))
-
-            # if output and input dimensions match (minus the size of the coordinates)
-            if res.shape[1] == (_x.shape[1] - self._mode):
-                # skip connection, excluding the coordinates
-                _x = res + _x[:, self._mode :]
+        y = z
+        # Batch,channel (lt dim),input dims
+        for index, layer in enumerate(self.layers):
+            to_cat = (ppipeds, y) if index == 0 else (ppipeds, z, y)
+            res = layer(torch.cat(to_cat, axis=1))
+            # if output and input dimensions match
+            if res.shape[1] == y.shape[1]:
+                # skip connection, excluding the scoordinates and the latent code
+                y = res + y
             else:
-                _x = res
-        return self.final_non_linearity(x)
+                y = res
+
+        return self.final_non_linearity(y)

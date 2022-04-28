@@ -39,6 +39,7 @@ class ImageVAE(BaseVAE):
         batch_norm: bool = True,
         mode: str = "3d",
         priors: Optional[Sequence[Prior]] = None,
+        kernel_size: int = 3,
         cache_outputs: Sequence = ("test",),
         final_non_linearity: nn.Module = nn.Threshold(6, 6),
     ):
@@ -50,6 +51,7 @@ class ImageVAE(BaseVAE):
             hidden_channels=hidden_channels,
             max_pool_layers=max_pool_layers,
             mode=mode,
+            kernel_size=kernel_size,
             non_linearity=non_linearity,
             skip_connections=skip_connections,
             batch_norm=batch_norm,
@@ -78,6 +80,7 @@ class ImageVAE(BaseVAE):
             non_linearity=non_linearity,
             skip_connections=skip_connections,
             batch_norm=batch_norm,
+            kernel_size=kernel_size,
         )
         decoder.apply(weight_init)
         nn.utils.spectral_norm(decoder.linear_decompress)

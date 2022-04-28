@@ -18,6 +18,7 @@ class ImageDecoder(nn.Module):
         non_linearity,
         skip_connections,
         batch_norm,
+        kernel_size,
     ):
         super().__init__()
 
@@ -39,6 +40,7 @@ class ImageDecoder(nn.Module):
             },
             up_conv=True,
             flat_output=False,
+            kernel_size=kernel_size,
             mode=mode,
             non_linearity=non_linearity,
             skip_connections=skip_connections,
