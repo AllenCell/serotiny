@@ -216,6 +216,7 @@ class BaseVAE(BaseModel):
         self.log(f"{stage}_loss", loss, logger=logger)
 
     def _step(self, stage, batch, batch_idx, logger):
+
         x = self.parse_batch(batch)
 
         if isinstance(x, tuple):

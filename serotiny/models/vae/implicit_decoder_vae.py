@@ -41,6 +41,7 @@ class ImplicitDecoderVAE(BaseVAE):
         learn_prior_logvar: bool = False,
         skip_connections: bool = True,
         mode: str = "3d",
+        kernel_size: int = 3,
         cache_outputs: Sequence = ("test",),
         temperature: Optional[float] = None,
     ):
@@ -52,6 +53,7 @@ class ImplicitDecoderVAE(BaseVAE):
             hidden_channels=hidden_channels,
             max_pool_layers=max_pool_layers,
             mode=mode,
+            kernel_size=kernel_size,
             non_linearity=non_linearity,
             # final_non_linearity=torch.nn.Sigmoid(),
             skip_connections=skip_connections,
@@ -88,11 +90,6 @@ class ImplicitDecoderVAE(BaseVAE):
             cache_outputs=cache_outputs,
         )
 
-        if decoder_non_linearity is not None:
-            self.decoder_non_linearity = decoder_non_linearity
-        else:
-            self.decoder_non_linearity = nn.Identity()
-
     def _current_decoding_dims(self, orig_dims):
         if self._temperature is not None:
             self._current_step = max(self._current_step, self.global_step)
@@ -112,14 +109,7 @@ class ImplicitDecoderVAE(BaseVAE):
         self.log(f"{stage} kld loss", kld_loss, logger=logger)
         self.log(f"{stage}_loss", loss, logger=logger)
         self.log(f"{stage}_scale", self._scale, logger=logger)
-
-    def decode(self, mu, logvar, **kwargs):
-        z = self.sample_z(mu, logvar)
-        x_hat = self.decoder_non_linearity(self.decoder(
-            z, **{k: v for k, v in kwargs.items() if k in self.decoder_args}
-        ))
-
-        return z, x_hat
+        self.log(f"{stage}_step", self._current_step, logger=logger)
 
     def parse_batch(self, batch):
         x, kwargs = super().parse_batch(batch)
