@@ -1,0 +1,3 @@
+id,source,target
+1,out/test/patch/221.ome.tiff,out/test/patch/221.ome.tiff
+2,out/test/patch/505.ome.tiff,out/test/patch/505.ome.tiff

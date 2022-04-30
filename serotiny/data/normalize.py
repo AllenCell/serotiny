@@ -56,3 +56,62 @@ class NormalizeMinMax:
         ar = 2 * (ar - norm_min) / (norm_max - norm_min) - 1
 
         return ar.astype(np.float32)
+
+
+class NormalizeAroundCenter():
+    def __init__(self, scope=32, z_center=None):
+        self.scope = scope
+        self.z_center = z_center
+
+    def __call__(self, ar: np.ndarray):
+        """Returns normalized version of input array.
+
+        The array will be normalized with respect to the mean, std pixel intensity
+        of the sub-array of length `self.scope` in the z-dimension centered around the
+        array's "z_center".
+
+        Parameters
+        ----------
+        ar
+            Input 3d array to be normalized.
+        z_center
+            Z-index of cell centers.
+
+        Returns
+        -------
+        np.ndarray
+           Normalized array, dtype = float32
+
+        """
+
+        original_dims = ar.ndim
+        if ar.ndim > 3:
+            ar = np.squeeze(ar)
+
+        if ar.ndim != 3:
+            raise ValueError("Input array must have 3 or more significant dimensions")
+        if ar.shape[0] < self.scope:
+            raise ValueError("Input array must be at least length 32 in first dimension")
+        if self.z_center is None:
+            z_center = ar.shape[0] // 2
+        else:
+            z_center = self.z_center
+
+        z_start = z_center - self.scope // 2
+        if z_start < 0:
+            z_start = 0
+            logger.warn(f"Warning: z_start set to {z_start}")
+        if (z_start + self.scope) > ar.shape[0]:
+            z_start = ar.shape[0] - self.scope
+            logger.warn(f"Warning: z_start set to {z_start}")
+        chunk = ar[z_start : z_start + self.scope, :, :]
+        ar = ar - chunk.mean()
+        ar = ar / chunk.std()
+
+        while original_dims > ar.ndim:
+            ar = np.expand_dims(ar, axis=0)
+
+        return ar.astype(np.float32)
+
+
+

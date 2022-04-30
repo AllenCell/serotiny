@@ -4,6 +4,7 @@
 /data
 /config
 /scripts
+/out
 
 # notebooks bcz eww (force add them if you must?)
 *.ipynb
