@@ -103,7 +103,9 @@ def _do_model_op_wrapper(cfg):
             # if we can't get mode from the command line,
             # try getting it from the config. this might be
             # needed for runs on distributed clusters like ray
-            mode = cfg.pop("mode")
+            mode = cfg.get("mode", None)
+            if mode is not None:
+                del cfg["mode"]
         except (AttributeError, KeyError) as e:
             logger.error(
                 f"serotiny was misconfigured. Unable to infer "
@@ -112,7 +114,9 @@ def _do_model_op_wrapper(cfg):
             )
             raise e
     else:
-        cfg.pop("mode", None)
+        mode = cfg.get("mode", None)
+        if mode is not None:
+            del cfg["mode"]
 
     _do_model_op(
         mode,
