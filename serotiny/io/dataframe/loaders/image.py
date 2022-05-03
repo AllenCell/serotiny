@@ -1,3 +1,4 @@
+import os
 from typing import Callable, Optional, Sequence, Union, Type
 
 import numpy as np
@@ -63,10 +64,17 @@ class LoadImage(Loader):
         self.dtype = dtype
         self.transform = transform
 
+    def _get_cached_path(self, path):
+        conf_path = os.getenv("FSSPEC_CONFIG_DIR")
+        if conf_path is not None:
+            if "simplecache::" not in str(path):
+                return "simplecache::" + path
+        return path
+
     def __call__(self, row):
         if self.file_type == "tiff":
             return image_loader(
-                row[self.column],
+                self._get_cached_path(row[self.column]),
                 select_channels=self.select_channels,
                 output_dtype=self.dtype,
                 transform=self.transform,
