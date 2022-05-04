@@ -18,7 +18,7 @@ jobs:
       - name: install poetry and build
         run: |
           pip install poetry && \
-          poetry version "$(poetry version -s).dev$(date '+%Y%m%d')" && \
+          poetry version "$(poetry version -s).dev$(date '+%Y%m%d%H%M')" && \
           poetry build
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@master
