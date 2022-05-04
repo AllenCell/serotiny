@@ -1,6 +1,6 @@
 import re
 from itertools import chain
-from pathlib import Path
+from upath import UPath as Path
 from typing import Dict, Optional, Sequence, Union
 
 import numpy as np
