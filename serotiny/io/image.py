@@ -108,6 +108,8 @@ def image_loader(
     if return_as_torch:
         import torch
 
+        if data.dtype.kind == "u":
+            data = data.astype(data.dtype.str[1:])
         data = torch.tensor(data)
 
     if return_channels:
