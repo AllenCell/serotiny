@@ -159,6 +159,7 @@ class BaseVAE(BaseModel):
         return (
             x_hat,
             z,
+            z_params,
             loss,
             reconstruction_loss,
             kld_loss,
@@ -183,6 +184,7 @@ class BaseVAE(BaseModel):
         (
             x_hat,
             z,
+            z_params,
             loss,
             reconstruction_loss,
             kld_loss,
@@ -199,6 +201,7 @@ class BaseVAE(BaseModel):
             "kld_loss": kld_loss.detach().cpu(),
             "batch_idx": batch_idx,
             "z": z.detach().cpu(),
+            "z_params": z_params.detach().cpu(),
             "kld_per_latent_dimension": kld_per_latent_dimension.detach().float().cpu(),
             "rcl_per_input_dimension": rcl_per_input_dimension.detach().float().cpu(),
         }
