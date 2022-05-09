@@ -1,12 +1,10 @@
 import logging
 import sys
-import uuid
 
 from omegaconf import OmegaConf
 from hydra.utils import get_original_cwd
 
 logger = logging.getLogger(__name__)
-OmegaConf.register_new_resolver("uuid", lambda: str(uuid.uuid4()))
 
 
 def _do_model_op(
