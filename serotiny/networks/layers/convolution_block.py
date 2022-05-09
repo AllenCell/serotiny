@@ -7,6 +7,7 @@ def conv_block(
     in_c: int,
     out_c: int,
     kernel_size: int = 3,
+    stride: int = 1,
     padding: int = 0,
     up_conv: bool = False,
     non_linearity: Optional[nn.Module] = None,
@@ -44,7 +45,7 @@ def conv_block(
         non_linearity = nn.ReLU()
 
     block = nn.Sequential(
-        conv(in_c, out_c, kernel_size=kernel_size, padding=padding),
+        conv(in_c, out_c, kernel_size=kernel_size, stride=stride, padding=padding),
         non_linearity,
         batch_norm_cls(out_c),
     )
