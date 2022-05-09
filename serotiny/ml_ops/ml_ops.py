@@ -7,6 +7,16 @@ from hydra.utils import get_original_cwd
 logger = logging.getLogger(__name__)
 
 
+def instantiate(cfg):
+    from hydra.utils import instantiate as _instantiate
+
+    _cfg = OmegaConf.resolve(cfg).copy()
+    if "_aux_" in _cfg:
+        del _cfg["_aux_"]
+
+    return _instantiate(_cfg)
+
+
 def _do_model_op(
     mode,
     model,
@@ -24,7 +34,6 @@ def _do_model_op(
     from pathlib import Path
 
     import pytorch_lightning as pl
-    from hydra.utils import instantiate
 
     from .mlflow_utils import mlflow_fit, mlflow_predict, mlflow_test
     from .utils import make_notebook as mk_notebook
