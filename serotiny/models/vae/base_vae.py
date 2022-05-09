@@ -41,6 +41,7 @@ class BaseVAE(BaseModel):
         reconstruction_reduce: str = "sum",
         priors: Optional[Sequence[Prior]] = None,
         cache_outputs: Sequence = ("test",),
+        **kwargs,
     ):
         """Instantiate a basic VAE model.
 

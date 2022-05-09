@@ -2,6 +2,7 @@ import gc
 import inspect
 import logging
 from typing import Sequence, Union
+from omegaconf import ListConfig, DictConfig, OmegaConf
 
 import numpy as np
 import pytorch_lightning as pl
@@ -20,7 +21,29 @@ def _is_primitive(value):
     if isinstance(value, (tuple, list)):
         return all(_is_primitive(el) for el in value)
 
+    if isinstance(value, dict):
+        return all(_is_primitive(el) for el in value.values())
+
     return False
+
+
+def _cast_omegaconf(value):
+    if isinstance(value, (ListConfig, DictConfig)):
+        return OmegaConf.to_container(value, resolve=True)
+    return value
+
+
+def _parse_init_args(frame):
+    init_args = get_init_args(frame)
+    if frame.f_back.f_code.co_name == "__init__":
+        # if this was called from a subclass's init
+        init_args.update(get_init_args(frame.f_back))
+
+    init_args = {k: _cast_omegaconf(v) for k, v in init_args.items()}
+    ignore = [arg for arg, v in init_args.items() if not _is_primitive(v)]
+    for arg in ignore:
+        del init_args[arg]
+    return init_args
 
 
 class BaseModel(pl.LightningModule):
@@ -28,14 +51,9 @@ class BaseModel(pl.LightningModule):
         super().__init__()
 
         frame = inspect.currentframe()
-        init_args = get_init_args(frame)
-        if frame.f_back.f_code.co_name == "__init__":
-            # if this was called from a subclass's init
-            init_args.update(get_init_args(frame.f_back))
-        self.save_hyperparameters(
-            ignore=[arg for arg, v in init_args.items() if not _is_primitive(v)]
-        )
+        init_args = _parse_init_args(frame)
 
+        self.save_hyperparameters(init_args, logger=False)
         self.optimizer = init_args.get("optimizer", torch.optim.Adam)
         self.cache_outputs = init_args.get("cache_outputs", ("test",))
         self._cached_outputs = dict()
