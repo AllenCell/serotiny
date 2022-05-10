@@ -21,6 +21,7 @@ class LoadImage(Loader):
         reader: Optional[str] = None,
         dtype: Optional[Union[str, Type[np.number]]] = None,
         load_as_torch: bool = True,
+        use_cache: bool = False,
     ):
         """
         Parameters
@@ -63,8 +64,12 @@ class LoadImage(Loader):
         self.file_type = file_type
         self.dtype = dtype
         self.transform = transform
+        self.use_cache = use_cache
 
     def _get_cached_path(self, path):
+        if not self.use_cache:
+            return path
+
         conf_path = os.getenv("FSSPEC_CONFIG_DIR")
         if conf_path is not None:
             if "simplecache::" not in str(path):
