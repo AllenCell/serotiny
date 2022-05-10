@@ -10,7 +10,7 @@ class LoadColumn(Loader):
     """Loader class, used to retrieve fields directly from dataframe
     columns."""
 
-    def __init__(self, column: str, dtype: str = "float"):
+    def __init__(self, column: str, dtype: str = "float", unsqueeze: bool = True):
         """
         Parameters
         ----------
@@ -20,8 +20,9 @@ class LoadColumn(Loader):
         """
         super().__init__()
 
-        self.column = column
+        self.column = [column] if unsqueeze else column
         self.dtype = np.dtype(dtype).type
+        self.unsqueeze = unsqueeze
 
     def __call__(self, row):
         return self.dtype(row[self.column])
