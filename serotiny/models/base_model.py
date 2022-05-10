@@ -118,6 +118,5 @@ class BaseModel(pl.LightningModule):
         return {
             "optimizer": optimizer,
             "monitor": "val_loss",
-            "interval": "epoch",
             "frequency": 1,
         }
