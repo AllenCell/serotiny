@@ -99,7 +99,7 @@ class ManifestDatamodule(pl.LightningDataModule):
 
     def make_dataloader(self, split):
         kwargs = dict(**self.dataloader_kwargs)
-        kwargs["shuffle"] = kwargs.get("shuffle", False) and split == "train"
+        kwargs["shuffle"] = kwargs.get("shuffle", True) and split == "train"
 
         return DataLoader(dataset=self.datasets[split], **kwargs)
 
