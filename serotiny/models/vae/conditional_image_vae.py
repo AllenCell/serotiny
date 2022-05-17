@@ -143,9 +143,6 @@ class ConditionalImageVAE(BaseVAE):
 
     def decode(self, mu, logvar, **kwargs):
         z = self.sample_z(mu, logvar)
-        # condition = {k: v for k, v in kwargs.items() if k in 'condition'}['condition']
-        # import ipdb
-        # ipdb.set_trace()
         x_hat = self.decoder[0](
             z, **kwargs
         ) #condition
