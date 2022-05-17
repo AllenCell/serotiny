@@ -43,6 +43,7 @@ class ImplicitDecoderVAE(BaseVAE):
         mode: str = "3d",
         kernel_size: int = 3,
         cache_outputs: Sequence = ("test",),
+        batch_norm: bool = True,
         temperature: Optional[float] = None,
     ):
 
@@ -57,6 +58,7 @@ class ImplicitDecoderVAE(BaseVAE):
             non_linearity=non_linearity,
             # final_non_linearity=torch.nn.Sigmoid(),
             skip_connections=skip_connections,
+            batch_norm=batch_norm,
         )
         encoder.apply(weight_init)
         nn.utils.spectral_norm(encoder.output)

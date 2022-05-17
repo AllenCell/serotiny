@@ -123,6 +123,7 @@ class BasicCNN(nn.Module):
 
         for i, layer in enumerate(self.layers):
             x = layer(x)
+
             if i in self.max_pool_layers:
                 x = self.max_pool(x)
 
