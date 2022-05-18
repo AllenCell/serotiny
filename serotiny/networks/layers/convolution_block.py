@@ -24,6 +24,8 @@ def conv_block(
         number of output channels
     kernel_size: Sequence[int] (defaults to (3, 3, 3))
         dimensions of the convolutional kernel to be applied
+    stride: Sequence[int] (defaults to (1, 1, 1))
+        stride of the convolution
     padding:
         padding value for the convolution (defaults to 0)
     mode:
@@ -59,6 +61,7 @@ class ConvBlock(nn.Module):
         in_c: int,
         out_c: int,
         kernel_size: int = 3,
+        stride: int = 1,
         padding: int = 0,
         up_conv: bool = False,
         non_linearity: Optional[nn.Module] = None,
@@ -76,6 +79,8 @@ class ConvBlock(nn.Module):
             number of output channels
         kernel_size: Sequence[int] (defaults to (3, 3, 3))
             dimensions of the convolutional kernel to be applied
+        stride: Sequence[int] (defaults to (1, 1, 1))
+            stride of the convolution
         padding:
             padding value for the convolution (defaults to 0)
         mode:
@@ -88,6 +93,7 @@ class ConvBlock(nn.Module):
             in_c=in_c,
             out_c=out_c,
             kernel_size=kernel_size,
+            stride=stride,
             padding=padding,
             up_conv=up_conv,
             non_linearity=non_linearity,
