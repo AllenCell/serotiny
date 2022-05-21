@@ -41,6 +41,9 @@ def _parse_init_args(frame):
 
     init_args = {k: _cast_omegaconf(v) for k, v in init_args.items()}
     ignore = [arg for arg, v in init_args.items() if not _is_primitive(v)]
+    if "optimizer" in ignore:
+        ignore.remove("optimizer")
+
     for arg in ignore:
         del init_args[arg]
     return init_args
@@ -54,7 +57,7 @@ class BaseModel(pl.LightningModule):
         init_args = _parse_init_args(frame)
 
         self.save_hyperparameters(init_args, logger=False)
-        self.optimizer = init_args.get("optimizer", torch.optim.Adam)
+        self.optimizer = init_args.pop("optimizer", torch.optim.Adam)
         self.cache_outputs = init_args.get("cache_outputs", ("test",))
         self._cached_outputs = dict()
 
