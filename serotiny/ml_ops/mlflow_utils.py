@@ -5,15 +5,14 @@ from pathlib import Path
 
 import mlflow
 import pytorch_lightning as pl
-import yaml
 from hydra._internal.utils import _locate
-from hydra.utils import instantiate
 from mlflow.tracking import MlflowClient
 from mlflow.utils.autologging_utils import autologging_integration
 from omegaconf import OmegaConf
 from packaging.version import Version
 
 from .utils import flatten_config, save_model_predictions
+from .ml_ops import instantiate
 
 logger = logging.getLogger(__name__)
 
@@ -148,20 +147,12 @@ def load_model_from_checkpoint(tracking_uri, run_id):
             return
 
         config = _get_config(tracking_uri, run_id, tmp_dir, mode="train")
-
-        with open(config, "r") as f:
-            config = yaml.safe_load(f)
+        config = OmegaConf.load(config)
+        config = OmegaConf.to_container(config, resolve=True)
 
         model_conf = config["model"]
-        for k, v in model_conf.items():
-            try:
-                if isinstance(v, dict):
-                    if "_target_" in v:
-                        model_conf[k] = instantiate(v)
-            except:  # noqa
-                pass
-
         model_class = model_conf.pop("_target_")
+        model_conf = instantiate(model_conf)
         model_class = _locate(model_class)
         return model_class.load_from_checkpoint(ckpt_path, **model_conf)
 

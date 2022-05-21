@@ -9,8 +9,13 @@ logger = logging.getLogger(__name__)
 
 def instantiate(cfg):
     from hydra.utils import instantiate as _instantiate
+    from copy import copy
 
-    _cfg = OmegaConf.to_container(cfg, resolve=True)
+    if not isinstance(cfg, (list, dict)):
+        _cfg = OmegaConf.to_container(cfg, resolve=True)
+    else:
+        _cfg = copy(cfg)
+
     if "_aux_" in _cfg:
         del _cfg["_aux_"]
 
