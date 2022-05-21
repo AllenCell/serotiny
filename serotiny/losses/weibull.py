@@ -14,11 +14,6 @@ def weibull_log_probs(beta, alpha, target, eps):
 
 
 class WeibullLogLoss(Loss):
-    """Continuous Bernoulli loss, proposed here:
-
-    https://arxiv.org/abs/1907.06845.
-    """
-
     def __init__(self, reduction="sum", mode="explicit", eps=1e-10):
         super(WeibullLogLoss, self).__init__(None, None, reduction)
         self.mode = mode
