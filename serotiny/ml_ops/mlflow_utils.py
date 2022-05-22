@@ -2,6 +2,7 @@ import logging
 import os
 import tempfile
 from pathlib import Path
+from contextlib import contextmanager
 
 import mlflow
 import pytorch_lightning as pl
@@ -17,7 +18,7 @@ from .ml_ops import instantiate
 logger = logging.getLogger(__name__)
 
 
-def _log_metrics_step(self, trainer, pl_module):
+def _log_metrics_step(self, trainer, model):
     sanity_checking = (
         trainer.sanity_checking
         if Version(pl.__version__) > Version("1.4.5")
@@ -56,13 +57,13 @@ def patched_autolog(
 
     @rank_zero_only
     def _patched_on_test_epoch_end(
-        original, self, trainer, pl_module, *args
+        original, self, trainer, model, *args
     ):  # pylint: disable=signature-differs,arguments-differ,unused-argument
-        self._log_metrics(trainer, pl_module)
+        self._log_metrics(trainer, model)
 
     @rank_zero_only
-    def _patched_on_train_batch_end(original, self, trainer, pl_module, *args):
-        _log_metrics_step(self, trainer, pl_module)
+    def _patched_on_train_batch_end(original, self, trainer, model, *args):
+        _log_metrics_step(self, trainer, model)
 
     assert mode in ["fit", "test", "predict"]
 
@@ -408,3 +409,23 @@ def mlflow_predict(mlflow_conf, trainer, model, data, full_conf):
                 save_model_predictions(model, preds, preds_dir)
                 _log_predictions(preds_dir, mlflow_conf["tracking_uri"], run_id)
         mlflow.end_run(status="FINISHED")
+
+
+@contextmanager
+def upload_artifacts(artifact_path, exclude=[], globstr="*"):
+    """Util context manager to upload artifacts.
+
+    It yields a temporary directory to store results and then uploads the files
+    stored therein. Optionally exclude given files or restrict to a given glob
+    filter
+    """
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        try:
+            yield tmp_dir
+        finally:
+            for fpath in Path(tmp_dir).glob(globstr):
+                if fpath in exclude or str(fpath) in exclude or not fpath.is_file():
+                    continue
+
+                mlflow.log_artifact(local_path=fpath, artifact_path=artifact_path)
