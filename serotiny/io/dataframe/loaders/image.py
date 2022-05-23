@@ -51,6 +51,9 @@ class LoadImage(Loader):
             Whether to load the image as a torch tensor rather than a numpy
             array. Some transforms require this.
 
+        use_cache: bool = True
+            Whether to cache images after downloading them once
+
         """
         super().__init__()
         self.column = column
