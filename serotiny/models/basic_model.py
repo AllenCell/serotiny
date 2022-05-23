@@ -46,9 +46,7 @@ class BasicModel(BaseModel):
         self._squeeze_y = False
 
         if save_predictions is not None:
-            self.save_predictions = lambda _, preds, output_dir: (
-                save_predictions(preds, output_dir)
-            )
+            self.save_predictions = save_predictions
 
     def parse_batch(self, batch):
         return (batch[self.hparams.x_label], batch[self.hparams.y_label])
