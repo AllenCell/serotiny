@@ -5,12 +5,10 @@ from pathlib import Path
 from contextlib import contextmanager
 
 import mlflow
-import pytorch_lightning as pl
 from hydra._internal.utils import _locate
 from mlflow.tracking import MlflowClient
 from mlflow.utils.autologging_utils import autologging_integration
 from omegaconf import OmegaConf
-from packaging.version import Version
 
 from .utils import flatten_config, save_model_predictions
 from .ml_ops import instantiate
@@ -19,11 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 def _log_metrics_step(self, trainer, model):
-    sanity_checking = (
-        trainer.sanity_checking
-        if Version(pl.__version__) > Version("1.4.5")
-        else trainer.running_sanity_check
-    )
+    sanity_checking = trainer.sanity_checking
     if sanity_checking:
         return
 
@@ -53,6 +47,7 @@ def patched_autolog(
 
     import mlflow.pytorch._pytorch_autolog as _pytorch_autolog
     from mlflow.utils.autologging_utils import safe_patch
+    from pytorch_lightning import Trainer
     from pytorch_lightning.utilities import rank_zero_only
 
     @rank_zero_only
@@ -83,11 +78,9 @@ def patched_autolog(
 
     safe_patch("pytorch", mlflow.pytorch, "autolog", patched_autolog)
 
-    safe_patch(
-        "pytorch", pl.Trainer, mode, _pytorch_autolog.patched_fit, manage_run=True
-    )
+    safe_patch("pytorch", Trainer, mode, _pytorch_autolog.patched_fit, manage_run=True)
 
-    safe_patch("pytorch", pl.Trainer, "save_checkpoint", _patched_save_checkpoint)
+    safe_patch("pytorch", Trainer, "save_checkpoint", _patched_save_checkpoint)
 
 
 def _is_empty(conf, key):
