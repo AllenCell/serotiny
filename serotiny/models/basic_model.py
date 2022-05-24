@@ -7,7 +7,7 @@ from torch.nn.modules.loss import _Loss as Loss
 
 from .base_model import BaseModel
 
-Array = Union[torch.Tensor, np.array, Sequence[float]]
+Array = Union[torch.Tensor, np.ndarray, Sequence[float]]
 
 
 class BasicModel(BaseModel):

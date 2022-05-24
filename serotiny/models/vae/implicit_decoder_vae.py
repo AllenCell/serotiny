@@ -13,7 +13,7 @@ import torch.nn.functional as F
 
 from .base_vae import BaseVAE
 
-Array = Union[torch.Tensor, np.array, Sequence[float]]
+Array = Union[torch.Tensor, np.ndarray, Sequence[float]]
 logger = logging.getLogger("lightning")
 logger.propagate = False
 

@@ -11,7 +11,7 @@ from serotiny.networks.mlp import MLP
 from .base_vae import BaseVAE
 from .priors import Prior
 
-Array = Union[torch.Tensor, np.array, Sequence[float]]
+Array = Union[torch.Tensor, np.ndarray, Sequence[float]]
 
 
 class TabularVAE(BaseVAE):

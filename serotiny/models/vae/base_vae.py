@@ -10,7 +10,7 @@ from torch.nn.modules.loss import _Loss as Loss
 from serotiny.models.base_model import BaseModel
 from .priors import Prior, IsotropicGaussianPrior
 
-Array = Union[torch.Tensor, np.array, Sequence[float]]
+Array = Union[torch.Tensor, np.ndarray, Sequence[float]]
 logger = logging.getLogger("lightning")
 logger.propagate = False
 

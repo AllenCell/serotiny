@@ -9,7 +9,7 @@ import pytorch_lightning as pl
 import torch
 from pytorch_lightning.utilities.parsing import get_init_args
 
-Array = Union[torch.Tensor, np.array, Sequence[float]]
+Array = Union[torch.Tensor, np.ndarray, Sequence[float]]
 logger = logging.getLogger("lightning")
 logger.propagate = False
 
