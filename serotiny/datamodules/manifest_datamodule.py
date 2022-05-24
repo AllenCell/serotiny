@@ -96,12 +96,19 @@ class ManifestDatamodule(pl.LightningDataModule):
 
         self.just_inference = just_inference
         self.dataloader_kwargs = dataloader_kwargs
+        self.dataloaders = dict()
 
     def make_dataloader(self, split):
         kwargs = dict(**self.dataloader_kwargs)
         kwargs["shuffle"] = kwargs.get("shuffle", True) and split == "train"
 
         return DataLoader(dataset=self.datasets[split], **kwargs)
+
+    def _get_dataloader(self, split):
+        if split not in self.dataloaders:
+            self.dataloaders[split] = self.make_dataloader(split)
+
+        return self.dataloaders[split]
 
     def train_dataloader(self):
         if self.just_inference:
@@ -110,7 +117,7 @@ class ManifestDatamodule(pl.LightningDataModule):
                 "so it doesn't have a train_dataloader and can't be "
                 "used for training."
             )
-        return self.make_dataloader("train")
+        return self._get_dataloader("train")
 
     def val_dataloader(self):
         if self.just_inference:
@@ -120,14 +127,14 @@ class ManifestDatamodule(pl.LightningDataModule):
                 "used for training."
             )
 
-        return self.make_dataloader("val")
+        return self._get_dataloader("val")
 
     def test_dataloader(self):
         split = "predict" if self.just_inference else "test"
-        return self.make_dataloader(split)
+        return self._get_dataloader(split)
 
     def predict_dataloader(self):
-        return self.make_dataloader("predict")
+        return self._get_dataloader("predict")
 
 
 def _get_canonical_split_name(split):
