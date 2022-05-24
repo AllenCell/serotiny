@@ -58,6 +58,7 @@ class BaseModel(pl.LightningModule):
 
         self.save_hyperparameters(init_args, logger=False)
         self.optimizer = init_args.pop("optimizer", torch.optim.Adam)
+        self.lr_scheduler = init_args.pop("lr_scheduler", None)
         self.cache_outputs = init_args.get("cache_outputs", ("test",))
         self._cached_outputs = dict()
 
@@ -118,8 +119,14 @@ class BaseModel(pl.LightningModule):
 
     def configure_optimizers(self):
         optimizer = self.optimizer(self.parameters())
-        return {
-            "optimizer": optimizer,
-            "monitor": "val_loss",
-            "frequency": 1,
-        }
+        if self.lr_scheduler is not None:
+            scheduler = self.lr_scheduler(optimizer=optimizer)
+            return {
+                "optimizer": optimizer,
+                "lr_scheduler": {
+                    "scheduler": scheduler,
+                    "monitor": "val_loss",
+                    "frequency": 1,
+                },
+            }
+        return optimizer
