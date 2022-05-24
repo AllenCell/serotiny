@@ -69,25 +69,25 @@ class BaseModel(pl.LightningModule):
         raise NotImplementedError
 
     def _step(self, stage, batch, batch_idx, logger):
+        """Here you should implement the logic for a step in the
+        training/validation/test process. The stage (training/validation/test)
+        is given by the variable `stage`.
+
+        Example:
+
+        x = self.parse_batch(batch)
+
+        if self.hparams.id_label is not None:
+           if self.hparams.id_label in batch:
+               ids = batch[self.hparams.id_label].detach().cpu()
+               results.update({
+                   self.hparams.id_label: ids,
+                   "id": ids
+               })
+
+        return results
+        """
         raise NotImplementedError
-
-        # Here you should implement the logic for a step in the
-        # training/validation/test process.
-        # The stage (training/validation/test) is given by the variable `stage`.
-        #
-        # Example:
-        #
-        # x = self.parse_batch(batch)
-
-        # if self.hparams.id_label is not None:
-        #    if self.hparams.id_label in batch:
-        #        ids = batch[self.hparams.id_label].detach().cpu()
-        #        results.update({
-        #            self.hparams.id_label: ids,
-        #            "id": ids
-        #        })
-
-        # return results
 
     def training_step(self, batch, batch_idx):
         return self._step("train", batch, batch_idx, logger=True)
