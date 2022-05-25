@@ -11,6 +11,7 @@ from torch.utils.data import DataLoader
 
 from serotiny.io.dataframe import DataframeDataset, read_dataframe
 from serotiny.io.dataframe.loaders.abstract_loader import Loader
+from .utils import FastDataLoader
 
 
 class ManifestDatamodule(pl.LightningDataModule):
@@ -34,6 +35,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         split_column: Optional[Union[Path, str]] = None,
         columns: Optional[Sequence[str]] = None,
         just_inference: bool = False,
+        dataloader_type: str = "fast",
         **dataloader_kwargs,
     ):
         """
@@ -69,6 +71,9 @@ class ManifestDatamodule(pl.LightningDataModule):
 
         super().__init__()
         self.path = path
+        self._dataloader_cls = (
+            FastDataLoader if dataloader_type == "fast" else DataLoader
+        )
 
         # if only one loader is specified, the same loaders are
         # used for all  folds
@@ -102,7 +107,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         kwargs = dict(**self.dataloader_kwargs)
         kwargs["shuffle"] = kwargs.get("shuffle", True) and split == "train"
 
-        return DataLoader(dataset=self.datasets[split], **kwargs)
+        return self._dataloader_cls(dataset=self.datasets[split], **kwargs)
 
     def _get_dataloader(self, split):
         if split not in self.dataloaders:
