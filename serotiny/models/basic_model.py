@@ -81,7 +81,13 @@ class BasicModel(BaseModel):
                     raise err
 
         if stage != "predict":
-            self.log(f"{stage}_loss", loss.detach(), logger=logger)
+            self.log(
+                f"{stage}_loss",
+                loss.detach(),
+                logger=logger,
+                on_step=True,
+                on_epoch=True,
+            )
 
         output = {
             "loss": loss,

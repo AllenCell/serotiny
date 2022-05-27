@@ -1,5 +1,4 @@
 import inspect
-import logging
 from typing import Optional, Sequence, Union
 
 import numpy as np
@@ -11,8 +10,6 @@ from serotiny.models.base_model import BaseModel
 from .priors import Prior, IsotropicGaussianPrior
 
 Array = Union[torch.Tensor, np.ndarray, Sequence[float]]
-logger = logging.getLogger("lightning")
-logger.propagate = False
 
 
 def get_args(encoder):
@@ -169,9 +166,19 @@ class BaseVAE(BaseModel):
         )
 
     def log_metrics(self, stage, reconstruction_loss, kld_loss, loss, logger):
-        self.log(f"{stage} reconstruction loss", reconstruction_loss, logger=logger)
-        self.log(f"{stage} kld loss", kld_loss, logger=logger)
-        self.log(f"{stage}_loss", loss, logger=logger)
+        on_step = stage == "train"
+
+        self.log(
+            f"{stage} reconstruction loss",
+            reconstruction_loss,
+            logger=logger,
+            on_step=on_step,
+            on_epoch=True,
+        )
+        self.log(
+            f"{stage} kld loss", kld_loss, logger=logger, on_step=on_step, on_epoch=True
+        )
+        self.log(f"{stage}_loss", loss, logger=logger, on_step=on_step, on_epoch=True)
 
     def _step(self, stage, batch, batch_idx, logger):
 
