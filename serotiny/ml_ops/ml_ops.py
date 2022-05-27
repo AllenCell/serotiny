@@ -31,6 +31,7 @@ def _do_model_op(
     mlflow=None,
     full_conf={},
     test=False,
+    predict=False,
     multiprocessing_strategy=None,
     make_notebook=None,
     **_,
@@ -55,21 +56,32 @@ def _do_model_op(
             return
 
         pl.seed_everything(seed)
-        logger.info("Instantiating model, datamodule and trainer")
-        model = instantiate(model)
+        logger.info("Instantiating datamodule")
         data = instantiate(data)
+        logger.info("Instantiating trainer")
         trainer = instantiate(trainer)
 
         if mode == "train":
+            logger.info("Instantiating model")
+            model = instantiate(model)
+
             if mlflow is not None and mlflow.get("tracking_uri") is not None:
-                mlflow_fit(mlflow, trainer, model, data, full_conf=full_conf, test=test)
+                mlflow_fit(
+                    mlflow,
+                    trainer,
+                    model,
+                    data,
+                    full_conf=full_conf,
+                    test=test,
+                    predict=predict,
+                )
             else:
                 logger.info("Calling trainer.fit")
                 trainer.fit(model, data)
 
         elif mode == "test":
             if mlflow is not None and mlflow.get("tracking_uri") is not None:
-                mlflow_test(mlflow, trainer, model, data, full_conf=full_conf)
+                mlflow_test(mlflow, trainer, data, full_conf=full_conf)
             else:
                 if "ckpt_path" not in full_conf:
                     raise NotImplementedError(
@@ -77,11 +89,11 @@ def _do_model_op(
                         "an MLFlow config, or a local ckpt_path."
                     )
                 ckpt_path = full_conf["ckpt_path"]
-                trainer.test(model, data, ckpt_path=ckpt_path)
+                trainer.test(data, ckpt_path=ckpt_path)
 
         elif mode == "predict":
             if mlflow is not None and mlflow.get("tracking_uri") is not None:
-                mlflow_predict(mlflow, trainer, model, data, full_conf=full_conf)
+                mlflow_predict(mlflow, trainer, data, full_conf=full_conf)
             else:
                 if "ckpt_path" not in full_conf:
                     raise NotImplementedError(
@@ -96,7 +108,7 @@ def _do_model_op(
                 preds_dir.mkdir(exist_ok=True, parents=True)
 
                 ckpt_path = full_conf["ckpt_path"]
-                preds = trainer.predict(model, data, ckpt_path=ckpt_path)
+                preds = trainer.predict(data, ckpt_path=ckpt_path)
                 save_model_predictions(model, preds, preds_dir)
 
     else:

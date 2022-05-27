@@ -16,22 +16,6 @@ from .ml_ops import instantiate
 logger = logging.getLogger(__name__)
 
 
-def _log_metrics_step(self, trainer, model):
-    sanity_checking = trainer.sanity_checking
-    if sanity_checking:
-        return
-
-    if (trainer.global_step + 1) % trainer.log_every_n_steps == 0:
-        # `trainer.callback_metrics` contains both training and validation metrics
-        cur_metrics = trainer.callback_metrics
-        # Cast metric value as  float before passing into logger.
-        metrics = dict(
-            map(lambda x: ("batch/" + x[0], float(x[1])), cur_metrics.items())
-        )
-
-        self.metrics_logger.record_metrics(metrics, trainer.global_step)
-
-
 @autologging_integration("pytorch")
 def patched_autolog(
     log_every_n_epoch=1,
@@ -54,11 +38,7 @@ def patched_autolog(
     def _patched_on_test_epoch_end(
         original, self, trainer, model, *args
     ):  # pylint: disable=signature-differs,arguments-differ,unused-argument
-        self._log_metrics(trainer, model)
-
-    @rank_zero_only
-    def _patched_on_train_batch_end(original, self, trainer, model, *args):
-        _log_metrics_step(self, trainer, model)
+        self._log_metrics(trainer, model, *args)
 
     assert mode in ["fit", "test", "predict"]
 
@@ -67,13 +47,6 @@ def patched_autolog(
         _pytorch_autolog.__MLflowPLCallback,
         "on_test_epoch_end",
         _patched_on_test_epoch_end,
-    )
-
-    safe_patch(
-        "pytorch",
-        _pytorch_autolog.__MLflowPLCallback,
-        "on_train_batch_end",
-        _patched_on_train_batch_end,
     )
 
     safe_patch("pytorch", mlflow.pytorch, "autolog", patched_autolog)
@@ -138,7 +111,7 @@ def load_model_from_checkpoint(tracking_uri, run_id):
         ckpt_path = _get_latest_checkpoint(tracking_uri, run_id, tmp_dir)
         if ckpt_path is None:
             logger.info("Given run_id doesn't have a checkpoint we can use.")
-            return
+            return None
 
         config = _get_config(tracking_uri, run_id, tmp_dir, mode="train")
         config = OmegaConf.load(config)
@@ -160,7 +133,7 @@ def _get_patience(trainer):
     return None
 
 
-def _mlflow_prep(mlflow_conf, trainer, model, data, mode):
+def _mlflow_prep(mlflow_conf, trainer, mode):
     logger.info("Validating and processing MLFlow configuration")
 
     _validate_mlflow_conf(mlflow_conf)
@@ -250,10 +223,8 @@ def _log_predictions(preds_dir, tracking_uri, run_id):
     )
 
 
-def mlflow_fit(mlflow_conf, trainer, model, data, full_conf, test=False):
-    experiment, run_id, patience = _mlflow_prep(
-        mlflow_conf, trainer, model, data, "fit"
-    )
+def mlflow_fit(mlflow_conf, trainer, model, data, full_conf, test=False, predict=False):
+    experiment, run_id, patience = _mlflow_prep(mlflow_conf, trainer, "fit")
 
     # if run_id has been specified, we're trying to resume
     if run_id is not None and not trainer.checkpoint_callback:
@@ -316,18 +287,19 @@ def mlflow_fit(mlflow_conf, trainer, model, data, full_conf, test=False):
                 if test:
                     logger.info("Calling trainer.test")
                     trainer.test(model, data)
+                if test:
+                    logger.info("Calling trainer.predict")
+                    trainer.predict(model, data)
 
         mlflow.end_run(status="FINISHED")
 
 
-def mlflow_test(mlflow_conf, trainer, model, data, full_conf):
-    experiment, run_id, patience = _mlflow_prep(
-        mlflow_conf, trainer, model, data, "test"
-    )
+def mlflow_test(mlflow_conf, trainer, data, full_conf):
+    experiment, run_id, _ = _mlflow_prep(mlflow_conf, trainer, "test")
 
     if run_id is None:
         raise ValueError(
-            "You're calling serotiny test but you " "haven't specified the run_id"
+            "You're calling serotiny test but you haven't specified the run_id"
         )
 
     with mlflow.start_run(
@@ -336,9 +308,6 @@ def mlflow_test(mlflow_conf, trainer, model, data, full_conf):
         run_id=run_id,
         nested=(run_id is not None),
     ):
-
-        # we don't know yet if there's a checkpoint
-        ckpt_path = None
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             if _get_config(
@@ -349,24 +318,18 @@ def mlflow_test(mlflow_conf, trainer, model, data, full_conf):
                     "retest it, set ++force=True"
                 )
             else:
-                ckpt_path = _get_latest_checkpoint(
-                    mlflow_conf.tracking_uri, run_id, tmp_dir
-                )
+                model = load_model_from_checkpoint(mlflow_conf.tracking_uri, run_id)
 
                 _log_conf(tmp_dir, full_conf, "test")
 
-                if ckpt_path is None:
-                    logger.info("No checkpoint found for this run. Skipping.")
-                else:
+                if model is not None:
                     logger.info("Calling trainer.test")
-                    trainer.test(model, data, ckpt_path=ckpt_path)
+                    trainer.test(model, data)
         mlflow.end_run(status="FINISHED")
 
 
-def mlflow_predict(mlflow_conf, trainer, model, data, full_conf):
-    experiment, run_id, patience = _mlflow_prep(
-        mlflow_conf, trainer, model, data, "predict"
-    )
+def mlflow_predict(mlflow_conf, trainer, data, full_conf):
+    experiment, run_id, _ = _mlflow_prep(mlflow_conf, trainer, "predict")
 
     if run_id is None:
         raise ValueError(
@@ -380,21 +343,14 @@ def mlflow_predict(mlflow_conf, trainer, model, data, full_conf):
         nested=(run_id is not None),
     ):
 
-        # we don't know yet if there's a checkpoint
-        ckpt_path = None
-
         with tempfile.TemporaryDirectory() as tmp_dir:
-            ckpt_path = _get_latest_checkpoint(
-                mlflow_conf.tracking_uri, run_id, tmp_dir
-            )
+            model = load_model_from_checkpoint(mlflow_conf.tracking_uri, run_id)
 
             _log_conf(tmp_dir, full_conf, "predict")
 
-            if ckpt_path is None:
-                logger.info("No checkpoint found for this run. Skipping.")
-            else:
+            if model is not None:
                 logger.info("Calling trainer.predict")
-                preds = trainer.predict(model, data, ckpt_path=ckpt_path)
+                preds = trainer.predict(model, data)
 
                 preds_dir = Path(tmp_dir) / "predictions"
                 preds_dir.mkdir(exist_ok=True)
