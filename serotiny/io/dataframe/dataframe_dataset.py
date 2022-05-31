@@ -1,4 +1,5 @@
-from torch.utils.data import Dataset
+import numpy as np
+from torch.utils.data import Dataset, default_collate
 
 
 class _Row:
@@ -19,10 +20,11 @@ class _Row:
 
 
 class DataframeDataset(Dataset):
-    """Class to wrap a pandas DataFrame in a pytorch Dataset. In practice, at AICS we
-    use this to wrap manifest dataframes that point to the image files that correspond
-    to a cell. The `loaders` dict contains a loading function for each key, normally
-    consisting of a function to load the contents of a file from a path.
+    """Class to wrap a pandas DataFrame in a pytorch Dataset. In practice, at
+    AICS we use this to wrap manifest dataframes that point to the image files
+    that correspond to a cell. The `loaders` dict contains a loading function
+    for each key, normally consisting of a function to load the contents of a
+    file from a path.
 
     Parameters
     ----------
@@ -52,3 +54,11 @@ class DataframeDataset(Dataset):
         row = _Row(self.dataframe[idx], self.columns)
 
         return {key: loader(row) for key, loader in self.loaders.items()}
+
+    def find_samples_by_column(self, column, value, collate_fn=default_collate):
+        condition = self.dataframe[self.columns.index(column)] == value
+        ixs = np.argwhere(condition)
+        if len(ixs) == 0:
+            return None
+
+        return collate_fn([self[ix] for ix in ixs])
