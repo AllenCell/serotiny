@@ -32,6 +32,7 @@ def _do_model_op(
     full_conf={},
     test=False,
     predict=False,
+    tune=False,
     multiprocessing_strategy=None,
     make_notebook=None,
     **_,
@@ -74,8 +75,13 @@ def _do_model_op(
                     full_conf=full_conf,
                     test=test,
                     predict=predict,
+                    tune=tune,
                 )
             else:
+                if tune:
+                    logger.info("Calling trainer.tune")
+                    trainer.tune(model, data)
+
                 logger.info("Calling trainer.fit")
                 trainer.fit(model, data)
 

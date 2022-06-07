@@ -223,7 +223,9 @@ def _log_predictions(preds_dir, tracking_uri, run_id):
     )
 
 
-def mlflow_fit(mlflow_conf, trainer, model, data, full_conf, test=False, predict=False):
+def mlflow_fit(
+    mlflow_conf, trainer, model, data, full_conf, test=False, predict=False, tune=False
+):
     experiment, run_id, patience = _mlflow_prep(mlflow_conf, trainer, "fit")
 
     # if run_id has been specified, we're trying to resume
@@ -281,13 +283,17 @@ def mlflow_fit(mlflow_conf, trainer, model, data, full_conf, test=False, predict
 
                 _log_conf(tmp_dir, full_conf, "train")
 
+                if tune:
+                    logger.info("Calling trainer.tune")
+                    trainer.tune(model, data)
+
                 logger.info("Calling trainer.fit")
                 trainer.fit(model, data, ckpt_path=ckpt_path)
 
                 if test:
                     logger.info("Calling trainer.test")
                     trainer.test(model, data)
-                if test:
+                if predict:
                     logger.info("Calling trainer.predict")
                     trainer.predict(model, data)
 
