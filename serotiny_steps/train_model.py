@@ -67,8 +67,12 @@ def train_model(
     pl.seed_everything(seed)
 
     model_zoo_path = model_zoo_config.get("path")
-    model_name = model_config.get(INIT_KEY, model_config.get(INVOKE_KEY, "UNDEFINED_MODEL_NAME"))
-    datamodule_name = datamodule_config.get(INIT_KEY, model_config.get(INVOKE_KEY, "UNDEFINED_DATAMODULE_NAME"))
+    model_name = model_config.get(
+        INIT_KEY, model_config.get(INVOKE_KEY, "UNDEFINED_MODEL_NAME")
+    )
+    datamodule_name = datamodule_config.get(
+        INIT_KEY, model_config.get(INVOKE_KEY, "UNDEFINED_DATAMODULE_NAME")
+    )
 
     store_metadata(called_args, model_name, version_string, model_zoo_path)
 
