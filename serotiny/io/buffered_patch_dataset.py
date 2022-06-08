@@ -2,10 +2,14 @@ from collections import deque
 from typing import List, Sequence, Union
 import logging
 
+import pandas as pd
+import yaml
 from tqdm import tqdm
 import numpy as np
 import torch
 from torch.utils.data import Dataset
+from serotiny.utils import load_multiple
+from serotiny.io.dataframe import DataframeDataset
 
 logger = logging.getLogger(__name__)
 ArrayLike = Union[np.ndarray, torch.Tensor]
@@ -91,6 +95,7 @@ class BufferedPatchDataset(Dataset):
             return datum
         else:
             dimensions = len(self.patch_shape)
+
             shape_spatial = datum[self.patch_columns[0]].shape[-dimensions:]
             patch = {}
             slices = None
@@ -190,3 +195,44 @@ class BufferedPatchDataset(Dataset):
 
         """
         return self.buffer_history
+
+def test_patch_sampling():
+    loader_yaml = '''
+      X:
+        ^invoke: 'serotiny.io.dataframe.loaders.Load3DImage'
+        column: 'source'
+        transforms:
+          - ^invoke: 'serotiny.data.normalize.NormalizeAroundCenter'
+      Y:
+        ^invoke: 'serotiny.io.dataframe.loaders.Load3DImage'
+        column: 'target'
+        transforms:
+          - ^invoke: 'serotiny.data.normalize.NormalizeMinMax'
+      index: 
+        ^invoke: 'serotiny.io.dataframe.loaders.LoadColumn'
+        column: 'id'
+    '''
+
+    loader_dict = yaml.safe_load(loader_yaml)
+    loaders = load_multiple(loader_dict)
+    manifest = 'test/manifest/test_manifest.csv'
+    dataframe = pd.read_csv(manifest)
+    dataset = DataframeDataset(dataframe=dataframe, loaders=loaders)
+
+    buffer = BufferedPatchDataset(
+        dataset=dataset,
+        patch_columns=['X', 'Y'],
+        patch_shape=[32, 64, 64],
+        buffer_size=1,
+        buffer_switch_interval=2,
+    )
+
+    buffer.get_patch(0)
+    buffer.get_random_patch()
+
+    import ipdb; ipdb.set_trace()
+
+
+
+if __name__ == '__main__':
+    test_patch_sampling()
