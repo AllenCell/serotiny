@@ -4,11 +4,12 @@ _full_slice = slice(None, None, None)
 
 
 class Prior(nn.Module):
-    def __init__(self, indices=None, **kwargs):
+    def __init__(self, dimensionality: int, **kwargs):
         super().__init__()
-        if indices is None:
-            indices = _full_slice
-        self.indices = indices
+        self.dimensionality = dimensionality
+
+    def __len__(self):
+        return self.dimensionality
 
     def kl_divergence(self, z):
         raise NotImplementedError
