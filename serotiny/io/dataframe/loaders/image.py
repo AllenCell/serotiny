@@ -9,7 +9,7 @@ _DEFAULT_LOADER_KWARGS = dict(
     transform=None,
     reader=None,
     dtype=None,
-    load_as_torch=True,
+    return_as_torch=True,
     force_3d=False,
 )
 
