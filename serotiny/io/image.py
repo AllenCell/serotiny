@@ -9,7 +9,7 @@ from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
 
 
 def infer_dims(img: aicsimageio.AICSImage):
-    """Given a an AICSImage image, infer the corresponding tiff dimensions."""
+    """Given a an AICSImage image, infer the corresponding dimensions."""
     dims = dict(img.dims.items())
 
     if dims.get("T", 1) > 1:
@@ -38,11 +38,12 @@ def infer_dims(img: aicsimageio.AICSImage):
 def image_loader(
     path,
     select_channels: Optional[Union[Sequence[int], Sequence[str]]] = None,
-    output_dtype: Optional[Union[str, Type[np.number]]] = None,
+    dtype: Optional[Union[str, Type[np.number]]] = None,
     transform: Optional[Callable] = None,
     return_channels: bool = False,
     return_as_torch: bool = True,
     reader: Optional[str] = None,
+    force_3d: bool = False,
 ):
     """Load image from path given by `path`. If the given image doesn't have
     channel names, `select_channels` must be a list of integers.
@@ -56,7 +57,7 @@ def image_loader(
         Channels to be retrieved from the image. If the given image doesn't
         have channel names, `select_channels` must be a list of integers
 
-    output_dtype: Type[np.number] = np.float32
+    dtype: Type[np.number] = np.float32
         Numpy dtype of output image
 
     transform: Optional[Callable] = None
@@ -68,6 +69,10 @@ def image_loader(
 
     return_as_torch: bool = True
         Flag to determine whether to return the resulting image as a torch.Tensor
+
+    force_3d: bool = True
+        Force interpretation as 3d image. Useful for wrongfully stored or
+        inferred dimensions.
     """
 
     if reader is not None:
@@ -99,8 +104,12 @@ def image_loader(
         channel_name: index for index, channel_name in enumerate(loaded_channels)
     }
 
-    if output_dtype is not None:
-        data = data.astype(output_dtype)
+    if len(data.shape) == 3 and force_3d:
+        data = np.expand_dims(data, axis=0)
+        channel_map = {"unnamed": 0}
+
+    if dtype is not None:
+        data = data.astype(dtype)
 
     if transform:
         data = transform(data)
