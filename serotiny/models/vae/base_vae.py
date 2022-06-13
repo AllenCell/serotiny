@@ -22,6 +22,7 @@ class BaseVAE(BaseModel):
         loss_mask_label: Optional[str] = None,
         reconstruction_loss: Loss = nn.MSELoss(reduction="none"),
         prior: Optional[Sequence[Prior]] = None,
+        latent_compose_function=None,
         cache_outputs: Sequence = ("test",),
         **kwargs,
     ):
@@ -70,6 +71,7 @@ class BaseVAE(BaseModel):
             prior = {x_label: prior}
 
         self.prior = nn.ModuleDict(prior)
+        self.latent_compose_function = latent_compose_function
 
     def calculate_elbo(self, x, x_hat, z, mask=None):
         rcl_per_input_dimension = self.reconstruction_loss(x_hat, x)
@@ -106,11 +108,14 @@ class BaseVAE(BaseModel):
             for part, prior in self.prior.items()
         }
 
-    def encode(self, batch, **kwargs):
+    def encode(self, batch):
         return {part: encoder(batch[part]) for part, encoder in self.encoder.items()}
 
     def decode(self, z_parts):
-        z = torch.cat(z_parts.values(), dim=1)
+        if self.latent_compose_function is not None:
+            z = self.latent_compose_function(z_parts)
+        else:
+            z = torch.cat(z_parts.values(), dim=1)
         return self.decoder(z)
 
     def forward(self, batch, decode=False, compute_loss=False):
