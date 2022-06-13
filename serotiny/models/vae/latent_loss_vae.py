@@ -19,6 +19,7 @@ class LatentLossVAE(BaseVAE):
         x_label: str,
         latent_loss: dict,
         latent_loss_target: dict,
+        latent_loss_backprop_when: dict = None,
         latent_optimizer: torch.optim.Optimizer = torch.optim.Adam,
         beta: float = 1.0,
         id_label: Optional[str] = None,
@@ -59,6 +60,11 @@ class LatentLossVAE(BaseVAE):
             latent_optimizer = {x_label: latent_optimizer}
         self.latent_optimizer = latent_loss
 
+        if not isinstance(latent_loss_backprop_when, (dict, DictConfig)):
+            assert x_label is not None
+            latent_loss_backprop_when = {x_label: latent_loss_backprop_when}
+        self.latent_loss_backprop_when = latent_loss
+
         self.automatic_optimization = False
 
         def _step(self, stage, batch, batch_idx, logger):
@@ -85,9 +91,11 @@ class LatentLossVAE(BaseVAE):
                     z_parts_params[part], batch[self.latent_loss_target[part]]
                 )
                 if stage == "train":
-                    optim.zero_grad()
-                    self.manual_backward(loss)
-                    optim.step()
+                    mod = self.latent_loss_backprop_when.get(part) or 1
+                    if batch_idx % mod == 0:
+                        optim.zero_grad()
+                        self.manual_backward(loss)
+                        optim.step()
 
                 on_step = stage == "train"
                 self.log(
