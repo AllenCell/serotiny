@@ -12,9 +12,12 @@ from torch.utils.data import DataLoader
 from serotiny.io.dataframe import DataframeDataset, read_dataframe
 from serotiny.io.dataframe.loaders.abstract_loader import Loader
 
-
-def _make_single_manifest_splits(manifest_path, loaders, split_column, columns=None):
+def _make_single_manifest_splits(manifest_path, loaders, split_column, columns=None, split_map=None):
     dataframe = read_dataframe(manifest_path, columns)
+
+    dataframe[split_column] = dataframe[split_column].astype(np.dtype('O'))
+    if split_map is not None:
+        dataframe[split_column] = dataframe[split_column].replace(split_map)
     assert dataframe.dtypes[split_column] == np.dtype("O")
 
     split_names = dataframe[split_column].unique().tolist()
@@ -112,6 +115,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         loaders: Union[Dict, Loader],
         split_column: Optional[Union[Path, str]] = None,
         columns: Optional[Sequence[str]] = None,
+        split_map: Optional[Dict] = None,
         **dataloader_kwargs,
     ):
 
@@ -137,7 +141,8 @@ class ManifestDatamodule(pl.LightningDataModule):
                 )
 
             self.datasets = _make_single_manifest_splits(
-                path, loaders, split_column, columns
+                path, loaders, split_column, columns, 
+                split_map
             )
 
         self.dataloader_kwargs = dataloader_kwargs
