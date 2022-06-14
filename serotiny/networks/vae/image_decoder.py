@@ -2,7 +2,7 @@ import numpy as np
 
 import torch.nn as nn
 
-from serotiny.networks import BasicCNN, MLP
+from serotiny.networks import BasicCNN
 
 
 class ImageDecoder(nn.Module):
@@ -19,8 +19,6 @@ class ImageDecoder(nn.Module):
         skip_connections,
         batch_norm,
         kernel_size,
-        c_dim,
-        linear_hidden_layers,
     ):
         super().__init__()
 
@@ -30,10 +28,7 @@ class ImageDecoder(nn.Module):
 
         hidden_channels[-1] = output_channels
         self.hidden_channels = hidden_channels
-        if linear_hidden_layers is not None:
-            self.linear_decompress = MLP(latent_dim + c_dim, compressed_img_size, hidden_layers=linear_hidden_layers)
-        else:
-            self.linear_decompress = nn.Linear(latent_dim, compressed_img_size)
+        self.linear_decompress = nn.Linear(latent_dim, compressed_img_size)
 
         self.deconv = BasicCNN(
             hidden_channels[0],
@@ -52,10 +47,8 @@ class ImageDecoder(nn.Module):
             batch_norm=batch_norm,
         )
 
-    def forward(self, z, **kwargs):
-
-        z = self.linear_decompress(z, **{k: v for k, v in kwargs.items() if k in 'condition'})
-
+    def forward(self, z):
+        z = self.linear_decompress(z)
         z = z.view(
             z.shape[0],  # batch size
             self.hidden_channels[0],
