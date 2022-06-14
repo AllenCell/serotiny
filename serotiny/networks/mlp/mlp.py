@@ -38,8 +38,6 @@ class MLP(nn.Module):
         self.net.apply(weight_init)
 
     def forward(self, x1, condition=None):
-        # import ipdb
-        # ipdb.set_trace()
         if condition is not None:
             if len(condition.shape) == 1:
                 condition = condition.unsqueeze(dim=1)
