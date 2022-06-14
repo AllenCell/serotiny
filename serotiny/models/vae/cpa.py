@@ -287,7 +287,7 @@ class CPA(BaseVAE):
         adversary_disc_conds_loss, adversary_cont_conds_loss, 
         adversary_disc_conds_penalty, adversary_cont_conds_penalty, logger):
 
-        self.log(f"{stage} loss", loss, logger=logger)
+        self.log(f"{stage}_loss", loss, logger=logger)
         self.log(f"{stage} reconstruction loss", reconstruction_loss, logger=logger)
         self.log(f"{stage} adversary_discrete_condition_loss", adversary_disc_conds_loss, logger=logger)
         self.log(f"{stage} adversary_continuous_condition_loss", adversary_cont_conds_loss, logger=logger)
