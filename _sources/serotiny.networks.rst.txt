@@ -16,3 +16,4 @@ Subpackages
    serotiny.networks.layers
    serotiny.networks.mlp
    serotiny.networks.utils
+   serotiny.networks.vae

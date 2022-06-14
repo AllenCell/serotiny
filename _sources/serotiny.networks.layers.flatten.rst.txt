@@ -1,0 +1,7 @@
+serotiny.networks.layers.flatten module
+=======================================
+
+.. automodule:: serotiny.networks.layers.flatten
+   :members:
+   :undoc-members:
+   :show-inheritance:

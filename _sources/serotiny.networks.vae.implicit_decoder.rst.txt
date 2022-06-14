@@ -1,0 +1,7 @@
+serotiny.networks.vae.implicit\_decoder module
+==============================================
+
+.. automodule:: serotiny.networks.vae.implicit_decoder
+   :members:
+   :undoc-members:
+   :show-inheritance:

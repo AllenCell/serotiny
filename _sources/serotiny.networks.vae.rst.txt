@@ -1,0 +1,16 @@
+serotiny.networks.vae package
+=============================
+
+.. automodule:: serotiny.networks.vae
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   serotiny.networks.vae.image_decoder
+   serotiny.networks.vae.implicit_decoder

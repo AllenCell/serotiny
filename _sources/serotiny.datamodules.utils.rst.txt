@@ -1,0 +1,7 @@
+serotiny.datamodules.utils module
+=================================
+
+.. automodule:: serotiny.datamodules.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:

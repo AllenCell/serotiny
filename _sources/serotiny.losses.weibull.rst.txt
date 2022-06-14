@@ -1,0 +1,7 @@
+serotiny.losses.weibull module
+==============================
+
+.. automodule:: serotiny.losses.weibull
+   :members:
+   :undoc-members:
+   :show-inheritance:
