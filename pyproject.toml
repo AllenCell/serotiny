@@ -51,7 +51,11 @@ nbformat = "5.2.0"
 omegaconf = "2.1.1"
 packaging = "20.9"
 pyarrow = "7.0.0"
+<<<<<<< Updated upstream
 pytorch-lightning = "^1.5.0"
+=======
+pytorch-lightning = "^1.6.0"
+>>>>>>> Stashed changes
 PyYAML = "6.0"
 scikit-learn = "1.0.2"
 aicsimageio = "4.6.4"
