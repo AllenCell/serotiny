@@ -8,11 +8,9 @@ import numpy as np
 import pandas as pd
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.exceptions import MisconfigurationException
-from torch.utils.data import DataLoader
 
 from serotiny.io.dataframe import DataframeDataset, read_dataframe
 from serotiny.io.dataframe.loaders.abstract_loader import Loader
-from .utils import FastDataLoader
 
 
 class ManifestDatamodule(pl.LightningDataModule):
@@ -37,7 +35,6 @@ class ManifestDatamodule(pl.LightningDataModule):
         columns: Optional[Sequence[str]] = None,
         split_map: Optional[Dict] = None,
         just_inference: bool = False,
-        dataloader_type: str = "fast",
         **dataloader_kwargs,
     ):
         """
@@ -73,9 +70,6 @@ class ManifestDatamodule(pl.LightningDataModule):
 
         super().__init__()
         self.path = path
-        self._dataloader_cls = (
-            FastDataLoader if dataloader_type == "fast" else DataLoader
-        )
 
         # if only one loader is specified, the same loaders are
         # used for all  folds
