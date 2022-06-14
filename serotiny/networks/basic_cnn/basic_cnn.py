@@ -17,6 +17,7 @@ class BasicCNN(nn.Module):
         output_dim: int,
         hidden_channels: Sequence[int],
         kernel_size: int = 3,
+        stride: int = 1,
         input_dims: Optional[Sequence[int]] = None,
         max_pool_layers: Sequence[int] = [],
         upsample_layers: Sequence[int] = [],
@@ -74,6 +75,7 @@ class BasicCNN(nn.Module):
                     _in_channels,
                     out_channels,
                     kernel_size=kernel_size,
+                    stride=stride,
                     up_conv=up_conv,
                     non_linearity=non_linearity,
                     mode=mode,
@@ -111,11 +113,10 @@ class BasicCNN(nn.Module):
         log.info(f"Determined 'compressed size': {compressed_size} for CNN")
 
         if flat_output:
-            # self.output = nn.Sequential(
-            #     nn.Linear(compressed_size, output_dim),
-            #     nn.Identity() if final_non_linearity is None else final_non_linearity,
-            # )
-            self.output = nn.Linear(compressed_size, output_dim)
+            self.output = nn.Sequential(
+                nn.Linear(compressed_size, output_dim),
+                nn.Identity() if final_non_linearity is None else final_non_linearity,
+            )
 
     def conv_forward(self, x, return_sizes=False):
         if return_sizes:

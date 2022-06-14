@@ -1,0 +1,27 @@
+---
+name: publish-dev
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: install poetry and build
+        run: |
+          pip install poetry && \
+          poetry version "$(poetry version -s).dev$(date '+%Y%m%d%H%M')" && \
+          poetry build
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_TOKEN }}

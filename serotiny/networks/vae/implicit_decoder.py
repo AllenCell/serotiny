@@ -38,8 +38,8 @@ class ImplicitDecoder(nn.Module):
             non_linearity = nn.ReLU()
 
         if final_non_linearity is None:
-            # final_non_linearity = nn.SiLU()
             final_non_linearity = nn.Identity()
+
         self.final_non_linearity = final_non_linearity
 
         layers = []
@@ -81,7 +81,7 @@ class ImplicitDecoder(nn.Module):
         y = z
         # Batch,channel (lt dim),input dims
         for index, layer in enumerate(self.layers):
-            to_cat = ((ppipeds, y) if index == 0 else (ppipeds, z, y))
+            to_cat = (ppipeds, y) if index == 0 else (ppipeds, z, y)
             res = layer(torch.cat(to_cat, axis=1))
             # if output and input dimensions match
             if res.shape[1] == y.shape[1]:

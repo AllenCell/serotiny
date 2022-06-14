@@ -1,0 +1,4 @@
+cell_id,image_path,volume,cell_type,split_column
+1,/path/to/file1.png,10,small,train
+2,/path/to/file2.png,30,big,train
+3,/path/to/file3.png,20,medium,valid

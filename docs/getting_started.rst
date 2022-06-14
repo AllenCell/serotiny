@@ -1,7 +1,7 @@
 .. _getting_started:
 
 Getting started
-=================
+================
 
 One of ``serotiny``'s main purposes is to standardize the structure of ML projects
 at our organization. For that, we created `a cookiecutter template <https://github.com/AllenCellModeling/serotiny-project-cookiecutter>`_
@@ -100,8 +100,8 @@ An (incomplete) example of a possible model config could be:
     hidden_layers: [32, 32, 32]
     x_label: "x"
     optimizer:
-      _partial**: true
-      _target**: torch.optim.Adam
+      _partial_: true
+      _target_: torch.optim.Adam
       lr: 1e-3
 
 
@@ -126,7 +126,7 @@ If your task boils down to:
 - Computing "yhat" with your network (e.g classify the input)
 - Computing a loss value based on "y" and "yhat" (e.g calculate the cross-entropy loss)
 
-then ``serotiny``'s :py:class:`BasicModel class <serotiny.models.BasicModel>` is likely
+then ``serotiny``'s :py:class:`BasicModel class <serotiny.models.basic_model.BasicModel>` is likely
 enough for your needs and you don't need to write a new class. You can simply
 instantiate ``BasicModel``, and supply it with the following arguments:
 
@@ -179,14 +179,7 @@ This is where the available datasets for training will be specified.
 Each configuration file in this group should contain a ``hydra`` specification of a
 `LightiningDatamodule <https://pytorch-lightning.readthedocs.io/en/latest/extensions/datamodules.html?highlight=datamodule>`_ datamodule class.
 
-As of now, we only provide a
-:py:class:`ManifestDatamodule class <serotiny.datamodules.ManifestDatamodule>` as
-part of ``serotiny``, which is a class that works on top of what we call manifest
-files. These are ``.csv`` files which describe a dataset, and for which we have
-:py:mod:`loader classes <serotiny.io.dataframe.loaders>` which consume values
-from the dataframe, either directly, or e.g. by reading file paths.
-
-Alternatively, you can write and instantiate your own custom datamodule class instead,
+You can write and instantiate your own custom datamodule class instead,
 or use one developed by someone else.
 
 .. seealso::
@@ -195,24 +188,73 @@ or use one developed by someone else.
    (and other useful building blocks) in a package called ``lightning-bolts`` which you
    can install via ``$ pip install lightning-bolts``. See `here <https://lightning-bolts.readthedocs.io/en/latest/>`_ for more info about it.
 
-One (incomplete) example of a datamodule instantiation could be:
+
+The ManifestDatamodule
+^^^^^^^^^^^^^^^^^^^^^^
+
+At the Allen Institute for Cell Science we usually center our datasets around
+a "manifest file" - a ``.csv`` file where each row normally corresponds to a cell,
+and each column corresponds to a feature of that cell and/or a path to a file
+(normally an image file) related to that cell. To work with such datasets, we created a
+:py:class:`ManifestDatamodule class <serotiny.datamodules.ManifestDatamodule>`.
+
+This datamodule expects the manifest to be given either as a path to a folder
+with three files - ``train.csv``, ``valid.csv``, ``test.csv`` - or a single
+``.csv`` file containing a column called ``split_column`` - whose values can be
+``train``, ``test``, ``valid``.
+
+.. note::
+
+   If you are configuring a ``ManifestDatamodule`` which will only be used for
+   predicting/testing (i.e., you will only be calling ``$ serotiny predict`` or
+   ``$ serotiny test`` on it), you can set the flag ``just_inference`` to ``True``
+   which will tell it to ignore the splits and simply use the whole dataset. This
+   is the default behavior when you call ``$ serotiny predict``, but if you set
+   ``just_inference`` to ``True`` your manifest isn't even required to have a
+   ``split_column``.
+
+To load data from these manifest files, the ``ManifestDatamodule`` uses
+:py:mod:`loader classes <serotiny.io.dataframe.loaders>` which consume values
+from the dataframe, either directly, or e.g. by reading file paths.
+
+For example, if we have a ``manifest.csv`` file whose first few rows look like:
+
+.. csv-table::
+   :file: example.csv
+   :header-rows: 1
+
+An example of a compatible datamodule instantiation could be:
 
 ::
 
     _target_: serotiny.datamodules.ManifestDatamodule
 
-    path: /path/to/a/csv/file.csv # this can either be the path to a .csv file
-                                  # or a folder with 3 .csv files named
-                                  # "train.csv", "valid.csv", "test.csv"
+    path: /path/to/a/csv/manifest.csv
+
     batch_size: 64
     num_workers: 1
     loaders:
-      x:
-        _target_: serotiny.io.dataframe.loaders.LoadColumns
-        startswith: feature_
+      id:
+        _target_: serotiny.io.dataframe.loaders.LoadColumn
+        column: cell_id
+        dtype: int
+      image:
+        _target_: serotiny.io.dataframe.loaders.LoadImage
+        column: image_path
+        select_channels: ['dna']
+      volume:
+        _target_: serotiny.io.dataframe.loaders.LoadColumn
+        column: volume
+        dtype: float
 
     split_column: "split"
 
+A ``ManifestDatamodule`` instantiated with this configuration
+would produce batches containing ``id``, ``image`` and ``volume``.
+
+Check the docs of the
+:py:class:`ManifestDatamodule class <serotiny.datamodules.ManifestDatamodule>` and
+the :py:mod:`loader classes <serotiny.io.dataframe.loaders>` for more info.
 
 **The** ``trainer`` **config group**
 ####################################
@@ -310,6 +352,9 @@ To just test it out, you can try running:
 This will start an MLFlow server on port 1234, and store
 its data on ``/a/path/to/store/mlflow/data``.
 
+If you just want to use ``serotiny`` without its MLFlow integration, you should
+change the value of ``mlflow.tracking_uri`` to ``null``.
+
 
 Train a model
 *************
@@ -327,7 +372,61 @@ Note the selection of the model and data configurations. If you omit these,
 ``serotiny`` will use the corresponding  ``default.yaml`` configurations.
 
 Assuming appropriate configuration, you should see the results of your model
-training on MLFlow
+training on MLFlow.
+
+For the commands in the above section, you can add an argument
+``++make_notebook=/path/to/destination/notebook.ipynb`` to the call, with a path
+to a destination notebook file which will be created and populated with cells
+that mimic the behavior of the respective CLI call, so that you can tinker with
+them and run them one by one.
+
+
+Use a trained model to make predictions
+***************************************
+
+Assuming you have a trained model, under a run named ``some_run`` under some
+MLFlow experiment, you can use that model to make predictions ony any datamodule
+with a ``predict_dataloader``. (``serotiny``'s
+:py:class:`ManifestDatamodule class <serotiny.datamodules.ManifestDatamodule>`
+has one).
+
+::
+
+   $ serotiny predict model=... data=... ++mlflow.run_name=some_run
+
+If you want to implement custom logic to save your model's predictions, you
+should override/implement the ``save_predictions`` method for your model class.
+This method takes ``preds`` and ``output_dir`` as inputs, where ``preds`` is the
+result of calling ``trainer.predict`` (see more about it
+`here <https://pytorch-lightning.readthedocs.io/en/latest/common/trainer.html#predict>`_)
+and ``output_dir`` is a temporary directory in which you should save the information
+in ``preds``. This will generally be a list where each element is the return
+value of your model's ``predict_step`` or ``forward`` methods for each batch.
+
+If you're using ``serotiny's`` :py:class:`BasicModel class <serotiny.models.basic_model.BasicModel>`
+then you can pass it a custom ``save_predictions`` function when you instantiate it
+by doing something like:
+
+::
+
+   ...
+
+   save_predictions:
+     _target_: a_tiny_project.some_module.your_save_predictions_function
+     _partial_: true
+
+   ...
+
+If you call ``$ serotiny predict`` and don't implement/provide a ``save_predictions``
+method, predictions will simply be dumped using ``joblib.dump``
+(see `here <https://joblib.readthedocs.io/en/latest/generated/joblib.dump.html>`_)
+and compressed with XZ.
+
+Finally, if you're using ``$ serotiny predict`` with an MLFlow configuration,
+results will be stored there. Otherwise, you additionally should supply a
+``predictions_output_dir`` argument in the command-line call, otherwise the results
+will be stored in a ``predictions`` folder inside the path where you ran the
+command from.
 
 Load a trained model
 ********************

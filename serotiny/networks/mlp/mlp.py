@@ -6,7 +6,9 @@ from serotiny.networks.utils import weight_init
 
 def _make_block(input_dim, output_dim):
     return nn.Sequential(
-        nn.Linear(input_dim, output_dim), nn.BatchNorm1d(output_dim), nn.ReLU()
+        nn.Linear(input_dim, output_dim),
+        nn.ReLU(),
+        nn.BatchNorm1d(output_dim),
     )
 
 

@@ -6,6 +6,14 @@ serotiny.models.vae package
    :undoc-members:
    :show-inheritance:
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   serotiny.models.vae.priors
+
 Submodules
 ----------
 

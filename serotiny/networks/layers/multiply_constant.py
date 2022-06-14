@@ -1,5 +1,6 @@
 import torch.nn as nn
-import torch
+
+
 class MultiplyConstant(nn.Module):
     def __init__(self, constant):
         super().__init__()

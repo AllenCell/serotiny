@@ -6,4 +6,4 @@ defaults:
   - trainer: default
   - mlflow: default
 
-task: train
+mode: train

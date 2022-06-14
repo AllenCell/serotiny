@@ -2,12 +2,16 @@ from typing import Optional, Sequence, Union
 
 import numpy as np
 import torch
+import torch.nn as nn
+
+from torch.nn.modules.loss import _Loss as Loss
 
 from serotiny.networks.mlp import MLP
 
 from .base_vae import BaseVAE
+from .priors import Prior
 
-Array = Union[torch.Tensor, np.array, Sequence[float]]
+Array = Union[torch.Tensor, np.ndarray, Sequence[float]]
 
 
 class TabularVAE(BaseVAE):
@@ -21,9 +25,9 @@ class TabularVAE(BaseVAE):
         loss_mask_label: Optional[str] = None,
         optimizer=torch.optim.Adam,
         beta: float = 1.0,
-        prior_mode: str = "isotropic",
-        prior_logvar: Optional[Array] = None,
-        learn_prior_logvar: bool = False,
+        priors: Optional[Sequence[Prior]] = None,
+        reconstruction_loss: Loss = nn.MSELoss(reduction="none"),
+        reconstruction_reduce: str = "sum",
         cache_outputs: Sequence = ("test",),
     ):
         encoder = MLP(
@@ -47,8 +51,8 @@ class TabularVAE(BaseVAE):
             id_label=id_label,
             loss_mask_label=loss_mask_label,
             beta=beta,
-            prior_mode=prior_mode,
-            prior_logvar=prior_logvar,
-            learn_prior_logvar=learn_prior_logvar,
+            priors=priors,
             cache_outputs=cache_outputs,
+            reconstruction_loss=reconstruction_loss,
+            reconstruction_reduce=reconstruction_reduce,
         )

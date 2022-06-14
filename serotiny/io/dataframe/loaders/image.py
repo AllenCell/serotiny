@@ -1,6 +1,6 @@
+import os
 from typing import Callable, Optional, Sequence, Union, Type
 
-from omegaconf import ListConfig
 import numpy as np
 
 from serotiny.io.image import image_loader
@@ -17,10 +17,11 @@ class LoadImage(Loader):
         column: str,
         file_type: str = "tiff",
         select_channels: Optional[Sequence] = None,
-        transforms: Optional[Union[Sequence, Callable]] = None,
+        transform: Optional[Callable] = None,
         reader: Optional[str] = None,
         dtype: Optional[Union[str, Type[np.number]]] = None,
         load_as_torch: bool = True,
+        use_cache: bool = False,
     ):
         """
         Parameters
@@ -36,8 +37,8 @@ class LoadImage(Loader):
         select_channels: Optional[Sequence] = None
             List of channels to include in the loaded image.
 
-        transforms: Optional[Union[Sequence, Callable]] = None
-            Transform, or list of transforms to apply upon loading the image.
+        transform: Optional[Callable] = None
+            Transform to apply upon loading the image.
 
         reader: Optional[str] = None
             `aicsimageio` reader to use
@@ -49,6 +50,9 @@ class LoadImage(Loader):
         load_as_torch: bool = True
             Whether to load the image as a torch tensor rather than a numpy
             array. Some transforms require this.
+
+        use_cache: bool = True
+            Whether to cache images after downloading them once
 
         """
         super().__init__()
@@ -62,21 +66,26 @@ class LoadImage(Loader):
 
         self.file_type = file_type
         self.dtype = dtype
+        self.transform = transform
+        self.use_cache = use_cache
 
-        if isinstance(transforms, (list, tuple, ListConfig)):
-            from torchvision.transforms import Compose
+    def _get_cached_path(self, path):
+        if not self.use_cache:
+            return path
 
-            transforms = Compose(transforms)
-
-        self.transforms = transforms
+        conf_path = os.getenv("FSSPEC_CONFIG_DIR")
+        if conf_path is not None:
+            if "simplecache::" not in str(path):
+                return "simplecache::" + path
+        return path
 
     def __call__(self, row):
         if self.file_type == "tiff":
             return image_loader(
-                row[self.column],
+                self._get_cached_path(row[self.column]),
                 select_channels=self.select_channels,
                 output_dtype=self.dtype,
-                transform=self.transforms,
+                transform=self.transform,
                 reader=self.reader,
                 return_as_torch=self.load_as_torch,
             )

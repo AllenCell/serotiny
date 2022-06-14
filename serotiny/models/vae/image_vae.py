@@ -11,8 +11,9 @@ from serotiny.networks.vae import ImageDecoder
 from serotiny.networks.utils import weight_init
 
 from .base_vae import BaseVAE
+from .priors import Prior
 
-Array = Union[torch.Tensor, np.array, Sequence[float]]
+Array = Union[torch.Tensor, np.ndarray, Sequence[float]]
 logger = logging.getLogger("lightning")
 logger.propagate = False
 
@@ -34,14 +35,13 @@ class ImageVAE(BaseVAE):
         loss_mask_label: Optional[str] = None,
         reconstruction_loss: Loss = nn.MSELoss(reduction="none"),
         reconstruction_reduce: str = "mean",
-        prior_mode: str = "isotropic",
-        prior_logvar: Optional[Array] = None,
-        learn_prior_logvar: bool = False,
         skip_connections: bool = True,
         batch_norm: bool = True,
         mode: str = "3d",
+        priors: Optional[Sequence[Prior]] = None,
         kernel_size: int = 3,
         cache_outputs: Sequence = ("test",),
+        final_non_linearity: nn.Module = nn.Threshold(6, 6),
     ):
 
         encoder = BasicCNN(
@@ -55,7 +55,7 @@ class ImageVAE(BaseVAE):
             non_linearity=non_linearity,
             skip_connections=skip_connections,
             batch_norm=batch_norm,
-            # final_non_linearity=nn.Sigmoid(),
+            final_non_linearity=final_non_linearity,
         )
         encoder.apply(weight_init)
         nn.utils.spectral_norm(encoder.output)
@@ -99,8 +99,6 @@ class ImageVAE(BaseVAE):
             beta=beta,
             reconstruction_loss=reconstruction_loss,
             reconstruction_reduce=reconstruction_reduce,
-            prior_mode=prior_mode,
-            prior_logvar=prior_logvar,
-            learn_prior_logvar=learn_prior_logvar,
+            priors=priors,
             cache_outputs=cache_outputs,
         )

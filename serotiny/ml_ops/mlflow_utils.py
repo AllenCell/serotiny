@@ -2,40 +2,18 @@ import logging
 import os
 import tempfile
 from pathlib import Path
+from contextlib import contextmanager
 
 import mlflow
-import pytorch_lightning as pl
-import yaml
 from hydra._internal.utils import _locate
-from hydra.utils import instantiate
 from mlflow.tracking import MlflowClient
 from mlflow.utils.autologging_utils import autologging_integration
 from omegaconf import OmegaConf
-from packaging.version import Version
 
 from .utils import flatten_config, save_model_predictions
+from .ml_ops import instantiate
 
 logger = logging.getLogger(__name__)
-
-
-def _log_metrics_step(self, trainer, pl_module):
-    sanity_checking = (
-        trainer.sanity_checking
-        if Version(pl.__version__) > Version("1.4.5")
-        else trainer.running_sanity_check
-    )
-    if sanity_checking:
-        return
-
-    if (trainer.global_step + 1) % trainer.log_every_n_steps == 0:
-        # `trainer.callback_metrics` contains both training and validation metrics
-        cur_metrics = trainer.callback_metrics
-        # Cast metric value as  float before passing into logger.
-        metrics = dict(
-            map(lambda x: ("batch/" + x[0], float(x[1])), cur_metrics.items())
-        )
-
-        self.metrics_logger.record_metrics(metrics, trainer.global_step)
 
 
 @autologging_integration("pytorch")
@@ -48,24 +26,21 @@ def patched_autolog(
     silent=False,
     mode="fit",
 ):
-    """Patched mlflow autolog, to enable on_test_epoch_end callbacks and to cover
-    trainer.test calls as well."""
+    """Patched mlflow autolog, to enable on_test_epoch_end callbacks and to
+    cover trainer.test calls as well."""
 
     import mlflow.pytorch._pytorch_autolog as _pytorch_autolog
     from mlflow.utils.autologging_utils import safe_patch
+    from pytorch_lightning import Trainer
     from pytorch_lightning.utilities import rank_zero_only
 
     @rank_zero_only
     def _patched_on_test_epoch_end(
-        original, self, trainer, pl_module, *args
+        original, self, trainer, model, *args
     ):  # pylint: disable=signature-differs,arguments-differ,unused-argument
-        self._log_metrics(trainer, pl_module)
+        self._log_metrics(trainer, model, *args)
 
-    @rank_zero_only
-    def _patched_on_train_batch_end(original, self, trainer, pl_module, *args):
-        _log_metrics_step(self, trainer, pl_module)
-
-    assert mode in ["fit", "test"]
+    assert mode in ["fit", "test", "predict"]
 
     safe_patch(
         "pytorch",
@@ -74,20 +49,11 @@ def patched_autolog(
         _patched_on_test_epoch_end,
     )
 
-    safe_patch(
-        "pytorch",
-        _pytorch_autolog.__MLflowPLCallback,
-        "on_train_batch_end",
-        _patched_on_train_batch_end,
-    )
-
     safe_patch("pytorch", mlflow.pytorch, "autolog", patched_autolog)
 
-    safe_patch(
-        "pytorch", pl.Trainer, mode, _pytorch_autolog.patched_fit, manage_run=True
-    )
+    safe_patch("pytorch", Trainer, mode, _pytorch_autolog.patched_fit, manage_run=True)
 
-    safe_patch("pytorch", pl.Trainer, "save_checkpoint", _patched_save_checkpoint)
+    safe_patch("pytorch", Trainer, "save_checkpoint", _patched_save_checkpoint)
 
 
 def _is_empty(conf, key):
@@ -145,23 +111,15 @@ def load_model_from_checkpoint(tracking_uri, run_id):
         ckpt_path = _get_latest_checkpoint(tracking_uri, run_id, tmp_dir)
         if ckpt_path is None:
             logger.info("Given run_id doesn't have a checkpoint we can use.")
-            return
+            return None
 
         config = _get_config(tracking_uri, run_id, tmp_dir, mode="train")
-
-        with open(config, "r") as f:
-            config = yaml.safe_load(f)
+        config = OmegaConf.load(config)
+        config = OmegaConf.to_container(config, resolve=True)
 
         model_conf = config["model"]
-        for k, v in model_conf.items():
-            try:
-                if isinstance(v, dict):
-                    if "_target_" in v:
-                        model_conf[k] = instantiate(v)
-            except:  # noqa
-                pass
-
         model_class = model_conf.pop("_target_")
+        model_conf = instantiate(model_conf)
         model_class = _locate(model_class)
         return model_class.load_from_checkpoint(ckpt_path, **model_conf)
 
@@ -175,7 +133,7 @@ def _get_patience(trainer):
     return None
 
 
-def _mlflow_prep(mlflow_conf, trainer, model, data, mode):
+def _mlflow_prep(mlflow_conf, trainer, mode):
     logger.info("Validating and processing MLFlow configuration")
 
     _validate_mlflow_conf(mlflow_conf)
@@ -206,8 +164,9 @@ def _mlflow_prep(mlflow_conf, trainer, model, data, mode):
         for run_info in mlflow.list_run_infos(experiment_id=experiment.experiment_id):
             run_tags = mlflow.get_run(run_info.run_id).data.tags
 
-            if run_tags["mlflow.runName"] == run_name:
-                runs.append(run_info.run_id)
+            if "mlflow.runName" in run_tags:
+                if run_tags["mlflow.runName"] == run_name:
+                    runs.append(run_info.run_id)
 
         if len(runs) > 1:
             raise ValueError(
@@ -260,21 +219,19 @@ def _log_conf(tmp_dir, full_conf, mode):
 def _log_predictions(preds_dir, tracking_uri, run_id):
     client = MlflowClient(tracking_uri=tracking_uri)
     client.log_artifacts(
-        run_id=run_id, local_path=preds_dir, artifact_path="predictions"
+        run_id=run_id, local_dir=preds_dir, artifact_path="predictions"
     )
 
 
-def mlflow_fit(mlflow_conf, trainer, model, data, full_conf, test=False):
-    experiment, run_id, patience = _mlflow_prep(
-        mlflow_conf, trainer, model, data, "fit"
-    )
-
-    flat_conf = flatten_config(OmegaConf.to_container(full_conf, resolve=True))
+def mlflow_fit(
+    mlflow_conf, trainer, model, data, full_conf, test=False, predict=False, tune=False
+):
+    experiment, run_id, patience = _mlflow_prep(mlflow_conf, trainer, "fit")
 
     # if run_id has been specified, we're trying to resume
     if run_id is not None and not trainer.checkpoint_callback:
         raise ValueError(
-            "You're trying to resume training, but " "checkpointing is not enabled."
+            "You're trying to resume training, but checkpointing is not enabled."
         )
 
     skip = False
@@ -286,7 +243,11 @@ def mlflow_fit(mlflow_conf, trainer, model, data, full_conf, test=False):
     ):
 
         if run_id is None:
-            mlflow.log_params(flat_conf)
+            params_to_log = mlflow_conf.get("params_to_log", None)
+            if params_to_log is not None:
+                mlflow.log_params(
+                    flatten_config(OmegaConf.to_container(params_to_log, resolve=True))
+                )
 
         if run_id is not None:
             client = MlflowClient(tracking_uri=mlflow_conf["tracking_uri"])
@@ -322,24 +283,29 @@ def mlflow_fit(mlflow_conf, trainer, model, data, full_conf, test=False):
 
                 _log_conf(tmp_dir, full_conf, "train")
 
+                if tune:
+                    logger.info("Calling trainer.tune")
+                    trainer.tune(model, data)
+
                 logger.info("Calling trainer.fit")
                 trainer.fit(model, data, ckpt_path=ckpt_path)
 
                 if test:
                     logger.info("Calling trainer.test")
                     trainer.test(model, data)
+                if predict:
+                    logger.info("Calling trainer.predict")
+                    trainer.predict(model, data)
 
         mlflow.end_run(status="FINISHED")
 
 
-def mlflow_test(mlflow_conf, trainer, model, data, full_conf):
-    experiment, run_id, patience = _mlflow_prep(
-        mlflow_conf, trainer, model, data, "test"
-    )
+def mlflow_test(mlflow_conf, trainer, data, full_conf):
+    experiment, run_id, _ = _mlflow_prep(mlflow_conf, trainer, "test")
 
     if run_id is None:
         raise ValueError(
-            "You're calling serotiny test but you " "haven't specified the run_id"
+            "You're calling serotiny test but you haven't specified the run_id"
         )
 
     with mlflow.start_run(
@@ -348,9 +314,6 @@ def mlflow_test(mlflow_conf, trainer, model, data, full_conf):
         run_id=run_id,
         nested=(run_id is not None),
     ):
-
-        # we don't know yet if there's a checkpoint
-        ckpt_path = None
 
         with tempfile.TemporaryDirectory() as tmp_dir:
             if _get_config(
@@ -361,46 +324,83 @@ def mlflow_test(mlflow_conf, trainer, model, data, full_conf):
                     "retest it, set ++force=True"
                 )
             else:
-                ckpt_path = _get_latest_checkpoint(
-                    mlflow_conf.tracking_uri, run_id, tmp_dir
-                )
+                model = load_model_from_checkpoint(mlflow_conf.tracking_uri, run_id)
 
                 _log_conf(tmp_dir, full_conf, "test")
 
-                if ckpt_path is None:
-                    logger.info("No checkpoint found for this run. Skipping.")
-                else:
+                if model is not None:
                     logger.info("Calling trainer.test")
-                    trainer.test(model, data, ckpt_path=ckpt_path)
+                    trainer.test(model, data)
         mlflow.end_run(status="FINISHED")
 
 
-def mlflow_predict(mlflow_conf, trainer, model, data, full_conf):
-    experiment, run_id, patience = _mlflow_prep(
-        mlflow_conf, trainer, model, data, "predict"
-    )
+def mlflow_predict(mlflow_conf, trainer, data, full_conf):
+    experiment, run_id, _ = _mlflow_prep(mlflow_conf, trainer, "predict")
 
     if run_id is None:
         raise ValueError(
             "You're calling serotiny predict but you " "haven't specified the run_id"
         )
 
-    # we don't know yet if there's a checkpoint
-    ckpt_path = None
+    with mlflow.start_run(
+        experiment_id=experiment.experiment_id,
+        run_name=mlflow_conf.run_name,
+        run_id=run_id,
+        nested=(run_id is not None),
+    ):
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            model = load_model_from_checkpoint(mlflow_conf.tracking_uri, run_id)
+
+            _log_conf(tmp_dir, full_conf, "predict")
+
+            if model is not None:
+                logger.info("Calling trainer.predict")
+                preds = trainer.predict(model, data)
+
+                preds_dir = Path(tmp_dir) / "predictions"
+                preds_dir.mkdir(exist_ok=True)
+
+                save_model_predictions(model, preds, preds_dir)
+                _log_predictions(preds_dir, mlflow_conf["tracking_uri"], run_id)
+        mlflow.end_run(status="FINISHED")
+
+
+@contextmanager
+def upload_artifacts(artifact_path, exclude=[], globstr="*"):
+    """Util context manager to upload artifacts.
+
+    It yields a temporary directory to store results and then uploads the files
+    stored therein. Optionally exclude given files or restrict to a given glob
+    filter
+    """
 
     with tempfile.TemporaryDirectory() as tmp_dir:
-        ckpt_path = _get_latest_checkpoint(mlflow_conf.tracking_uri, run_id, tmp_dir)
+        try:
+            yield tmp_dir
+        finally:
+            for fpath in Path(tmp_dir).glob(globstr):
+                if fpath in exclude or str(fpath) in exclude or not fpath.is_file():
+                    continue
 
-        _log_conf(tmp_dir, full_conf, "predict")
+                mlflow.log_artifact(local_path=fpath, artifact_path=artifact_path)
 
-        if ckpt_path is None:
-            logger.info("No checkpoint found for this run. Skipping.")
-        else:
-            logger.info("Calling trainer.predict")
-            preds = trainer.predict(model, data, ckpt_path=ckpt_path)
 
-            preds_dir = Path(tmp_dir) / "predictions"
-            preds_dir.mkdir(exist_ok=True)
+@contextmanager
+def download_artifact(artifact_path):
+    """Util context manager to download artifacts.
 
-            save_model_predictions(model, preds, preds_dir)
-            _log_predictions(preds_dir, mlflow_conf["tracking_uri"], run_id)
+    Returns a path to the downloaded artifact
+    """
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        try:
+            client = mlflow.tracking.MlflowClient(mlflow.get_tracking_uri())
+            yield client.download_artifacts(
+                run_id=mlflow.active_run().info.run_id,
+                path=artifact_path,
+                dst_path=tmp_dir,
+            )
+
+        finally:
+            pass

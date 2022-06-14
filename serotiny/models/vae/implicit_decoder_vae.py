@@ -13,7 +13,7 @@ import torch.nn.functional as F
 
 from .base_vae import BaseVAE
 
-Array = Union[torch.Tensor, np.array, Sequence[float]]
+Array = Union[torch.Tensor, np.ndarray, Sequence[float]]
 logger = logging.getLogger("lightning")
 logger.propagate = False
 
@@ -72,6 +72,9 @@ class ImplicitDecoderVAE(BaseVAE):
         )
         decoder.apply(weight_init)
 
+        if decoder_non_linearity is not None:
+            decoder = nn.Sequential(decoder, decoder_non_linearity)
+
         self._current_step = 0
         self._temperature = temperature
 
@@ -101,7 +104,7 @@ class ImplicitDecoderVAE(BaseVAE):
         else:
             self._scale = 1
         return [int(self._scale * dim) for dim in orig_dims]
-            
+
     def calculate_elbo(self, x, x_hat, mu, logvar, mask=None):
         x_hat = F.interpolate(x_hat, size=x.shape[2:])
         return super().calculate_elbo(x, x_hat, mu, logvar, mask)
@@ -112,6 +115,16 @@ class ImplicitDecoderVAE(BaseVAE):
         self.log(f"{stage}_loss", loss, logger=logger)
         self.log(f"{stage}_scale", self._scale, logger=logger)
         self.log(f"{stage}_step", self._current_step, logger=logger)
+
+    def decode(self, z_params, **kwargs):
+        z = self.sample_z(z_params)
+        x_hat = self.decoder_non_linearity(
+            self.decoder(
+                z, **{k: v for k, v in kwargs.items() if k in self.decoder_args}
+            )
+        )
+
+        return z, x_hat
 
     def parse_batch(self, batch):
         x, kwargs = super().parse_batch(batch)

@@ -12,17 +12,27 @@ def infer_dims(img: aicsimageio.AICSImage):
     """Given a an AICSImage image, infer the corresponding tiff dimensions."""
     dims = dict(img.dims.items())
 
-    if "S" in dims:
-        if dims["S"] > 1:
-            raise ValueError("Expected image with no S dimensions")
-    if "T" in dims:
-        if dims["T"] > 1:
-            raise ValueError("Expected image with no T dimensions")
-
+    if dims.get("T", 1) > 1:
+        raise ValueError("Expected image with no T dimensions")
     if (dims["X"] < 1) or (dims["Y"] < 1):
         raise ValueError("Expected image with height and width")
 
-    return "CYX" if dims["Z"] <= 1 else "CZYX"
+    if dims.get("S", 0) > 1 and dims.get("C", 0) > 1:
+        raise ValueError("Can't handle S dimension > 1 AND C dimension > 1")
+
+    zero_dims = {"T": 0}
+    order = "YX"
+    for dim in list("ZCS"):
+        if dims.get(dim, 1) == 1:
+            zero_dims[dim] = 0
+        else:
+            order = dim + order
+
+    if "C" not in order and "S" not in order:
+        order = "C" + order
+        del zero_dims["C"]
+
+    return order, zero_dims
 
 
 def image_loader(
@@ -34,8 +44,8 @@ def image_loader(
     return_as_torch: bool = True,
     reader: Optional[str] = None,
 ):
-    """Load image from path given by `path`. If the given image doesn't have channel
-    names, `select_channels` must be a list of integers.
+    """Load image from path given by `path`. If the given image doesn't have
+    channel names, `select_channels` must be a list of integers.
 
     Parameters
     ----------
@@ -79,12 +89,11 @@ def image_loader(
     loaded_channels = select_channels
     loaded_channels_idx = [channel_names.index(channel) for channel in loaded_channels]
 
-    dims = infer_dims(img)
+    order, zero_dims = infer_dims(img)
 
-    if "Z" in dims:
-        data = img.get_image_data(dims, S=0, T=0, C=loaded_channels_idx)
-    else:
-        data = img.get_image_data(dims, Z=0, S=0, T=0, C=loaded_channels_idx)
+    first_dim = {order[0]: loaded_channels_idx} if order[0] in ["S", "C"] else {}
+
+    data = img.get_image_data(order, **zero_dims, **first_dim)
 
     channel_map = {
         channel_name: index for index, channel_name in enumerate(loaded_channels)
@@ -99,6 +108,8 @@ def image_loader(
     if return_as_torch:
         import torch
 
+        if data.dtype.kind == "u":
+            data = data.astype(data.dtype.str[1:])
         data = torch.tensor(data)
 
     if return_channels:

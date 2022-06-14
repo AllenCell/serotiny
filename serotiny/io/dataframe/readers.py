@@ -1,5 +1,6 @@
 import re
 from pathlib import Path
+from upath import UPath
 from typing import Optional, Sequence, Union
 
 import pandas as pd
@@ -35,13 +36,13 @@ def read_h5ad(path, include_columns):
     return dataframe
 
 def read_parquet(path, include_columns=None):
-    """Read a dataframe stored in a .parquet file, and optionally include only the
-    columns given by `include_columns`
+    """Read a dataframe stored in a .parquet file, and optionally include only
+    the columns given by `include_columns`
 
     Parameters
     ----------
 
-    path: Union[Path, str]
+    path: Union[Path, UPath, str]
         Path to the .parquet file
     include_columns: Optional[Sequence[str]] = None
         List of column names and/or regex expressions, used to only include the
@@ -65,13 +66,13 @@ def read_parquet(path, include_columns=None):
 
 
 def read_csv(path, include_columns=None):
-    """Read a dataframe stored in a .csv file, and optionally include only the columns
-    given by `include_columns`
+    """Read a dataframe stored in a .csv file, and optionally include only the
+    columns given by `include_columns`
 
     Parameters
     ----------
 
-    path: Union[Path, str]
+    path: Union[Path, UPath, str]
         Path to the .csv file
     include_columns: Optional[Sequence[str]] = None
         List of column names and/or regex expressions, used to only include the
@@ -96,17 +97,17 @@ def read_csv(path, include_columns=None):
 
 
 def read_dataframe(
-    dataframe: Union[Path, str, pd.DataFrame],
+    dataframe: Union[Path, UPath, str, pd.DataFrame],
     required_columns: Optional[Sequence[str]] = None,
     include_columns: Optional[Sequence[str]] = None,
 ) -> pd.DataFrame:
-    """Load a dataframe from a .csv or .parquet file, or assert a given pd.DataFrame
-    contains the expected required columns.
+    """Load a dataframe from a .csv or .parquet file, or assert a given
+    pd.DataFrame contains the expected required columns.
 
     Parameters
     ----------
 
-    dataframe: Union[Path, str, pd.DataFrame]
+    dataframe: Union[Path, UPath, str, pd.DataFrame]
         Either the path to the dataframe to be loaded, or a pd.DataFrame. Supported
         file types are .csv and .parquet
 
@@ -128,8 +129,14 @@ def read_dataframe(
     if required_columns is not None and include_columns is not None:
         include_columns += required_columns
 
-    if isinstance(dataframe, (str, Path)):
-        dataframe = Path(dataframe).expanduser().resolve(strict=True)
+    if isinstance(dataframe, str):
+        dataframe = UPath(dataframe)
+
+    if isinstance(dataframe, (UPath, Path)):
+        try:
+            dataframe = dataframe.expanduser().resolve(strict=True)
+        except (NotImplementedError, FileNotFoundError):
+            pass
 
         if not dataframe.is_file():
             raise FileNotFoundError("Manifest file not found at given path")
@@ -190,10 +197,11 @@ def filter_columns(
     contains: Optional[str] = None,
     excludes: Optional[str] = None,
 ) -> Sequence[str]:
-    """Filter a list of columns, using a combination of different queries, or a `regex`
-    pattern. If `regex` is supplied it takes precedence and the remaining arguments are
-    ignored. Otherwise, the logical AND of the supplied filters is applied, i.e. the
-    columns that respect all of the supplied conditions are returned.
+    """Filter a list of columns, using a combination of different queries, or a
+    `regex` pattern. If `regex` is supplied it takes precedence and the
+    remaining arguments are ignored. Otherwise, the logical AND of the supplied
+    filters is applied, i.e. the columns that respect all of the supplied
+    conditions are returned.
 
     Parameters
     ----------

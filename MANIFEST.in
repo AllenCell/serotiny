@@ -1,4 +1,0 @@
-global-exclude *.pyc
-global-exclude __pycache__
-recursive-include serotiny/config *.yaml
-recursive-include serotiny/config/* *.yaml
