@@ -1,5 +1,5 @@
 from .abstract_prior import Prior
-
+import torch
 
 class IdentityPrior(Prior):
     """Prior class that doesn't contribute to KL loss.
@@ -9,6 +9,6 @@ class IdentityPrior(Prior):
 
     def forward(self, z, mode="kl", **kwargs):
         if mode == "kl":
-            return 0
+            return torch.tensor(0)
         else:
             return z
