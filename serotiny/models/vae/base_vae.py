@@ -4,6 +4,7 @@ from omegaconf import DictConfig
 import torch
 import torch.nn as nn
 from torch.nn.modules.loss import _Loss as Loss
+from torch.optim.lr_scheduler import _LRScheduler as LRScheduler
 
 from serotiny.models.base_model import BaseModel
 from .priors import Prior, IsotropicGaussianPrior
@@ -19,10 +20,10 @@ class BaseVAE(BaseModel):
         beta: float = 1.0,
         id_label: Optional[str] = None,
         optimizer: torch.optim.Optimizer = torch.optim.Adam,
+        lr_scheduler: torch.optim.lr_scheduler._LRScheduler = torch.optim.lr_scheduler.StepLR,
         loss_mask_label: Optional[str] = None,
-        reconstruction_loss: Loss = nn.MSELoss(reduction="none"),
+        reconstruction_loss: torch.nn.modules.loss._Loss = nn.MSELoss(reduction="none"),
         prior: Optional[Sequence[Prior]] = None,
-        latent_compose_function=None,
         cache_outputs: Sequence = ("test",),
         **kwargs,
     ):
@@ -71,10 +72,13 @@ class BaseVAE(BaseModel):
             prior = {x_label: prior}
 
         self.prior = nn.ModuleDict(prior)
-        self.latent_compose_function = latent_compose_function
+
+    def calculate_rcl(self, x_hat, x):
+        rcl_per_input_dimension = self.reconstruction_loss(x_hat, x)
+        return rcl_per_input_dimension
 
     def calculate_elbo(self, x, x_hat, z, mask=None):
-        rcl_per_input_dimension = self.reconstruction_loss(x_hat, x)
+        rcl_per_input_dimension = self.calculate_rcl(x_hat, x)
 
         if mask is not None:
             rcl_per_input_dimension = rcl_per_input_dimension * mask
@@ -88,17 +92,18 @@ class BaseVAE(BaseModel):
         )
 
         rcl = rcl.mean()
-
         kld_per_part = {
             part: self.prior[part](z_part, mode="kl") for part, z_part in z.items()
         }
 
-        kld = torch.sum(kld_per_part.values(), dim=1).mean()
+        kld_per_part = {
+            part: torch.sum(this_kld_part.view(-1,1), dim=1).float().mean() for part, this_kld_part in kld_per_part.items() 
+        }
 
         return (
-            rcl + self.beta * kld,
+            rcl + self.beta * sum(kld_per_part.values()),
             rcl,
-            kld,
+            sum(kld_per_part.values()),
             kld_per_part,
         )
 
@@ -111,21 +116,28 @@ class BaseVAE(BaseModel):
     def encode(self, batch):
         return {part: encoder(batch[part]) for part, encoder in self.encoder.items()}
 
+    def latent_compose_function(self, z_parts, **kwargs):
+        return torch.cat(z_parts.values(), dim=1)
+
     def decode(self, z_parts):
-        if self.latent_compose_function is not None:
-            z = self.latent_compose_function(z_parts)
-        else:
-            z = torch.cat(z_parts.values(), dim=1)
-        return self.decoder(z)
+        z = self.latent_compose_function(z_parts)
+        return self.decoder(z), z
+    
+    def parse_batch(self, batch):
+        return batch
 
     def forward(self, batch, decode=False, compute_loss=False):
+
+        batch = self.parse_batch(batch)
+
         z_parts_params = self.encode(batch)
 
         if not decode:
             return z_parts_params
 
         z_parts = self.sample_z(z_parts_params)
-        x_hat = self.decode(z_parts)
+
+        x_hat, z_composed = self.decode(z_parts)
 
         if not compute_loss:
             return x_hat, z_parts, z_parts_params
@@ -140,6 +152,7 @@ class BaseVAE(BaseModel):
             x_hat,
             z_parts,
             z_parts_params,
+            z_composed,
             loss,
             reconstruction_loss,
             kld_loss,
@@ -171,6 +184,7 @@ class BaseVAE(BaseModel):
         kld_per_part,
         z_parts,
         z_parts_params,
+        z_composed,
         x_hat,
     ):
         results = {
@@ -178,9 +192,11 @@ class BaseVAE(BaseModel):
             f"{stage}_loss": loss.detach().cpu(),  # for epoch end logging purposes
             "reconstruction_loss": reconstruction_loss.detach().cpu(),
             "kld_loss": kld_loss.detach().cpu(),
+            "z_composed": z_composed.detach().cpu(),
         }
-
-        for part, z_part in z_parts.keys():
+        # import ipdb
+        # ipdb.set_trace()
+        for part, z_part in z_parts.items():
             results.update(
                 {
                     f"z_parts/{part}": z_part.detach().cpu(),
@@ -210,6 +226,7 @@ class BaseVAE(BaseModel):
             x_hat,
             z_parts,
             z_parts_params,
+            z_composed,
             loss,
             reconstruction_loss,
             kld_loss,
@@ -227,5 +244,6 @@ class BaseVAE(BaseModel):
             kld_per_part,
             z_parts,
             z_parts_params,
+            z_composed,
             x_hat,
         )
