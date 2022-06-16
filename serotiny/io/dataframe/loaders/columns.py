@@ -5,7 +5,6 @@ from serotiny.transforms.dataframe.transforms import _filter_columns as filter_c
 
 from .abstract_loader import Loader
 
-
 class LoadColumn(Loader):
     """Loader class, used to retrieve fields directly from dataframe
     columns."""
@@ -107,4 +106,5 @@ class LoadColumns(Loader):
 
     def __call__(self, row):
         filtered_cols = self._filter_columns(row.index)
-        return row[filtered_cols].astype(self.dtype)
+        row = row[filtered_cols]
+        return row.astype(self.dtype)

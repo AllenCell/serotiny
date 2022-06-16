@@ -1,6 +1,7 @@
 import torch
 from typing import Optional
 from .abstract_loader import Loader
+import numpy as np
 
 def to_onehot(labels, num_classes):
     labels = labels.type(torch.int64)
@@ -16,6 +17,7 @@ class LoadClass(Loader):
         num_classes: int, 
         y_encoded_label: str, 
         binary: bool = False, 
+        dtype: str = "float",
         map_dict: Optional[bool] = None):
         """
         Parameters
@@ -37,6 +39,7 @@ class LoadClass(Loader):
         self.binary = binary
         self.y_encoded_label = y_encoded_label
         self.map_dict = map_dict
+        self.dtype = np.dtype(dtype).type
 
     def __call__(self, row):
         labels = row[self.y_encoded_label]
@@ -48,7 +51,7 @@ class LoadClass(Loader):
 
         if len(labels.shape) == 2:
             labels = labels.squeeze(axis=0)
-        return labels
+        return self.dtype(labels)
 
 class LoadClassWithValues(Loader):
     """Loader one hot classes for a column with values based on another column """
@@ -58,6 +61,7 @@ class LoadClassWithValues(Loader):
         num_classes: int, 
         y_encoded_label: str, 
         y_value_label: str, 
+        dtype: str = "float",
         map_dict: Optional[dict] = None
         ):
         """
@@ -79,6 +83,7 @@ class LoadClassWithValues(Loader):
         self.y_value_label = y_value_label
         self.y_encoded_label = y_encoded_label
         self.map_dict = map_dict
+        self.dtype = np.dtype(dtype).type
 
     def __call__(self, row):
         # import ipdb
@@ -92,5 +97,5 @@ class LoadClassWithValues(Loader):
         labels[labels == 1] = values
         if len(labels.shape) == 2:
             labels = labels.squeeze(axis=0)
-        return labels
+        return self.dtype(labels)
 
