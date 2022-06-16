@@ -1,22 +1,23 @@
 import numpy as np
+from frozendict import frozendict
 from torch.utils.data import Dataset, default_collate
 
 
 class _Row:
     """Helper class to enable string indexing of numpy arrays."""
 
-    def __init__(self, array, columns):
+    def __init__(self, array, columns, index):
         self.array = array
-        self.columns = columns
-        self.index = self.columns
+        self.index = columns  # to mimic pd.Series interface if loaders need it
+        self._index = index
 
     def __getitem__(self, col):
         if isinstance(col, (list, tuple)):
-            return self.array[[self.columns.index(_col) for _col in col]]
-        return self.array[self.columns.index(col)]
+            return self.array[[self._index[_col] for _col in col]]
+        return self.array[self._index[col]]
 
     def __getattr__(self, col):
-        return self.array[self.columns.index(col)]
+        return self.array[self._index[col]]
 
 
 class DataframeDataset(Dataset):
@@ -44,6 +45,9 @@ class DataframeDataset(Dataset):
         # triggered by pandas' inner workings
         self.dataframe = dataframe.values
         self.columns = dataframe.columns.tolist()
+        self.column_index = frozendict(
+            {col: ix for ix, col in enumerate(self.column_index)}
+        )
 
         self.loaders = loaders
 
@@ -51,12 +55,12 @@ class DataframeDataset(Dataset):
         return len(self.dataframe)
 
     def __getitem__(self, idx):
-        row = _Row(self.dataframe[idx], self.columns)
+        row = _Row(self.dataframe[idx], self.columns, self.column_index)
 
         return {key: loader(row) for key, loader in self.loaders.items()}
 
     def find_samples_by_column(self, column, value, collate_fn=default_collate):
-        condition = self.dataframe[self.columns.index(column)] == value
+        condition = self.dataframe[:, self.column_index[column]] == value
         ixs = np.argwhere(condition)
         if len(ixs) == 0:
             return None

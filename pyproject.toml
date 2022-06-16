@@ -64,6 +64,7 @@ universal-pathlib = "^0.0.18"
 s3fs = "^2022.3.0"
 fsspec = "^2022.3.0"
 pycryptodome = "^3.14.1"
+frozendict = "^2.3.2"
 
 [tool.poetry.dev-dependencies]
 
