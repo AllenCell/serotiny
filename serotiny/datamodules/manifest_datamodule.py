@@ -11,6 +11,7 @@ from pytorch_lightning.utilities.exceptions import MisconfigurationException
 
 from serotiny.io.dataframe import DataframeDataset, read_dataframe
 from serotiny.io.dataframe.loaders.abstract_loader import Loader
+from torch.utils.data import DataLoader
 
 
 class ManifestDatamodule(pl.LightningDataModule):
@@ -105,7 +106,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         kwargs = dict(**self.dataloader_kwargs)
         kwargs["shuffle"] = kwargs.get("shuffle", True) and split == "train"
 
-        return self._dataloader_cls(dataset=self.datasets[split], **kwargs)
+        return DataLoader(dataset=self.datasets[split], **kwargs)
 
     def _get_dataloader(self, split):
         if split not in self.dataloaders:
