@@ -99,6 +99,10 @@ class LatentLossVAE(BaseVAE):
         else:
             batch[self.hparams.x_label] = batch[self.hparams.x_label].float() 
         batch[self.comb_label] = batch[self.comb_label].float()
+        discrete_batches = []
+        for i in self.discrete_labels:
+            if len(batch[i].shape) != 2:
+                batch[i] = batch[i].view(-1,1)
         return batch
 
     def encode(self, batch):
@@ -110,16 +114,16 @@ class LatentLossVAE(BaseVAE):
         encoded[self.continuous_labels[-1]] = self.encoder[self.continuous_labels[0]](batch[self.comb_label]) @ self.encoder[self.continuous_labels[-1]].weight
         return encoded
 
-    def calculate_rcl(self, x_hat, x):
-        if isinstance(self.reconstruction_loss, nn.GaussianNLLLoss):
-            dim = x_hat.size(1) // 2
-            recon_means = x_hat[:, :dim]
-            recon_vars = F.softplus(x_hat[:, dim:]).add(1e-3)
-            x_hat = torch.cat([recon_means, recon_vars], dim=1)
-            rcl_per_input_dimension = self.reconstruction_loss(recon_means, x, recon_vars)
-        else:
-            rcl_per_input_dimension = self.reconstruction_loss(x_hat, x)
-        return rcl_per_input_dimension
+    # def calculate_rcl(self, x_hat, x):
+    #     if isinstance(self.reconstruction_loss, nn.GaussianNLLLoss):
+    #         dim = x_hat.size(1) // 2
+    #         recon_means = x_hat[:, :dim]
+    #         recon_vars = F.softplus(x_hat[:, dim:]).add(1e-3)
+    #         x_hat = torch.cat([recon_means, recon_vars], dim=1)
+    #         rcl_per_input_dimension = self.reconstruction_loss(recon_means, x, recon_vars)
+    #     else:
+    #         rcl_per_input_dimension = self.reconstruction_loss(x_hat, x)
+    #     return rcl_per_input_dimension
 
     def latent_compose_function(self, z_parts, **kwargs):
         latent_basal = z_parts[self.hparams.x_label]
@@ -143,9 +147,12 @@ class LatentLossVAE(BaseVAE):
 
         _loss = {}
         for part in self.latent_loss.keys():
+            if isinstance(self.latent_loss[part].loss, torch.nn.modules.loss.BCEWithLogitsLoss):
+                batch[self.latent_loss_target[part]] = batch[self.latent_loss_target[part]].gt(0).float()
+
             _loss[part] = self.latent_loss[part](
-                z_parts_params[part], batch[self.latent_loss_target[part]] * self.latent_loss_weights.get(part, 1.0) 
-            )
+                z_parts_params[part], batch[self.latent_loss_target[part]]
+            ) * self.latent_loss_weights.get(part, 1.0) 
 
         # import ipdb
         # ipdb.set_trace()
@@ -188,7 +195,7 @@ class LatentLossVAE(BaseVAE):
             if main_lr_sched is not None:
                 main_lr_sched.step()
 
-        self.log_metrics(stage, reconstruction_loss, kld_loss, loss, logger)
+        self.log_metrics(stage, reconstruction_loss, kld_loss, loss, logger, x_hat.shape[0])
 
         return self.make_results_dict(
             stage,
@@ -242,7 +249,7 @@ class LatentLossVAE(BaseVAE):
 
     #     get_params = lambda self, cond: list(self.parameters()) if cond else []
     #     _parameters = (
-    #         get_params(self.encoder[self.x_label], True)
+    #         get_params(self.encoder[self.hparams.x_label], True)
     #         + get_params(self.decoder, True)
     #         + get_params(self.encoder[self.continuous_labels[1]], True)
     #     )
@@ -250,7 +257,7 @@ class LatentLossVAE(BaseVAE):
     #     for label in self.discrete_labels:
     #         _parameters.extend(get_params(self.encoder[label], True))
 
-    #     optimizers.append(self.latent_loss_optimizer[self.x_label](
+    #     optimizers.append(self.latent_loss_optimizer[self.hparams.x_label](
     #         _parameters,
     #     ))
 

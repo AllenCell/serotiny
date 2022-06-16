@@ -11,7 +11,7 @@ from serotiny.networks import MLP
 from serotiny.networks.vae import ImageDecoder
 from serotiny.networks.utils import weight_init
 
-from .base_vae import BaseVAE, get_args
+from .base_vae import BaseVAE
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]
 logger = logging.getLogger("lightning")

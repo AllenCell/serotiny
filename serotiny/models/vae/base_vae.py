@@ -73,25 +73,29 @@ class BaseVAE(BaseModel):
 
         self.prior = nn.ModuleDict(prior)
 
-    def calculate_rcl(self, x_hat, x):
-        rcl_per_input_dimension = self.reconstruction_loss(x_hat, x)
+    def calculate_rcl(self, x, x_hat):
+        rcl_per_input_dimension = self.reconstruction_loss(x, x_hat)
         return rcl_per_input_dimension
 
     def calculate_elbo(self, x, x_hat, z, mask=None):
-        rcl_per_input_dimension = self.calculate_rcl(x_hat, x)
+        rcl_per_input_dimension = self.calculate_rcl(x, x_hat)
 
         if mask is not None:
             rcl_per_input_dimension = rcl_per_input_dimension * mask
 
-        rcl = (
-            rcl_per_input_dimension
-            # flatten
-            .view(rcl_per_input_dimension.shape[0], -1)
-            # and sum across each batch element's dimensions
-            .sum(dim=1)
-        )
+        if len(rcl_per_input_dimension.shape) == 2:
+            rcl = (
+                rcl_per_input_dimension
+                # flatten
+                .view(rcl_per_input_dimension.shape[0], -1)
+                # and sum across each batch element's dimensions
+                .sum(dim=1)
+            )
 
-        rcl = rcl.mean()
+            rcl = rcl.mean()
+        else:
+            rcl = rcl_per_input_dimension
+
         kld_per_part = {
             part: self.prior[part](z_part, mode="kl") for part, z_part in z.items()
         }
@@ -159,7 +163,7 @@ class BaseVAE(BaseModel):
             kld_per_part,
         )
 
-    def log_metrics(self, stage, reconstruction_loss, kld_loss, loss, logger):
+    def log_metrics(self, stage, reconstruction_loss, kld_loss, loss, logger, batch_size):
         on_step = stage == "train"
 
         self.log(
@@ -168,11 +172,12 @@ class BaseVAE(BaseModel):
             logger=logger,
             on_step=on_step,
             on_epoch=True,
+            batch_size=batch_size
         )
         self.log(
-            f"{stage} kld loss", kld_loss, logger=logger, on_step=on_step, on_epoch=True
+            f"{stage} kld loss", kld_loss, logger=logger, on_step=on_step, on_epoch=True, batch_size=batch_size
         )
-        self.log(f"{stage}_loss", loss, logger=logger, on_step=on_step, on_epoch=True)
+        self.log(f"{stage}_loss", loss, logger=logger, on_step=on_step, on_epoch=True, batch_size=batch_size)
 
     def make_results_dict(
         self,
@@ -233,7 +238,7 @@ class BaseVAE(BaseModel):
             kld_per_part,
         ) = self.forward(batch, decode=True, compute_loss=True)
 
-        self.log_metrics(stage, reconstruction_loss, kld_loss, loss, logger)
+        self.log_metrics(stage, reconstruction_loss, kld_loss, loss, logger, x_hat.shape[0])
 
         return self.make_results_dict(
             stage,

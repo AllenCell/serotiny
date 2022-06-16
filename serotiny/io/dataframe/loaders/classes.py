@@ -49,9 +49,10 @@ class LoadClass(Loader):
         if self.binary:
             labels = to_onehot(labels, self.num_classes)
 
+        labels = self.dtype(labels)
         if len(labels.shape) == 2:
             labels = labels.squeeze(axis=0)
-        return self.dtype(labels)
+        return labels
 
 class LoadClassWithValues(Loader):
     """Loader one hot classes for a column with values based on another column """

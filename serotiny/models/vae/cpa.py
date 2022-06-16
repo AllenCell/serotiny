@@ -7,13 +7,13 @@ from serotiny.networks.mlp import MLP
 from torch.nn.modules.loss import _Loss as Loss
 import torch.nn.functional as F
 
-from .base_vae import BaseVAE
+from serotiny.models.base_model import BaseModel
 from .cpa_utils import GeneralizedSigmoid, NBLoss, compute_gradients
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]
 
 
-class CPA(BaseVAE):
+class CPA(BaseModel):
     def __init__(
         self,
         x_dim: int,
@@ -70,6 +70,8 @@ class CPA(BaseVAE):
             latent_dim
         )
 
+        dosers = GeneralizedSigmoid(num_continuous_conditions, nonlin=doser_type)
+
         if num_discrete_conditions == [0]:
             pass
         else:
@@ -113,9 +115,9 @@ class CPA(BaseVAE):
         self.num_cont_conds = num_continuous_conditions
         self.num_disc_conds = num_discrete_conditions
         self.doser_type = doser_type
+        self.dosers = dosers
         self.adversary_cont_conds = adversary_cont_conds
-        self.loss_adversary_cont_conds = torch.nn.BCEWithLogitsLoss()
-        self.dosers = GeneralizedSigmoid(self.num_cont_conds, nonlin=self.doser_type)
+        self.loss_adversary_cont_conds = torch.nn.BCEWithLogitsLoss() 
         self.disc_conds_embeddings = disc_conds_embeddings
         self.loss_adversary_disc_conds = loss_adversary_disc_conds
         self.adversary_disc_conds = adversary_disc_conds
@@ -136,8 +138,20 @@ class CPA(BaseVAE):
         # manual gradients
         self.automatic_optimization = False
 
+        self.reconstruction_loss = reconstruction_loss
+        self.encoder = encoder
+        self.decoder = decoder
+        self.beta = beta
+        self.latent_dim = latent_dim
+
     def parse_batch(self, batch):
-        return batch[self.x_label].float(), [batch[i] for i in self.c_discrete_labels], batch[self.c_continuous_label]
+        discrete_batches = []
+        for i in self.c_discrete_labels:
+            if len(batch[i].shape) != 2:
+                discrete_batches.append(batch[i].view(-1,1))
+            else:
+                discrete_batches.append(batch[i])
+        return batch[self.x_label].float(), discrete_batches, batch[self.c_continuous_label].float()
 
     def compute_cont_conds_embeddings_(self, cont_conds):
         """
@@ -250,7 +264,7 @@ class CPA(BaseVAE):
         else:
             pass
 
-        tot_loss = reconstruction_loss + adversary_cont_conds_loss + adversary_disc_conds_loss
+        tot_loss = reconstruction_loss - ( adversary_cont_conds_loss + adversary_disc_conds_loss)
 
         self.log_metrics(stage, tot_loss, reconstruction_loss, 
         adversary_disc_conds_loss, adversary_cont_conds_loss, 
@@ -287,12 +301,12 @@ class CPA(BaseVAE):
         adversary_disc_conds_loss, adversary_cont_conds_loss, 
         adversary_disc_conds_penalty, adversary_cont_conds_penalty, logger):
 
-        self.log(f"{stage}_loss", loss, logger=logger)
-        self.log(f"{stage} reconstruction loss", reconstruction_loss, logger=logger)
-        self.log(f"{stage} adversary_discrete_condition_loss", adversary_disc_conds_loss, logger=logger)
-        self.log(f"{stage} adversary_continuous_condition_loss", adversary_cont_conds_loss, logger=logger)
-        self.log(f"{stage} adversary_continuous_condition_penalty", adversary_cont_conds_penalty, logger=logger)
-        self.log(f"{stage} adversary_discrete_condition_penalty", adversary_disc_conds_penalty, logger=logger)
+        self.log(f"{stage}_loss", loss, on_step=True, logger=logger)
+        self.log(f"{stage} reconstruction loss", reconstruction_loss, on_step=True, logger=logger)
+        self.log(f"{stage} adversary_discrete_condition_loss", adversary_disc_conds_loss, on_step=True, logger=logger)
+        self.log(f"{stage} adversary_continuous_condition_loss", adversary_cont_conds_loss, on_step=True, logger=logger)
+        self.log(f"{stage} adversary_continuous_condition_penalty", adversary_cont_conds_penalty, on_step=True, logger=logger)
+        self.log(f"{stage} adversary_discrete_condition_penalty", adversary_disc_conds_penalty, on_step=True, logger=logger)
 
     def configure_optimizers(self):
 

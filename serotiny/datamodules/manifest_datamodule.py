@@ -170,6 +170,7 @@ def _make_single_manifest_splits(
         dataframe["split"] = dataframe[split_column].apply(_get_canonical_split_name)
 
     datasets = {}
+
     if not just_inference:
         for split in ["train", "val", "test"]:
             datasets[split] = DataframeDataset(
