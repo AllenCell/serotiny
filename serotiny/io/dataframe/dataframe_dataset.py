@@ -46,7 +46,7 @@ class DataframeDataset(Dataset):
         self.dataframe = dataframe.values
         self.columns = dataframe.columns.tolist()
         self.column_index = frozendict(
-            {col: ix for ix, col in enumerate(self.column_index)}
+            {col: ix for ix, col in enumerate(self.columns)}
         )
 
         self.loaders = loaders
