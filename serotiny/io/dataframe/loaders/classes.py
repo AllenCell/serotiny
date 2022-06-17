@@ -93,7 +93,7 @@ class LoadClassWithValues(Loader):
         if self.map_dict:
             labels = self.map_dict[labels]
         labels = torch.tensor(labels)
-        labels = to_onehot(labels, self.num_classes)
+        labels = self.dtype(to_onehot(labels, self.num_classes))
         values = torch.tensor(float(row[self.y_value_label]))
         labels[labels == 1] = values
         if len(labels.shape) == 2:

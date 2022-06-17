@@ -6,9 +6,9 @@ import torch.nn as nn
 from serotiny.networks.mlp import MLP
 from torch.nn.modules.loss import _Loss as Loss
 import torch.nn.functional as F
-
+from torch.autograd import Variable
+from torch.utils.data import DataLoader
 from serotiny.models.base_model import BaseModel
-from .cpa_utils import GeneralizedSigmoid, NBLoss, compute_gradients
 
 Array = Union[torch.Tensor, np.array, Sequence[float]]
 
@@ -29,14 +29,15 @@ class CPA(BaseModel):
         prior_logvar: Optional[Array] = None,
         learn_prior_logvar: bool = False,
         num_continuous_conditions: int=5,
-        num_discrete_conditions: list = [0],
+        num_discrete_conditions: list = [1],
         cache_outputs: Sequence = ("test",),
         autoencoder_lr: float = 3e-4,
         autoencoder_wd: float = 4e-7,
         dosers_lr: float = 4e-3,
         dosers_wd: float = 1e-7,
         reg_adversary: int = 60,
-        penalty_adversary: int = 60,
+        # penalty_adversary: int = 60,
+        penalty_adversary: int = 0,
         adversary_lr: float = 3e-4,
         adversary_wd: float = 4e-7,
         adversary_steps: int = 3,
@@ -161,21 +162,23 @@ class CPA(BaseModel):
     def forward(self, x, **kwargs):
 
         inputs, disc_conds, cont_conds = x[0],x[1],x[2]
-        if self.log_transform:
-            inputs = torch.log1p(inputs)
+        # if self.log_transform:
+        #     inputs = torch.log1p(inputs)
 
         latent_basal = self.encoder(inputs)
-        latent_perturbed = latent_basal
+        latent_perturbed = latent_basal.float()
 
         if self.num_cont_conds > 0:
-            latent_perturbed = latent_perturbed + self.compute_cont_conds_embeddings_(cont_conds)
+            # import ipdb
+            # ipdb.set_trace()
+            latent_perturbed = latent_perturbed + self.compute_cont_conds_embeddings_(cont_conds).float()
         if self.num_disc_conds[0] > 0:
             for i, emb in enumerate(self.disc_conds_embeddings):
                 latent_perturbed = latent_perturbed + emb(
                     disc_conds[i].argmax(1)
-                )  #argmax because OHE
+                ).float()  #argmax because OHE
 
-        reconstructions = self.decoder(latent_perturbed)
+        reconstructions = self.decoder(latent_perturbed.float())
 
         if isinstance(self.reconstruction_loss, nn.GaussianNLLLoss):
             dim = reconstructions.size(1) // 2
@@ -193,6 +196,7 @@ class CPA(BaseModel):
         )
 
     def _step(self, stage, batch, batch_idx, logger):
+
         x = self.parse_batch(batch)
         inputs, disc_conds, cont_conds = x[0],x[1],x[2]
 
@@ -205,6 +209,8 @@ class CPA(BaseModel):
         ) = self.forward(x)
 
         reconstruction_loss = self.reconstruction_loss(recon_means, inputs, recon_vars)
+        if stage == 'train':
+            print(reconstruction_loss, batch['drug_dose'].unique())
         adversary_cont_conds_loss = torch.tensor([0.0]).type_as(inputs)
 
         if self.num_cont_conds > 0:
@@ -229,7 +235,7 @@ class CPA(BaseModel):
         opt_auto, opt_adv, opt_dos = self.optimizers()
         lr_auto, lr_adv, lr_dos = self.lr_schedulers()
 
-        if (batch_idx % self.adversary_steps) & (stage == 'train'):
+        if (batch_idx % self.adversary_steps == 0) & (stage == 'train'):
             if self.num_cont_conds > 0:
                 adversary_cont_conds_penalty = compute_gradients(
                     adversary_cont_conds_predictions.sum(), latent_basal
@@ -240,16 +246,16 @@ class CPA(BaseModel):
                     adversary_disc_conds_penalty += compute_gradients(
                         pred.sum(), latent_basal
                     )  
-                opt_adv.zero_grad()
-          
-                self.manual_backward(
-                    adversary_cont_conds_loss
-                    + self.penalty_adversary * adversary_cont_conds_penalty
-                    + adversary_disc_conds_loss
-                    + self.penalty_adversary * adversary_disc_conds_penalty
-                )
-                opt_adv.step()
-        elif (stage == 'train'):
+            opt_adv.zero_grad()
+        
+            self.manual_backward(
+                adversary_cont_conds_loss
+                + self.penalty_adversary * adversary_cont_conds_penalty
+                + adversary_disc_conds_loss
+                + self.penalty_adversary * adversary_disc_conds_penalty
+            )
+            opt_adv.step()
+        if (stage == 'train') & (batch_idx % self.adversary_steps != 0):
             opt_auto.zero_grad()
             if self.num_cont_conds > 0:
                 opt_dos.zero_grad()
@@ -261,8 +267,6 @@ class CPA(BaseModel):
             opt_auto.step()
             if self.num_cont_conds > 0:
                 opt_dos.step()
-        else:
-            pass
 
         tot_loss = reconstruction_loss - ( adversary_cont_conds_loss + adversary_disc_conds_loss)
 
@@ -302,7 +306,7 @@ class CPA(BaseModel):
         adversary_disc_conds_penalty, adversary_cont_conds_penalty, logger):
 
         self.log(f"{stage}_loss", loss, on_step=True, logger=logger)
-        self.log(f"{stage} reconstruction loss", reconstruction_loss, on_step=True, logger=logger)
+        self.log(f"{stage} reconstruction loss", reconstruction_loss, on_step=True,  logger=logger)
         self.log(f"{stage} adversary_discrete_condition_loss", adversary_disc_conds_loss, on_step=True, logger=logger)
         self.log(f"{stage} adversary_continuous_condition_loss", adversary_cont_conds_loss, on_step=True, logger=logger)
         self.log(f"{stage} adversary_continuous_condition_penalty", adversary_cont_conds_penalty, on_step=True, logger=logger)
@@ -364,3 +368,88 @@ class CPA(BaseModel):
 
         return optimizers, schedulers
 
+def compute_gradients(output, input):
+    grads = torch.autograd.grad(output, input, create_graph=True)
+    grads = grads[0].pow(2).mean()
+    return grads
+
+class GeneralizedSigmoid(torch.nn.Module):
+    """
+    Sigmoid, log-sigmoid or linear functions for encoding dose-response for
+    drug perurbations.
+    """
+
+    def __init__(self, dim, nonlin="sigmoid"):
+        """Sigmoid modeling of continuous variable.
+        Params
+        ------
+        nonlin : str (default: logsigm)
+            One of logsigm, sigm.
+        """
+        super(GeneralizedSigmoid, self).__init__()
+        self.nonlin = nonlin
+        self.beta = torch.nn.Parameter(
+            torch.ones(1, dim), requires_grad=True
+        )
+        self.bias = torch.nn.Parameter(
+            torch.zeros(1, dim), requires_grad=True
+        )
+
+    def forward(self, x):
+        if self.nonlin == "logsigm":
+            # import ipdb
+            # ipdb.set_trace()
+            # self.bias = self.bias.type_as(x)
+            c0 = self.bias.sigmoid()
+            return (torch.log1p(x) * self.beta + self.bias).sigmoid() - c0
+        elif self.nonlin == "sigm":
+            # self.bias = self.bias.type_as(x)
+            c0 = self.bias.sigmoid() 
+            return (x * self.beta + self.bias).sigmoid() - c0
+        else:
+            return x
+
+    def one_drug(self, x, i):
+        if self.nonlin == "logsigm":
+            c0 = self.bias[0][i].sigmoid()
+            return (torch.log1p(x) * self.beta[0][i] + self.bias[0][i]).sigmoid() - c0
+        elif self.nonlin == "sigm":
+            c0 = self.bias[0][i].sigmoid()
+            return (x * self.beta[0][i] + self.bias[0][i]).sigmoid() - c0
+        else:
+            return x
+
+class NBLoss(torch.nn.Module):
+    def __init__(self):
+        super(NBLoss, self).__init__()
+
+    def forward(self, mu, y, theta, eps=1e-8):
+        """Negative binomial negative log-likelihood. It assumes targets `y` with n
+        rows and d columns, but estimates `yhat` with n rows and 2d columns.
+        The columns 0:d of `yhat` contain estimated means, the columns d:2*d of
+        `yhat` contain estimated variances. This module assumes that the
+        estimated mean and inverse dispersion are positive---for numerical
+        stability, it is recommended that the minimum estimated variance is
+        greater than a small number (1e-3).
+        Parameters
+        ----------
+        yhat: Tensor
+                Torch Tensor of reeconstructed data.
+        y: Tensor
+                Torch Tensor of ground truth data.
+        eps: Float
+                numerical stability constant.
+        """
+        if theta.ndimension() == 1:
+            # In this case, we reshape theta for broadcasting
+            theta = theta.view(1, theta.size(0))
+        log_theta_mu_eps = torch.log(theta + mu + eps)
+        res = (
+            theta * (torch.log(theta + eps) - log_theta_mu_eps)
+            + y * (torch.log(mu + eps) - log_theta_mu_eps)
+            + torch.lgamma(y + theta)
+            - torch.lgamma(theta)
+            - torch.lgamma(y + 1)
+        )
+        res = _nan2inf(res)
+        return -torch.mean(res)

@@ -199,8 +199,7 @@ class BaseVAE(BaseModel):
             "kld_loss": kld_loss.detach().cpu(),
             "z_composed": z_composed.detach().cpu(),
         }
-        # import ipdb
-        # ipdb.set_trace()
+
         for part, z_part in z_parts.items():
             results.update(
                 {
