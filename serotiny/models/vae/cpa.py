@@ -169,8 +169,6 @@ class CPA(BaseModel):
         latent_perturbed = latent_basal.float()
 
         if self.num_cont_conds > 0:
-            # import ipdb
-            # ipdb.set_trace()
             latent_perturbed = latent_perturbed + self.compute_cont_conds_embeddings_(cont_conds).float()
         if self.num_disc_conds[0] > 0:
             for i, emb in enumerate(self.disc_conds_embeddings):

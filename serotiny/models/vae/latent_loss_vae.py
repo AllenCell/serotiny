@@ -129,8 +129,8 @@ class LatentLossVAE(BaseVAE):
             kld_loss,
             kld_per_part,
         ) = self.forward(batch, decode=True, compute_loss=True)
-        if stage == 'train':
-            print(reconstruction_loss, z_composed.max(), batch['drug_dose'].unique())
+        # if stage == 'train':
+        #     print(reconstruction_loss, z_composed.max(), batch['drug_dose'].unique())
 
         _loss = {}
         for part in self.latent_loss.keys():
