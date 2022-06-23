@@ -216,7 +216,8 @@ class BaseVAE(BaseModel):
                 }
             )
             for k, v in batch.items():
-                results[k] = v.detach.cpu()
+                if not isinstance(v, list):
+                    results[k] = v.detach().cpu()
 
         if self.hparams.id_label is not None:
             if self.hparams.id_label in batch:
