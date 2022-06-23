@@ -141,62 +141,66 @@ class LatentLossVAE(BaseVAE):
                 z_parts_params[self.hparams.x_label], batch[self.latent_loss_target[part]]
             ) * self.latent_loss_weights.get(part, 1.0) 
 
-        optimizers = self.optimizers()
-        lr_schedulers = self.lr_schedulers()
-        main_optim = optimizers.pop(0)
-        main_lr_sched = lr_schedulers.pop(0)
+        if stage != 'test':
+            optimizers = self.optimizers()
+            lr_schedulers = self.lr_schedulers()
 
-        non_main_key = [i for i in self.optimizer.keys() if i != 'main']
-        non_main_optims = []
-        non_main_lr_scheds = []
-        for i in non_main_key:
-            non_main_optims.append(optimizers.pop(0))
-            non_main_lr_scheds.append(lr_schedulers.pop(0))
+            main_optim = optimizers.pop(0)
+            main_lr_sched = lr_schedulers.pop(0)
 
-        adversarial_flag = False
-        for optim_ix, (optim, lr_sched) in enumerate(
-            zip(optimizers, lr_schedulers)
-        ):
+            non_main_key = [i for i in self.optimizer.keys() if i != 'main']
+            non_main_optims = []
+            non_main_lr_scheds = []
+            for i in non_main_key:
+                non_main_optims.append(optimizers.pop(0))
+                non_main_lr_scheds.append(lr_schedulers.pop(0))
 
-            group_key = self.latent_loss_optimizer_map[optim_ix]
-            parts = self.latent_loss_optimizer[group_key]['keys']
-            mod = self.latent_loss_backprop_when.get(group_key) or 3
-            adv_loss = 0
-            if stage == 'train':
-                for part in parts:  
-                    adv_loss += _loss[part]
-                if batch_idx % mod == 0:
-                    adversarial_flag = True
-                    optim.zero_grad()
-                    self.manual_backward(adv_loss)
-                    optim.step()
-                    # Dont use LR scheduler here, messes up the loss
-                    # if lr_sched is not None:
-                    #     lr_sched.step()
+            adversarial_flag = False
+            for optim_ix, (optim, lr_sched) in enumerate(
+                zip(optimizers, lr_schedulers)
+            ):
 
-                    on_step = stage == "train"
+                group_key = self.latent_loss_optimizer_map[optim_ix]
+                parts = self.latent_loss_optimizer[group_key]['keys']
+                mod = self.latent_loss_backprop_when.get(group_key) or 3
+                adv_loss = 0
+                if stage == 'train':
+                    for part in parts:  
+                        adv_loss += _loss[part]
+                    if batch_idx % mod == 0:
+                        adversarial_flag = True
+                        optim.zero_grad()
+                        self.manual_backward(adv_loss)
+                        optim.step()
+                        # Dont use LR scheduler here, messes up the loss
+                        # if lr_sched is not None:
+                        #     lr_sched.step()
 
-                    self.log(
-                        f"{stage}_{part}_latent_loss",
-                        adv_loss.detach().cpu(),
-                        logger=logger,
-                        on_step=on_step,
-                        on_epoch=True,
-                    )
+                        on_step = stage == "train"
 
-        if (stage == "train") & (adversarial_flag == False):
-            main_optim.zero_grad()
-            for non_main_optim in non_main_optims:
-                non_main_optim.zero_grad()
-            self.manual_backward(loss - adv_loss)
-            main_optim.step()
-            for non_main_optim in non_main_optims:
-                non_main_optim.step()
-            # Dont use LR scheduler here, messes up the loss
-            # if main_lr_sched is not None:
-            #     main_lr_sched.step()
-            # for non_main_lr_sched in non_main_lr_scheds:
-            #     non_main_lr_sched.step()
+                        self.log(
+                            f"{stage}_{part}_latent_loss",
+                            adv_loss.detach().cpu(),
+                            logger=logger,
+                            on_step=on_step,
+                            on_epoch=True,
+                        )
+
+            if (stage == "train") & (adversarial_flag == False):
+                main_optim.zero_grad()
+                for non_main_optim in non_main_optims:
+                    non_main_optim.zero_grad()
+                self.manual_backward(reconstruction_loss - adv_loss)
+                main_optim.step()
+                for non_main_optim in non_main_optims:
+                    non_main_optim.step()
+                # Dont use LR scheduler here, messes up the loss
+                # if main_lr_sched is not None:
+                #     main_lr_sched.step()
+                # for non_main_lr_sched in non_main_lr_scheds:
+                #     non_main_lr_sched.step()
+        adv_loss = sum([_loss[i] for i in self.latent_loss.keys()])
+        loss = reconstruction_loss - adv_loss
 
         self.log_metrics(stage, reconstruction_loss, kld_loss, loss, logger, x_hat.shape[0])
 
