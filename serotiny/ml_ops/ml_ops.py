@@ -4,6 +4,7 @@ import sys
 from omegaconf import OmegaConf
 from hydra.utils import get_original_cwd
 
+logging.getLogger("xmlschema").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 
