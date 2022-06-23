@@ -136,7 +136,6 @@ class CPA(BaseModel):
         self.dosers_wd = dosers_wd
         self.log_transform = log_transform
         self.penalty_adversary = penalty_adversary
-        # manual gradients
         self.automatic_optimization = False
 
         self.reconstruction_loss = reconstruction_loss
