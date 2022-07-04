@@ -163,21 +163,19 @@ class BaseVAE(BaseModel):
             kld_per_part,
         )
 
-    def log_metrics(self, stage, reconstruction_loss, kld_loss, loss, logger, batch_size):
-        on_step = stage == "train"
+    def log_metrics(self, stage, results, logger, batch_size):
+        on_step = (stage == "val") | (stage == 'train')
 
-        self.log(
-            f"{stage} reconstruction loss",
-            reconstruction_loss,
-            logger=logger,
-            on_step=on_step,
-            on_epoch=True,
-            batch_size=batch_size
-        )
-        self.log(
-            f"{stage} kld loss", kld_loss, logger=logger, on_step=on_step, on_epoch=True, batch_size=batch_size
-        )
-        self.log(f"{stage}_loss", loss, logger=logger, on_step=on_step, on_epoch=True, batch_size=batch_size)
+        for key, value in results.items():
+            if (len(value.shape) == 0) | (len(value.shape) == 1):
+                self.log(
+                    f"{stage} {key}",
+                    value,
+                    logger=logger,
+                    on_step=on_step,
+                    on_epoch=True,
+                    batch_size=batch_size
+                )
 
     def make_results_dict(
         self,
@@ -238,9 +236,7 @@ class BaseVAE(BaseModel):
             kld_per_part,
         ) = self.forward(batch, decode=True, compute_loss=True)
 
-        self.log_metrics(stage, reconstruction_loss, kld_loss, loss, logger, x_hat.shape[0])
-
-        return self.make_results_dict(
+        results = self.make_results_dict(
             stage,
             batch,
             loss,
@@ -252,3 +248,7 @@ class BaseVAE(BaseModel):
             z_composed,
             x_hat,
         )
+
+        self.log_metrics(stage, results, logger, x_hat.shape[0])
+
+        return results

@@ -202,9 +202,7 @@ class LatentLossVAE(BaseVAE):
         adv_loss = sum([_loss[i] for i in self.latent_loss.keys()])
         loss = reconstruction_loss - adv_loss
 
-        self.log_metrics(stage, reconstruction_loss, kld_loss, loss, logger, x_hat.shape[0])
-
-        return self.make_results_dict(
+        results = self.make_results_dict(
             stage,
             batch,
             loss,
@@ -216,6 +214,17 @@ class LatentLossVAE(BaseVAE):
             z_composed,
             x_hat,
         )
+
+        for part, value in _loss.items():
+            results.update(
+                {
+                    f"adv_loss/{part}": value.detach().cpu(),
+                }
+            )
+
+        self.log_metrics(stage, results, logger, x_hat.shape[0])
+
+        return results
 
     def configure_optimizers(self):
 

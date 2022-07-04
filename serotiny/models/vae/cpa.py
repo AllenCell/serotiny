@@ -206,8 +206,8 @@ class CPA(BaseModel):
         ) = self.forward(x)
 
         reconstruction_loss = self.reconstruction_loss(recon_means, inputs, recon_vars)
-        if stage == 'train':
-            print(reconstruction_loss, batch['drug_dose'].unique())
+        # if stage == 'train':
+        #     print(reconstruction_loss, batch['drug_dose'].unique())
         adversary_cont_conds_loss = torch.tensor([0.0]).type_as(inputs)
 
         if self.num_cont_conds > 0:
