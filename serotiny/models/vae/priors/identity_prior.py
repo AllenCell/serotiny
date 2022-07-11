@@ -11,4 +11,4 @@ class IdentityPrior(Prior):
         if mode == "kl":
             return torch.tensor(0)
         else:
-            return z
+            return z[:,:int(z.shape[1]/2)] # return means

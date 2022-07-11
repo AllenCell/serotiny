@@ -41,7 +41,6 @@ class IsotropicGaussianPrior(Prior):
     def forward(self, z, mode="kl", **kwargs):
         mean_logvar = z
         mean, logvar = torch.split(mean_logvar, mean_logvar.shape[1] // 2, dim=1)
-
         if mode == "kl":
             return self.kl_divergence(mean, logvar, **kwargs)
         else:

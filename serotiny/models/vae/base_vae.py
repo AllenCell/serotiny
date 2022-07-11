@@ -20,7 +20,7 @@ class BaseVAE(BaseModel):
         beta: float = 1.0,
         id_label: Optional[str] = None,
         optimizer: torch.optim.Optimizer = torch.optim.Adam,
-        lr_scheduler: torch.optim.lr_scheduler._LRScheduler = torch.optim.lr_scheduler.StepLR,
+        lr_scheduler: Optional[torch.optim.lr_scheduler._LRScheduler] = None,
         loss_mask_label: Optional[str] = None,
         reconstruction_loss: torch.nn.modules.loss._Loss = nn.MSELoss(reduction="none"),
         prior: Optional[Sequence[Prior]] = None,
@@ -97,17 +97,17 @@ class BaseVAE(BaseModel):
             rcl = rcl_per_input_dimension
 
         kld_per_part = {
-            part: self.prior[part](z_part, mode="kl") for part, z_part in z.items()
+            part: self.prior[part](z_part, mode="kl", reduction="none") for part, z_part in z.items()
         }
 
-        kld_per_part = {
-            part: torch.sum(this_kld_part.view(-1,1), dim=1).float().mean() for part, this_kld_part in kld_per_part.items() 
+        kld_per_part_summed = {
+            part: this_kld_part.view(-1,1).sum(dim=1).float().mean() for part, this_kld_part in kld_per_part.items() 
         }
-
+        
         return (
-            rcl + self.beta * sum(kld_per_part.values()),
+            rcl + self.beta * sum(kld_per_part_summed.values()),
             rcl,
-            sum(kld_per_part.values()),
+            sum(kld_per_part_summed.values()),
             kld_per_part,
         )
 
@@ -118,10 +118,10 @@ class BaseVAE(BaseModel):
         }
 
     def encode(self, batch):
-        return {part: encoder(batch[part]) for part, encoder in self.encoder.items()}
+        return {part: encoder(batch[part].float()) for part, encoder in self.encoder.items()}
 
     def latent_compose_function(self, z_parts, **kwargs):
-        return torch.cat(z_parts.values(), dim=1)
+        return torch.cat([i for i in z_parts.values()], dim=1)
 
     def decode(self, z_parts):
         z = self.latent_compose_function(z_parts)
@@ -136,22 +136,21 @@ class BaseVAE(BaseModel):
 
         z_parts_params = self.encode(batch)
 
-        if not decode:
-            return z_parts_params
-
         z_parts = self.sample_z(z_parts_params)
 
         x_hat, z_composed = self.decode(z_parts)
 
+        if not decode:
+            return z_parts_params, z_composed
+
         if not compute_loss:
-            return x_hat, z_parts, z_parts_params
+            return x_hat, z_parts, z_parts_params, z_composed
 
         mask = batch.get(self.hparams.get("loss_mask_label"))
 
         (loss, reconstruction_loss, kld_loss, kld_per_part,) = self.calculate_elbo(
             batch[self.hparams.x_label], x_hat, z_parts_params, mask=mask
         )
-
         return (
             x_hat,
             z_parts,

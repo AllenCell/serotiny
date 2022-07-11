@@ -4,8 +4,11 @@ from .abstract_loader import Loader
 import numpy as np
 
 def to_onehot(labels, num_classes):
+    # import ipdb
+    # ipdb.set_trace()
     labels = labels.type(torch.int64)
     labels_onehot = torch.zeros(1, num_classes).type_as(labels)
+
     labels_onehot.scatter_(1, labels.view(-1, 1), 1)
     return labels_onehot
 
@@ -18,6 +21,7 @@ class LoadClass(Loader):
         y_encoded_label: str, 
         binary: bool = False, 
         dtype: str = "float",
+        min: int = 0,
         map_dict: Optional[bool] = None):
         """
         Parameters
@@ -40,9 +44,12 @@ class LoadClass(Loader):
         self.y_encoded_label = y_encoded_label
         self.map_dict = map_dict
         self.dtype = np.dtype(dtype).type
+        self.min = min
 
     def __call__(self, row):
         labels = row[self.y_encoded_label]
+        if self.min != 0:
+            labels = labels - self.min
         if self.map_dict:
             labels = self.map_dict[labels]
         labels = torch.tensor(labels)
@@ -63,6 +70,7 @@ class LoadClassWithValues(Loader):
         y_encoded_label: str, 
         y_value_label: str, 
         dtype: str = "float",
+        min: int = 0,
         map_dict: Optional[dict] = None
         ):
         """
@@ -85,11 +93,14 @@ class LoadClassWithValues(Loader):
         self.y_encoded_label = y_encoded_label
         self.map_dict = map_dict
         self.dtype = np.dtype(dtype).type
+        self.min = min
 
     def __call__(self, row):
         # import ipdb
         # ipdb.set_trace()
         labels = row[self.y_encoded_label]
+        if self.min != 0:
+            labels = labels - self.min
         if self.map_dict:
             labels = self.map_dict[labels]
         labels = torch.tensor(labels)
