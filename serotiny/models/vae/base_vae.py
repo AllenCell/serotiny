@@ -151,6 +151,7 @@ class BaseVAE(BaseModel):
         (loss, reconstruction_loss, kld_loss, kld_per_part,) = self.calculate_elbo(
             batch[self.hparams.x_label], x_hat, z_parts_params, mask=mask
         )
+
         return (
             x_hat,
             z_parts,
