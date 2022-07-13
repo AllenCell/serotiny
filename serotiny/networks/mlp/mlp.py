@@ -1,6 +1,6 @@
 import torch
 from torch import nn
-
+from typing import Optional
 from serotiny.networks.utils import weight_init
 
 
@@ -17,13 +17,14 @@ class MLP(nn.Module):
         self,
         *dims,
         hidden_layers=[256],
+        scale_output: Optional[int] = 1,
     ):
         super().__init__()
 
         assert len(dims) >= 2
 
         self.input_dims = dims[:-1]
-        self.output_dim = dims[-1]
+        self.output_dim = dims[-1] * scale_output
 
         self.hidden_layers = hidden_layers
 
