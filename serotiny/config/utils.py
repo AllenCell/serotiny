@@ -11,7 +11,7 @@ from Crypto.Cipher import AES
 from Crypto import Random
 from getpass import getpass
 from omegaconf import OmegaConf
-from omegaconf._utils import is_primitive_type, split_key
+from omegaconf._utils import split_key
 
 
 def get_obj_from_path(obj_path: str):
@@ -69,7 +69,7 @@ def _create_config(obj, obj_path=None, add_partial=False):
     for arg, default in args_dict.items():
         if isinstance(default, tuple):
             args_dict[arg] = list(default)
-        elif not is_primitive_type(default):
+        elif OmegaConf.is_config(default):
             try:
                 args_dict[arg] = _create_config(
                     default, add_partial=inspect.isclass(default)
