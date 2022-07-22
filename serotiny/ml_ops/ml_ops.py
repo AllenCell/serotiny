@@ -62,11 +62,10 @@ def _do_model_op(
         data = instantiate(data)
         logger.info("Instantiating trainer")
         trainer = instantiate(trainer)
+        logger.info("Instantiating model")
+        model = instantiate(model)
 
         if mode == "train":
-            logger.info("Instantiating model")
-            model = instantiate(model)
-
             if mlflow is not None and mlflow.get("tracking_uri") is not None:
                 mlflow_fit(
                     mlflow,
