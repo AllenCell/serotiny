@@ -326,7 +326,9 @@ def mlflow_test(mlflow_conf, trainer, data, full_conf):
                     "retest it, set ++force=True"
                 )
             else:
-                model = load_model_from_checkpoint(mlflow_conf.tracking_uri, run_id)
+                model = load_model_from_checkpoint(
+                    mlflow_conf.tracking_uri, run_id, full_conf
+                )
 
                 _log_conf(tmp_dir, full_conf, "test")
 
