@@ -105,7 +105,7 @@ def _get_config(tracking_uri, run_id, tmp_dir, mode="test"):
         return None
 
 
-def load_model_from_checkpoint(tracking_uri, run_id):
+def load_model_from_checkpoint(tracking_uri, run_id, full_conf):
     mlflow.set_tracking_uri(tracking_uri)
     with tempfile.TemporaryDirectory() as tmp_dir:
         ckpt_path = _get_latest_checkpoint(tracking_uri, run_id, tmp_dir)
@@ -115,6 +115,8 @@ def load_model_from_checkpoint(tracking_uri, run_id):
 
         config = _get_config(tracking_uri, run_id, tmp_dir, mode="train")
         config = OmegaConf.load(config)
+        if full_conf.get("override_model_conf", True):
+            config = OmegaConf.merge(config, full_conf.get("model", {}))
         config = OmegaConf.to_container(config, resolve=True)
 
         model_conf = config["model"]
@@ -350,7 +352,9 @@ def mlflow_predict(mlflow_conf, trainer, data, full_conf):
     ):
 
         with tempfile.TemporaryDirectory() as tmp_dir:
-            model = load_model_from_checkpoint(mlflow_conf.tracking_uri, run_id)
+            model = load_model_from_checkpoint(
+                mlflow_conf.tracking_uri, run_id, full_conf
+            )
 
             _log_conf(tmp_dir, full_conf, "predict")
 
