@@ -13,4 +13,3 @@ Submodules
    :maxdepth: 4
 
    serotiny.datamodules.manifest_datamodule
-   serotiny.datamodules.utils
