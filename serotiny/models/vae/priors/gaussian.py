@@ -5,14 +5,14 @@ import numpy as np
 from .abstract_prior import Prior
 
 
+def compute_tc_penalty(logvar):
+    return (2 * logvar).exp().mean(dim=0).sum()
+
+
 class IsotropicGaussianPrior(Prior):
     def __init__(self, indices=None, tc_penalty_weight=None):
         self.tc_penalty_weight = tc_penalty_weight
         super().__init__(indices)
-
-    @classmethod
-    def compute_tc_penalty(cls, logvar):
-        return (logvar * 2).exp().mean(dim=0).sum()
 
     @classmethod
     def kl_divergence(cls, mean, logvar, reduction="sum", tc_penalty_weight=None):
@@ -38,7 +38,7 @@ class IsotropicGaussianPrior(Prior):
             loss = kl.sum(dim=-1)
 
         if tc_penalty_weight is not None and reduction == "mean":
-            tc_penalty = cls.compute_tc_penalty(logvar)
+            tc_penalty = compute_tc_penalty(logvar)
             loss = loss + tc_penalty_weight * tc_penalty
 
         return loss
@@ -70,6 +70,7 @@ class DiagonalGaussianPrior(IsotropicGaussianPrior):
         learn_mean=False,
         learn_logvar=False,
         dimension=None,
+        tc_penalty_weight=None,
     ):
         super().__init__(indices)
 
@@ -102,9 +103,12 @@ class DiagonalGaussianPrior(IsotropicGaussianPrior):
             mean = nn.Parameter(mean, requires_grad=True)
 
         self.mean = mean
+        self.tc_penalty_weight = tc_penalty_weight
 
     @classmethod
-    def kl_divergence(cls, mu1, mu2, logvar1, logvar2, reduction="sum"):
+    def kl_divergence(
+        cls, mu1, mu2, logvar1, logvar2, reduction="sum", tc_penalty_weight=None
+    ):
         """Computes the Kullback-Leibler divergence between two diagonal
         gaussians (not necessarily isotropic). It also works batch-wise.
 
@@ -132,11 +136,17 @@ class DiagonalGaussianPrior(IsotropicGaussianPrior):
         )
 
         if reduction == "none":
-            return kl
+            loss = kl
         elif reduction == "mean":
-            return kl.mean(dim=-1)
+            loss = kl.mean(dim=-1)
         else:
-            return kl.sum(dim=-1)
+            loss = kl.sum(dim=-1)
+
+        if tc_penalty_weight is not None and reduction == "mean":
+            tc_penalty = compute_tc_penalty(logvar1)
+            loss = loss + tc_penalty_weight * tc_penalty
+
+        return loss
 
     def forward(self, z, mode="kl", **kwargs):
         mean_logvar = z[:, self.indices]
