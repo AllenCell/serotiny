@@ -78,23 +78,26 @@ class BaseVAE(BaseModel):
         return rcl_per_input_dimension
 
     def calculate_elbo(self, x, x_hat, z, mask=None):
-        rcl_per_input_dimension = self.calculate_rcl(x, x_hat)
+        rcl_per_input_dimension = {}
+        rcl_avg = {}
+        for key in x:
+            rcl_per_input_dimension[key] = self.calculate_rcl(x[key], x_hat[key])
 
-        if mask is not None:
-            rcl_per_input_dimension = rcl_per_input_dimension * mask
+            if mask is not None:
+                rcl_per_input_dimension[key] = rcl_per_input_dimension[key] * mask[key]
 
-        if len(rcl_per_input_dimension.shape) == 2:
-            rcl = (
-                rcl_per_input_dimension
-                # flatten
-                .view(rcl_per_input_dimension.shape[0], -1)
-                # and sum across each batch element's dimensions
-                .sum(dim=1)
-            )
+            if len(rcl_per_input_dimension[key].shape) == 2:
+                rcl = (
+                    rcl_per_input_dimension[key]
+                    # flatten
+                    .view(rcl_per_input_dimension[key].shape[0], -1)
+                    # and sum across each batch element's dimensions
+                    .sum(dim=1)
+                )
 
-            rcl = rcl.mean()
-        else:
-            rcl = rcl_per_input_dimension
+                rcl_avg[key] = rcl.mean()
+            else:
+                rcl_avg[key] = rcl_per_input_dimension[key]
 
         kld_per_part = {
             part: self.prior[part](z_part, mode="kl", reduction="none") for part, z_part in z.items()
@@ -105,8 +108,8 @@ class BaseVAE(BaseModel):
         }
         
         return (
-            rcl + self.beta * sum(kld_per_part_summed.values()),
-            rcl,
+            rcl_avg.sum() + self.beta * sum(kld_per_part_summed.values()),
+            rcl_avg,
             sum(kld_per_part_summed.values()),
             kld_per_part,
         )

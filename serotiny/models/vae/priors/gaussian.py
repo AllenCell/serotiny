@@ -13,12 +13,10 @@ class IsotropicGaussianPrior(Prior):
     def kl_divergence(cls, mean, logvar, reduction="sum"):
         """Computes the Kullback-Leibler divergence between a diagonal gaussian
         and an isotropic (0,1) gaussian. It also works batch-wise.
-
         Parameters
         ----------
         mean: torch.Tensor
             Mean of the gaussian (or batch of gaussians)
-
         logvar: torch.Tensor
             Log-variance of the gaussian (or batch of gaussians)
         """
@@ -100,18 +98,14 @@ class DiagonalGaussianPrior(IsotropicGaussianPrior):
     def kl_divergence(cls, mu1, mu2, logvar1, logvar2, reduction="sum"):
         """Computes the Kullback-Leibler divergence between two diagonal
         gaussians (not necessarily isotropic). It also works batch-wise.
-
         Parameters
         ----------
         mu1: torch.Tensor
             Mean of the first gaussian (or batch of first gaussians)
-
         mu2: torch.Tensor
             Mean of the second gaussian (or batch of second gaussians)
-
         logvar1: torch.Tensor
             Log-variance of the first gaussian (or batch of first gaussians)
-
         logvar2: torch.Tensor
             Log-variance of the second gaussian (or batch of second gaussians)
         """
