@@ -10,9 +10,9 @@ def compute_tc_penalty(logvar):
 
 
 class IsotropicGaussianPrior(Prior):
-    def __init__(self, indices=None, tc_penalty_weight=None):
+    def __init__(self, dimensionality=None, tc_penalty_weight=None):
         self.tc_penalty_weight = tc_penalty_weight
-        super().__init__(indices)
+        super().__init__(dimensionality)
 
     @classmethod
     def kl_divergence(cls, mean, logvar, reduction="sum", tc_penalty_weight=None):
@@ -50,13 +50,11 @@ class IsotropicGaussianPrior(Prior):
         return eps.mul(std).add(mean)
 
     def forward(self, z, mode="kl", **kwargs):
-        mean_logvar = z[:, self.indices]
+        mean_logvar = z
         mean, logvar = torch.split(mean_logvar, mean_logvar.shape[1] // 2, dim=1)
 
         if mode == "kl":
-            return self.kl_divergence(
-                mean, logvar, tc_penalty_weight=self.tc_penalty_weight, **kwargs
-            )
+            return self.kl_divergence(mean, logvar, **kwargs)
         else:
             return self.sample(mean, logvar, **kwargs)
 
@@ -64,29 +62,34 @@ class IsotropicGaussianPrior(Prior):
 class DiagonalGaussianPrior(IsotropicGaussianPrior):
     def __init__(
         self,
-        indices=None,
+        dimensionality=None,
         mean=None,
         logvar=None,
         learn_mean=False,
         learn_logvar=False,
-        dimension=None,
         tc_penalty_weight=None,
     ):
-        super().__init__(indices)
-
-        if None in [logvar, mean]:
-            if dimension is not None:
-                self.dimension = dimension
-            elif hasattr(indices, "__len__"):
-                self.dimension = len(indices)
+        if hasattr(mean, "__len__"):
+            if dimensionality is None:
+                dimensionality = len(mean)
             else:
-                raise ValueError(
-                    "If you don't specify `indices` you must ", "specify `dimension`"
-                )
+                assert dimensionality == len(mean)
+
+        if hasattr(logvar, "__len__"):
+            if dimensionality is None:
+                dimensionality = len(logvar)
+            else:
+                assert dimensionality == len(logvar)
+
+        assert dimensionality is not None
+
+        super().__init__(dimensionality)
 
         if logvar is None:
-            logvar = torch.zeros(self.dimension)
+            logvar = torch.zeros(self.dimensionality)
         else:
+            if not hasattr(logvar, "__len__"):
+                logvar = [logvar] * self.dimensionality
             logvar = torch.tensor(np.fromiter(logvar, dtype=float))
 
         if learn_logvar:
@@ -97,6 +100,8 @@ class DiagonalGaussianPrior(IsotropicGaussianPrior):
         if mean is None:
             mean = torch.zeros(self.dimension)
         else:
+            if not hasattr(mean, "__len__"):
+                logvar = [mean] * self.dimensionality
             mean = torch.tensor(np.fromiter(mean, dtype=float))
 
         if learn_mean:
@@ -136,20 +141,18 @@ class DiagonalGaussianPrior(IsotropicGaussianPrior):
         )
 
         if reduction == "none":
-            loss = kl
-        elif reduction == "mean":
-            loss = kl.mean(dim=-1)
-        else:
-            loss = kl.sum(dim=-1)
+            return kl
 
-        if tc_penalty_weight is not None and reduction == "mean":
+        loss = kl.sum(dim=-1).mean()
+
+        if tc_penalty_weight is not None:
             tc_penalty = compute_tc_penalty(logvar1)
             loss = loss + tc_penalty_weight * tc_penalty
 
         return loss
 
     def forward(self, z, mode="kl", **kwargs):
-        mean_logvar = z[:, self.indices]
+        mean_logvar = z
         mean, logvar = torch.split(mean_logvar, mean_logvar.shape[1] // 2, dim=1)
 
         if mode == "kl":

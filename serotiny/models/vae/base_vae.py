@@ -101,18 +101,12 @@ class BaseVAE(BaseModel):
 
         rcl = rcl.mean()
 
-        kld_per_dimension = torch.cat(
-            [prior(z, reduction="none", mode="kl") for prior in self.priors], dim=1
-        )
-
-        kld = kld_per_dimension.sum(dim=1).mean()
+        kld = torch.sum([prior(z, mode="kl") for prior in self.priors])
 
         return (
             rcl + self.beta * kld,
             rcl,
             kld,
-            rcl_per_input_dimension,
-            kld_per_dimension,
         )
 
     def parse_batch(self, batch):
@@ -161,8 +155,6 @@ class BaseVAE(BaseModel):
             loss,
             reconstruction_loss,
             kld_loss,
-            rcl_per_input_dimension,
-            kld_per_latent_dimension,
         )
 
     def log_metrics(self, stage, reconstruction_loss, kld_loss, loss, logger):
