@@ -6,11 +6,16 @@ from .abstract_prior import Prior
 
 
 class IsotropicGaussianPrior(Prior):
-    def __init__(self, indices=None):
+    def __init__(self, indices=None, tc_penalty_weight=None):
+        self.tc_penalty_weight = tc_penalty_weight
         super().__init__(indices)
 
     @classmethod
-    def kl_divergence(cls, mean, logvar, reduction="sum"):
+    def compute_tc_penalty(cls, logvar):
+        return (logvar * 2).exp().mean(dim=0).sum()
+
+    @classmethod
+    def kl_divergence(cls, mean, logvar, reduction="sum", tc_penalty_weight=None):
         """Computes the Kullback-Leibler divergence between a diagonal gaussian
         and an isotropic (0,1) gaussian. It also works batch-wise.
 
@@ -26,11 +31,17 @@ class IsotropicGaussianPrior(Prior):
         kl = -0.5 * (1 + logvar - mean.pow(2) - logvar.exp())
 
         if reduction == "none":
-            return kl
+            loss = kl
         elif reduction == "mean":
-            return kl.mean(dim=-1)
+            loss = kl.mean(dim=-1)
         else:
-            return kl.sum(dim=-1)
+            loss = kl.sum(dim=-1)
+
+        if tc_penalty_weight is not None and reduction == "mean":
+            tc_penalty = cls.compute_tc_penalty(logvar)
+            loss = loss + tc_penalty_weight * tc_penalty
+
+        return loss
 
     @classmethod
     def sample(cls, mean, logvar):
@@ -43,7 +54,9 @@ class IsotropicGaussianPrior(Prior):
         mean, logvar = torch.split(mean_logvar, mean_logvar.shape[1] // 2, dim=1)
 
         if mode == "kl":
-            return self.kl_divergence(mean, logvar, **kwargs)
+            return self.kl_divergence(
+                mean, logvar, tc_penalty_weight=self.tc_penalty_weight, **kwargs
+            )
         else:
             return self.sample(mean, logvar, **kwargs)
 
