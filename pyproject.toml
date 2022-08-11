@@ -43,7 +43,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.7"
 pip = "^22.1.2"
-torch = {version = ">=1.7.1*", allow-prereleases = true}
+torch = {version = ">=1.11.0*", allow-prereleases = true}
 fire = "^0.4.0"
 makefun = "^1.13.1"
 hydra-core = "^1.2.0"
