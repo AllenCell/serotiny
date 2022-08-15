@@ -101,9 +101,9 @@ class BaseVAE(BaseModel):
         }
 
         kld_per_part_summed = {
-            part: this_kld_part.view(-1,1).sum(dim=1).float().mean() for part, this_kld_part in kld_per_part.items() 
+            part: self.prior[part](z_part, mode="kl") for part, z_part in z.items()
         }
-        
+
         return (
             rcl + self.beta * sum(kld_per_part_summed.values()),
             rcl,
