@@ -4,6 +4,7 @@ import sys
 from omegaconf import OmegaConf
 from hydra.utils import get_original_cwd
 
+logging.getLogger("xmlschema").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 
@@ -61,11 +62,10 @@ def _do_model_op(
         data = instantiate(data)
         logger.info("Instantiating trainer")
         trainer = instantiate(trainer)
+        logger.info("Instantiating model")
+        model = instantiate(model)
 
         if mode == "train":
-            logger.info("Instantiating model")
-            model = instantiate(model)
-
             if mlflow is not None and mlflow.get("tracking_uri") is not None:
                 mlflow_fit(
                     mlflow,
@@ -95,7 +95,7 @@ def _do_model_op(
                         "an MLFlow config, or a local ckpt_path."
                     )
                 ckpt_path = full_conf["ckpt_path"]
-                trainer.test(data, ckpt_path=ckpt_path)
+                trainer.test(model, data, ckpt_path=ckpt_path)
 
         elif mode == "predict":
             if mlflow is not None and mlflow.get("tracking_uri") is not None:
@@ -114,7 +114,7 @@ def _do_model_op(
                 preds_dir.mkdir(exist_ok=True, parents=True)
 
                 ckpt_path = full_conf["ckpt_path"]
-                preds = trainer.predict(data, ckpt_path=ckpt_path)
+                preds = trainer.predict(model, data, ckpt_path=ckpt_path)
                 save_model_predictions(model, preds, preds_dir)
 
     else:

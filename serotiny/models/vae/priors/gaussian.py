@@ -32,7 +32,7 @@ class IsotropicGaussianPrior(Prior):
         else:
             tc_penalty = 0
         if reduction == "none":
-            return kl
+            loss = kl
         elif reduction == "mean":
             return kl.mean(dim=-1).mean() + tc_penalty * tc_penalty_weight
         else:
@@ -101,9 +101,12 @@ class DiagonalGaussianPrior(IsotropicGaussianPrior):
             mean = nn.Parameter(mean, requires_grad=True)
 
         self.mean = mean
+        self.tc_penalty_weight = tc_penalty_weight
 
     @classmethod
-    def kl_divergence(cls, mu1, mu2, logvar1, logvar2, reduction="sum"):
+    def kl_divergence(
+        cls, mu1, mu2, logvar1, logvar2, reduction="sum", tc_penalty_weight=None
+    ):
         """Computes the Kullback-Leibler divergence between two diagonal
         gaussians (not necessarily isotropic). It also works batch-wise.
         Parameters
@@ -128,10 +131,14 @@ class DiagonalGaussianPrior(IsotropicGaussianPrior):
 
         if reduction == "none":
             return kl
-        elif reduction == "mean":
-            return kl.mean(dim=-1)
-        else:
-            return kl.sum(dim=-1)
+
+        loss = kl.sum(dim=-1).mean()
+
+        if tc_penalty_weight is not None:
+            tc_penalty = compute_tc_penalty(logvar1)
+            loss = loss + tc_penalty_weight * tc_penalty
+
+        return loss
 
     def forward(self, z, mode="kl", **kwargs):
         mean_logvar = z

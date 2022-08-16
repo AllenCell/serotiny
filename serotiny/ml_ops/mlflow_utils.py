@@ -105,7 +105,7 @@ def _get_config(tracking_uri, run_id, tmp_dir, mode="test"):
         return None
 
 
-def load_model_from_checkpoint(tracking_uri, run_id):
+def load_model_from_checkpoint(tracking_uri, run_id, full_conf):
     mlflow.set_tracking_uri(tracking_uri)
     with tempfile.TemporaryDirectory() as tmp_dir:
         ckpt_path = _get_latest_checkpoint(tracking_uri, run_id, tmp_dir)
@@ -115,6 +115,8 @@ def load_model_from_checkpoint(tracking_uri, run_id):
 
         config = _get_config(tracking_uri, run_id, tmp_dir, mode="train")
         config = OmegaConf.load(config)
+        if full_conf.get("override_model_conf", True):
+            config = OmegaConf.merge(config, full_conf.get("model", {}))
         config = OmegaConf.to_container(config, resolve=True)
 
         model_conf = config["model"]
@@ -324,7 +326,9 @@ def mlflow_test(mlflow_conf, trainer, data, full_conf):
                     "retest it, set ++force=True"
                 )
             else:
-                model = load_model_from_checkpoint(mlflow_conf.tracking_uri, run_id)
+                model = load_model_from_checkpoint(
+                    mlflow_conf.tracking_uri, run_id, full_conf
+                )
 
                 _log_conf(tmp_dir, full_conf, "test")
 
@@ -350,7 +354,9 @@ def mlflow_predict(mlflow_conf, trainer, data, full_conf):
     ):
 
         with tempfile.TemporaryDirectory() as tmp_dir:
-            model = load_model_from_checkpoint(mlflow_conf.tracking_uri, run_id)
+            model = load_model_from_checkpoint(
+                mlflow_conf.tracking_uri, run_id, full_conf
+            )
 
             _log_conf(tmp_dir, full_conf, "predict")
 
@@ -387,7 +393,7 @@ def upload_artifacts(artifact_path, exclude=[], globstr="*"):
 
 
 @contextmanager
-def download_artifact(artifact_path):
+def download_artifact(artifact_path, run_id=None):
     """Util context manager to download artifacts.
 
     Returns a path to the downloaded artifact
@@ -396,8 +402,9 @@ def download_artifact(artifact_path):
     with tempfile.TemporaryDirectory() as tmp_dir:
         try:
             client = mlflow.tracking.MlflowClient(mlflow.get_tracking_uri())
+            _run_id = run_id if run_id is not None else mlflow.active_run().info.run_id
             yield client.download_artifacts(
-                run_id=mlflow.active_run().info.run_id,
+                run_id=_run_id,
                 path=artifact_path,
                 dst_path=tmp_dir,
             )

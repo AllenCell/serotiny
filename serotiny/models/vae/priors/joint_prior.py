@@ -29,16 +29,10 @@ class JointPrior(Prior):
             )
             start_ix = end_ix + 1
 
-        kl = torch.cat(kl, axis=1)
-
         if reduction == "none":
-            return kl
-        elif reduction == "sum":
-            return kl.sum(dim=-1)
-        else:
-            raise NotImplementedError(
-                f"Reduction '{reduction}' not implemented " "for JoinPrior"
-            )
+            return torch.cat(kl, axis=1)
+
+        return torch.sum(kl)
 
     def sample(self, z_params):
         samples = []
@@ -53,6 +47,6 @@ class JointPrior(Prior):
 
     def forward(self, z_params, mode="kl", **kwargs):
         if mode == "kl":
-            return self.kl_divergence(z_params)
+            return self.kl_divergence(z_params, **kwargs)
         else:
-            return self.sample(z_params)
+            return self.sample(z_params, **kwargs)

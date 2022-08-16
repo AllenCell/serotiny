@@ -6,8 +6,10 @@ from typing import Dict, Optional, Sequence, Union
 
 import numpy as np
 import pandas as pd
+from torch.utils.data import DataLoader
 import pytorch_lightning as pl
 from pytorch_lightning.utilities.exceptions import MisconfigurationException
+from omegaconf import OmegaConf
 
 from serotiny.io.dataframe import DataframeDataset, read_dataframe
 from serotiny.io.dataframe.loaders.abstract_loader import Loader
@@ -206,7 +208,9 @@ def _make_multiple_manifest_splits(
 
 
 def _dict_depth(d):
-    return max(_dict_depth(v) if isinstance(v, dict) else 0 for v in d.values()) + 1
+    return (
+        max((_dict_depth(v) if OmegaConf.is_config(v) else 0) for v in d.values()) + 1
+    )
 
 
 def _parse_loaders(loaders):
