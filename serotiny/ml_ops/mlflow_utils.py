@@ -393,7 +393,7 @@ def upload_artifacts(artifact_path, exclude=[], globstr="*"):
 
 
 @contextmanager
-def download_artifact(artifact_path):
+def download_artifact(artifact_path, run_id=None):
     """Util context manager to download artifacts.
 
     Returns a path to the downloaded artifact
@@ -402,8 +402,9 @@ def download_artifact(artifact_path):
     with tempfile.TemporaryDirectory() as tmp_dir:
         try:
             client = mlflow.tracking.MlflowClient(mlflow.get_tracking_uri())
+            _run_id = run_id if run_id is not None else mlflow.active_run().info.run_id
             yield client.download_artifacts(
-                run_id=mlflow.active_run().info.run_id,
+                run_id=_run_id,
                 path=artifact_path,
                 dst_path=tmp_dir,
             )
