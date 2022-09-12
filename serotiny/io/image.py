@@ -91,8 +91,7 @@ def image_loader(
     else:
         if reader is not None:
             reader = _load_reader(reader)
-
-            img = aicsimageio.AICSImage(path, reader=reader)
+        img = aicsimageio.AICSImage(path, reader=reader)
     channel_names = img.channel_names or list(range(img.data.shape[0]))
 
     if (select_channels is None) or (len(select_channels) == 0):
