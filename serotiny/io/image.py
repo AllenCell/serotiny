@@ -6,6 +6,8 @@ import numpy as np
 import torch
 from aicsimageio.aics_image import _load_reader
 from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
+from ome_zarr.reader import Reader
+from ome_zarr.io import parse_url
 
 
 def infer_dims(img: aicsimageio.AICSImage):
@@ -146,9 +148,6 @@ def read_ome_zarr(path, level=0, image_name="default"):
     Note: This is here temporarily, until aicsimageio
     provides an OmeZarrReader class
     """
-    from ome_zarr.reader import Reader
-    from ome_zarr.io import parse_url
-
     path = str(path if image_name is None else Path(path) / image_name)
     reader = Reader(parse_url(path))
 
