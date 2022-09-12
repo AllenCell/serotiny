@@ -11,6 +11,8 @@ _DEFAULT_LOADER_KWARGS = dict(
     dtype=None,
     return_as_torch=True,
     force_3d=False,
+    ome_zarr_level=0,
+    ome_zarr_image_name="default",
 )
 
 
@@ -46,7 +48,7 @@ class LoadImage(Loader):
         super().__init__()
         self.column = column
 
-        if file_type not in ("tiff"):
+        if file_type not in ("tiff", "zarr"):
             raise NotImplementedError(f"File type {file_type} not supported.")
 
         self.file_type = file_type
@@ -66,6 +68,6 @@ class LoadImage(Loader):
         return path
 
     def __call__(self, row):
-        if self.file_type == "tiff":
+        if self.file_type in ("tiff", "zarr"):
             path = self._get_cached_path(row[self.column])
             return image_loader(path, **self.loader_kwargs)
