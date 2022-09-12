@@ -1764,7 +1764,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "universal-pathlib"
-version = "0.0.18"
+version = "0.0.20"
 description = "Pathlib API extended to use fsspec backends"
 category = "main"
 optional = false
@@ -1774,7 +1774,7 @@ python-versions = ">=3.7"
 fsspec = "*"
 
 [package.extras]
-test = ["aiohttp", "flake8", "gcsfs", "hadoop-test-cluster", "ipython", "jupyter", "moto", "pyarrow", "pylint", "pytest", "requests", "s3fs"]
+test = ["aiohttp", "adlfs", "flake8", "gcsfs", "hadoop-test-cluster", "ipython", "jupyter", "moto", "pyarrow", "pylint", "pytest", "requests", "s3fs", "webdav4"]
 
 [[package]]
 name = "urllib3"
@@ -1919,7 +1919,7 @@ docs = ["sphinx", "furo", "m2r2"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "2bc5ab5b3d0182d845688f845865108a33469312dd1c893a090995f49ec5c2ab"
+content-hash = "03234559e3cc17bccea7f720613121d7223d7f633d99b41754209c9c29346db6"
 
 [metadata.files]
 absl-py = []
@@ -2768,10 +2768,7 @@ tqdm = [
 ]
 traitlets = []
 typing-extensions = []
-universal-pathlib = [
-    {file = "universal_pathlib-0.0.18-py3-none-any.whl", hash = "sha256:ddaa3cbfd98d0aef0d018915d1787149b8a77da473ede4245ab0103d85b6784a"},
-    {file = "universal_pathlib-0.0.18.tar.gz", hash = "sha256:b011f68611c1e9f839d86a76a154f3cd4fc17f4a9952cc43ddcd23e2080d74e0"},
-]
+universal-pathlib = []
 urllib3 = [
     {file = "urllib3-1.26.9-py2.py3-none-any.whl", hash = "sha256:44ece4d53fb1706f667c9bd1c648f5469a2ec925fcf3a776667042d645472c14"},
     {file = "urllib3-1.26.9.tar.gz", hash = "sha256:aabaf16477806a5e1dd19aa41f8c2b7950dd3c746362d7e3223dbe6de6ac448e"},
