@@ -135,7 +135,7 @@ def _get_patience(trainer):
     return None
 
 
-def get_run_id(run_name, experiment_name=None, experiment_id=None):
+def get_run_id(run_name, experiment_name=None, experiment_id=None, raise_error=False):
     if experiment_id is None:
         if experiment_name is None:
             raise ValueError("`experiment_name` and `experiment_id` can't both be None")
@@ -161,6 +161,9 @@ def get_run_id(run_name, experiment_name=None, experiment_id=None):
         raise ValueError("There are multiple runs in this experiment with that name.")
     elif len(runs) == 1:
         return runs[0]
+
+    if raise_error:
+        raise ValueError("Not run matches the specified run_name and experiment")
 
     return None
 
@@ -390,7 +393,9 @@ def upload_artifacts(artifact_path, exclude=[], globstr="*"):
 
     It yields a temporary directory to store results and then uploads the files
     stored therein. Optionally exclude given files or restrict to a given glob
-    filter
+    filter.
+
+    NOTE: Must be used in the context of an active MLFlow run!
     """
 
     with tempfile.TemporaryDirectory() as tmp_dir:
@@ -405,18 +410,28 @@ def upload_artifacts(artifact_path, exclude=[], globstr="*"):
 
 
 @contextmanager
-def download_artifact(artifact_path, run_id=None):
+def download_artifact(artifact_path, experiment_name=None, run_name=None, run_id=None):
     """Util context manager to download artifacts.
 
     Returns a path to the downloaded artifact
     """
 
+    if run_id is None:
+        if None in [experiment_name, run_name]:
+            raise ValueError(
+                "If `run_id` is None, you must specify `experiment_name` and "
+                "`run_name`"
+            )
+
+        run_id = get_run_id(
+            experiment_name=experiment_name, run_name=run_name, raise_error=True
+        )
+
     with tempfile.TemporaryDirectory() as tmp_dir:
         try:
             client = mlflow.tracking.MlflowClient(mlflow.get_tracking_uri())
-            _run_id = run_id if run_id is not None else mlflow.active_run().info.run_id
             yield client.download_artifacts(
-                run_id=_run_id,
+                run_id=run_id,
                 path=artifact_path,
                 dst_path=tmp_dir,
             )
