@@ -119,7 +119,6 @@ def image_loader(
 
     if len(data.shape) == 3 and force_3d:
         data = np.expand_dims(data, axis=0)
-        channel_map = {"unnamed": 0}
 
     if dtype is not None:
         data = data.astype(dtype)
