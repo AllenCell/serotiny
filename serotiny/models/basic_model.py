@@ -20,6 +20,7 @@ class BasicModel(BaseModel):
         x_label: str = "x",
         y_label: str = "y",
         optimizer: torch.optim.Optimizer = torch.optim.Adam,
+        squeeze_y: bool = False,
         save_predictions: Optional[Callable] = None,
         fields_to_log: Optional[Sequence] = None,
         **kwargs,
@@ -70,8 +71,8 @@ class BasicModel(BaseModel):
         else:
             try:
                 loss = self.loss(yhat, y)
-            except RuntimeError as err:
-                if y.shape[-1] == 1:
+            except (RuntimeError, ValueError) as err:
+                if yhat.shape[-1] == 1:
                     try:
                         loss = self.loss(yhat, y.squeeze())
                         self._squeeze_y = True
