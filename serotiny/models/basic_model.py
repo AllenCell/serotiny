@@ -72,7 +72,7 @@ class BasicModel(BaseModel):
             try:
                 loss = self.loss(yhat, y)
             except (RuntimeError, ValueError) as err:
-                if y.shape[-1] == 1:
+                if _check_one_dimensional_shapes(y.shape, yhat.shape):
                     try:
                         loss = self.loss(yhat.squeeze(), y.squeeze())
                         self._squeeze_y = True
@@ -107,3 +107,9 @@ class BasicModel(BaseModel):
                     output[field] = batch[field]
 
         return output
+
+
+def _check_one_dimensional_shapes(shape1, shape2):
+    return (len(shape1) == 1 and len(shape2) == 2 and shape2[-1] == 1) or (
+        len(shape2) == 1 and len(shape1) == 2 and shape1[-1] == 1
+    )
