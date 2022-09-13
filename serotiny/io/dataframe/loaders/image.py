@@ -1,4 +1,6 @@
 import os
+from typing import Optional
+import numpy as np
 
 from serotiny.io.image import image_loader
 from .abstract_loader import Loader
@@ -23,8 +25,8 @@ class LoadImage(Loader):
     def __init__(
         self,
         column: str,
-        file_type: str = "tiff",
         use_cache: bool = False,
+        dtype: Optional[str] = None,
         **loader_kwargs,
     ):
         """
@@ -48,10 +50,8 @@ class LoadImage(Loader):
         super().__init__()
         self.column = column
 
-        if file_type not in ("tiff", "zarr"):
-            raise NotImplementedError(f"File type {file_type} not supported.")
+        self.dtype = np.dtype(dtype).type if dtype is not None else None
 
-        self.file_type = file_type
         self.use_cache = use_cache
 
         self.loader_kwargs = _DEFAULT_LOADER_KWARGS.copy()
@@ -68,6 +68,8 @@ class LoadImage(Loader):
         return path
 
     def __call__(self, row):
-        if self.file_type in ("tiff", "zarr"):
-            path = self._get_cached_path(row[self.column])
-            return image_loader(path, **self.loader_kwargs)
+        path = self._get_cached_path(row[self.column])
+        img = image_loader(path, **self.loader_kwargs)
+        if self.dtype is not None:
+            return self.dtype(img)
+        return img
