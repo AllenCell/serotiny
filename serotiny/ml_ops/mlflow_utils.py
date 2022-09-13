@@ -146,12 +146,10 @@ def get_run_id(run_name, experiment_name=None, experiment_id=None, raise_error=F
                 experiment = _experiment
                 break
 
-            if experiment is None:
-                if raise_error:
-                    raise ValueError(
-                        "No experiment matches the specified experiment_name"
-                    )
-                return None
+        if experiment is None:
+            if raise_error:
+                raise ValueError("No experiment matches the specified experiment_name")
+            return None
         experiment_id = experiment.experiment_id
 
     runs = []
