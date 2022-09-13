@@ -10,6 +10,7 @@ from hydra.utils import get_original_cwd
 warnings.filterwarnings(action="ignore", category=FutureWarning, module="ome_types")
 logging.getLogger("xmlschema").setLevel(logging.WARNING)
 logging.getLogger("bfio").setLevel(logging.WARNING)
+logging.getLogger("bfio.backends").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
