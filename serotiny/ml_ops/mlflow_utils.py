@@ -135,6 +135,36 @@ def _get_patience(trainer):
     return None
 
 
+def get_run_id(run_name, experiment_name=None, experiment_id=None):
+    if experiment_id is None:
+        if experiment_name is None:
+            raise ValueError("`experiment_name` and `experiment_id` can't both be None")
+
+        experiment = None
+        for _experiment in mlflow.list_experiments():
+            if _experiment.name == experiment_name:
+                break
+
+            if experiment is None:
+                return None
+        experiment_id = experiment.experiment_id
+
+    runs = []
+    for run_info in mlflow.list_run_infos(experiment_id=experiment_id):
+        run_tags = mlflow.get_run(run_info.run_id).data.tags
+
+        if "mlflow.runName" in run_tags:
+            if run_tags["mlflow.runName"] == run_name:
+                runs.append(run_info.run_id)
+
+    if len(runs) > 1:
+        raise ValueError("There are multiple runs in this experiment with that name.")
+    elif len(runs) == 1:
+        return runs[0]
+
+    return None
+
+
 def _mlflow_prep(mlflow_conf, trainer, mode):
     logger.info("Validating and processing MLFlow configuration")
 
@@ -161,25 +191,7 @@ def _mlflow_prep(mlflow_conf, trainer, mode):
         assert run_name is not None
         # creates experiment if it doesn't exist, otherwise just gets it
         experiment = mlflow.set_experiment(experiment_name=mlflow_conf.experiment_name)
-
-        runs = []
-        for run_info in mlflow.list_run_infos(experiment_id=experiment.experiment_id):
-            run_tags = mlflow.get_run(run_info.run_id).data.tags
-
-            if "mlflow.runName" in run_tags:
-                if run_tags["mlflow.runName"] == run_name:
-                    runs.append(run_info.run_id)
-
-        if len(runs) > 1:
-            raise ValueError(
-                "You provided `run_name`, but there are multiple "
-                "runs in this experiment with that name. Please "
-                "specify `run_id`."
-            )
-        elif len(runs) == 1:
-            run_id = runs[0]
-        else:  # redundant but leaving it here to be explicit
-            run_id = None
+        run_id = get_run_id(run_name, experiment_id=experiment.experiment_id)
 
     else:
         run = mlflow.get_run(run_id=run_id)
