@@ -4,6 +4,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.nn.modules.loss import _Loss as Loss
+from omegaconf import ListConfig, DictConfig
 
 from .base_model import BaseModel
 
@@ -96,12 +97,12 @@ class BasicModel(BaseModel):
             "y": y.detach().squeeze(),
         }
 
-        if isinstance(self.fields_to_log, list):
+        if isinstance(self.fields_to_log, (list, ListConfig)):
             if stage in ["predict", "test"]:
                 for field in self.fields_to_log:
                     output[field] = batch[field]
 
-        elif isinstance(self.fields_to_log, dict):
+        elif isinstance(self.fields_to_log, (dict, DictConfig)):
             if stage in self.fields_to_log:
                 for field in self.fields_to_log[stage]:
                     output[field] = batch[field]
