@@ -72,9 +72,9 @@ class BasicModel(BaseModel):
             try:
                 loss = self.loss(yhat, y)
             except (RuntimeError, ValueError) as err:
-                if yhat.shape[-1] == 1:
+                if y.shape[-1] == 1:
                     try:
-                        loss = self.loss(yhat, y.squeeze())
+                        loss = self.loss(yhat.squeeze(), y.squeeze())
                         self._squeeze_y = True
                     except Exception as inner_err:
                         raise inner_err from err
