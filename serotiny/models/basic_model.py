@@ -67,7 +67,7 @@ class BasicModel(BaseModel):
         yhat = self.forward(x)
 
         if self._squeeze_y:
-            loss = self.loss(yhat, y.squeeze())
+            loss = self.loss(yhat.squeeze(), y.squeeze())
         else:
             try:
                 loss = self.loss(yhat, y)
