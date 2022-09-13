@@ -11,6 +11,8 @@ warnings.filterwarnings(action="ignore", category=FutureWarning, module="ome_typ
 logging.getLogger("xmlschema").setLevel(logging.WARNING)
 logging.getLogger("bfio").setLevel(logging.WARNING)
 logging.getLogger("bfio.backends").setLevel(logging.WARNING)
+logging.getLogger("ome_zarr").setLevel(logging.WARNING)
+logging.getLogger("ome_zarr.reader").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
