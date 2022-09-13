@@ -1,10 +1,16 @@
 import logging
+import warnings
 import sys
 
 from omegaconf import OmegaConf
 from hydra.utils import get_original_cwd
 
+
+# silence aicsimageio related warnings
+warnings.filterwarnings(action="ignore", category=FutureWarning, module="ome_types")
 logging.getLogger("xmlschema").setLevel(logging.WARNING)
+logging.getLogger("bfio").setLevel(logging.WARNING)
+
 logger = logging.getLogger(__name__)
 
 
