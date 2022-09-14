@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "serotiny"
-version = "0.0.2"
+version = "0.0.3"
 homepage = "https://allencell.github.io/serotiny"
 documentation = "https://allencell.github.io/serotiny"
 repository = "https://github.com/AllenCell/serotiny"
