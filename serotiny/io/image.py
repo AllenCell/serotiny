@@ -1,4 +1,4 @@
-from pathlib import Path
+from upath import UPath as Path
 from typing import Callable, Optional, Sequence, Type, Union
 
 import aicsimageio
@@ -6,6 +6,8 @@ import numpy as np
 import torch
 from aicsimageio.aics_image import _load_reader
 from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
+from ome_zarr.reader import Reader
+from ome_zarr.io import parse_url
 
 
 def infer_dims(img: aicsimageio.AICSImage):
@@ -44,6 +46,8 @@ def image_loader(
     return_as_torch: bool = True,
     reader: Optional[str] = None,
     force_3d: bool = False,
+    ome_zarr_level: int = 0,
+    ome_zarr_image_name: str = "default",
 ):
     """Load image from path given by `path`. If the given image doesn't have
     channel names, `select_channels` must be a list of integers.
@@ -73,12 +77,21 @@ def image_loader(
     force_3d: bool = True
         Force interpretation as 3d image. Useful for wrongfully stored or
         inferred dimensions.
+
+    ome_zarr_level: int = 0
+        If reading an ome zarr image, this specifies what level of the pyramid
+        to return
+
+    ome_zarr_image_name: str = "default"
+        If reading an ome zarr image, this specifies the image name
     """
 
-    if reader is not None:
-        reader = _load_reader(reader)
-
-    img = aicsimageio.AICSImage(path, reader=reader)
+    if str(path).endswith(".zarr"):
+        img = read_ome_zarr(path, ome_zarr_level, ome_zarr_image_name)
+    else:
+        if reader is not None:
+            reader = _load_reader(reader)
+        img = aicsimageio.AICSImage(path, reader=reader)
     channel_names = img.channel_names or list(range(img.data.shape[0]))
 
     if (select_channels is None) or (len(select_channels) == 0):
@@ -106,7 +119,6 @@ def image_loader(
 
     if len(data.shape) == 3 and force_3d:
         data = np.expand_dims(data, axis=0)
-        channel_map = {"unnamed": 0}
 
     if dtype is not None:
         data = data.astype(dtype)
@@ -125,6 +137,26 @@ def image_loader(
         return data, channel_map
 
     return data
+
+
+def read_ome_zarr(path, level=0, image_name="default"):
+    """Function that reads an ome.zarr image and (optionally) returns an
+    AICSImage object.
+
+    Note: This is here temporarily, until aicsimageio
+    provides an OmeZarrReader class
+    """
+    path = str(path if image_name is None else Path(path) / image_name)
+    reader = Reader(parse_url(path))
+
+    node = next(iter(reader()))
+    pps = node.metadata["coordinateTransformations"][0][0]["scale"][-3:]
+
+    return aicsimageio.AICSImage(
+        node.data[level].compute(),
+        channel_names=node.metadata["name"],
+        physical_pixel_sizes=pps,
+    )
 
 
 def tiff_writer(

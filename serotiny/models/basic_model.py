@@ -4,6 +4,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.nn.modules.loss import _Loss as Loss
+from omegaconf import ListConfig, DictConfig
 
 from .base_model import BaseModel
 
@@ -20,6 +21,7 @@ class BasicModel(BaseModel):
         x_label: str = "x",
         y_label: str = "y",
         optimizer: torch.optim.Optimizer = torch.optim.Adam,
+        squeeze_y: bool = False,
         save_predictions: Optional[Callable] = None,
         fields_to_log: Optional[Sequence] = None,
         **kwargs,
@@ -66,14 +68,14 @@ class BasicModel(BaseModel):
         yhat = self.forward(x)
 
         if self._squeeze_y:
-            loss = self.loss(yhat, y.squeeze())
+            loss = self.loss(yhat.squeeze(), y.squeeze())
         else:
             try:
                 loss = self.loss(yhat, y)
-            except RuntimeError as err:
-                if y.shape[-1] == 1:
+            except (RuntimeError, ValueError) as err:
+                if _check_one_dimensional_shapes(y.shape, yhat.shape):
                     try:
-                        loss = self.loss(yhat, y.squeeze())
+                        loss = self.loss(yhat.squeeze(), y.squeeze())
                         self._squeeze_y = True
                     except Exception as inner_err:
                         raise inner_err from err
@@ -95,14 +97,20 @@ class BasicModel(BaseModel):
             "y": y.detach().squeeze(),
         }
 
-        if isinstance(self.fields_to_log, list):
+        if isinstance(self.fields_to_log, (list, ListConfig)):
             if stage in ["predict", "test"]:
                 for field in self.fields_to_log:
                     output[field] = batch[field]
 
-        elif isinstance(self.fields_to_log, dict):
+        elif isinstance(self.fields_to_log, (dict, DictConfig)):
             if stage in self.fields_to_log:
                 for field in self.fields_to_log[stage]:
                     output[field] = batch[field]
 
         return output
+
+
+def _check_one_dimensional_shapes(shape1, shape2):
+    return (len(shape1) == 1 and len(shape2) == 2 and shape2[-1] == 1) or (
+        len(shape2) == 1 and len(shape1) == 2 and shape1[-1] == 1
+    )

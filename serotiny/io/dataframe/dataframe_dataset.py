@@ -45,9 +45,8 @@ class DataframeDataset(Dataset):
         # triggered by pandas' inner workings
         self.dataframe = dataframe.values
         self.columns = dataframe.columns.tolist()
-        self.column_index = frozendict(
-            {col: ix for ix, col in enumerate(self.columns)}
-        )
+
+        self.column_index = frozendict({col: ix for ix, col in enumerate(self.columns)})
 
         self.loaders = loaders
 
