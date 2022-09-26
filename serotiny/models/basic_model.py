@@ -16,22 +16,23 @@ class BasicModel(BaseModel):
 
     def __init__(
         self,
-        network: nn.Module,
-        loss: Loss,
+        network: Optional[nn.Module] = None,
+        loss: Optional[Loss] = None,
         x_label: str = "x",
         y_label: str = "y",
         optimizer: torch.optim.Optimizer = torch.optim.Adam,
         squeeze_y: bool = False,
         save_predictions: Optional[Callable] = None,
         fields_to_log: Optional[Sequence] = None,
+        pretrained_weights: Optional[str] = None,
         **kwargs,
     ):
         """
         Parameters
         ----------
-        network: nn.Module
+        network: Optional[nn.Module] = None
             The network to wrap
-        loss: Loss
+        loss: Optional[Loss] = None
             The loss function to optimize for
         x_label: str = "x"
             The key used to retrieve the input from dataloader batches
@@ -45,10 +46,30 @@ class BasicModel(BaseModel):
             List of batch fields to store with the outputs. Use a list to log
             the same fields for every training stage (train, val, test, prediction).
             If a list is used, it is assumed to be for test and prediction only
+        pretrained_weights: Optional[str] = None
+            Path to pretrained weights. If network is not None, this will be
+            loaded via `network.load_state_dict`, otherwise it will be
+            loaded via `torch.load`.
         """
         super().__init__()
-        self.network = network
-        self.loss = loss
+
+        if network is None and pretrained_weights is None:
+            raise ValueError("`network` and `pretrained_weights` can't both be None.")
+
+        if pretrained_weights is not None:
+            pretrained_weights = torch.load(pretrained_weights)
+
+        if network is not None:
+            self.network = network
+            if pretrained_weights is not None:
+                self.network.load_state_dict(pretrained_weights)
+        else:
+            self.network = pretrained_weights
+
+        if loss is not None:
+            self.loss = loss
+        else:
+            self.loss = nn.MSELoss()
 
         self._squeeze_y = False
 
