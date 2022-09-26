@@ -54,14 +54,17 @@ class BasicModel(BaseModel):
         super().__init__()
 
         if network is None and pretrained_weights is None:
-            raise ValueError("`network` and `pretrained_weights` can't both" "be None.")
+            raise ValueError("`network` and `pretrained_weights` can't both be None.")
+
+        if pretrained_weights is not None:
+            pretrained_weights = torch.load(pretrained_weights)
 
         if network is not None:
             self.network = network
             if pretrained_weights is not None:
                 self.network.load_state_dict(pretrained_weights)
         else:
-            self.network = torch.load(pretrained_weights)
+            self.network = pretrained_weights
 
         if loss is not None:
             self.loss = loss
