@@ -8,11 +8,11 @@ from hydra.utils import get_original_cwd
 
 # silence aicsimageio related warnings
 warnings.filterwarnings(action="ignore", category=FutureWarning, module="ome_types")
-logging.getLogger("xmlschema").setLevel(logging.WARNING)
-logging.getLogger("bfio").setLevel(logging.WARNING)
-logging.getLogger("bfio.backends").setLevel(logging.WARNING)
-logging.getLogger("ome_zarr").setLevel(logging.WARNING)
-logging.getLogger("ome_zarr.reader").setLevel(logging.WARNING)
+logging.getLogger("xmlschema").setLevel(logging.ERROR)
+logging.getLogger("bfio").setLevel(logging.ERROR)
+logging.getLogger("bfio.backends").setLevel(logging.ERROR)
+logging.getLogger("ome_zarr").setLevel(logging.ERROR)
+logging.getLogger("ome_zarr.reader").setLevel(logging.ERROR)
 
 logger = logging.getLogger(__name__)
 
