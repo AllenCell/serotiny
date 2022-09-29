@@ -6,7 +6,7 @@ import os
 import yaml
 from omegaconf import OmegaConf
 from omegaconf._utils import split_key
-from .config import _encrypt as encrypt  # noqa: F401
+from .resolvers import _encrypt as encrypt  # noqa: F401
 
 
 def get_obj_from_path(obj_path: str):
