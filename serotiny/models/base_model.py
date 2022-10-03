@@ -34,6 +34,7 @@ def _cast_omegaconf(value):
 
 
 def _parse_init_args(frame):
+
     init_args = get_init_args(frame)
     if frame.f_back.f_code.co_name == "__init__":
         # if this was called from a subclass's init
@@ -43,6 +44,9 @@ def _parse_init_args(frame):
     ignore = [arg for arg, v in init_args.items() if not _is_primitive(v)]
     if "optimizer" in ignore:
         ignore.remove("optimizer")
+
+    if "lr_scheduler" in ignore:
+        ignore.remove("lr_scheduler")
 
     for arg in ignore:
         del init_args[arg]
@@ -55,7 +59,6 @@ class BaseModel(pl.LightningModule):
 
         frame = inspect.currentframe()
         init_args = _parse_init_args(frame)
-
         self.save_hyperparameters(init_args, logger=False)
         self.optimizer = init_args.pop("optimizer", torch.optim.Adam)
         self.lr_scheduler = init_args.pop("lr_scheduler", None)
@@ -72,11 +75,8 @@ class BaseModel(pl.LightningModule):
         """Here you should implement the logic for a step in the
         training/validation/test process. The stage (training/validation/test)
         is given by the variable `stage`.
-
         Example:
-
         x = self.parse_batch(batch)
-
         if self.hparams.id_label is not None:
            if self.hparams.id_label in batch:
                ids = batch[self.hparams.id_label].detach().cpu()
@@ -84,7 +84,6 @@ class BaseModel(pl.LightningModule):
                    self.hparams.id_label: ids,
                    "id": ids
                })
-
         return results
         """
         raise NotImplementedError

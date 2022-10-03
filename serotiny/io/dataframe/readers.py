@@ -5,24 +5,47 @@ from typing import Optional, Sequence, Union
 
 import pandas as pd
 import pyarrow.parquet
+import scanpy as sc
+import anndata
+
+
+def read_h5ad(path, include_columns):
+    """
+    Read an annData object stored in a .h5ad file
+    Parameters
+    ----------
+    path: Union[Path, str]
+        Path to the .h5ad file
+    include_columns: Optional[Sequence[str]] = None
+        List of column names and/or regex expressions, used to only include the
+        desired columns in the resulting dataframe.
+    Returns
+    -------
+    annData
+    """
+    dataframe = sc.read(path)
+
+    if include_columns is not None:
+        columns = []
+        for filter_ in include_columns:
+            columns += filter_columns(dataframe.obs.columns.tolist(), regex=filter_)
+
+        dataframe.obs = dataframe.obs[columns]
+    return dataframe
 
 
 def read_parquet(path, include_columns=None):
     """Read a dataframe stored in a .parquet file, and optionally include only
     the columns given by `include_columns`
-
     Parameters
     ----------
-
     path: Union[Path, UPath, str]
         Path to the .parquet file
     include_columns: Optional[Sequence[str]] = None
         List of column names and/or regex expressions, used to only include the
         desired columns in the resulting dataframe.
-
     Returns
     -------
-
     dataframe: pd.DataFrame
     """
     if include_columns is not None:
@@ -40,19 +63,15 @@ def read_parquet(path, include_columns=None):
 def read_csv(path, include_columns=None):
     """Read a dataframe stored in a .csv file, and optionally include only the
     columns given by `include_columns`
-
     Parameters
     ----------
-
     path: Union[Path, UPath, str]
         Path to the .csv file
     include_columns: Optional[Sequence[str]] = None
         List of column names and/or regex expressions, used to only include the
         desired columns in the resulting dataframe.
-
     Returns
     -------
-
     dataframe: pd.DataFrame
     """
 
@@ -75,26 +94,20 @@ def read_dataframe(
 ) -> pd.DataFrame:
     """Load a dataframe from a .csv or .parquet file, or assert a given
     pd.DataFrame contains the expected required columns.
-
     Parameters
     ----------
-
     dataframe: Union[Path, UPath, str, pd.DataFrame]
         Either the path to the dataframe to be loaded, or a pd.DataFrame. Supported
         file types are .csv and .parquet
-
     required_columns: Optional[Sequence[str]] = None
         List of columns that the dataframe must contain. If these aren't found,
         a ValueError is thrown
-
     include_columns: Optional[Sequence[str]] = None
         List of column names and/or regex expressions, used to only include the
         desired columns in the resulting dataframe. For .parquet this also results
         in slower read latency.
-
     Returns
     -------
-
     dataframe: pd.DataFrame
     """
 
@@ -117,9 +130,10 @@ def read_dataframe(
             dataframe = read_csv(dataframe, include_columns)
         elif dataframe.suffix == ".parquet":
             dataframe = read_parquet(dataframe, include_columns)
+        elif dataframe.suffix == ".h5ad":
+            dataframe = read_h5ad(dataframe, include_columns)
         else:
             raise TypeError("File type of provided manifest is not .csv " "or .parquet")
-
     elif isinstance(dataframe, pd.DataFrame):
         if include_columns is not None:
             columns = []
@@ -127,12 +141,29 @@ def read_dataframe(
                 columns += filter_columns(dataframe.columns, regex=filter_)
 
             dataframe = dataframe[columns]
+    elif isinstance(dataframe, anndata.AnnData):
+        if include_columns is not None:
+            columns = []
+            for filter_ in include_columns:
+                columns += filter_columns(dataframe.obs.columns, regex=filter_)
 
+            dataframe.obs = dataframe.obs[columns]
     else:
         raise TypeError(
             f"`dataframe` must be either a pd.DataFrame or a path to "
             f"a file to load one. You passed {type(dataframe)}"
         )
+
+    if isinstance(dataframe, anndata.AnnData):
+        # Make dataframe out of anndata object
+        X = dataframe.X.toarray()
+        X = pd.DataFrame(X, columns=[f"X_{i}" for i in range(X.shape[1])]).reset_index(
+            drop=True
+        )
+        index = pd.DataFrame(dataframe.obs_names)
+        dataframe = dataframe.obs.reset_index(drop=True)
+        dataframe = pd.concat([X, dataframe], axis=1)
+        dataframe = pd.concat([index, dataframe], axis=1)
 
     if required_columns is not None:
         missing_columns = set(required_columns) - set(dataframe.columns)
@@ -158,24 +189,18 @@ def filter_columns(
     remaining arguments are ignored. Otherwise, the logical AND of the supplied
     filters is applied, i.e. the columns that respect all of the supplied
     conditions are returned.
-
     Parameters
     ----------
     columns_to_filter: Sequence[str]
         List of columns to filter
-
     regex: Optional[str] = None
         A string containing a regular expression to be matched
-
     startswith: Optional[str] = None
         A substring the matching columns must start with
-
     endswith: Optional[str] = None
         A substring the matching columns must end with
-
     contains: Optional[str] = None
         A substring the matching columns must contain
-
     excludes: Optional[str] = None
         A substring the matching columns must not contain
     """

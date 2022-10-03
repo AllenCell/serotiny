@@ -1,6 +1,8 @@
 import re
 from itertools import chain
-from upath import UPath as Path
+
+# from upath import UPath as Path
+from pathlib import Path
 from typing import Dict, Optional, Sequence, Union
 
 import numpy as np
@@ -12,6 +14,7 @@ from omegaconf import OmegaConf
 
 from serotiny.io.dataframe import DataframeDataset, read_dataframe
 from serotiny.io.dataframe.loaders.abstract_loader import Loader
+from torch.utils.data import DataLoader
 
 
 class ManifestDatamodule(pl.LightningDataModule):
@@ -19,11 +22,9 @@ class ManifestDatamodule(pl.LightningDataModule):
     use a single manifest file, which contains a column based on which a train-
     val-test split can be made; or it can use three manifest files, one for
     each fold (train, val, test).
-
     Additionally, if it is only going to be used for prediction/testing, a flag
     `just_inference` can be set to True so the splits are ignored and the whole
     dataset is used.
-
     The `predict_datamodule` is simply constructed from the whole dataset,
     regardless of the value of `just_inference`.
     """
@@ -34,6 +35,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         loaders: Union[Dict, Loader],
         split_column: Optional[Union[Path, str]] = None,
         columns: Optional[Sequence[str]] = None,
+        split_map: Optional[Dict] = None,
         just_inference: bool = False,
         **dataloader_kwargs,
     ):
@@ -42,23 +44,18 @@ class ManifestDatamodule(pl.LightningDataModule):
         ----------
         path: Union[Path, str]
             Path to a manifest file
-
         loaders: Union[Dict, Loader]
             Loader specifications for each given split.
-
         split_column: Optional[str] = None
             Name of a column in the dataset which can be used to create train, val, test
             splits.
-
         columns: Optional[Sequence[str]] = None
             List of columns to load from the dataset, in case it's a parquet file.
             If None, load everything.
-
         just_inference: bool = False
             Whether this datamodule will be used for just inference
             (testing/prediction).
             If so, the splits are ignored and the whole dataset is used.
-
         dataloader_kwargs:
             Additional keyword arguments are passed to the
             torch.utils.data.DataLoader class when instantiating it (aside from
@@ -92,7 +89,7 @@ class ManifestDatamodule(pl.LightningDataModule):
                 )
 
             self.datasets = _make_single_manifest_splits(
-                path, loaders, split_column, columns, just_inference
+                path, loaders, split_column, columns, just_inference, split_map
             )
 
         self.just_inference = just_inference
@@ -146,11 +143,21 @@ def _get_canonical_split_name(split):
 
 
 def _make_single_manifest_splits(
-    manifest_path, loaders, split_column, columns=None, just_inference=False
+    manifest_path,
+    loaders,
+    split_column,
+    columns=None,
+    just_inference=False,
+    split_map=None,
 ):
     dataframe = read_dataframe(manifest_path, columns)
+    dataframe[split_column] = dataframe[split_column].astype(np.dtype("O"))
+
     if not just_inference:
         assert dataframe.dtypes[split_column] == np.dtype("O")
+
+    if split_map is not None:
+        dataframe[split_column] = dataframe[split_column].replace(split_map)
 
     split_names = dataframe[split_column].unique().tolist()
     if not just_inference:
@@ -161,15 +168,16 @@ def _make_single_manifest_splits(
     if split_column != "split":
         dataframe["split"] = dataframe[split_column].apply(_get_canonical_split_name)
 
+    datasets = {}
+
     if not just_inference:
-        datasets = {}
         for split in ["train", "val", "test"]:
             datasets[split] = DataframeDataset(
                 dataframe.loc[dataframe["split"].str.startswith(split)].copy(),
                 loaders[split],
             )
-
-    datasets["predict"] = DataframeDataset(dataframe.copy(), loaders["predict"])
+    else:
+        datasets["predict"] = DataframeDataset(dataframe.copy(), loaders["predict"])
     return datasets
 
 
