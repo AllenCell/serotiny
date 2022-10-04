@@ -1,3 +1,4 @@
+import torch
 from .abstract_prior import Prior
 
 
@@ -9,6 +10,6 @@ class IdentityPrior(Prior):
 
     def forward(self, z, mode="kl", **kwargs):
         if mode == "kl":
-            return 0
+            return torch.tensor(0)
         else:
             return z
