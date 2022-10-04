@@ -161,8 +161,8 @@ def _make_single_manifest_splits(
     if split_column != "split":
         dataframe["split"] = dataframe[split_column].apply(_get_canonical_split_name)
 
+    datasets = {}
     if not just_inference:
-        datasets = {}
         for split in ["train", "val", "test"]:
             datasets[split] = DataframeDataset(
                 dataframe.loc[dataframe["split"].str.startswith(split)].copy(),
