@@ -9,7 +9,7 @@ import scanpy as sc
 import anndata
 
 
-def read_h5ad(path, include_columns):
+def read_h5ad(path, include_columns=None):
     """
     Read an annData object stored in a .h5ad file
     Parameters
