@@ -8,6 +8,7 @@ from aicsimageio.aics_image import _load_reader
 from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
 from ome_zarr.reader import Reader
 from ome_zarr.io import parse_url
+from omegaconf import ListConfig
 
 
 def infer_dims(img: aicsimageio.AICSImage):
@@ -129,7 +130,11 @@ def image_loader(
         data = data.astype(dtype)
 
     if transform:
-        data = transform(data)
+        if isinstance(transform, (list, tuple, ListConfig)):
+            for _transform in transform:
+                data = _transform(data)
+        else:
+            data = transform(data)
 
     if return_as_torch:
         import torch
