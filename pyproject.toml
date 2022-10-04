@@ -69,6 +69,7 @@ pycryptodome = "^3.14.1"
 frozendict = "^2.3.2"
 ome-zarr = "^0.6.0"
 bfio = "^2.3.0"
+scanpy = "^1.9.1"
 
 
 [tool.poetry.dev-dependencies]
