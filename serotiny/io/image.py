@@ -8,6 +8,7 @@ from aicsimageio.aics_image import _load_reader
 from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
 from ome_zarr.reader import Reader
 from ome_zarr.io import parse_url
+from omegaconf import ListConfig
 
 
 def infer_dims(img: aicsimageio.AICSImage):
@@ -111,6 +112,11 @@ def image_loader(
 
     first_dim = {order[0]: loaded_channels_idx} if order[0] in ["S", "C"] else {}
 
+    for first_dim_key, first_dim_val in first_dim.items():
+        if len(first_dim_val) == 1:
+            order = order.replace(first_dim_key, "")
+            first_dim[first_dim_key] = first_dim_val[0]
+
     data = img.get_image_data(order, **zero_dims, **first_dim)
 
     channel_map = {
@@ -124,7 +130,11 @@ def image_loader(
         data = data.astype(dtype)
 
     if transform:
-        data = transform(data)
+        if isinstance(transform, (list, tuple, ListConfig)):
+            for _transform in transform:
+                data = _transform(data)
+        else:
+            data = transform(data)
 
     if return_as_torch:
         import torch
