@@ -100,10 +100,11 @@ class BaseVAE(BaseModel):
             part: self.prior[part](z_part, mode="kl", reduction="none")
             for part, z_part in z.items()
         }
+        import ipdb
+        ipdb.set_trace()
 
         kld_per_part_summed = {
-            part: this_kld_part.view(-1, 1).sum(dim=1).float().mean()
-            for part, this_kld_part in kld_per_part.items()
+            part: self.prior[part](z_part, mode="kl") for part, z_part in z.items()
         }
 
         return (
@@ -160,7 +161,9 @@ class BaseVAE(BaseModel):
             kld_loss,
             kld_per_part,
         ) = self.calculate_elbo(batch, x_hat, z_parts_params)
-
+        import ipdb
+        ipdb.set_trace()
+        
         return (
             x_hat,
             z_parts,
