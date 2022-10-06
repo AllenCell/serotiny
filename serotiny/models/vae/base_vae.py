@@ -10,10 +10,6 @@ from serotiny.models.base_model import BaseModel
 from .priors import Prior, IsotropicGaussianPrior
 
 
-def _latent_compose_function(z_parts, **kwargs):
-    return z_parts
-
-
 class BaseVAE(BaseModel):
     def __init__(
         self,
@@ -27,7 +23,6 @@ class BaseVAE(BaseModel):
         lr_scheduler: Optional[LRScheduler] = None,
         reconstruction_loss: Loss = nn.MSELoss(reduction="none"),
         prior: Optional[Sequence[Prior]] = None,
-        latent_compose_function=None,
         cache_outputs: Sequence = ("test",),
         **kwargs,
     ):
@@ -77,10 +72,6 @@ class BaseVAE(BaseModel):
 
         self.prior = nn.ModuleDict(prior)
 
-        if latent_compose_function is None:
-            latent_compose_function = _latent_compose_function
-        self.latent_compose_function = latent_compose_function
-
     def calculate_rcl(self, x, x_hat, key):
         rcl_per_input_dimension = self.reconstruction_loss[key](x[key], x_hat[key])
         return rcl_per_input_dimension
@@ -88,10 +79,11 @@ class BaseVAE(BaseModel):
     def calculate_elbo(self, x, x_hat, z):
 
         rcl_per_input_dimension = {}
-        rcl_reduced = {}
+        rcl_avg = {}
         for key in x_hat.keys():
             rcl_per_input_dimension[key] = self.calculate_rcl(x, x_hat, key)
-            if len(rcl_per_input_dimension[key].shape) > 0:
+
+            if len(rcl_per_input_dimension[key].shape) == 2:
                 rcl = (
                     rcl_per_input_dimension[key]
                     # flatten
@@ -100,9 +92,9 @@ class BaseVAE(BaseModel):
                     .sum(dim=1)
                 )
 
-                rcl_reduced[key] = rcl.mean()
+                rcl_avg[key] = rcl.mean()
             else:
-                rcl_reduced[key] = rcl_per_input_dimension[key]
+                rcl_avg[key] = rcl_per_input_dimension[key]
 
         kld_per_part = {
             part: self.prior[part](z_part, mode="kl", reduction="none")
@@ -110,14 +102,14 @@ class BaseVAE(BaseModel):
         }
 
         kld_per_part_summed = {
-            part: kl.sum(dim=-1).mean() for part, kl in kld_per_part.items()
+            part: this_kld_part.view(-1, 1).sum(dim=1).float().mean()
+            for part, this_kld_part in kld_per_part.items()
         }
 
-        total_kld = sum(kld_per_part_summed.values())
         return (
-            sum(rcl_reduced.values()) + self.beta * total_kld,
-            rcl_reduced,
-            total_kld,
+            sum(rcl_avg.values()) + self.beta * sum(kld_per_part_summed.values()),
+            rcl_avg,
+            sum(kld_per_part_summed.values()),
             kld_per_part,
         )
 
@@ -132,6 +124,9 @@ class BaseVAE(BaseModel):
             part: encoder(batch[part].float()) for part, encoder in self.encoder.items()
         }
 
+    def latent_compose_function(self, z_parts, **kwargs):
+        return z_parts
+
     def decode(self, z_parts):
         z = self.latent_compose_function(z_parts)
 
@@ -140,7 +135,12 @@ class BaseVAE(BaseModel):
             z,
         )
 
+    def parse_batch(self, batch):
+        return batch
+
     def forward(self, batch, decode=False, compute_loss=False, **kwargs):
+
+        batch = self.parse_batch(batch)
 
         z_parts_params = self.encode(batch)
 
@@ -227,6 +227,17 @@ class BaseVAE(BaseModel):
                     f"kld/{part}": kld_per_part[part].detach().float().cpu(),
                 }
             )
+
+        if stage == "test":
+            for part, reconstruction in x_hat.items():
+                results.update(
+                    {
+                        f"x_hat/{part}": reconstruction.detach().cpu(),
+                    }
+                )
+            for k, v in batch.items():
+                if not isinstance(v, list):
+                    results[k] = v.detach().cpu()
 
         if self.hparams.id_label is not None:
             if self.hparams.id_label in batch:

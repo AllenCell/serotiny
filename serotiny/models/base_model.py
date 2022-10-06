@@ -43,6 +43,8 @@ def _parse_init_args(frame):
     ignore = [arg for arg, v in init_args.items() if not _is_primitive(v)]
     if "optimizer" in ignore:
         ignore.remove("optimizer")
+    if "lr_scheduler" in ignore:
+        ignore.remove("lr_scheduler")
 
     if "lr_scheduler" in ignore:
         ignore.remove("lr_scheduler")
