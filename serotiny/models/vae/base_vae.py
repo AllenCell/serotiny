@@ -159,8 +159,6 @@ class BaseVAE(BaseModel):
             kld_loss,
             kld_per_part,
         ) = self.calculate_elbo(batch, x_hat, z_parts_params)
-        import ipdb
-        ipdb.set_trace()
         
         return (
             x_hat,

@@ -68,8 +68,6 @@ class ImageDecoder(nn.Module):
             self.first_out_channels,
             *self.compressed_img_shape
         )
-        import ipdb
-        ipdb.set_trace()
         z = self.deconv(z)
         z = z.clamp(max=50)
         return z
