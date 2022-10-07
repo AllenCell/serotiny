@@ -95,14 +95,13 @@ class BaseVAE(BaseModel):
             else:
                 rcl_avg[key] = rcl_per_input_dimension[key]
 
-
         kld_per_part = {
             part: self.prior[part](z_part, mode="kl", reduction="none")
             for part, z_part in z.items()
         }
 
         kld_per_part_summed = {
-            part: self.prior[part](z_part, mode="kl") for part, z_part in z.items()
+            part: kl.sum(dim=-1).mean() for part, kl in kld_per_part.items()
         }
 
         return (
@@ -153,13 +152,10 @@ class BaseVAE(BaseModel):
         if not compute_loss:
             return x_hat, z_parts, z_parts_params, z_composed
 
-        (
-            loss,
-            reconstruction_loss,
-            kld_loss,
-            kld_per_part,
-        ) = self.calculate_elbo(batch, x_hat, z_parts_params)
-        
+        (loss, reconstruction_loss, kld_loss, kld_per_part,) = self.calculate_elbo(
+            batch, x_hat, z_parts_params
+        )
+
         return (
             x_hat,
             z_parts,
@@ -206,16 +202,12 @@ class BaseVAE(BaseModel):
 
         for part, z_comp_part in z_composed.items():
             results.update(
-                {
-                    f"z_composed/{part}": z_comp_part.detach().cpu(),
-                }
+                {f"z_composed/{part}": z_comp_part.detach().cpu(),}
             )
 
         for part, recon_part in reconstruction_loss.items():
             results.update(
-                {
-                    f"reconstruction_loss/{part}": recon_part.detach().cpu(),
-                }
+                {f"reconstruction_loss/{part}": recon_part.detach().cpu(),}
             )
 
         for part, z_part in z_parts.items():
@@ -230,9 +222,7 @@ class BaseVAE(BaseModel):
         if stage == "test":
             for part, reconstruction in x_hat.items():
                 results.update(
-                    {
-                        f"x_hat/{part}": reconstruction.detach().cpu(),
-                    }
+                    {f"x_hat/{part}": reconstruction.detach().cpu(),}
                 )
             for k, v in batch.items():
                 if not isinstance(v, list):

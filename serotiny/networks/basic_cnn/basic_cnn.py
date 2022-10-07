@@ -115,8 +115,7 @@ class BasicCNN(nn.Module):
 
         if flat_output:
             self.output = nn.Sequential(
-                nn.Linear(compressed_size, output_dim),
-                nn.Identity()
+                nn.Linear(compressed_size, output_dim), nn.Identity()
             )
 
     def conv_forward(self, x, return_sizes=False):
@@ -149,13 +148,13 @@ class BasicCNN(nn.Module):
 
     def forward(self, x):
         x = self.conv_forward(x)
-            
+
         if self.pyramid_pool_splits is not None:
             x = spatial_pyramid_pool(x, self.pyramid_pool_splits)
 
         if self.flat_output:
             x = self.output(x.view(x.shape[0], -1))
-            
+
         if self.encoder_clamp:
             x = x.clamp(max=self.encoder_clamp)
 
