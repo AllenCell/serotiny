@@ -25,7 +25,7 @@ class BasicCNN(nn.Module):
         flat_output: bool = True,
         up_conv: bool = False,
         non_linearity: Optional[nn.Module] = None,
-        final_non_linearity: Optional[nn.Module] = None,
+        encoder_clamp: Optional[int] = None,
         skip_connections: Union[bool, Sequence[int]] = False,
         batch_norm: bool = True,
         mode: str = "3d",
@@ -111,11 +111,12 @@ class BasicCNN(nn.Module):
             compressed_size = np.prod(dummy_compressed.shape[1:])
 
         log.info(f"Determined 'compressed size': {compressed_size} for CNN")
+        self.encoder_clamp = encoder_clamp
 
         if flat_output:
             self.output = nn.Sequential(
                 nn.Linear(compressed_size, output_dim),
-                nn.Identity() if final_non_linearity is None else final_non_linearity,
+                nn.Identity()
             )
 
     def conv_forward(self, x, return_sizes=False):
@@ -148,10 +149,14 @@ class BasicCNN(nn.Module):
 
     def forward(self, x):
         x = self.conv_forward(x)
+            
         if self.pyramid_pool_splits is not None:
             x = spatial_pyramid_pool(x, self.pyramid_pool_splits)
 
         if self.flat_output:
             x = self.output(x.view(x.shape[0], -1))
+            
+        if self.encoder_clamp:
+            x = x.clamp(max=self.encoder_clamp)
 
         return x
