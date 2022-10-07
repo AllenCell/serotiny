@@ -12,7 +12,7 @@ _DEFAULT_LOADER_KWARGS = dict(
     reader=None,
     dtype=None,
     return_as_torch=True,
-    force_3d=False,
+    unsqueeze_first_dim=False,
     ome_zarr_level=0,
     ome_zarr_image_name="default",
 )
