@@ -46,7 +46,7 @@ def image_loader(
     return_channels: bool = False,
     return_as_torch: bool = True,
     reader: Optional[str] = None,
-    force_3d: bool = False,
+    unsqueeze_first_dim: bool = False,
     ome_zarr_level: int = 0,
     ome_zarr_image_name: str = "default",
 ):
@@ -75,9 +75,10 @@ def image_loader(
     return_as_torch: bool = True
         Flag to determine whether to return the resulting image as a torch.Tensor
 
-    force_3d: bool = True
-        Force interpretation as 3d image. Useful for wrongfully stored or
-        inferred dimensions.
+    unsqueeze_first_dim: bool = False
+        Whether to unsqueeze the first dimension.
+        Useful when the channel dimension is needed even if there's a single
+        channel.
 
     ome_zarr_level: int = 0
         If reading an ome zarr image, this specifies what level of the pyramid
@@ -123,7 +124,9 @@ def image_loader(
         channel_name: index for index, channel_name in enumerate(loaded_channels)
     }
 
-    if len(data.shape) == 3 and force_3d:
+    data = data.squeeze()
+
+    if unsqueeze_first_dim:
         data = np.expand_dims(data, axis=0)
 
     if dtype is not None:
