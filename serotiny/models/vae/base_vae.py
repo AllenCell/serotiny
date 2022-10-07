@@ -82,8 +82,7 @@ class BaseVAE(BaseModel):
         rcl_avg = {}
         for key in x_hat.keys():
             rcl_per_input_dimension[key] = self.calculate_rcl(x, x_hat, key)
-
-            if len(rcl_per_input_dimension[key].shape) == 2:
+            if len(rcl_per_input_dimension[key].shape) > 0:
                 rcl = (
                     rcl_per_input_dimension[key]
                     # flatten
@@ -95,6 +94,7 @@ class BaseVAE(BaseModel):
                 rcl_avg[key] = rcl.mean()
             else:
                 rcl_avg[key] = rcl_per_input_dimension[key]
+
 
         kld_per_part = {
             part: self.prior[part](z_part, mode="kl", reduction="none")
@@ -159,6 +159,8 @@ class BaseVAE(BaseModel):
             kld_loss,
             kld_per_part,
         ) = self.calculate_elbo(batch, x_hat, z_parts_params)
+        import ipdb
+        ipdb.set_trace()
         
         return (
             x_hat,

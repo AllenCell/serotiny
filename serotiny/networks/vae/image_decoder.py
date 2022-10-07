@@ -8,6 +8,7 @@ class ImageDecoder(nn.Module):
     def __init__(
         self,
         encoder,
+        deconv_block,
         input_dims,
         in_channels,
         latent_dim,
@@ -44,8 +45,7 @@ class ImageDecoder(nn.Module):
                         stride=conv.stride,
                     )
                 )
-                deconv_layers.append(torch.nn.LeakyReLU())
-                deconv_layers.append(torch.nn.LazyBatchNorm3d())
+                
             else:
                 deconv_layers.append(
                     torch.nn.LazyConvTranspose2d(
@@ -54,8 +54,8 @@ class ImageDecoder(nn.Module):
                         stride=conv.stride,
                     )
                 )
-                deconv_layers.append(torch.nn.LeakyReLU())
-                deconv_layers.append(torch.nn.LazyBatchNorm2d())
+            if index != 0:
+                deconv_layers.append(deconv_block)
 
         deconv = nn.Sequential(*deconv_layers)
         self.deconv = deconv
@@ -68,7 +68,8 @@ class ImageDecoder(nn.Module):
             self.first_out_channels,
             *self.compressed_img_shape
         )
-
+        import ipdb
+        ipdb.set_trace()
         z = self.deconv(z)
         z = z.clamp(max=50)
         return z
