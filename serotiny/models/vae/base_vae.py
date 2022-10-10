@@ -219,14 +219,14 @@ class BaseVAE(BaseModel):
                 }
             )
 
-        if stage == "test":
-            for part, reconstruction in x_hat.items():
-                results.update(
-                    {f"x_hat/{part}": reconstruction.detach().cpu(),}
-                )
-            for k, v in batch.items():
-                if not isinstance(v, list):
-                    results[k] = v.detach().cpu()
+        # if stage == "test":
+        #     for part, reconstruction in x_hat.items():
+        #         results.update(
+        #             {f"x_hat/{part}": reconstruction.detach().cpu(),}
+        #         )
+        #     for k, v in batch.items():
+        #         if not isinstance(v, list):
+        #             results[k] = v.detach().cpu()
 
         if self.hparams.id_label is not None:
             if self.hparams.id_label in batch:
