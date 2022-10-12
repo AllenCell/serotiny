@@ -44,6 +44,9 @@ def _parse_init_args(frame):
     if "optimizer" in ignore:
         ignore.remove("optimizer")
 
+    if "lr_scheduler" in ignore:
+        ignore.remove("lr_scheduler")
+
     for arg in ignore:
         del init_args[arg]
     return init_args

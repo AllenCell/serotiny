@@ -5,6 +5,36 @@ from typing import Optional, Sequence, Union
 
 import pandas as pd
 import pyarrow.parquet
+import scanpy as sc
+import anndata
+
+
+def read_h5ad(path, include_columns=None):
+    """Read an annData object stored in a .h5ad file.
+
+    Parameters
+    ----------
+
+    path: Union[Path, str]
+        Path to the .h5ad file
+
+    include_columns: Optional[Sequence[str]] = None
+        List of column names and/or regex expressions, used to only include the
+        desired columns in the resulting dataframe.
+
+    Returns
+    -------
+    annData
+    """
+    dataframe = sc.read(path)
+
+    if include_columns is not None:
+        columns = []
+        for filter_ in include_columns:
+            columns += filter_columns(dataframe.obs.columns.tolist(), regex=filter_)
+
+        dataframe.obs = dataframe.obs[columns]
+    return dataframe
 
 
 def read_parquet(path, include_columns=None):
@@ -117,6 +147,8 @@ def read_dataframe(
             dataframe = read_csv(dataframe, include_columns)
         elif dataframe.suffix == ".parquet":
             dataframe = read_parquet(dataframe, include_columns)
+        elif dataframe.suffix == ".h5ad":
+            dataframe = read_h5ad(dataframe, include_columns)
         else:
             raise TypeError("File type of provided manifest is not .csv " "or .parquet")
 
@@ -127,12 +159,29 @@ def read_dataframe(
                 columns += filter_columns(dataframe.columns, regex=filter_)
 
             dataframe = dataframe[columns]
+    elif isinstance(dataframe, anndata.AnnData):
+        if include_columns is not None:
+            columns = []
+            for filter_ in include_columns:
+                columns += filter_columns(dataframe.obs.columns, regex=filter_)
 
+            dataframe.obs = dataframe.obs[columns]
     else:
         raise TypeError(
             f"`dataframe` must be either a pd.DataFrame or a path to "
             f"a file to load one. You passed {type(dataframe)}"
         )
+
+    if isinstance(dataframe, anndata.AnnData):
+        # Make dataframe out of anndata object
+        X = dataframe.X.toarray()
+        X = pd.DataFrame(X, columns=[f"X_{i}" for i in range(X.shape[1])]).reset_index(
+            drop=True
+        )
+        index = pd.DataFrame(dataframe.obs_names)
+        dataframe = dataframe.obs.reset_index(drop=True)
+        dataframe = pd.concat([X, dataframe], axis=1)
+        dataframe = pd.concat([index, dataframe], axis=1)
 
     if required_columns is not None:
         missing_columns = set(required_columns) - set(dataframe.columns)

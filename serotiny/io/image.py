@@ -1,4 +1,4 @@
-from pathlib import Path
+from upath import UPath as Path
 from typing import Callable, Optional, Sequence, Type, Union
 
 import aicsimageio
@@ -6,6 +6,9 @@ import numpy as np
 import torch
 from aicsimageio.aics_image import _load_reader
 from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
+from ome_zarr.reader import Reader
+from ome_zarr.io import parse_url
+from omegaconf import ListConfig
 
 
 def infer_dims(img: aicsimageio.AICSImage):
@@ -41,9 +44,10 @@ def image_loader(
     dtype: Optional[Union[str, Type[np.number]]] = None,
     transform: Optional[Callable] = None,
     return_channels: bool = False,
-    return_as_torch: bool = True,
     reader: Optional[str] = None,
-    force_3d: bool = False,
+    unsqueeze_first_dim: bool = False,
+    ome_zarr_level: int = 0,
+    ome_zarr_image_name: str = "default",
 ):
     """Load image from path given by `path`. If the given image doesn't have
     channel names, `select_channels` must be a list of integers.
@@ -67,18 +71,25 @@ def image_loader(
         Flag to determine whether to return a channel-index map when loading
         the image. This is only useful when channels have names
 
-    return_as_torch: bool = True
-        Flag to determine whether to return the resulting image as a torch.Tensor
+    unsqueeze_first_dim: bool = False
+        Whether to unsqueeze the first dimension.
+        Useful when the channel dimension is needed even if there's a single
+        channel.
 
-    force_3d: bool = True
-        Force interpretation as 3d image. Useful for wrongfully stored or
-        inferred dimensions.
+    ome_zarr_level: int = 0
+        If reading an ome zarr image, this specifies what level of the pyramid
+        to return
+
+    ome_zarr_image_name: str = "default"
+        If reading an ome zarr image, this specifies the image name
     """
 
-    if reader is not None:
-        reader = _load_reader(reader)
-
-    img = aicsimageio.AICSImage(path, reader=reader)
+    if str(path).endswith(".zarr"):
+        img = read_ome_zarr(path, ome_zarr_level, ome_zarr_image_name)
+    else:
+        if reader is not None:
+            reader = _load_reader(reader)
+        img = aicsimageio.AICSImage(path, reader=reader)
     channel_names = img.channel_names or list(range(img.data.shape[0]))
 
     if (select_channels is None) or (len(select_channels) == 0):
@@ -98,33 +109,56 @@ def image_loader(
 
     first_dim = {order[0]: loaded_channels_idx} if order[0] in ["S", "C"] else {}
 
+    for first_dim_key, first_dim_val in first_dim.items():
+        if len(first_dim_val) == 1:
+            order = order.replace(first_dim_key, "")
+            first_dim[first_dim_key] = first_dim_val[0]
+
     data = img.get_image_data(order, **zero_dims, **first_dim)
 
     channel_map = {
         channel_name: index for index, channel_name in enumerate(loaded_channels)
     }
 
-    if len(data.shape) == 3 and force_3d:
+    data = data.squeeze()
+
+    if unsqueeze_first_dim:
         data = np.expand_dims(data, axis=0)
-        channel_map = {"unnamed": 0}
 
     if dtype is not None:
         data = data.astype(dtype)
 
     if transform:
-        data = transform(data)
-
-    if return_as_torch:
-        import torch
-
-        if data.dtype.kind == "u":
-            data = data.astype(data.dtype.str[1:])
-        data = torch.tensor(data)
+        if isinstance(transform, (list, tuple, ListConfig)):
+            for _transform in transform:
+                data = _transform(data)
+        else:
+            data = transform(data)
 
     if return_channels:
         return data, channel_map
 
     return data
+
+
+def read_ome_zarr(path, level=0, image_name="default"):
+    """Function that reads an ome.zarr image and (optionally) returns an
+    AICSImage object.
+
+    Note: This is here temporarily, until aicsimageio
+    provides an OmeZarrReader class
+    """
+    path = str(path if image_name is None else Path(path) / image_name)
+    reader = Reader(parse_url(path))
+
+    node = next(iter(reader()))
+    pps = node.metadata["coordinateTransformations"][0][0]["scale"][-3:]
+
+    return aicsimageio.AICSImage(
+        node.data[level].compute(),
+        channel_names=node.metadata["name"],
+        physical_pixel_sizes=pps,
+    )
 
 
 def tiff_writer(

@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "serotiny"
-version = "0.0.2"
+version = "0.0.5"
 homepage = "https://allencell.github.io/serotiny"
 documentation = "https://allencell.github.io/serotiny"
 repository = "https://github.com/AllenCell/serotiny"
@@ -43,7 +43,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.7"
 pip = "^22.1.2"
-torch = {version = ">=1.7.1*", allow-prereleases = true}
+torch = {version = "^1.11.0", allow-prereleases = true}
 fire = "^0.4.0"
 makefun = "^1.13.1"
 hydra-core = "^1.2.0"
@@ -62,11 +62,14 @@ pandas = "^1.1"
 sphinx = {version="*", optional = true}
 furo = {version="*", optional = true}
 m2r2 = {version="*", optional = true}
-universal-pathlib = "^0.0.18"
+universal-pathlib = "^0.0.20"
 s3fs = "^2022.3.0"
 fsspec = "^2022.3.0"
 pycryptodome = "^3.14.1"
 frozendict = "^2.3.2"
+ome-zarr = "^0.6.0"
+bfio = "^2.3.0"
+scanpy = "^1.9.1"
 
 
 [tool.poetry.dev-dependencies]

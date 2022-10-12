@@ -34,6 +34,7 @@ class ManifestDatamodule(pl.LightningDataModule):
         loaders: Union[Dict, Loader],
         split_column: Optional[Union[Path, str]] = None,
         columns: Optional[Sequence[str]] = None,
+        split_map: Optional[Dict] = None,
         just_inference: bool = False,
         **dataloader_kwargs,
     ):
@@ -53,6 +54,9 @@ class ManifestDatamodule(pl.LightningDataModule):
         columns: Optional[Sequence[str]] = None
             List of columns to load from the dataset, in case it's a parquet file.
             If None, load everything.
+
+        split_map: Optional[Dict] = None
+            TODO: document this argument
 
         just_inference: bool = False
             Whether this datamodule will be used for just inference
@@ -92,7 +96,7 @@ class ManifestDatamodule(pl.LightningDataModule):
                 )
 
             self.datasets = _make_single_manifest_splits(
-                path, loaders, split_column, columns, just_inference
+                path, loaders, split_column, columns, just_inference, split_map
             )
 
         self.just_inference = just_inference
@@ -146,11 +150,21 @@ def _get_canonical_split_name(split):
 
 
 def _make_single_manifest_splits(
-    manifest_path, loaders, split_column, columns=None, just_inference=False
+    manifest_path,
+    loaders,
+    split_column,
+    columns=None,
+    just_inference=False,
+    split_map=None,
 ):
     dataframe = read_dataframe(manifest_path, columns)
+    dataframe[split_column] = dataframe[split_column].astype(np.dtype("O"))
+
     if not just_inference:
         assert dataframe.dtypes[split_column] == np.dtype("O")
+
+    if split_map is not None:
+        dataframe[split_column] = dataframe[split_column].replace(split_map)
 
     split_names = dataframe[split_column].unique().tolist()
     if not just_inference:
@@ -161,8 +175,8 @@ def _make_single_manifest_splits(
     if split_column != "split":
         dataframe["split"] = dataframe[split_column].apply(_get_canonical_split_name)
 
+    datasets = {}
     if not just_inference:
-        datasets = {}
         for split in ["train", "val", "test"]:
             datasets[split] = DataframeDataset(
                 dataframe.loc[dataframe["split"].str.startswith(split)].copy(),

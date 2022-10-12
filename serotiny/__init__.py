@@ -1,3 +1,4 @@
-__version__ = "0.0.2"
+__version__ = "0.0.5"
 
-import serotiny.config.utils as _cfg_utils  # to init omegaconf resolvers
+# to force init of omegaconf resolvers
+import serotiny.config.resolvers as _cfg_resolvers

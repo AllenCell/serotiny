@@ -4,6 +4,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch.nn.modules.loss import _Loss as Loss
+from omegaconf import ListConfig, DictConfig
 
 from .base_model import BaseModel
 
@@ -15,21 +16,23 @@ class BasicModel(BaseModel):
 
     def __init__(
         self,
-        network: nn.Module,
-        loss: Loss,
+        network: Optional[nn.Module] = None,
+        loss: Optional[Loss] = None,
         x_label: str = "x",
         y_label: str = "y",
         optimizer: torch.optim.Optimizer = torch.optim.Adam,
+        squeeze_y: bool = False,
         save_predictions: Optional[Callable] = None,
         fields_to_log: Optional[Sequence] = None,
+        pretrained_weights: Optional[str] = None,
         **kwargs,
     ):
         """
         Parameters
         ----------
-        network: nn.Module
+        network: Optional[nn.Module] = None
             The network to wrap
-        loss: Loss
+        loss: Optional[Loss] = None
             The loss function to optimize for
         x_label: str = "x"
             The key used to retrieve the input from dataloader batches
@@ -43,10 +46,30 @@ class BasicModel(BaseModel):
             List of batch fields to store with the outputs. Use a list to log
             the same fields for every training stage (train, val, test, prediction).
             If a list is used, it is assumed to be for test and prediction only
+        pretrained_weights: Optional[str] = None
+            Path to pretrained weights. If network is not None, this will be
+            loaded via `network.load_state_dict`, otherwise it will be
+            loaded via `torch.load`.
         """
         super().__init__()
-        self.network = network
-        self.loss = loss
+
+        if network is None and pretrained_weights is None:
+            raise ValueError("`network` and `pretrained_weights` can't both be None.")
+
+        if pretrained_weights is not None:
+            pretrained_weights = torch.load(pretrained_weights)
+
+        if network is not None:
+            self.network = network
+            if pretrained_weights is not None:
+                self.network.load_state_dict(pretrained_weights)
+        else:
+            self.network = pretrained_weights
+
+        if loss is not None:
+            self.loss = loss
+        else:
+            self.loss = nn.MSELoss()
 
         self._squeeze_y = False
 
@@ -66,14 +89,14 @@ class BasicModel(BaseModel):
         yhat = self.forward(x)
 
         if self._squeeze_y:
-            loss = self.loss(yhat, y.squeeze())
+            loss = self.loss(yhat.squeeze(), y.squeeze())
         else:
             try:
                 loss = self.loss(yhat, y)
-            except RuntimeError as err:
-                if y.shape[-1] == 1:
+            except (RuntimeError, ValueError) as err:
+                if _check_one_dimensional_shapes(y.shape, yhat.shape):
                     try:
-                        loss = self.loss(yhat, y.squeeze())
+                        loss = self.loss(yhat.squeeze(), y.squeeze())
                         self._squeeze_y = True
                     except Exception as inner_err:
                         raise inner_err from err
@@ -95,14 +118,20 @@ class BasicModel(BaseModel):
             "y": y.detach().squeeze(),
         }
 
-        if isinstance(self.fields_to_log, list):
+        if isinstance(self.fields_to_log, (list, ListConfig)):
             if stage in ["predict", "test"]:
                 for field in self.fields_to_log:
                     output[field] = batch[field]
 
-        elif isinstance(self.fields_to_log, dict):
+        elif isinstance(self.fields_to_log, (dict, DictConfig)):
             if stage in self.fields_to_log:
                 for field in self.fields_to_log[stage]:
                     output[field] = batch[field]
 
         return output
+
+
+def _check_one_dimensional_shapes(shape1, shape2):
+    return (len(shape1) == 1 and len(shape2) == 2 and shape2[-1] == 1) or (
+        len(shape2) == 1 and len(shape1) == 2 and shape1[-1] == 1
+    )
