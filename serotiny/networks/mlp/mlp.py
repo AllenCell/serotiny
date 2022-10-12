@@ -1,14 +1,14 @@
 import torch
 from torch import nn
-
+from typing import Optional
 from serotiny.networks.utils import weight_init
 
 
 def _make_block(input_dim, output_dim):
     return nn.Sequential(
         nn.Linear(input_dim, output_dim),
-        nn.ReLU(),
         nn.BatchNorm1d(output_dim),
+        nn.ReLU(),
     )
 
 
@@ -17,13 +17,14 @@ class MLP(nn.Module):
         self,
         *dims,
         hidden_layers=[256],
+        scale_output: Optional[int] = 1,
     ):
         super().__init__()
 
         assert len(dims) >= 2
 
         self.input_dims = dims[:-1]
-        self.output_dim = dims[-1]
+        self.output_dim = dims[-1] * scale_output
 
         self.hidden_layers = hidden_layers
 
@@ -39,7 +40,9 @@ class MLP(nn.Module):
         self.net = nn.Sequential(*net)
         self.net.apply(weight_init)
 
-    def forward(self, x1, x2=None):
-        if x2 is not None:
-            x1 = torch.cat([x1, x2], dim=1)
+    def forward(self, x1, condition=None):
+        if condition is not None:
+            if len(condition.shape) == 1:
+                condition = condition.unsqueeze(dim=1)
+            x1 = torch.cat([x1, condition], dim=1)
         return self.net(x1)
