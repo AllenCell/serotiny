@@ -15,7 +15,7 @@ class IsotropicGaussianPrior(Prior):
         super().__init__(dimensionality)
 
     @classmethod
-    def kl_divergence(cls, mean, logvar, reduction="sum", tc_penalty_weight=None):
+    def kl_divergence(cls, mean, logvar, tc_penalty_weight=None, reduction="sum"):
         """Computes the Kullback-Leibler divergence between a diagonal gaussian
         and an isotropic (0,1) gaussian. It also works batch-wise.
 
@@ -37,7 +37,7 @@ class IsotropicGaussianPrior(Prior):
         else:
             loss = kl.sum(dim=-1)
 
-        if tc_penalty_weight is not None and reduction == "mean":
+        if tc_penalty_weight is not None and reduction != "none":
             tc_penalty = compute_tc_penalty(logvar)
             loss = loss + tc_penalty_weight * tc_penalty
 
@@ -52,9 +52,10 @@ class IsotropicGaussianPrior(Prior):
     def forward(self, z, mode="kl", **kwargs):
         mean_logvar = z
         mean, logvar = torch.split(mean_logvar, mean_logvar.shape[1] // 2, dim=1)
-
         if mode == "kl":
-            return self.kl_divergence(mean, logvar, **kwargs)
+            return self.kl_divergence(
+                mean, logvar, tc_penalty_weight=self.tc_penalty_weight, **kwargs
+            )
         else:
             return self.sample(mean, logvar, **kwargs)
 
@@ -112,22 +113,18 @@ class DiagonalGaussianPrior(IsotropicGaussianPrior):
 
     @classmethod
     def kl_divergence(
-        cls, mu1, mu2, logvar1, logvar2, reduction="sum", tc_penalty_weight=None
+        cls, mu1, mu2, logvar1, logvar2, tc_penalty_weight=None, reduction="sum"
     ):
         """Computes the Kullback-Leibler divergence between two diagonal
         gaussians (not necessarily isotropic). It also works batch-wise.
-
         Parameters
         ----------
         mu1: torch.Tensor
             Mean of the first gaussian (or batch of first gaussians)
-
         mu2: torch.Tensor
             Mean of the second gaussian (or batch of second gaussians)
-
         logvar1: torch.Tensor
             Log-variance of the first gaussian (or batch of first gaussians)
-
         logvar2: torch.Tensor
             Log-variance of the second gaussian (or batch of second gaussians)
         """
@@ -156,6 +153,13 @@ class DiagonalGaussianPrior(IsotropicGaussianPrior):
         mean, logvar = torch.split(mean_logvar, mean_logvar.shape[1] // 2, dim=1)
 
         if mode == "kl":
-            return self.kl_divergence(mean, self.mean, logvar, self.logvar, **kwargs)
-        else:
-            return self.sample(mean, logvar, **kwargs)
+            return self.kl_divergence(
+                mean,
+                self.mean,
+                logvar,
+                self.logvar,
+                tc_penalty_weight=self.tc_penalty_weight,
+                **kwargs
+            )
+
+        return self.sample(mean, logvar, **kwargs)
