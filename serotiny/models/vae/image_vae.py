@@ -7,8 +7,9 @@ import torch.nn as nn
 from torch.nn.modules.loss import _Loss as Loss
 
 from serotiny.networks import BasicCNN
-from serotiny.networks.vae import ImageDecoder
+from serotiny.networks.vae import ImageDecoderBasicCNN
 from serotiny.networks.utils import weight_init
+import serotiny
 
 from .base_vae import BaseVAE
 from .priors import Prior
@@ -16,6 +17,7 @@ from .priors import Prior
 Array = Union[torch.Tensor, np.ndarray, Sequence[float]]
 logger = logging.getLogger("lightning")
 logger.propagate = False
+from omegaconf import DictConfig
 
 
 class ImageVAE(BaseVAE):
@@ -34,20 +36,26 @@ class ImageVAE(BaseVAE):
         decoder_non_linearity: Optional[nn.Module] = None,
         loss_mask_label: Optional[str] = None,
         reconstruction_loss: Loss = nn.MSELoss(reduction="none"),
-        reconstruction_reduce: str = "mean",
         skip_connections: bool = True,
         batch_norm: bool = True,
         mode: str = "3d",
-        priors: Optional[Sequence[Prior]] = None,
+        prior: Optional[Sequence[Prior]] = None,
         kernel_size: int = 3,
         cache_outputs: Sequence = ("test",),
-        final_non_linearity: nn.Module = nn.Threshold(6, 6),
+        encoder_clamp: Optional[int] = 6,
+        # final_non_linearity: Optional[nn.Module] = None,
     ):
+        if isinstance(
+            prior[x_label], serotiny.models.vae.priors.IsotropicGaussianPrior
+        ):
+            encoder_latent_dims = 2 * latent_dim
+        else:
+            encoder_latent_dims = latent_dim
 
         encoder = BasicCNN(
             in_channels=in_channels,
             input_dims=input_dims,
-            output_dim=latent_dim * 2,  # because it has to return mu and sigma
+            output_dim=encoder_latent_dims,  # because it has to return mu and sigma
             hidden_channels=hidden_channels,
             max_pool_layers=max_pool_layers,
             mode=mode,
@@ -55,10 +63,9 @@ class ImageVAE(BaseVAE):
             non_linearity=non_linearity,
             skip_connections=skip_connections,
             batch_norm=batch_norm,
-            final_non_linearity=final_non_linearity,
+            encoder_clamp=encoder_clamp,
         )
         encoder.apply(weight_init)
-        nn.utils.spectral_norm(encoder.output)
 
         dummy_out, intermediate_sizes = encoder.conv_forward(
             torch.zeros(1, in_channels, *input_dims), return_sizes=True
@@ -69,7 +76,7 @@ class ImageVAE(BaseVAE):
         intermediate_sizes = [input_dims] + intermediate_sizes[:-1]
         intermediate_sizes = intermediate_sizes[::-1]
 
-        decoder = ImageDecoder(
+        decoder = ImageDecoderBasicCNN(
             compressed_img_shape=compressed_img_shape,
             hidden_channels=list(reversed(hidden_channels)),
             intermediate_sizes=intermediate_sizes,
@@ -88,6 +95,22 @@ class ImageVAE(BaseVAE):
         if decoder_non_linearity is not None:
             decoder = nn.Sequential(decoder, decoder_non_linearity)
 
+        if not isinstance(encoder, (dict, DictConfig)):
+            assert x_label is not None
+            encoder = {x_label: encoder}
+
+        if not isinstance(decoder, (dict, DictConfig)):
+            assert x_label is not None
+            decoder = {x_label: decoder}
+
+        if not isinstance(reconstruction_loss, (dict, DictConfig)):
+            assert x_label is not None
+            reconstruction_loss = {x_label: reconstruction_loss}
+
+        if not isinstance(prior, (dict, DictConfig)):
+            assert x_label is not None
+            prior = {x_label: prior}
+
         super().__init__(
             encoder=encoder,
             decoder=decoder,
@@ -95,10 +118,9 @@ class ImageVAE(BaseVAE):
             optimizer=optimizer,
             x_label=x_label,
             id_label=id_label,
-            loss_mask_label=loss_mask_label,
             beta=beta,
             reconstruction_loss=reconstruction_loss,
-            reconstruction_reduce=reconstruction_reduce,
-            priors=priors,
             cache_outputs=cache_outputs,
+            optimizier=optimizer,
+            prior=prior,
         )
