@@ -1,26 +1,17 @@
-import inspect
-from typing import Optional, Sequence, Union
+from typing import Optional, Sequence
+from omegaconf import DictConfig
 
-import numpy as np
 import torch
 import torch.nn as nn
 from torch.nn.modules.loss import _Loss as Loss
+from torch.optim.lr_scheduler import _LRScheduler as LRScheduler
 
 from serotiny.models.base_model import BaseModel
 from .priors import Prior, IsotropicGaussianPrior
 
-Array = Union[torch.Tensor, np.ndarray, Sequence[float]]
 
-
-def get_args(encoder):
-    args = []
-    if isinstance(encoder, nn.Sequential):
-        for i in range(len(encoder)):
-            args.append(inspect.getfullargspec(encoder[i].forward).args)
-        args = [item for sublist in args for item in sublist]
-    else:
-        args = inspect.getfullargspec(encoder.forward).args
-    return args
+def _latent_compose_function(z_parts, **kwargs):
+    return z_parts
 
 
 class BaseVAE(BaseModel):
@@ -28,189 +19,212 @@ class BaseVAE(BaseModel):
         self,
         encoder: nn.Module,
         decoder: nn.Module,
-        latent_dim: Union[int, Sequence[int]],
-        beta: float,
+        latent_dim: int,
         x_label: str,
+        beta: float = 1.0,
         id_label: Optional[str] = None,
         optimizer: torch.optim.Optimizer = torch.optim.Adam,
-        loss_mask_label: Optional[str] = None,
+        lr_scheduler: Optional[LRScheduler] = None,
         reconstruction_loss: Loss = nn.MSELoss(reduction="none"),
-        reconstruction_reduce: str = "sum",
-        priors: Optional[Sequence[Prior]] = None,
+        prior: Optional[Sequence[Prior]] = None,
+        latent_compose_function=None,
         cache_outputs: Sequence = ("test",),
         **kwargs,
     ):
         """Instantiate a basic VAE model.
-
         Parameters
         ----------
         encoder: nn.Module
             Encoder network
         decoder: nn.Module
             Decoder network
+        x_label: Optional[str] = None
+        id_label: Optional[str] = None
         optimizer: torch.optim.Optimizer
             Optimizer to use
-        beta: float
+        beta: float = 1.0
             Beta parameter - the weight of the KLD term in the loss function
-        x_label: str
-            String label used to retrieve X from the batches
         reconstruction_loss: Loss
             Loss to be used for reconstruction. Can be a PyTorch loss or a class
             that respects the same interface,
             i.e. subclasses torch.nn.modules._Loss
-        priors: Optional[Sequence[AbstractPrior]]
+        prior: Optional[Sequence[AbstractPrior]]
             List of prior specifications to use for latent space
         """
         super().__init__()
 
-        self.reconstruction_reduce = reconstruction_reduce
         self.reconstruction_loss = reconstruction_loss
-        self.encoder = encoder
-        self.decoder = decoder
+
+        if not isinstance(encoder, (dict, DictConfig)):
+            assert x_label is not None
+            encoder = {x_label: encoder}
+        self.encoder = nn.ModuleDict(encoder)
+
+        if not isinstance(decoder, (dict, DictConfig)):
+            assert x_label is not None
+            decoder = {x_label: decoder}
+        self.decoder = nn.ModuleDict(decoder)
 
         self.beta = beta
         self.latent_dim = latent_dim
 
-        self.encoder_args = inspect.getfullargspec(self.encoder.forward).args
-        self.decoder_args = inspect.getfullargspec(self.decoder.forward).args
+        if prior is None:
+            prior = IsotropicGaussianPrior()
 
-        if priors is None:
-            priors = [IsotropicGaussianPrior()]
+        if not isinstance(prior, (dict, DictConfig)):
+            assert x_label is not None
+            prior = {x_label: prior}
 
-        self.priors = nn.ModuleList(priors)
+        self.prior = nn.ModuleDict(prior)
 
-    def calculate_elbo(self, x, x_hat, z, mask=None):
-        rcl_per_input_dimension = self.reconstruction_loss(x_hat, x)
+        if latent_compose_function is None:
+            latent_compose_function = _latent_compose_function
+        self.latent_compose_function = latent_compose_function
 
-        if mask is not None:
-            rcl_per_input_dimension = rcl_per_input_dimension * mask
-            normalizer = mask.view(mask.shape[0], -1).sum(dim=1)
-        else:
-            normalizer = np.prod(x.shape[1:])
+    def calculate_rcl(self, x, x_hat, key):
+        rcl_per_input_dimension = self.reconstruction_loss[key](x[key], x_hat[key])
+        return rcl_per_input_dimension
 
-        rcl = (
-            rcl_per_input_dimension
-            # flatten
-            .view(rcl_per_input_dimension.shape[0], -1)
-            # and sum across each batch element's dimensions
-            .sum(dim=1)
+    def calculate_elbo(self, x, x_hat, z):
+
+        rcl_per_input_dimension = {}
+        rcl_reduced = {}
+        for key in x_hat.keys():
+            rcl_per_input_dimension[key] = self.calculate_rcl(x, x_hat, key)
+            if len(rcl_per_input_dimension[key].shape) > 0:
+                rcl = (
+                    rcl_per_input_dimension[key]
+                    # flatten
+                    .view(rcl_per_input_dimension[key].shape[0], -1)
+                    # and sum across each batch element's dimensions
+                    .sum(dim=1)
+                )
+
+                rcl_reduced[key] = rcl.mean()
+            else:
+                rcl_reduced[key] = rcl_per_input_dimension[key]
+
+        kld_per_part = {
+            part: self.prior[part](z_part, mode="kl", reduction="none")
+            for part, z_part in z.items()
+        }
+
+        kld_per_part_summed = {
+            part: kl.sum(dim=-1).mean() for part, kl in kld_per_part.items()
+        }
+
+        total_kld = sum(kld_per_part_summed.values())
+        return (
+            sum(rcl_reduced.values()) + self.beta * total_kld,
+            rcl_reduced,
+            total_kld,
+            kld_per_part,
         )
 
-        if self.reconstruction_reduce == "mean":
-            rcl = rcl / normalizer
+    def sample_z(self, z_parts_params):
+        return {
+            part: prior(z_parts_params[part], mode="sample")
+            for part, prior in self.prior.items()
+        }
 
-        rcl = rcl.mean()
+    def encode(self, batch):
+        return {
+            part: encoder(batch[part].float()) for part, encoder in self.encoder.items()
+        }
 
-        kld = torch.sum([prior(z, mode="kl") for prior in self.priors])
+    def decode(self, z_parts):
+        z = self.latent_compose_function(z_parts)
 
         return (
-            rcl + self.beta * kld,
-            rcl,
-            kld,
+            {part: decoder(z[part].float()) for part, decoder in self.decoder.items()},
+            z,
         )
 
-    def parse_batch(self, batch):
-        if self.hparams.loss_mask_label is not None:
-            mask = batch[self.hparams.loss_mask_label].float()
-        else:
-            mask = None
-        return batch[self.hparams.x_label].float(), dict(mask=mask)
+    def forward(self, batch, decode=False, compute_loss=False, **kwargs):
 
-    def sample_z(self, z):
-        return torch.cat([prior(z, mode="sample") for prior in self.priors], dim=1)
+        z_parts_params = self.encode(batch)
 
-    def encode(self, x, **kwargs):
-        return self.encoder(
-            x, **{k: v for k, v in kwargs.items() if k in self.encoder_args}
-        )
+        z_parts = self.sample_z(z_parts_params)
 
-    def decode(self, z, **kwargs):
-        return self.decoder(
-            z, **{k: v for k, v in kwargs.items() if k in self.decoder_args}
-        )
+        x_hat, z_composed = self.decode(z_parts)
 
-    def forward(self, x, decode=False, compute_loss=False, **kwargs):
-        z_params = self.encode(x, **kwargs)
         if not decode:
-            return z_params
-
-        z = self.sample_z(z_params)
-        x_hat = self.decode(z, **kwargs)
+            return z_parts_params, z_composed
 
         if not compute_loss:
-            return x_hat, z, z_params
+            return x_hat, z_parts, z_parts_params, z_composed
 
         (
             loss,
             reconstruction_loss,
             kld_loss,
-            rcl_per_input_dimension,
-            kld_per_latent_dimension,
-        ) = self.calculate_elbo(x, x_hat, z_params, mask=kwargs.get("mask", None))
+            kld_per_part,
+        ) = self.calculate_elbo(batch, x_hat, z_parts_params)
 
         return (
             x_hat,
-            z,
-            z_params,
+            z_parts,
+            z_parts_params,
+            z_composed,
             loss,
             reconstruction_loss,
             kld_loss,
+            kld_per_part,
         )
 
-    def log_metrics(self, stage, reconstruction_loss, kld_loss, loss, logger):
-        on_step = stage == "train"
+    def log_metrics(self, stage, results, logger, batch_size):
+        on_step = (stage == "val") | (stage == "train")
 
-        self.log(
-            f"{stage} reconstruction loss",
-            reconstruction_loss,
-            logger=logger,
-            on_step=on_step,
-            on_epoch=True,
-        )
-        self.log(
-            f"{stage} kld loss", kld_loss, logger=logger, on_step=on_step, on_epoch=True
-        )
-        self.log(f"{stage}_loss", loss, logger=logger, on_step=on_step, on_epoch=True)
+        for key, value in results.items():
+            if (len(value.shape) == 0) | (len(value.shape) == 1):
+                self.log(
+                    f"{stage} {key}",
+                    value,
+                    logger=logger,
+                    on_step=on_step,
+                    on_epoch=True,
+                    batch_size=batch_size,
+                )
 
-    def _step(self, stage, batch, batch_idx, logger):
-
-        x = self.parse_batch(batch)
-
-        if isinstance(x, tuple):
-            x, forward_kwargs = x
-        else:
-            forward_kwargs = dict()
-
-        (
-            x_hat,
-            z,
-            z_params,
-            loss,
-            reconstruction_loss,
-            kld_loss,
-            rcl_per_input_dimension,
-            kld_per_latent_dimension,
-        ) = self.forward(x, decode=True, compute_loss=True, **forward_kwargs)
-
-        self.log_metrics(stage, reconstruction_loss, kld_loss, loss, logger)
-
+    def make_results_dict(
+        self,
+        stage,
+        batch,
+        loss,
+        reconstruction_loss,
+        kld_loss,
+        kld_per_part,
+        z_parts,
+        z_parts_params,
+        z_composed,
+        x_hat,
+    ):
         results = {
             "loss": loss,
             f"{stage}_loss": loss.detach().cpu(),  # for epoch end logging purposes
-            "reconstruction_loss": reconstruction_loss.detach().cpu(),
             "kld_loss": kld_loss.detach().cpu(),
-            "batch_idx": batch_idx,
-            "z": z.detach().cpu(),
-            "z_params": z_params.detach().cpu(),
-            "kld_per_latent_dimension": kld_per_latent_dimension.detach().float().cpu(),
-            "rcl_per_input_dimension": rcl_per_input_dimension.detach().float().cpu(),
         }
 
-        if stage == "test":
+        for part, z_comp_part in z_composed.items():
             results.update(
                 {
-                    "x_hat": x_hat.detach().cpu(),
-                    "x": x.detach().cpu(),
+                    f"z_composed/{part}": z_comp_part.detach().cpu(),
+                }
+            )
+
+        for part, recon_part in reconstruction_loss.items():
+            results.update(
+                {
+                    f"reconstruction_loss/{part}": recon_part.detach().cpu(),
+                }
+            )
+
+        for part, z_part in z_parts.items():
+            results.update(
+                {
+                    f"z_parts/{part}": z_part.detach().cpu(),
+                    f"z_parts_params/{part}": z_parts_params[part].detach().cpu(),
+                    f"kld/{part}": kld_per_part[part].detach().float().cpu(),
                 }
             )
 
@@ -218,5 +232,34 @@ class BaseVAE(BaseModel):
             if self.hparams.id_label in batch:
                 ids = batch[self.hparams.id_label].detach().cpu()
                 results.update({self.hparams.id_label: ids, "id": ids})
+
+        return results
+
+    def _step(self, stage, batch, batch_idx, logger):
+        (
+            x_hat,
+            z_parts,
+            z_parts_params,
+            z_composed,
+            loss,
+            reconstruction_loss,
+            kld_loss,
+            kld_per_part,
+        ) = self.forward(batch, decode=True, compute_loss=True)
+
+        results = self.make_results_dict(
+            stage,
+            batch,
+            loss,
+            reconstruction_loss,
+            kld_loss,
+            kld_per_part,
+            z_parts,
+            z_parts_params,
+            z_composed,
+            x_hat,
+        )
+
+        self.log_metrics(stage, results, logger, batch[self.hparams.x_label].shape[0])
 
         return results
