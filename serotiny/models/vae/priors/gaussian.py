@@ -37,7 +37,7 @@ class IsotropicGaussianPrior(Prior):
         else:
             loss = kl.sum(dim=-1)
 
-        if tc_penalty_weight is not None and reduction == "mean":
+        if tc_penalty_weight is not None and reduction != "none":
             tc_penalty = compute_tc_penalty(logvar)
             loss = loss + tc_penalty_weight * tc_penalty
 
