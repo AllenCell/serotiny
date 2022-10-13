@@ -1,4 +1,5 @@
 import re
+from contextlib import suppress
 from pathlib import Path
 from upath import UPath
 from typing import Optional, Sequence, Union
@@ -135,10 +136,8 @@ def read_dataframe(
         dataframe = UPath(dataframe)
 
     if isinstance(dataframe, (UPath, Path)):
-        try:
+        with suppress((NotImplementedError, FileNotFoundError)):
             dataframe = dataframe.expanduser().resolve(strict=True)
-        except (NotImplementedError, FileNotFoundError):
-            pass
 
         if not dataframe.is_file():
             raise FileNotFoundError("Manifest file not found at given path")
@@ -185,7 +184,7 @@ def read_dataframe(
 
     if required_columns is not None:
         missing_columns = set(required_columns) - set(dataframe.columns)
-        if len(missing_columns) > 0:
+        if missing_columns:
             raise ValueError(
                 f"Some or all of the required columns were not "
                 f"found on the given dataframe:\n{missing_columns}"

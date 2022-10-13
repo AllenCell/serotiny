@@ -101,7 +101,7 @@ class ManifestDatamodule(pl.LightningDataModule):
 
         self.just_inference = just_inference
         self.dataloader_kwargs = dataloader_kwargs
-        self.dataloaders = dict()
+        self.dataloaders = {}
 
     def make_dataloader(self, split):
         kwargs = dict(**self.dataloader_kwargs)
@@ -143,7 +143,7 @@ class ManifestDatamodule(pl.LightningDataModule):
 
 
 def _get_canonical_split_name(split):
-    for canon in ["train", "val", "test", "predict"]:
+    for canon in ("train", "val", "test", "predict"):
         if split.startswith(canon) or canon.startswith(split):
             return canon
     raise ValueError
@@ -177,7 +177,7 @@ def _make_single_manifest_splits(
 
     datasets = {}
     if not just_inference:
-        for split in ["train", "val", "test"]:
+        for split in ("train", "val", "test"):
             datasets[split] = DataframeDataset(
                 dataframe.loc[dataframe["split"].str.startswith(split)].copy(),
                 loaders[split],
@@ -231,7 +231,7 @@ def _parse_loaders(loaders):
             assert loaders[k] in loaders
             loaders[k] = loaders[loaders[k]]
 
-    for split in ["train", "val", "test"]:
+    for split in ("train", "val", "test"):
         if split not in loaders:
             raise ValueError(f"'{split}' missing from loaders dict.")
 

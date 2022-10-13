@@ -48,7 +48,7 @@ def main():
         return
 
     # hydra modes
-    if mode in ["train", "test", "predict"]:
+    if mode in ("train", "test", "predict"):
         import hydra
 
         if sys.argv[0].endswith("serotiny"):

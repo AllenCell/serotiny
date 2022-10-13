@@ -54,5 +54,5 @@ class JointPrior(Prior):
     def forward(self, z_params, mode="kl", **kwargs):
         if mode == "kl":
             return self.kl_divergence(z_params)
-        else:
-            return self.sample(z_params)
+
+        return self.sample(z_params)
