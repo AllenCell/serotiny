@@ -2,7 +2,7 @@ import logging
 import os
 import tempfile
 from pathlib import Path
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 
 import mlflow
 from hydra._internal.utils import _locate
@@ -40,7 +40,7 @@ def patched_autolog(
     ):  # pylint: disable=signature-differs,arguments-differ,unused-argument
         self._log_metrics(trainer, model, *args)
 
-    assert mode in ["fit", "test", "predict"]
+    assert mode in ("fit", "test", "predict")
 
     safe_patch(
         "pytorch",
@@ -175,7 +175,7 @@ def _mlflow_prep(mlflow_conf, trainer, mode):
     logger.info("Validating and processing MLFlow configuration")
 
     _validate_mlflow_conf(mlflow_conf)
-    assert mode in ["fit", "test", "predict"]
+    assert mode in ("fit", "test", "predict")
 
     # if autolog arguments aren't given, or are None, set to empty dict
     autolog = (
@@ -212,16 +212,14 @@ def _mlflow_prep(mlflow_conf, trainer, mode):
     # the program. For that reason, from this point on we remove the suffix, and
     # re-insert it as the second element in argv
 
-    try:
+    with suppress():
+        # in hydra sweeps, this only needs to be done once and will cause an
+        # error if we try to do it again
         import sys
 
         command, suffix = sys.argv[0].split(" ")
         sys.argv[0] = command
         sys.argv.insert(1, suffix)
-    except:  # noqa
-        # in hydra sweeps, this only needs to be done once and will cause an
-        # error if we try to do it again
-        pass
 
     return experiment, run_id, patience
 
@@ -420,7 +418,7 @@ def download_artifact(artifact_path, experiment_name=None, run_name=None, run_id
     """
 
     if run_id is None:
-        if None in [experiment_name, run_name]:
+        if None in (experiment_name, run_name):
             raise ValueError(
                 "If `run_id` is None, you must specify `experiment_name` and "
                 "`run_name`"

@@ -63,7 +63,7 @@ class BaseModel(pl.LightningModule):
         self.optimizer = init_args.pop("optimizer", torch.optim.Adam)
         self.lr_scheduler = init_args.pop("lr_scheduler", None)
         self.cache_outputs = init_args.get("cache_outputs", ("test",))
-        self._cached_outputs = dict()
+        self._cached_outputs = {}
 
     def parse_batch(self, batch):
         raise NotImplementedError

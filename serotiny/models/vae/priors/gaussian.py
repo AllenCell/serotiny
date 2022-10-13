@@ -56,8 +56,8 @@ class IsotropicGaussianPrior(Prior):
             return self.kl_divergence(
                 mean, logvar, tc_penalty_weight=self.tc_penalty_weight, **kwargs
             )
-        else:
-            return self.sample(mean, logvar, **kwargs)
+
+        return self.sample(mean, logvar, **kwargs)
 
 
 class DiagonalGaussianPrior(IsotropicGaussianPrior):

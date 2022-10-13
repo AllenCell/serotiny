@@ -4,6 +4,7 @@ import inspect
 import json
 import os
 import yaml
+from upath import UPath as Path
 from omegaconf import OmegaConf
 from omegaconf._utils import split_key
 from .resolvers import _encrypt as encrypt  # noqa: F401
@@ -31,7 +32,7 @@ def _create_config(obj, obj_path=None, add_partial=False):
     else:
         sig = inspect.getfullargspec(obj)
 
-    args_dict = dict()
+    args_dict = {}
     if add_partial:
         args_dict["_partial_"] = True
     args_dict["_target_"] = obj_path
@@ -109,9 +110,8 @@ def add_config(obj_path, dest):
     answer = input(
         f"This is going to overwrite {dest}{prompt_str_suffix}" "\nContinue? [Y/n] "
     )
-    if answer is None or answer.lower().strip() in ["", "yes", "y"]:
-        with open(dest, "w") as f:
-            f.write(OmegaConf.to_yaml(dest_config))
+    if answer is None or answer.lower().strip() in ("", "yes", "y"):
+        Path(dest).write_text(OmegaConf.to_yaml(dest_config))
     else:
         print("Not writing the result. The resulting config would have been:\n")
         print(OmegaConf.to_yaml(dest_config))

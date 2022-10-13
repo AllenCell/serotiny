@@ -11,5 +11,4 @@ class IdentityPrior(Prior):
     def forward(self, z, mode="kl", **kwargs):
         if mode == "kl":
             return torch.tensor(0).float()
-        else:
-            return z
+        return z

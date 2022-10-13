@@ -119,7 +119,7 @@ class BasicModel(BaseModel):
         }
 
         if isinstance(self.fields_to_log, (list, ListConfig)):
-            if stage in ["predict", "test"]:
+            if stage in ("predict", "test"):
                 for field in self.fields_to_log:
                     output[field] = batch[field]
 

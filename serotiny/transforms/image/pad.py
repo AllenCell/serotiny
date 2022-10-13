@@ -37,8 +37,7 @@ def expand_to(array, dimensions, pad=None):
 def to_tensor(value):
     if isinstance(value, np.ndarray):
         return torch.from_numpy(value)
-    else:
-        return torch.Tensor([value])
+    return torch.Tensor([value])
 
 
 def expand_columns(rows, expanded_columns, dimensions, pad=None):
@@ -101,8 +100,7 @@ class PadTo:
             # when 2 * pad_dim is even, this doesn't change the result.
             # when 2 * pad_dim is odd, this makes padding amount one pixel/voxel
             # bigger on one side
-            pad.append(math.floor(pad_dim))
-            pad.append(math.ceil(pad_dim))
+            pad.extend((math.floor(pad_dim), math.ceil(pad_dim)))
 
         # pytorch pad function expects padding amount in reverse order
         pad = pad[::-1]
