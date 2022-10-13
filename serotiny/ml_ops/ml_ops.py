@@ -140,7 +140,13 @@ def _do_model_op_wrapper(cfg):
     if mode in ("train", "predict", "test"):
         cfg = OmegaConf.merge(cfg, {"mode": mode})
 
-    _do_model_op(
-        **cfg,
-        full_conf=cfg,
-    )
+    def _log_warnings(message, category, filename, *args, **kwargs):
+        _logger = logging.getLogger(filename)
+        _logger.warning(f"{category.__name__}: {message}")
+
+    with warnings.catch_warnings():
+        warnings.showwarning = _log_warnings
+        _do_model_op(
+            **cfg,
+            full_conf=cfg,
+        )
