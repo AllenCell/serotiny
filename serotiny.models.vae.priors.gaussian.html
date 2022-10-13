@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny.models.vae.base_vae module" href="serotiny.models.vae.base_vae.html" /><link rel="prev" title="serotiny.models.vae.priors.abstract_prior module" href="serotiny.models.vae.priors.abstract_prior.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny.models.vae.priors.identity_prior module" href="serotiny.models.vae.priors.identity_prior.html" /><link rel="prev" title="serotiny.models.vae.priors.abstract_prior module" href="serotiny.models.vae.priors.abstract_prior.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
-        <title>serotiny.models.vae.priors.gaussian module - serotiny 0.0.2 documentation</title>
+        <title>serotiny.models.vae.priors.gaussian module - serotiny 0.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">serotiny 0.0.2 documentation</div></a>
+      <a href="index.html"><div class="brand">serotiny 0.0.6 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -149,7 +149,7 @@
     <img class="sidebar-logo" src="_static/serotiny_logo.svg" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">serotiny 0.0.2 documentation</span>
+  <span class="sidebar-brand-text">serotiny 0.0.6 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -188,8 +188,10 @@
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.losses.html">serotiny.losses package</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.losses.adversarial_loss.html">serotiny.losses.adversarial_loss module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.losses.continuous_bernoulli.html">serotiny.losses.continuous_bernoulli module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.losses.cosine_loss.html">serotiny.losses.cosine_loss module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.losses.gaussian_nllloss.html">serotiny.losses.gaussian_nllloss module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.losses.weibull.html">serotiny.losses.weibull module</a></li>
 </ul>
 </li>
@@ -208,6 +210,8 @@
 <li class="toctree-l5 current has-children"><a class="reference internal" href="serotiny.models.vae.priors.html">serotiny.models.vae.priors package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l6"><a class="reference internal" href="serotiny.models.vae.priors.abstract_prior.html">serotiny.models.vae.priors.abstract_prior module</a></li>
 <li class="toctree-l6 current current-page"><a class="current reference internal" href="#">serotiny.models.vae.priors.gaussian module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="serotiny.models.vae.priors.identity_prior.html">serotiny.models.vae.priors.identity_prior module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="serotiny.models.vae.priors.joint_prior.html">serotiny.models.vae.priors.joint_prior module</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
@@ -243,6 +247,7 @@
 </li>
 <li class="toctree-l4 has-children"><a class="reference internal" href="serotiny.networks.vae.html">serotiny.networks.vae package</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" role="switch" type="checkbox"/><label for="toctree-checkbox-18"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.networks.vae.image_decoder.html">serotiny.networks.vae.image_decoder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="serotiny.networks.vae.image_decoder_basiccnn.html">serotiny.networks.vae.image_decoder_basiccnn module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.networks.vae.implicit_decoder.html">serotiny.networks.vae.implicit_decoder module</a></li>
 </ul>
 </li>
@@ -303,7 +308,7 @@
 <span id="serotiny-models-vae-priors-gaussian-module"></span><h1>serotiny.models.vae.priors.gaussian module<a class="headerlink" href="#module-serotiny.models.vae.priors.gaussian" title="Permalink to this headline">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="serotiny.models.vae.priors.gaussian.DiagonalGaussianPrior">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.models.vae.priors.gaussian.</span></span><span class="sig-name descname"><span class="pre">DiagonalGaussianPrior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learn_mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learn_logvar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/priors/gaussian.html#DiagonalGaussianPrior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.priors.gaussian.DiagonalGaussianPrior" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.models.vae.priors.gaussian.</span></span><span class="sig-name descname"><span class="pre">DiagonalGaussianPrior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dimensionality</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learn_mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learn_logvar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tc_penalty_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/priors/gaussian.html#DiagonalGaussianPrior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.priors.gaussian.DiagonalGaussianPrior" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#serotiny.models.vae.priors.gaussian.IsotropicGaussianPrior" title="serotiny.models.vae.priors.gaussian.IsotropicGaussianPrior"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.models.vae.priors.gaussian.IsotropicGaussianPrior</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="serotiny.models.vae.priors.gaussian.DiagonalGaussianPrior.forward">
@@ -311,19 +316,17 @@
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="serotiny.models.vae.priors.gaussian.DiagonalGaussianPrior.kl_divergence">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kl_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sum'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/priors/gaussian.html#DiagonalGaussianPrior.kl_divergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.priors.gaussian.DiagonalGaussianPrior.kl_divergence" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kl_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mu1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tc_penalty_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sum'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/priors/gaussian.html#DiagonalGaussianPrior.kl_divergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.priors.gaussian.DiagonalGaussianPrior.kl_divergence" title="Permalink to this definition">#</a></dt>
 <dd><p>Computes the Kullback-Leibler divergence between two diagonal
-gaussians (not necessarily isotropic). It also works batch-wise.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mu1</strong> (<em>torch.Tensor</em>) – Mean of the first gaussian (or batch of first gaussians)</p></li>
+gaussians (not necessarily isotropic). It also works batch-wise.
+:Parameters: * <strong>mu1</strong> (<em>torch.Tensor</em>) – Mean of the first gaussian (or batch of first gaussians)</p>
+<blockquote>
+<div><ul class="simple">
 <li><p><strong>mu2</strong> (<em>torch.Tensor</em>) – Mean of the second gaussian (or batch of second gaussians)</p></li>
 <li><p><strong>logvar1</strong> (<em>torch.Tensor</em>) – Log-variance of the first gaussian (or batch of first gaussians)</p></li>
 <li><p><strong>logvar2</strong> (<em>torch.Tensor</em>) – Log-variance of the second gaussian (or batch of second gaussians)</p></li>
 </ul>
-</dd>
-</dl>
+</div></blockquote>
 </dd></dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.priors.gaussian.DiagonalGaussianPrior.training">
@@ -332,7 +335,7 @@ gaussians (not necessarily isotropic). It also works batch-wise.</p>
 </dd></dl>
 <dl class="py class">
 <dt class="sig sig-object py" id="serotiny.models.vae.priors.gaussian.IsotropicGaussianPrior">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.models.vae.priors.gaussian.</span></span><span class="sig-name descname"><span class="pre">IsotropicGaussianPrior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indices</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/priors/gaussian.html#IsotropicGaussianPrior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.priors.gaussian.IsotropicGaussianPrior" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.models.vae.priors.gaussian.</span></span><span class="sig-name descname"><span class="pre">IsotropicGaussianPrior</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dimensionality</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tc_penalty_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/priors/gaussian.html#IsotropicGaussianPrior"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.priors.gaussian.IsotropicGaussianPrior" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="serotiny.models.vae.priors.abstract_prior.html#serotiny.models.vae.priors.abstract_prior.Prior" title="serotiny.models.vae.priors.abstract_prior.Prior"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.models.vae.priors.abstract_prior.Prior</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="serotiny.models.vae.priors.gaussian.IsotropicGaussianPrior.forward">
@@ -340,7 +343,7 @@ gaussians (not necessarily isotropic). It also works batch-wise.</p>
 <dd></dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="serotiny.models.vae.priors.gaussian.IsotropicGaussianPrior.kl_divergence">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kl_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sum'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/priors/gaussian.html#IsotropicGaussianPrior.kl_divergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.priors.gaussian.IsotropicGaussianPrior.kl_divergence" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">kl_divergence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tc_penalty_weight</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sum'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/priors/gaussian.html#IsotropicGaussianPrior.kl_divergence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.priors.gaussian.IsotropicGaussianPrior.kl_divergence" title="Permalink to this definition">#</a></dt>
 <dd><p>Computes the Kullback-Leibler divergence between a diagonal gaussian
 and an isotropic (0,1) gaussian. It also works batch-wise.</p>
 <dl class="field-list simple">
@@ -361,6 +364,10 @@ and an isotropic (0,1) gaussian. It also works batch-wise.</p>
 <span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.vae.priors.gaussian.IsotropicGaussianPrior.training" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 </dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="serotiny.models.vae.priors.gaussian.compute_tc_penalty">
+<span class="sig-prename descclassname"><span class="pre">serotiny.models.vae.priors.gaussian.</span></span><span class="sig-name descname"><span class="pre">compute_tc_penalty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logvar</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/priors/gaussian.html#compute_tc_penalty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.priors.gaussian.compute_tc_penalty" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
 </section>
 
         </article>
@@ -368,12 +375,12 @@ and an isotropic (0,1) gaussian. It also works batch-wise.</p>
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="serotiny.models.vae.base_vae.html">
+          <a class="next-page" href="serotiny.models.vae.priors.identity_prior.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">serotiny.models.vae.base_vae module</div>
+                <div class="title">serotiny.models.vae.priors.identity_prior module</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>

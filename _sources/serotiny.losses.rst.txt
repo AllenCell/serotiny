@@ -12,6 +12,8 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
+   serotiny.losses.adversarial_loss
    serotiny.losses.continuous_bernoulli
    serotiny.losses.cosine_loss
+   serotiny.losses.gaussian_nllloss
    serotiny.losses.weibull

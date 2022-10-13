@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny.networks package" href="serotiny.networks.html" /><link rel="prev" title="serotiny.models.base_model module" href="serotiny.models.base_model.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
-        <title>serotiny.models.basic_model module - serotiny 0.0.2 documentation</title>
+        <title>serotiny.models.basic_model module - serotiny 0.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">serotiny 0.0.2 documentation</div></a>
+      <a href="index.html"><div class="brand">serotiny 0.0.6 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -149,7 +149,7 @@
     <img class="sidebar-logo" src="_static/serotiny_logo.svg" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">serotiny 0.0.2 documentation</span>
+  <span class="sidebar-brand-text">serotiny 0.0.6 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -188,8 +188,10 @@
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="serotiny.losses.html">serotiny.losses package</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.losses.adversarial_loss.html">serotiny.losses.adversarial_loss module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.losses.continuous_bernoulli.html">serotiny.losses.continuous_bernoulli module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.losses.cosine_loss.html">serotiny.losses.cosine_loss module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.losses.gaussian_nllloss.html">serotiny.losses.gaussian_nllloss module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="serotiny.losses.weibull.html">serotiny.losses.weibull module</a></li>
 </ul>
 </li>
@@ -208,6 +210,8 @@
 <li class="toctree-l5 has-children"><a class="reference internal" href="serotiny.models.vae.priors.html">serotiny.models.vae.priors package</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l6"><a class="reference internal" href="serotiny.models.vae.priors.abstract_prior.html">serotiny.models.vae.priors.abstract_prior module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="serotiny.models.vae.priors.gaussian.html">serotiny.models.vae.priors.gaussian module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="serotiny.models.vae.priors.identity_prior.html">serotiny.models.vae.priors.identity_prior module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="serotiny.models.vae.priors.joint_prior.html">serotiny.models.vae.priors.joint_prior module</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
@@ -243,6 +247,7 @@
 </li>
 <li class="toctree-l4 has-children"><a class="reference internal" href="serotiny.networks.vae.html">serotiny.networks.vae package</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" role="switch" type="checkbox"/><label for="toctree-checkbox-18"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.networks.vae.image_decoder.html">serotiny.networks.vae.image_decoder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="serotiny.networks.vae.image_decoder_basiccnn.html">serotiny.networks.vae.image_decoder_basiccnn module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.networks.vae.implicit_decoder.html">serotiny.networks.vae.implicit_decoder module</a></li>
 </ul>
 </li>
@@ -303,14 +308,14 @@
 <span id="serotiny-models-basic-model-module"></span><h1>serotiny.models.basic_model module<a class="headerlink" href="#module-serotiny.models.basic_model" title="Permalink to this headline">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="serotiny.models.basic_model.BasicModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.models.basic_model.</span></span><span class="sig-name descname"><span class="pre">BasicModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network:</span> <span class="pre">torch.nn.modules.module.Module</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss:</span> <span class="pre">torch.nn.modules.loss._Loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'y'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer:</span> <span class="pre">torch.optim.optimizer.Optimizer</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'torch.optim.adam.Adam'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_predictions:</span> <span class="pre">typing.Optional[typing.Callable]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields_to_log:</span> <span class="pre">typing.Optional[typing.Sequence]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/basic_model.html#BasicModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.basic_model.BasicModel" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.models.basic_model.</span></span><span class="sig-name descname"><span class="pre">BasicModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network:</span> <span class="pre">typing.Optional[torch.nn.modules.module.Module]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss:</span> <span class="pre">typing.Optional[torch.nn.modules.loss._Loss]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'x'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'y'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer:</span> <span class="pre">torch.optim.optimizer.Optimizer</span> <span class="pre">=</span> <span class="pre">&lt;class</span> <span class="pre">'torch.optim.adam.Adam'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">squeeze_y:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_predictions:</span> <span class="pre">typing.Optional[typing.Callable]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields_to_log:</span> <span class="pre">typing.Optional[typing.Sequence]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained_weights:</span> <span class="pre">typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/basic_model.html#BasicModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.basic_model.BasicModel" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="serotiny.models.base_model.html#serotiny.models.base_model.BaseModel" title="serotiny.models.base_model.BaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.models.base_model.BaseModel</span></code></a></p>
 <p>A minimal Pytorch Lightning wrapper around generic Pytorch models.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>nn.Module</em>) – The network to wrap</p></li>
-<li><p><strong>loss</strong> (<em>Loss</em>) – The loss function to optimize for</p></li>
+<li><p><strong>network</strong> (<em>Optional[nn.Module] = None</em>) – The network to wrap</p></li>
+<li><p><strong>loss</strong> (<em>Optional[Loss] = None</em>) – The loss function to optimize for</p></li>
 <li><p><strong>x_label</strong> (<em>str = “x”</em>) – The key used to retrieve the input from dataloader batches</p></li>
 <li><p><strong>y_label</strong> (<em>str = “y”</em>) – The key used to retrieve the target from dataloader batches</p></li>
 <li><p><strong>optimizer</strong> (<em>torch.optim.Optimizer = torch.optim.Adam</em>) – The optimizer class</p></li>
@@ -318,6 +323,9 @@
 <li><p><strong>fields_to_log</strong> (<em>Optional[Union[Sequence, Dict]] = None</em>) – List of batch fields to store with the outputs. Use a list to log
 the same fields for every training stage (train, val, test, prediction).
 If a list is used, it is assumed to be for test and prediction only</p></li>
+<li><p><strong>pretrained_weights</strong> (<em>Optional[str] = None</em>) – Path to pretrained weights. If network is not None, this will be
+loaded via <cite>network.load_state_dict</cite>, otherwise it will be
+loaded via <cite>torch.load</cite>.</p></li>
 </ul>
 </dd>
 </dl>

@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
-        <title>serotiny.ml_ops.mlflow_utils - serotiny 0.0.2 documentation</title>
+        <title>serotiny.ml_ops.mlflow_utils - serotiny 0.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -122,7 +122,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">serotiny 0.0.2 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">serotiny 0.0.6 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -148,7 +148,7 @@
     <img class="sidebar-logo" src="../../../_static/serotiny_logo.svg" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">serotiny 0.0.2 documentation</span>
+  <span class="sidebar-brand-text">serotiny 0.0.6 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -187,8 +187,10 @@
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../serotiny.losses.html">serotiny.losses package</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.losses.adversarial_loss.html">serotiny.losses.adversarial_loss module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../serotiny.losses.continuous_bernoulli.html">serotiny.losses.continuous_bernoulli module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../serotiny.losses.cosine_loss.html">serotiny.losses.cosine_loss module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.losses.gaussian_nllloss.html">serotiny.losses.gaussian_nllloss module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../serotiny.losses.weibull.html">serotiny.losses.weibull module</a></li>
 </ul>
 </li>
@@ -207,6 +209,8 @@
 <li class="toctree-l5 has-children"><a class="reference internal" href="../../../serotiny.models.vae.priors.html">serotiny.models.vae.priors package</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l6"><a class="reference internal" href="../../../serotiny.models.vae.priors.abstract_prior.html">serotiny.models.vae.priors.abstract_prior module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../serotiny.models.vae.priors.gaussian.html">serotiny.models.vae.priors.gaussian module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../serotiny.models.vae.priors.identity_prior.html">serotiny.models.vae.priors.identity_prior module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../serotiny.models.vae.priors.joint_prior.html">serotiny.models.vae.priors.joint_prior module</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
@@ -242,6 +246,7 @@
 </li>
 <li class="toctree-l4 has-children"><a class="reference internal" href="../../../serotiny.networks.vae.html">serotiny.networks.vae package</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" role="switch" type="checkbox"/><label for="toctree-checkbox-18"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.networks.vae.image_decoder.html">serotiny.networks.vae.image_decoder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../serotiny.networks.vae.image_decoder_basiccnn.html">serotiny.networks.vae.image_decoder_basiccnn module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.networks.vae.implicit_decoder.html">serotiny.networks.vae.implicit_decoder module</a></li>
 </ul>
 </li>
@@ -436,6 +441,42 @@
     <span class="k">return</span> <span class="kc">None</span>
 
 
+<div class="viewcode-block" id="get_run_id"><a class="viewcode-back" href="../../../serotiny.ml_ops.mlflow_utils.html#serotiny.ml_ops.mlflow_utils.get_run_id">[docs]</a><span class="k">def</span> <span class="nf">get_run_id</span><span class="p">(</span><span class="n">run_name</span><span class="p">,</span> <span class="n">experiment_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">experiment_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">raise_error</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">experiment_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">experiment_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"`experiment_name` and `experiment_id` can't both be None"</span><span class="p">)</span>
+
+        <span class="n">experiment</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">_experiment</span> <span class="ow">in</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">list_experiments</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">_experiment</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">experiment_name</span><span class="p">:</span>
+                <span class="n">experiment</span> <span class="o">=</span> <span class="n">_experiment</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">experiment</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">raise_error</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"No experiment matches the specified experiment_name"</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">experiment_id</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">experiment_id</span>
+
+    <span class="n">runs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">run_info</span> <span class="ow">in</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">list_run_infos</span><span class="p">(</span><span class="n">experiment_id</span><span class="o">=</span><span class="n">experiment_id</span><span class="p">):</span>
+        <span class="n">run_tags</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">run_info</span><span class="o">.</span><span class="n">run_id</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tags</span>
+
+        <span class="k">if</span> <span class="s2">"mlflow.runName"</span> <span class="ow">in</span> <span class="n">run_tags</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">run_tags</span><span class="p">[</span><span class="s2">"mlflow.runName"</span><span class="p">]</span> <span class="o">==</span> <span class="n">run_name</span><span class="p">:</span>
+                <span class="n">runs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">run_info</span><span class="o">.</span><span class="n">run_id</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">runs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"There are multiple runs in this experiment with that name."</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">runs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">runs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">raise_error</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Not run matches the specified run_name and experiment"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
 <span class="k">def</span> <span class="nf">_mlflow_prep</span><span class="p">(</span><span class="n">mlflow_conf</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Validating and processing MLFlow configuration"</span><span class="p">)</span>
 
@@ -462,25 +503,7 @@
         <span class="k">assert</span> <span class="n">run_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="c1"># creates experiment if it doesn't exist, otherwise just gets it</span>
         <span class="n">experiment</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="n">experiment_name</span><span class="o">=</span><span class="n">mlflow_conf</span><span class="o">.</span><span class="n">experiment_name</span><span class="p">)</span>
-
-        <span class="n">runs</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">run_info</span> <span class="ow">in</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">list_run_infos</span><span class="p">(</span><span class="n">experiment_id</span><span class="o">=</span><span class="n">experiment</span><span class="o">.</span><span class="n">experiment_id</span><span class="p">):</span>
-            <span class="n">run_tags</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">run_info</span><span class="o">.</span><span class="n">run_id</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tags</span>
-
-            <span class="k">if</span> <span class="s2">"mlflow.runName"</span> <span class="ow">in</span> <span class="n">run_tags</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">run_tags</span><span class="p">[</span><span class="s2">"mlflow.runName"</span><span class="p">]</span> <span class="o">==</span> <span class="n">run_name</span><span class="p">:</span>
-                    <span class="n">runs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">run_info</span><span class="o">.</span><span class="n">run_id</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">runs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">"You provided `run_name`, but there are multiple "</span>
-                <span class="s2">"runs in this experiment with that name. Please "</span>
-                <span class="s2">"specify `run_id`."</span>
-            <span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">runs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">run_id</span> <span class="o">=</span> <span class="n">runs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>  <span class="c1"># redundant but leaving it here to be explicit</span>
-            <span class="n">run_id</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">run_id</span> <span class="o">=</span> <span class="n">get_run_id</span><span class="p">(</span><span class="n">run_name</span><span class="p">,</span> <span class="n">experiment_id</span><span class="o">=</span><span class="n">experiment</span><span class="o">.</span><span class="n">experiment_id</span><span class="p">)</span>
 
     <span class="k">else</span><span class="p">:</span>
         <span class="n">run</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">)</span>
@@ -679,7 +702,9 @@
 
 <span class="sd">    It yields a temporary directory to store results and then uploads the files</span>
 <span class="sd">    stored therein. Optionally exclude given files or restrict to a given glob</span>
-<span class="sd">    filter</span>
+<span class="sd">    filter.</span>
+
+<span class="sd">    NOTE: Must be used in the context of an active MLFlow run!</span>
 <span class="sd">    """</span>
 
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_dir</span><span class="p">:</span>
@@ -694,17 +719,28 @@
 
 
 <div class="viewcode-block" id="download_artifact"><a class="viewcode-back" href="../../../serotiny.ml_ops.mlflow_utils.html#serotiny.ml_ops.mlflow_utils.download_artifact">[docs]</a><span class="nd">@contextmanager</span>
-<span class="k">def</span> <span class="nf">download_artifact</span><span class="p">(</span><span class="n">artifact_path</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">download_artifact</span><span class="p">(</span><span class="n">artifact_path</span><span class="p">,</span> <span class="n">experiment_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">run_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">run_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">"""Util context manager to download artifacts.</span>
 
 <span class="sd">    Returns a path to the downloaded artifact</span>
 <span class="sd">    """</span>
 
+    <span class="k">if</span> <span class="n">run_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="p">[</span><span class="n">experiment_name</span><span class="p">,</span> <span class="n">run_name</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"If `run_id` is None, you must specify `experiment_name` and "</span>
+                <span class="s2">"`run_name`"</span>
+            <span class="p">)</span>
+
+        <span class="n">run_id</span> <span class="o">=</span> <span class="n">get_run_id</span><span class="p">(</span>
+            <span class="n">experiment_name</span><span class="o">=</span><span class="n">experiment_name</span><span class="p">,</span> <span class="n">run_name</span><span class="o">=</span><span class="n">run_name</span><span class="p">,</span> <span class="n">raise_error</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_dir</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">client</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">tracking</span><span class="o">.</span><span class="n">MlflowClient</span><span class="p">(</span><span class="n">mlflow</span><span class="o">.</span><span class="n">get_tracking_uri</span><span class="p">())</span>
             <span class="k">yield</span> <span class="n">client</span><span class="o">.</span><span class="n">download_artifacts</span><span class="p">(</span>
-                <span class="n">run_id</span><span class="o">=</span><span class="n">mlflow</span><span class="o">.</span><span class="n">active_run</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span><span class="p">,</span>
+                <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span>
                 <span class="n">path</span><span class="o">=</span><span class="n">artifact_path</span><span class="p">,</span>
                 <span class="n">dst_path</span><span class="o">=</span><span class="n">tmp_dir</span><span class="p">,</span>
             <span class="p">)</span>

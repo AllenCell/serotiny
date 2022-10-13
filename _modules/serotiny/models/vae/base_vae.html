@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
-        <title>serotiny.models.vae.base_vae - serotiny 0.0.2 documentation</title>
+        <title>serotiny.models.vae.base_vae - serotiny 0.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -122,7 +122,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../../index.html"><div class="brand">serotiny 0.0.2 documentation</div></a>
+      <a href="../../../../index.html"><div class="brand">serotiny 0.0.6 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -148,7 +148,7 @@
     <img class="sidebar-logo" src="../../../../_static/serotiny_logo.svg" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">serotiny 0.0.2 documentation</span>
+  <span class="sidebar-brand-text">serotiny 0.0.6 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -187,8 +187,10 @@
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../serotiny.losses.html">serotiny.losses package</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.losses.adversarial_loss.html">serotiny.losses.adversarial_loss module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.losses.continuous_bernoulli.html">serotiny.losses.continuous_bernoulli module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.losses.cosine_loss.html">serotiny.losses.cosine_loss module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.losses.gaussian_nllloss.html">serotiny.losses.gaussian_nllloss module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../serotiny.losses.weibull.html">serotiny.losses.weibull module</a></li>
 </ul>
 </li>
@@ -207,6 +209,8 @@
 <li class="toctree-l5 has-children"><a class="reference internal" href="../../../../serotiny.models.vae.priors.html">serotiny.models.vae.priors package</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l6"><a class="reference internal" href="../../../../serotiny.models.vae.priors.abstract_prior.html">serotiny.models.vae.priors.abstract_prior module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../../serotiny.models.vae.priors.gaussian.html">serotiny.models.vae.priors.gaussian module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../serotiny.models.vae.priors.identity_prior.html">serotiny.models.vae.priors.identity_prior module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../serotiny.models.vae.priors.joint_prior.html">serotiny.models.vae.priors.joint_prior module</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
@@ -242,6 +246,7 @@
 </li>
 <li class="toctree-l4 has-children"><a class="reference internal" href="../../../../serotiny.networks.vae.html">serotiny.networks.vae package</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" role="switch" type="checkbox"/><label for="toctree-checkbox-18"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../../serotiny.networks.vae.image_decoder.html">serotiny.networks.vae.image_decoder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../serotiny.networks.vae.image_decoder_basiccnn.html">serotiny.networks.vae.image_decoder_basiccnn module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../serotiny.networks.vae.implicit_decoder.html">serotiny.networks.vae.implicit_decoder module</a></li>
 </ul>
 </li>
@@ -299,29 +304,20 @@
         </div>
         <article role="main">
           <h1>Source code for serotiny.models.vae.base_vae</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">inspect</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">DictConfig</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
 <span class="kn">from</span> <span class="nn">torch.nn.modules.loss</span> <span class="kn">import</span> <span class="n">_Loss</span> <span class="k">as</span> <span class="n">Loss</span>
+<span class="kn">from</span> <span class="nn">torch.optim.lr_scheduler</span> <span class="kn">import</span> <span class="n">_LRScheduler</span> <span class="k">as</span> <span class="n">LRScheduler</span>
 
 <span class="kn">from</span> <span class="nn">serotiny.models.base_model</span> <span class="kn">import</span> <span class="n">BaseModel</span>
 <span class="kn">from</span> <span class="nn">.priors</span> <span class="kn">import</span> <span class="n">Prior</span><span class="p">,</span> <span class="n">IsotropicGaussianPrior</span>
 
-<span class="n">Array</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span>
 
-
-<div class="viewcode-block" id="get_args"><a class="viewcode-back" href="../../../../serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.get_args">[docs]</a><span class="k">def</span> <span class="nf">get_args</span><span class="p">(</span><span class="n">encoder</span><span class="p">):</span>
-    <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">encoder</span><span class="p">)):</span>
-            <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="n">encoder</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">forward</span><span class="p">)</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">item</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">args</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="n">encoder</span><span class="o">.</span><span class="n">forward</span><span class="p">)</span><span class="o">.</span><span class="n">args</span>
-    <span class="k">return</span> <span class="n">args</span></div>
+<span class="k">def</span> <span class="nf">_latent_compose_function</span><span class="p">(</span><span class="n">z_parts</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">z_parts</span>
 
 
 <div class="viewcode-block" id="BaseVAE"><a class="viewcode-back" href="../../../../serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE">[docs]</a><span class="k">class</span> <span class="nc">BaseVAE</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
@@ -329,197 +325,212 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">encoder</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
         <span class="n">decoder</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span>
-        <span class="n">latent_dim</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span>
-        <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">latent_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">x_label</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
         <span class="n">id_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">optimizer</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">,</span>
-        <span class="n">loss_mask_label</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">lr_scheduler</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LRScheduler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">reconstruction_loss</span><span class="p">:</span> <span class="n">Loss</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">(</span><span class="n">reduction</span><span class="o">=</span><span class="s2">"none"</span><span class="p">),</span>
-        <span class="n">reconstruction_reduce</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"sum"</span><span class="p">,</span>
-        <span class="n">priors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="n">Prior</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">prior</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="n">Prior</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">latent_compose_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">cache_outputs</span><span class="p">:</span> <span class="n">Sequence</span> <span class="o">=</span> <span class="p">(</span><span class="s2">"test"</span><span class="p">,),</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">"""Instantiate a basic VAE model.</span>
-
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        encoder: nn.Module</span>
 <span class="sd">            Encoder network</span>
 <span class="sd">        decoder: nn.Module</span>
 <span class="sd">            Decoder network</span>
+<span class="sd">        x_label: Optional[str] = None</span>
+<span class="sd">        id_label: Optional[str] = None</span>
 <span class="sd">        optimizer: torch.optim.Optimizer</span>
 <span class="sd">            Optimizer to use</span>
-<span class="sd">        beta: float</span>
+<span class="sd">        beta: float = 1.0</span>
 <span class="sd">            Beta parameter - the weight of the KLD term in the loss function</span>
-<span class="sd">        x_label: str</span>
-<span class="sd">            String label used to retrieve X from the batches</span>
 <span class="sd">        reconstruction_loss: Loss</span>
 <span class="sd">            Loss to be used for reconstruction. Can be a PyTorch loss or a class</span>
 <span class="sd">            that respects the same interface,</span>
 <span class="sd">            i.e. subclasses torch.nn.modules._Loss</span>
-<span class="sd">        priors: Optional[Sequence[AbstractPrior]]</span>
+<span class="sd">        prior: Optional[Sequence[AbstractPrior]]</span>
 <span class="sd">            List of prior specifications to use for latent space</span>
 <span class="sd">        """</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">reconstruction_reduce</span> <span class="o">=</span> <span class="n">reconstruction_reduce</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reconstruction_loss</span> <span class="o">=</span> <span class="n">reconstruction_loss</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">encoder</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">decoder</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">encoder</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">)):</span>
+            <span class="k">assert</span> <span class="n">x_label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">encoder</span> <span class="o">=</span> <span class="p">{</span><span class="n">x_label</span><span class="p">:</span> <span class="n">encoder</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleDict</span><span class="p">(</span><span class="n">encoder</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">decoder</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">)):</span>
+            <span class="k">assert</span> <span class="n">x_label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">decoder</span> <span class="o">=</span> <span class="p">{</span><span class="n">x_label</span><span class="p">:</span> <span class="n">decoder</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleDict</span><span class="p">(</span><span class="n">decoder</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">=</span> <span class="n">beta</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">latent_dim</span> <span class="o">=</span> <span class="n">latent_dim</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">encoder_args</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">forward</span><span class="p">)</span><span class="o">.</span><span class="n">args</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">decoder_args</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getfullargspec</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">forward</span><span class="p">)</span><span class="o">.</span><span class="n">args</span>
+        <span class="k">if</span> <span class="n">prior</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">prior</span> <span class="o">=</span> <span class="n">IsotropicGaussianPrior</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">priors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">priors</span> <span class="o">=</span> <span class="p">[</span><span class="n">IsotropicGaussianPrior</span><span class="p">()]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="p">(</span><span class="nb">dict</span><span class="p">,</span> <span class="n">DictConfig</span><span class="p">)):</span>
+            <span class="k">assert</span> <span class="n">x_label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">prior</span> <span class="o">=</span> <span class="p">{</span><span class="n">x_label</span><span class="p">:</span> <span class="n">prior</span><span class="p">}</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">priors</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">(</span><span class="n">priors</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prior</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleDict</span><span class="p">(</span><span class="n">prior</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BaseVAE.calculate_elbo"><a class="viewcode-back" href="../../../../serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.calculate_elbo">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_elbo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x_hat</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">rcl_per_input_dimension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reconstruction_loss</span><span class="p">(</span><span class="n">x_hat</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">latent_compose_function</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">latent_compose_function</span> <span class="o">=</span> <span class="n">_latent_compose_function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">latent_compose_function</span> <span class="o">=</span> <span class="n">latent_compose_function</span>
 
-        <span class="k">if</span> <span class="n">mask</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">rcl_per_input_dimension</span> <span class="o">=</span> <span class="n">rcl_per_input_dimension</span> <span class="o">*</span> <span class="n">mask</span>
-            <span class="n">normalizer</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">mask</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">normalizer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+<div class="viewcode-block" id="BaseVAE.calculate_rcl"><a class="viewcode-back" href="../../../../serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.calculate_rcl">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_rcl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x_hat</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">rcl_per_input_dimension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reconstruction_loss</span><span class="p">[</span><span class="n">key</span><span class="p">](</span><span class="n">x</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">x_hat</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">rcl_per_input_dimension</span></div>
 
-        <span class="n">rcl</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">rcl_per_input_dimension</span>
-            <span class="c1"># flatten</span>
-            <span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">rcl_per_input_dimension</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-            <span class="c1"># and sum across each batch element's dimensions</span>
-            <span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="p">)</span>
+<div class="viewcode-block" id="BaseVAE.calculate_elbo"><a class="viewcode-back" href="../../../../serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.calculate_elbo">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_elbo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x_hat</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reconstruction_reduce</span> <span class="o">==</span> <span class="s2">"mean"</span><span class="p">:</span>
-            <span class="n">rcl</span> <span class="o">=</span> <span class="n">rcl</span> <span class="o">/</span> <span class="n">normalizer</span>
+        <span class="n">rcl_per_input_dimension</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">rcl_reduced</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">x_hat</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">rcl_per_input_dimension</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_rcl</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x_hat</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rcl_per_input_dimension</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">rcl</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">rcl_per_input_dimension</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                    <span class="c1"># flatten</span>
+                    <span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">rcl_per_input_dimension</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="c1"># and sum across each batch element's dimensions</span>
+                    <span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="p">)</span>
 
-        <span class="n">rcl</span> <span class="o">=</span> <span class="n">rcl</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="n">rcl_reduced</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">rcl</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">rcl_reduced</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">rcl_per_input_dimension</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
-        <span class="n">kld_per_dimension</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">prior</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="s2">"none"</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"kl"</span><span class="p">)</span> <span class="k">for</span> <span class="n">prior</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">priors</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span>
-        <span class="p">)</span>
+        <span class="n">kld_per_part</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">part</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior</span><span class="p">[</span><span class="n">part</span><span class="p">](</span><span class="n">z_part</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"kl"</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">part</span><span class="p">,</span> <span class="n">z_part</span> <span class="ow">in</span> <span class="n">z</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
 
-        <span class="n">kld</span> <span class="o">=</span> <span class="n">kld_per_dimension</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">kld_per_part_summed</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">part</span><span class="p">:</span> <span class="n">kl</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="k">for</span> <span class="n">part</span><span class="p">,</span> <span class="n">kl</span> <span class="ow">in</span> <span class="n">kld_per_part</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+
+        <span class="n">total_kld</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">kld_per_part_summed</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="nb">sum</span><span class="p">(</span><span class="n">rcl_reduced</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">*</span> <span class="n">total_kld</span><span class="p">,</span>
+            <span class="n">rcl_reduced</span><span class="p">,</span>
+            <span class="n">total_kld</span><span class="p">,</span>
+            <span class="n">kld_per_part</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="BaseVAE.sample_z"><a class="viewcode-back" href="../../../../serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.sample_z">[docs]</a>    <span class="k">def</span> <span class="nf">sample_z</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z_parts_params</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">part</span><span class="p">:</span> <span class="n">prior</span><span class="p">(</span><span class="n">z_parts_params</span><span class="p">[</span><span class="n">part</span><span class="p">],</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"sample"</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">part</span><span class="p">,</span> <span class="n">prior</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">prior</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="BaseVAE.encode"><a class="viewcode-back" href="../../../../serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">part</span><span class="p">:</span> <span class="n">encoder</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="n">part</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">())</span> <span class="k">for</span> <span class="n">part</span><span class="p">,</span> <span class="n">encoder</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="BaseVAE.decode"><a class="viewcode-back" href="../../../../serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z_parts</span><span class="p">):</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">latent_compose_function</span><span class="p">(</span><span class="n">z_parts</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="p">(</span>
-            <span class="n">rcl</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">beta</span> <span class="o">*</span> <span class="n">kld</span><span class="p">,</span>
-            <span class="n">rcl</span><span class="p">,</span>
-            <span class="n">kld</span><span class="p">,</span>
-            <span class="n">rcl_per_input_dimension</span><span class="p">,</span>
-            <span class="n">kld_per_dimension</span><span class="p">,</span>
+            <span class="p">{</span><span class="n">part</span><span class="p">:</span> <span class="n">decoder</span><span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">part</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">())</span> <span class="k">for</span> <span class="n">part</span><span class="p">,</span> <span class="n">decoder</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">items</span><span class="p">()},</span>
+            <span class="n">z</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="BaseVAE.parse_batch"><a class="viewcode-back" href="../../../../serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.parse_batch">[docs]</a>    <span class="k">def</span> <span class="nf">parse_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">loss_mask_label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">loss_mask_label</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">mask</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">return</span> <span class="n">batch</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">x_label</span><span class="p">]</span><span class="o">.</span><span class="n">float</span><span class="p">(),</span> <span class="nb">dict</span><span class="p">(</span><span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">)</span></div>
+<div class="viewcode-block" id="BaseVAE.forward"><a class="viewcode-back" href="../../../../serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">decode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">compute_loss</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
 
-<div class="viewcode-block" id="BaseVAE.sample_z"><a class="viewcode-back" href="../../../../serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.sample_z">[docs]</a>    <span class="k">def</span> <span class="nf">sample_z</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">prior</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"sample"</span><span class="p">)</span> <span class="k">for</span> <span class="n">prior</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">priors</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></div>
+        <span class="n">z_parts_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BaseVAE.encode"><a class="viewcode-back" href="../../../../serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.encode">[docs]</a>    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span>
-            <span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_args</span><span class="p">}</span>
-        <span class="p">)</span></div>
+        <span class="n">z_parts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_z</span><span class="p">(</span><span class="n">z_parts_params</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BaseVAE.decode"><a class="viewcode-back" href="../../../../serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.decode">[docs]</a>    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder</span><span class="p">(</span>
-            <span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">decoder_args</span><span class="p">}</span>
-        <span class="p">)</span></div>
+        <span class="n">x_hat</span><span class="p">,</span> <span class="n">z_composed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">z_parts</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BaseVAE.forward"><a class="viewcode-back" href="../../../../serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">decode</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">compute_loss</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">z_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">decode</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">z_params</span>
-
-        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_z</span><span class="p">(</span><span class="n">z_params</span><span class="p">)</span>
-        <span class="n">x_hat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">z_parts_params</span><span class="p">,</span> <span class="n">z_composed</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">compute_loss</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">x_hat</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">z_params</span>
+            <span class="k">return</span> <span class="n">x_hat</span><span class="p">,</span> <span class="n">z_parts</span><span class="p">,</span> <span class="n">z_parts_params</span><span class="p">,</span> <span class="n">z_composed</span>
 
         <span class="p">(</span>
             <span class="n">loss</span><span class="p">,</span>
             <span class="n">reconstruction_loss</span><span class="p">,</span>
             <span class="n">kld_loss</span><span class="p">,</span>
-            <span class="n">rcl_per_input_dimension</span><span class="p">,</span>
-            <span class="n">kld_per_latent_dimension</span><span class="p">,</span>
-        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_elbo</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x_hat</span><span class="p">,</span> <span class="n">z_params</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"mask"</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+            <span class="n">kld_per_part</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_elbo</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">x_hat</span><span class="p">,</span> <span class="n">z_parts_params</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="p">(</span>
             <span class="n">x_hat</span><span class="p">,</span>
-            <span class="n">z</span><span class="p">,</span>
-            <span class="n">z_params</span><span class="p">,</span>
+            <span class="n">z_parts</span><span class="p">,</span>
+            <span class="n">z_parts_params</span><span class="p">,</span>
+            <span class="n">z_composed</span><span class="p">,</span>
             <span class="n">loss</span><span class="p">,</span>
             <span class="n">reconstruction_loss</span><span class="p">,</span>
             <span class="n">kld_loss</span><span class="p">,</span>
-            <span class="n">rcl_per_input_dimension</span><span class="p">,</span>
-            <span class="n">kld_per_latent_dimension</span><span class="p">,</span>
+            <span class="n">kld_per_part</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-<div class="viewcode-block" id="BaseVAE.log_metrics"><a class="viewcode-back" href="../../../../serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.log_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">log_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">,</span> <span class="n">reconstruction_loss</span><span class="p">,</span> <span class="n">kld_loss</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
-        <span class="n">on_step</span> <span class="o">=</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">"train"</span>
+<div class="viewcode-block" id="BaseVAE.log_metrics"><a class="viewcode-back" href="../../../../serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.log_metrics">[docs]</a>    <span class="k">def</span> <span class="nf">log_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">):</span>
+        <span class="n">on_step</span> <span class="o">=</span> <span class="p">(</span><span class="n">stage</span> <span class="o">==</span> <span class="s2">"val"</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">stage</span> <span class="o">==</span> <span class="s2">"train"</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2"> reconstruction loss"</span><span class="p">,</span>
-            <span class="n">reconstruction_loss</span><span class="p">,</span>
-            <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span>
-            <span class="n">on_step</span><span class="o">=</span><span class="n">on_step</span><span class="p">,</span>
-            <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2"> kld loss"</span><span class="p">,</span> <span class="n">kld_loss</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="n">on_step</span><span class="p">,</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">_loss"</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span> <span class="n">on_step</span><span class="o">=</span><span class="n">on_step</span><span class="p">,</span> <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+                    <span class="n">value</span><span class="p">,</span>
+                    <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span>
+                    <span class="n">on_step</span><span class="o">=</span><span class="n">on_step</span><span class="p">,</span>
+                    <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
+                <span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
-
-        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">forward_kwargs</span> <span class="o">=</span> <span class="n">x</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">forward_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-
-        <span class="p">(</span>
-            <span class="n">x_hat</span><span class="p">,</span>
-            <span class="n">z</span><span class="p">,</span>
-            <span class="n">z_params</span><span class="p">,</span>
-            <span class="n">loss</span><span class="p">,</span>
-            <span class="n">reconstruction_loss</span><span class="p">,</span>
-            <span class="n">kld_loss</span><span class="p">,</span>
-            <span class="n">rcl_per_input_dimension</span><span class="p">,</span>
-            <span class="n">kld_per_latent_dimension</span><span class="p">,</span>
-        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">decode</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">compute_loss</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">forward_kwargs</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">log_metrics</span><span class="p">(</span><span class="n">stage</span><span class="p">,</span> <span class="n">reconstruction_loss</span><span class="p">,</span> <span class="n">kld_loss</span><span class="p">,</span> <span class="n">loss</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
-
+<div class="viewcode-block" id="BaseVAE.make_results_dict"><a class="viewcode-back" href="../../../../serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.make_results_dict">[docs]</a>    <span class="k">def</span> <span class="nf">make_results_dict</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">stage</span><span class="p">,</span>
+        <span class="n">batch</span><span class="p">,</span>
+        <span class="n">loss</span><span class="p">,</span>
+        <span class="n">reconstruction_loss</span><span class="p">,</span>
+        <span class="n">kld_loss</span><span class="p">,</span>
+        <span class="n">kld_per_part</span><span class="p">,</span>
+        <span class="n">z_parts</span><span class="p">,</span>
+        <span class="n">z_parts_params</span><span class="p">,</span>
+        <span class="n">z_composed</span><span class="p">,</span>
+        <span class="n">x_hat</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="n">results</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">"loss"</span><span class="p">:</span> <span class="n">loss</span><span class="p">,</span>
             <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">_loss"</span><span class="p">:</span> <span class="n">loss</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span>  <span class="c1"># for epoch end logging purposes</span>
-            <span class="s2">"reconstruction_loss"</span><span class="p">:</span> <span class="n">reconstruction_loss</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span>
             <span class="s2">"kld_loss"</span><span class="p">:</span> <span class="n">kld_loss</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span>
-            <span class="s2">"batch_idx"</span><span class="p">:</span> <span class="n">batch_idx</span><span class="p">,</span>
-            <span class="s2">"z"</span><span class="p">:</span> <span class="n">z</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span>
-            <span class="s2">"z_params"</span><span class="p">:</span> <span class="n">z_params</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span>
-            <span class="s2">"kld_per_latent_dimension"</span><span class="p">:</span> <span class="n">kld_per_latent_dimension</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span>
-            <span class="s2">"rcl_per_input_dimension"</span><span class="p">:</span> <span class="n">rcl_per_input_dimension</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span>
         <span class="p">}</span>
 
-        <span class="k">if</span> <span class="n">stage</span> <span class="o">==</span> <span class="s2">"test"</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">part</span><span class="p">,</span> <span class="n">z_comp_part</span> <span class="ow">in</span> <span class="n">z_composed</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">results</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
                 <span class="p">{</span>
-                    <span class="s2">"x_hat"</span><span class="p">:</span> <span class="n">x_hat</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span>
-                    <span class="s2">"x"</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span>
+                    <span class="sa">f</span><span class="s2">"z_composed/</span><span class="si">{</span><span class="n">part</span><span class="si">}</span><span class="s2">"</span><span class="p">:</span> <span class="n">z_comp_part</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">part</span><span class="p">,</span> <span class="n">recon_part</span> <span class="ow">in</span> <span class="n">reconstruction_loss</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="sa">f</span><span class="s2">"reconstruction_loss/</span><span class="si">{</span><span class="n">part</span><span class="si">}</span><span class="s2">"</span><span class="p">:</span> <span class="n">recon_part</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">part</span><span class="p">,</span> <span class="n">z_part</span> <span class="ow">in</span> <span class="n">z_parts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="sa">f</span><span class="s2">"z_parts/</span><span class="si">{</span><span class="n">part</span><span class="si">}</span><span class="s2">"</span><span class="p">:</span> <span class="n">z_part</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span>
+                    <span class="sa">f</span><span class="s2">"z_parts_params/</span><span class="si">{</span><span class="n">part</span><span class="si">}</span><span class="s2">"</span><span class="p">:</span> <span class="n">z_parts_params</span><span class="p">[</span><span class="n">part</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span>
+                    <span class="sa">f</span><span class="s2">"kld/</span><span class="si">{</span><span class="n">part</span><span class="si">}</span><span class="s2">"</span><span class="p">:</span> <span class="n">kld_per_part</span><span class="p">[</span><span class="n">part</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span>
                 <span class="p">}</span>
             <span class="p">)</span>
 
@@ -527,6 +538,35 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">id_label</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">:</span>
                 <span class="n">ids</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">id_label</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
                 <span class="n">results</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">id_label</span><span class="p">:</span> <span class="n">ids</span><span class="p">,</span> <span class="s2">"id"</span><span class="p">:</span> <span class="n">ids</span><span class="p">})</span>
+
+        <span class="k">return</span> <span class="n">results</span></div>
+
+    <span class="k">def</span> <span class="nf">_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+        <span class="p">(</span>
+            <span class="n">x_hat</span><span class="p">,</span>
+            <span class="n">z_parts</span><span class="p">,</span>
+            <span class="n">z_parts_params</span><span class="p">,</span>
+            <span class="n">z_composed</span><span class="p">,</span>
+            <span class="n">loss</span><span class="p">,</span>
+            <span class="n">reconstruction_loss</span><span class="p">,</span>
+            <span class="n">kld_loss</span><span class="p">,</span>
+            <span class="n">kld_per_part</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">decode</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">compute_loss</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_results_dict</span><span class="p">(</span>
+            <span class="n">stage</span><span class="p">,</span>
+            <span class="n">batch</span><span class="p">,</span>
+            <span class="n">loss</span><span class="p">,</span>
+            <span class="n">reconstruction_loss</span><span class="p">,</span>
+            <span class="n">kld_loss</span><span class="p">,</span>
+            <span class="n">kld_per_part</span><span class="p">,</span>
+            <span class="n">z_parts</span><span class="p">,</span>
+            <span class="n">z_parts_params</span><span class="p">,</span>
+            <span class="n">z_composed</span><span class="p">,</span>
+            <span class="n">x_hat</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_metrics</span><span class="p">(</span><span class="n">stage</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span> <span class="n">batch</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="o">.</span><span class="n">x_label</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="n">results</span></div>
 </pre></div>

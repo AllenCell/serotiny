@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
-        <title>serotiny.io.image - serotiny 0.0.2 documentation</title>
+        <title>serotiny.io.image - serotiny 0.0.6 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -122,7 +122,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">serotiny 0.0.2 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">serotiny 0.0.6 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -148,7 +148,7 @@
     <img class="sidebar-logo" src="../../../_static/serotiny_logo.svg" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">serotiny 0.0.2 documentation</span>
+  <span class="sidebar-brand-text">serotiny 0.0.6 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -187,8 +187,10 @@
 </ul>
 </li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../serotiny.losses.html">serotiny.losses package</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.losses.adversarial_loss.html">serotiny.losses.adversarial_loss module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../serotiny.losses.continuous_bernoulli.html">serotiny.losses.continuous_bernoulli module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../serotiny.losses.cosine_loss.html">serotiny.losses.cosine_loss module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../serotiny.losses.gaussian_nllloss.html">serotiny.losses.gaussian_nllloss module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../serotiny.losses.weibull.html">serotiny.losses.weibull module</a></li>
 </ul>
 </li>
@@ -207,6 +209,8 @@
 <li class="toctree-l5 has-children"><a class="reference internal" href="../../../serotiny.models.vae.priors.html">serotiny.models.vae.priors package</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" role="switch" type="checkbox"/><label for="toctree-checkbox-12"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l6"><a class="reference internal" href="../../../serotiny.models.vae.priors.abstract_prior.html">serotiny.models.vae.priors.abstract_prior module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../serotiny.models.vae.priors.gaussian.html">serotiny.models.vae.priors.gaussian module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../serotiny.models.vae.priors.identity_prior.html">serotiny.models.vae.priors.identity_prior module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../serotiny.models.vae.priors.joint_prior.html">serotiny.models.vae.priors.joint_prior module</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
@@ -242,6 +246,7 @@
 </li>
 <li class="toctree-l4 has-children"><a class="reference internal" href="../../../serotiny.networks.vae.html">serotiny.networks.vae package</a><input class="toctree-checkbox" id="toctree-checkbox-18" name="toctree-checkbox-18" role="switch" type="checkbox"/><label for="toctree-checkbox-18"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.networks.vae.image_decoder.html">serotiny.networks.vae.image_decoder module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../serotiny.networks.vae.image_decoder_basiccnn.html">serotiny.networks.vae.image_decoder_basiccnn module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.networks.vae.implicit_decoder.html">serotiny.networks.vae.implicit_decoder module</a></li>
 </ul>
 </li>
@@ -299,7 +304,7 @@
         </div>
         <article role="main">
           <h1>Source code for serotiny.io.image</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span></span><span class="kn">from</span> <span class="nn">upath</span> <span class="kn">import</span> <span class="n">UPath</span> <span class="k">as</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">aicsimageio</span>
@@ -307,6 +312,9 @@
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">aicsimageio.aics_image</span> <span class="kn">import</span> <span class="n">_load_reader</span>
 <span class="kn">from</span> <span class="nn">aicsimageio.writers.ome_tiff_writer</span> <span class="kn">import</span> <span class="n">OmeTiffWriter</span>
+<span class="kn">from</span> <span class="nn">ome_zarr.reader</span> <span class="kn">import</span> <span class="n">Reader</span>
+<span class="kn">from</span> <span class="nn">ome_zarr.io</span> <span class="kn">import</span> <span class="n">parse_url</span>
+<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">ListConfig</span>
 
 
 <div class="viewcode-block" id="infer_dims"><a class="viewcode-back" href="../../../serotiny.io.image.html#serotiny.io.image.infer_dims">[docs]</a><span class="k">def</span> <span class="nf">infer_dims</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">aicsimageio</span><span class="o">.</span><span class="n">AICSImage</span><span class="p">):</span>
@@ -342,9 +350,10 @@
     <span class="n">dtype</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Type</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">number</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">transform</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">return_channels</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">return_as_torch</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">reader</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">force_3d</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">unsqueeze_first_dim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">ome_zarr_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">ome_zarr_image_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"default"</span><span class="p">,</span>
 <span class="p">):</span>
     <span class="sd">"""Load image from path given by `path`. If the given image doesn't have</span>
 <span class="sd">    channel names, `select_channels` must be a list of integers.</span>
@@ -368,18 +377,25 @@
 <span class="sd">        Flag to determine whether to return a channel-index map when loading</span>
 <span class="sd">        the image. This is only useful when channels have names</span>
 
-<span class="sd">    return_as_torch: bool = True</span>
-<span class="sd">        Flag to determine whether to return the resulting image as a torch.Tensor</span>
+<span class="sd">    unsqueeze_first_dim: bool = False</span>
+<span class="sd">        Whether to unsqueeze the first dimension.</span>
+<span class="sd">        Useful when the channel dimension is needed even if there's a single</span>
+<span class="sd">        channel.</span>
 
-<span class="sd">    force_3d: bool = True</span>
-<span class="sd">        Force interpretation as 3d image. Useful for wrongfully stored or</span>
-<span class="sd">        inferred dimensions.</span>
+<span class="sd">    ome_zarr_level: int = 0</span>
+<span class="sd">        If reading an ome zarr image, this specifies what level of the pyramid</span>
+<span class="sd">        to return</span>
+
+<span class="sd">    ome_zarr_image_name: str = "default"</span>
+<span class="sd">        If reading an ome zarr image, this specifies the image name</span>
 <span class="sd">    """</span>
 
-    <span class="k">if</span> <span class="n">reader</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">reader</span> <span class="o">=</span> <span class="n">_load_reader</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
-
-    <span class="n">img</span> <span class="o">=</span> <span class="n">aicsimageio</span><span class="o">.</span><span class="n">AICSImage</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="n">reader</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".zarr"</span><span class="p">):</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">read_ome_zarr</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">ome_zarr_level</span><span class="p">,</span> <span class="n">ome_zarr_image_name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">reader</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">reader</span> <span class="o">=</span> <span class="n">_load_reader</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">aicsimageio</span><span class="o">.</span><span class="n">AICSImage</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="n">reader</span><span class="p">)</span>
     <span class="n">channel_names</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">channel_names</span> <span class="ow">or</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
 
     <span class="k">if</span> <span class="p">(</span><span class="n">select_channels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">select_channels</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
@@ -399,33 +415,56 @@
 
     <span class="n">first_dim</span> <span class="o">=</span> <span class="p">{</span><span class="n">order</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">loaded_channels_idx</span><span class="p">}</span> <span class="k">if</span> <span class="n">order</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"S"</span><span class="p">,</span> <span class="s2">"C"</span><span class="p">]</span> <span class="k">else</span> <span class="p">{}</span>
 
+    <span class="k">for</span> <span class="n">first_dim_key</span><span class="p">,</span> <span class="n">first_dim_val</span> <span class="ow">in</span> <span class="n">first_dim</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">first_dim_val</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="n">order</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">first_dim_key</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+            <span class="n">first_dim</span><span class="p">[</span><span class="n">first_dim_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">first_dim_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
     <span class="n">data</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">get_image_data</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="o">**</span><span class="n">zero_dims</span><span class="p">,</span> <span class="o">**</span><span class="n">first_dim</span><span class="p">)</span>
 
     <span class="n">channel_map</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">channel_name</span><span class="p">:</span> <span class="n">index</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">channel_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">loaded_channels</span><span class="p">)</span>
     <span class="p">}</span>
 
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">force_3d</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">unsqueeze_first_dim</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">channel_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"unnamed"</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
 
     <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">transform</span><span class="p">:</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">return_as_torch</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">torch</span>
-
-        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">"u"</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dtype</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">transform</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">ListConfig</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">_transform</span> <span class="ow">in</span> <span class="n">transform</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">_transform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">return_channels</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">channel_map</span>
 
     <span class="k">return</span> <span class="n">data</span></div>
+
+
+<div class="viewcode-block" id="read_ome_zarr"><a class="viewcode-back" href="../../../serotiny.io.image.html#serotiny.io.image.read_ome_zarr">[docs]</a><span class="k">def</span> <span class="nf">read_ome_zarr</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">image_name</span><span class="o">=</span><span class="s2">"default"</span><span class="p">):</span>
+    <span class="sd">"""Function that reads an ome.zarr image and (optionally) returns an</span>
+<span class="sd">    AICSImage object.</span>
+
+<span class="sd">    Note: This is here temporarily, until aicsimageio</span>
+<span class="sd">    provides an OmeZarrReader class</span>
+<span class="sd">    """</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span> <span class="k">if</span> <span class="n">image_name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">/</span> <span class="n">image_name</span><span class="p">)</span>
+    <span class="n">reader</span> <span class="o">=</span> <span class="n">Reader</span><span class="p">(</span><span class="n">parse_url</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+    <span class="n">node</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">reader</span><span class="p">()))</span>
+    <span class="n">pps</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"coordinateTransformations"</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">"scale"</span><span class="p">][</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span>
+
+    <span class="k">return</span> <span class="n">aicsimageio</span><span class="o">.</span><span class="n">AICSImage</span><span class="p">(</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">level</span><span class="p">]</span><span class="o">.</span><span class="n">compute</span><span class="p">(),</span>
+        <span class="n">channel_names</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span>
+        <span class="n">physical_pixel_sizes</span><span class="o">=</span><span class="n">pps</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="tiff_writer"><a class="viewcode-back" href="../../../serotiny.io.image.html#serotiny.io.image.tiff_writer">[docs]</a><span class="k">def</span> <span class="nf">tiff_writer</span><span class="p">(</span>

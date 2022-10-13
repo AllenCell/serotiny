@@ -13,4 +13,5 @@ Submodules
    :maxdepth: 4
 
    serotiny.networks.vae.image_decoder
+   serotiny.networks.vae.image_decoder_basiccnn
    serotiny.networks.vae.implicit_decoder
