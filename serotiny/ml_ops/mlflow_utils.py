@@ -140,25 +140,25 @@ def get_run_id(run_name, experiment_name=None, experiment_id=None, raise_error=F
         if experiment_name is None:
             raise ValueError("`experiment_name` and `experiment_id` can't both be None")
 
-        experiment = None
-        for _experiment in mlflow.list_experiments():
-            if _experiment.name == experiment_name:
-                experiment = _experiment
-                break
+        _experiments = mlflow.search_experiments(
+            max_results=1, filter_string=f"name = '{experiment_name}'"
+        )
 
-        if experiment is None:
+        if not _experiments:
             if raise_error:
                 raise ValueError("No experiment matches the specified experiment_name")
             return None
+
+        experiment = _experiments[0]
         experiment_id = experiment.experiment_id
 
     runs = []
-    for run_info in mlflow.list_run_infos(experiment_id=experiment_id):
-        run_tags = mlflow.get_run(run_info.run_id).data.tags
+    for run in mlflow.search_runs(experiment_ids=[experiment_id], output_format="list"):
+        run_tags = mlflow.get_run(run.info.run_id).data.tags
 
         if "mlflow.runName" in run_tags:
             if run_tags["mlflow.runName"] == run_name:
-                runs.append(run_info.run_id)
+                runs.append(run.info.run_id)
 
     if len(runs) > 1:
         raise ValueError("There are multiple runs in this experiment with that name.")
