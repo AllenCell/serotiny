@@ -63,8 +63,8 @@ class BasicCNN(nn.Module):
         else:
             if skip_connections:
                 self.skip_connections = tuple(range(len(hidden_channels)))
-            else:
-                self.skip_connections = tuple()
+
+            self.skip_connections = ()
 
         layers = []
 

@@ -1,20 +1,16 @@
-import os
+from contextlib import suppress
 from pathlib import Path
-from textwrap import dedent
-
 import nbformat
 import nbformat.v4 as v4
 from omegaconf import OmegaConf
 
 
 def get_serotiny_project():
-    try:
-        if (Path(os.getcwd()) / ".serotiny").exists():
+    with suppress():
+        if (Path.cwd() / ".serotiny").exists():
             with open(".serotiny", "r") as f:
                 project_name = f.read().strip()
             return project_name
-    except:  # noqa
-        pass
 
     return "serotiny"
 
@@ -26,13 +22,11 @@ def flatten_config(cfg):
     keys = list(conf.keys())
 
     for k in keys:
-        try:
+        with suppress():
             sub_conf = flatten_config(conf[k])
             conf.update({f"{k}/{_k}": v for _k, v in sub_conf.items()})
             del conf[k]
             continue
-        except:  # noqa
-            pass
 
         if isinstance(conf[k], list):
             for i, el in enumerate(conf[k]):
@@ -46,77 +40,61 @@ def flatten_config(cfg):
     return pd.json_normalize(conf, sep="/").to_dict(orient="records")[0]
 
 
-def _dedent(s):
-    return dedent(s).strip()
-
-
 def make_notebook(cfg, path):
     cells = []
 
     cells.append(
         (
             "code",
-            _dedent(
-                """
-    import yaml
-    import pytorch_lightning as pl
-    import torch
-    import torch.nn as nn
-
-    from hydra.utils import instantiate
-    """
+            (
+                "import yaml"
+                "import pytorch_lightning as pl"
+                "import torch"
+                "import torch.nn as nn"
+                "from hydra.utils import instantiate"
             ),
         )
     )
 
-    for subconfig in ["data", "model", "trainer"]:
-        cells.append(
+    for subconfig in ("data", "model", "trainer"):
+        cells.extend(
             (
-                "markdown",
-                _dedent(
-                    f"""
-        Below is the `{subconfig}` config and instantiation. Edit the yaml code
-        to change the configuration.
-        """
+                (
+                    "markdown",
+                    (
+                        f"\nBelow is the `{subconfig}` config and instantiation. Edit the yaml code"  # noqa
+                        f"\nto change the configuration."
+                    ),
+                ),
+                (
+                    "code",
+                    (
+                        f"{subconfig} = instantiate(yaml.full_load('''\n"
+                        + OmegaConf.to_yaml(cfg[subconfig])
+                        + "\n"
+                        + "'''))\n"
+                    ),
                 ),
             )
         )
 
-        cells.append(
+    cells.extend(
+        (
+            (
+                "markdown",
+                (
+                    "\n---"
+                    "\nThe cell below loads a batch from the train dataloader, and prints the"  # noqa
+                    "\navailable keys."
+                ),
+            ),
             (
                 "code",
                 (
-                    f"{subconfig} = instantiate(yaml.full_load('''\n"
-                    + OmegaConf.to_yaml(cfg[subconfig])
-                    + "\n"
-                    + "'''))\n"
+                    "\ntrain_dl = data.train_dataloader()"
+                    "\ntrain_batch = next(iter(train_dl))"
+                    "\n\nprint(train_batch.keys())"
                 ),
-            )
-        )
-
-    cells.append(
-        (
-            "markdown",
-            _dedent(
-                """
-    ---
-    The cell below loads a batch from the train dataloader, and prints the
-    available keys.
-    """
-            ),
-        )
-    )
-
-    cells.append(
-        (
-            "code",
-            _dedent(
-                """
-    train_dl = data.train_dataloader()
-    train_batch = next(iter(train_dl))
-
-    print(train_batch.keys())
-    """
             ),
         )
     )

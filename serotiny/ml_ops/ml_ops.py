@@ -61,7 +61,7 @@ def _do_model_op(
 
         torch.multiprocessing.set_sharing_strategy(multiprocessing_strategy)
 
-    if mode in ["train", "test", "predict"]:
+    if mode in ("train", "test", "predict"):
         if make_notebook is not None:
             mk_notebook(full_conf, make_notebook)
             return
@@ -137,7 +137,7 @@ def _do_model_op_wrapper(cfg):
     # there might be other dots in the
     # executable path, ours is the last
     mode = sys.argv[0].split(".")[-1]
-    if mode in ["train", "predict", "test"]:
+    if mode in ("train", "predict", "test"):
         cfg = OmegaConf.merge(cfg, {"mode": mode})
 
     _do_model_op(

@@ -33,7 +33,7 @@ def infer_dims(img: aicsimageio.AICSImage):
 
     if "C" not in order and "S" not in order:
         order = "C" + order
-        del zero_dims["C"]
+        zero_dims.pop("C")
 
     return order, zero_dims
 
@@ -107,7 +107,7 @@ def image_loader(
 
     order, zero_dims = infer_dims(img)
 
-    first_dim = {order[0]: loaded_channels_idx} if order[0] in ["S", "C"] else {}
+    first_dim = {order[0]: loaded_channels_idx} if order[0] in ("S", "C") else {}
 
     for first_dim_key, first_dim_val in first_dim.items():
         if len(first_dim_val) == 1:

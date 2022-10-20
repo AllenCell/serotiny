@@ -30,7 +30,7 @@ class PipelineCLI:
         def wrapper(*iargs, **kwargs):
             args = []
             for arg in iargs:
-                if (arg == ...) or (arg == "..."):
+                if arg in (..., "..."):
                     args.append([self._result])
                 elif arg == "*...":
                     args.append(self._result)
@@ -39,7 +39,7 @@ class PipelineCLI:
             args = sum(args, [])
 
             for key, value in kwargs.items():
-                if value in [..., "..."]:
+                if value in (..., "..."):
                     kwargs[key] = self._result
 
             _func = self._decorate(func)
