@@ -78,15 +78,15 @@ class BasicModel(BaseModel):
         self.fields_to_log = fields_to_log
 
     def parse_batch(self, batch):
-        return (batch[self.hparams.x_label], batch[self.hparams.y_label])
+        return (batch[self.hparams.x_label], batch[self.hparams.y_label], {})
 
     def forward(self, x, **kwargs):
         return self.network(x, **kwargs)
 
     def _step(self, stage, batch, batch_idx, logger):
-        x, y = self.parse_batch(batch)
+        x, y, forward_kwargs = self.parse_batch(batch)
 
-        yhat = self.forward(x)
+        yhat = self.forward(x, **forward_kwargs)
 
         if self._squeeze_y:
             loss = self.loss(yhat.squeeze(), y.squeeze())
