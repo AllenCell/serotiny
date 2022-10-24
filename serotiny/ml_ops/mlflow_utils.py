@@ -212,7 +212,7 @@ def _mlflow_prep(mlflow_conf, trainer, mode):
     # the program. For that reason, from this point on we remove the suffix, and
     # re-insert it as the second element in argv
 
-    with suppress():
+    with suppress(ValueError):
         # in hydra sweeps, this only needs to be done once and will cause an
         # error if we try to do it again
         import sys
