@@ -1,11 +1,12 @@
 defaults:
-  - _self_
-  - base
   - model: default
   - data: default
   - trainer: default
   - mlflow: default
+  - base
+  - hydra@hydra
+  - _self_
 
 mode: predict
 
-log_level: INFO
+hydra: {}
