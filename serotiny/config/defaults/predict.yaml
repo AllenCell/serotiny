@@ -7,3 +7,5 @@ defaults:
   - mlflow: default
 
 mode: predict
+
+log_level: INFO
