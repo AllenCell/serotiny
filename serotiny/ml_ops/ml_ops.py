@@ -1,20 +1,11 @@
+import re
 import logging
 import warnings
 import sys
+from contextlib import suppress
 
 from omegaconf import OmegaConf
 from hydra.utils import get_original_cwd
-
-
-# silence aicsimageio related warnings
-warnings.filterwarnings(action="ignore", category=FutureWarning, module="ome_types")
-logging.getLogger("xmlschema").setLevel(logging.ERROR)
-logging.getLogger("bfio").setLevel(logging.ERROR)
-logging.getLogger("bfio.backends").setLevel(logging.ERROR)
-logging.getLogger("ome_zarr").setLevel(logging.ERROR)
-logging.getLogger("ome_zarr.reader").setLevel(logging.ERROR)
-
-logger = logging.getLogger(__name__)
 
 
 def instantiate(cfg):
@@ -55,6 +46,8 @@ def _do_model_op(
     from .mlflow_utils import mlflow_fit, mlflow_predict, mlflow_test
     from .utils import make_notebook as mk_notebook
     from .utils import save_model_predictions
+
+    logger = logging.getLogger(__name__)
 
     if multiprocessing_strategy is not None:
         import torch
@@ -130,7 +123,24 @@ def _do_model_op(
         raise ValueError(f"`mode` must be 'train', 'test' or 'predict'. Got '{mode}'")
 
 
+def _setup_logging(cfg):
+    _root_logger = logging.getLogger()
+    assert _root_logger.hasHandlers()
+    assert len(_root_logger.handlers) == 2
+
+    log_level = cfg.get("log_level", "ERROR")
+    if isinstance(log_level, str):
+        _root_logger.setLevel(log_level)
+        _root_logger.handlers[0].setLevel(cfg.get("log_level", "ERROR"))
+    else:
+        for key, value in log_level.items():
+            _logger = logging.getLogger(key)
+            _logger.setLevel(value)
+
+
 def _do_model_op_wrapper(cfg):
+    _setup_logging(cfg)
+
     if isinstance(cfg, dict):
         cfg = OmegaConf.create(cfg)
 
@@ -141,6 +151,12 @@ def _do_model_op_wrapper(cfg):
         cfg = OmegaConf.merge(cfg, {"mode": mode})
 
     def _log_warnings(message, category, filename, *args, **kwargs):
+
+        with suppress(AttributeError):
+            filename = ".".join(
+                re.search(r"site-packages/(.*)\.py", filename).groups()[0].split("/")
+            )
+
         _logger = logging.getLogger(filename)
         _logger.warning(f"{category.__name__}: {message}")
 
