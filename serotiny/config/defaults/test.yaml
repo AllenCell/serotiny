@@ -6,4 +6,6 @@ defaults:
   - trainer: default
   - mlflow: default
 
-mode: apply
+mode: test
+
+log_level: INFO

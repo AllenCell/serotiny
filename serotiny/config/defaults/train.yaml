@@ -7,3 +7,5 @@ defaults:
   - mlflow: default
 
 mode: train
+
+log_level: INFO
