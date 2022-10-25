@@ -9,6 +9,8 @@ from aicsimageio.writers.ome_tiff_writer import OmeTiffWriter
 from ome_zarr.reader import Reader
 from ome_zarr.io import parse_url
 from omegaconf import ListConfig
+import warnings
+import logging
 
 
 def infer_dims(img: aicsimageio.AICSImage):
@@ -83,6 +85,14 @@ def image_loader(
     ome_zarr_image_name: str = "default"
         If reading an ome zarr image, this specifies the image name
     """
+
+    # silence aicsimageio related warnings
+    warnings.filterwarnings(action="ignore", category=FutureWarning, module="ome_types")
+    logging.getLogger("xmlschema").setLevel(logging.ERROR)
+    logging.getLogger("bfio").setLevel(logging.ERROR)
+    logging.getLogger("bfio.backends").setLevel(logging.ERROR)
+    logging.getLogger("ome_zarr").setLevel(logging.ERROR)
+    logging.getLogger("ome_zarr.reader").setLevel(logging.ERROR)
 
     if str(path).endswith(".zarr"):
         img = read_ome_zarr(path, ome_zarr_level, ome_zarr_image_name)
