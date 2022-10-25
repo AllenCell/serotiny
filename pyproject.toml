@@ -76,6 +76,7 @@ lxml = "^4.9.1"
 PyJWT = "^2.4.0"
 protobuf = "^3.20.2"
 oauthlib = "^3.2.1"
+modin = "^0.16.2"
 
 
 [tool.poetry.dev-dependencies]
