@@ -1,0 +1,10 @@
+job:
+  chdir: false
+
+output_subdir: null
+
+run:
+  dir: ${logs_root}/${mode}/${now:%Y-%m-%d}/${now:%H-%M-%S_%f}
+sweep:
+  dir: ${logs_root}/${mode}/${now:%Y-%m-%d}
+  subdir: ${now:%H-%M-%S_%f}
