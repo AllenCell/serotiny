@@ -154,9 +154,12 @@ class BaseVAE(BaseModel):
         if not compute_loss:
             return x_hat, z_parts, z_parts_params, z_composed
 
-        (loss, reconstruction_loss, kld_loss, kld_per_part,) = self.calculate_elbo(
-            batch, x_hat, z_parts_params
-        )
+        (
+            loss,
+            reconstruction_loss,
+            kld_loss,
+            kld_per_part,
+        ) = self.calculate_elbo(batch, x_hat, z_parts_params)
 
         return (
             x_hat,
@@ -195,37 +198,40 @@ class BaseVAE(BaseModel):
         z_parts,
         z_parts_params,
         z_composed,
-        x_hat,
     ):
 
         results = {
             "loss": loss,
-            f"{stage}_loss": loss,  # for epoch end logging purposes
-            "kld_loss": kld_loss,
+            f"{stage}_loss": loss.detach(),  # for epoch end logging purposes
+            "kld_loss": kld_loss.detach(),
         }
 
         for part, z_comp_part in z_composed.items():
             results.update(
-                {f"z_composed/{part}": z_comp_part,}
+                {
+                    f"z_composed/{part}": z_comp_part.detach(),
+                }
             )
 
         for part, recon_part in reconstruction_loss.items():
             results.update(
-                {f"reconstruction_loss/{part}": recon_part,}
+                {
+                    f"reconstruction_loss/{part}": recon_part.detach(),
+                }
             )
 
         for part, z_part in z_parts.items():
             results.update(
                 {
-                    f"z_parts/{part}": z_part,
-                    f"z_parts_params/{part}": z_parts_params[part],
-                    f"kld/{part}": kld_per_part[part],
+                    f"z_parts/{part}": z_part.detach(),
+                    f"z_parts_params/{part}": z_parts_params[part].detach(),
+                    f"kld/{part}": kld_per_part[part].detach(),
                 }
             )
 
         if self.hparams.id_label is not None:
             if self.hparams.id_label in batch:
-                ids = batch[self.hparams.id_label]
+                ids = batch[self.hparams.id_label].detach()
                 results.update({self.hparams.id_label: ids, "id": ids})
 
         return results
@@ -252,7 +258,6 @@ class BaseVAE(BaseModel):
             z_parts,
             z_parts_params,
             z_composed,
-            x_hat,
         )
 
         self.log_metrics(stage, results, logger, batch[self.hparams.x_label].shape[0])
