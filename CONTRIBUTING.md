@@ -3,6 +3,9 @@
 When contributing to this repository, please first discuss the change you wish to make via issue,
 email, or any other method with the owners of this repository before making a change.
 
+Also verify that there isn't already a pending issue or PR that addresses your
+intended or proposed change.
+
 Please note we have a code of conduct, please follow it in all your interactions with the project.
 
 ## Getting started
@@ -17,7 +20,10 @@ Ready to contribute? Here's how to set up `serotiny` for local development.
     git clone git@github.com:{your_name_here}/serotiny.git
     ```
 
-3. Install the project in editable mode. (It is also recommended to work in a virtualenv or anaconda environment):
+3. Install the project in editable mode. Note that this will also install
+   [`pre-commit`](https://pre-commit.com), which will ensure your code gets
+   linted according to the this repo's standards before it is commited.
+   (It is also recommended to work in a virtualenv or anaconda environment):
 
     ```bash
     cd serotiny/
