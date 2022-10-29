@@ -51,7 +51,7 @@ joblib = "^1.2.0"
 mlflow = "^1.23.1"
 nbformat = "^5.2.0"
 omegaconf = "^2.2.2"
-packaging = "^20.9"
+packaging = "^21.0"
 pyarrow = "^7.0.0"
 pytorch-lightning = "^1.6.0"
 PyYAML = "^6.0"
@@ -92,6 +92,9 @@ docs = [
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^2.20.0"
+furo = "^2022.9.29"
+m2r2 = "^0.3.3"
+sphinx = "^5.3.0"
 
 [tool.flake8]
 exclude = "docs/"
