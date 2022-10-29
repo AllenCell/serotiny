@@ -51,7 +51,6 @@ joblib = "^1.2.0"
 mlflow = "^1.23.1"
 nbformat = "^5.2.0"
 omegaconf = "^2.2.2"
-packaging = "^21.0"
 pyarrow = "^7.0.0"
 pytorch-lightning = "^1.6.0"
 PyYAML = "^6.0"
@@ -67,15 +66,7 @@ frozendict = "^2.3.2"
 ome-zarr = "^0.6.0"
 bfio = "^2.3.0"
 scanpy = "^1.9.1"
-waitress = "^2.1.2"
-Mako = "^1.2.2"
-lxml = "^4.9.1"
-PyJWT = "^2.4.0"
-protobuf = "^3.20.2"
-oauthlib = "^3.2.1"
 
-
-[tool.poetry.dev-dependencies]
 
 [tool.poetry.scripts]
 serotiny = "serotiny.cli.cli:main"
@@ -83,18 +74,17 @@ serotiny = "serotiny.cli.cli:main"
 "serotiny.test" = "serotiny.cli.cli:main"
 "serotiny.predict" = "serotiny.cli.cli:main"
 
-[tool.poetry.extras]
-docs = [
-    "sphinx",
-    "furo",
-    "m2r2",
-]
-
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^2.20.0"
 furo = "^2022.9.29"
 m2r2 = "^0.3.3"
 sphinx = "^5.3.0"
+packaging = "^21.3"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.2.0"
+tox = "^3.27.0"
 
 [tool.flake8]
 exclude = "docs/"
