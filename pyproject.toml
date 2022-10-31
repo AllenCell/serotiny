@@ -48,7 +48,7 @@ fire = "^0.4.0"
 makefun = "^1.13.1"
 hydra-core = "^1.2.0"
 joblib = "^1.2.0"
-mlflow = "^1.23.1"
+mlflow = "^1.30.0"
 nbformat = "^5.2.0"
 omegaconf = "^2.2.2"
 pyarrow = "^7.0.0"
@@ -66,6 +66,7 @@ frozendict = "^2.3.2"
 ome-zarr = "^0.6.0"
 bfio = "^2.3.0"
 scanpy = "^1.9.1"
+protobuf = "<4.0.0"
 
 
 [tool.poetry.scripts]
