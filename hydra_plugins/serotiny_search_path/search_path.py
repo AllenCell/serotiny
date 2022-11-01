@@ -1,5 +1,5 @@
-import os
 import sys
+from pathlib import Path
 
 from hydra.core.config_search_path import ConfigSearchPath
 from hydra.plugins.search_path_plugin import SearchPathPlugin
@@ -24,7 +24,7 @@ class SerotinySearchPath(SearchPathPlugin):
                 if project_name != "serotiny":
                     search_path.append(
                         provider="serotiny-project",
-                        path=f"{os.getcwd()}/{project_name}/config",
+                        path=f"{Path.cwd()}/{project_name}/config",
                     )
                 else:
                     print(

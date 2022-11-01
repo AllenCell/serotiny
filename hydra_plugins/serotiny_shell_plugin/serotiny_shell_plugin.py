@@ -61,7 +61,7 @@ COMP_WORDBREAKS=$COMP_WORDBREAKS complete -o nospace -o default -F hydra_serotin
 
     @staticmethod
     def help(command: str) -> str:
-        assert command in ["install", "uninstall"]
+        assert command in ("install", "uninstall")
         return f'eval "$({{}} -sc {command}=serotiny_bash)"'
 
     @staticmethod
@@ -72,8 +72,7 @@ COMP_WORDBREAKS=$COMP_WORDBREAKS complete -o nospace -o default -F hydra_serotin
             return "serotiny.test"
         elif "predict" in sys.argv[0]:
             return "serotiny.test"
-        else:
-            return None
+        return None
 
     def query(self, config_name: Optional[str]) -> None:
         line = os.environ["COMP_LINE"]
