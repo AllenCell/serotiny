@@ -4,7 +4,11 @@ from pathlib import Path
 from upath import UPath
 from typing import Optional, Sequence, Union
 
-import modin.pandas as pd
+try:
+    import modin.pandas as pd
+except ModuleNotFoundError:
+    import pandas as pd
+
 import pyarrow.parquet
 import scanpy as sc
 import anndata

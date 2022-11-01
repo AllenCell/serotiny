@@ -78,7 +78,7 @@ pytest-cov = {version = "^4.0.0", optional = true}
 tox = {version = "^3.27.0", optional = true}
 jupyter-core = "^4.11.2"
 grpcio = "^1.46.0"
-modin = "^0.16.2"
+modin = {version = "^0.16.2", optional = true}
 
 
 [tool.poetry.scripts]
