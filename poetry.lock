@@ -210,27 +210,6 @@ html5lib = ["html5lib"]
 lxml = ["lxml"]
 
 [[package]]
-name = "bfio"
-version = "2.3.0"
-description = "Simple reading and writing classes for tiled tiffs using Bioformats."
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[package.dependencies]
-imagecodecs = ">=2021.2.26"
-lxml = "*"
-numpy = ">=1.20.1"
-ome-types = ">=0.2.10"
-tifffile = ">=2021.8.30"
-
-[package.extras]
-all = ["bioformats-jar (==6.7.0.post2)", "zarr (>=2.6.1)"]
-bioformats = ["bioformats-jar (==6.7.0.post2)"]
-dev = ["bioformats-jar (==6.7.0.post2)", "requests (>=2.26.0)", "zarr (>=2.6.1)"]
-zarr = ["zarr (>=2.6.1)"]
-
-[[package]]
 name = "botocore"
 version = "1.27.59"
 description = "Low-level, data-driven core of boto 3."
@@ -2673,7 +2652,7 @@ test = ["pre-commit", "lightning-bolts", "torchvision", "pytest", "pytest-cov", 
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "3f7702e3c259a179533a719d93b3886c474bf033bc7f1228ef7e6ebbe018910d"
+content-hash = "2c1f087dc7c2937f7e00414608b02d4af5b64d9cdff543427741b1b4a6b0e4ad"
 
 [metadata.files]
 absl-py = [
@@ -2818,10 +2797,6 @@ babel = [
 beautifulsoup4 = [
     {file = "beautifulsoup4-4.11.1-py3-none-any.whl", hash = "sha256:58d5c3d29f5a36ffeb94f02f0d786cd53014cf9b3b3951d42e0080d8a9498d30"},
     {file = "beautifulsoup4-4.11.1.tar.gz", hash = "sha256:ad9aa55b65ef2808eb405f46cf74df7fcb7044d5cbc26487f96eb2ef2e436693"},
-]
-bfio = [
-    {file = "bfio-2.3.0-py2.py3-none-any.whl", hash = "sha256:df343233add10e592a047254397d167c4c22496415287ff5ab4cdb0cb94c110a"},
-    {file = "bfio-2.3.0.tar.gz", hash = "sha256:963a56aed17cf0fcbcac3995daf61dd75b8d68d8358b144003d79cf17dce16fe"},
 ]
 botocore = [
     {file = "botocore-1.27.59-py3-none-any.whl", hash = "sha256:69d756791fc024bda54f6c53f71ae34e695ee41bbbc1743d9179c4837a4929da"},
