@@ -67,6 +67,16 @@ ome-zarr = "^0.6.0"
 bfio = "^2.3.0"
 scanpy = "^1.9.1"
 protobuf = "<4.0.0"
+pre-commit = {version = "^2.20.0", optional = true}
+furo = {version = "^2022.9.29", optional = true}
+m2r2 = {version = "^0.3.3", optional = true}
+sphinx = {version = "^5.3.0", optional = true}
+packaging = {version = "^21.3", optional = true}
+lightning-bolts = {git = "https://github.com/Lightning-AI/lightning-bolts.git", rev = "78cbcdd5226d5d1cb5d9214a12c499bb702fe80f", optional = true}
+torchvision = {version = "^0.14.0", optional = true}
+pytest = {version = "^7.2.0", optional = true}
+pytest-cov = {version = "^4.0.0", optional = true}
+tox = {version = "^3.27.0", optional = true}
 
 
 [tool.poetry.scripts]
@@ -75,17 +85,12 @@ serotiny = "serotiny.cli.cli:main"
 "serotiny.test" = "serotiny.cli.cli:main"
 "serotiny.predict" = "serotiny.cli.cli:main"
 
-[tool.poetry.group.dev.dependencies]
-pre-commit = "^2.20.0"
-furo = "^2022.9.29"
-m2r2 = "^0.3.3"
-sphinx = "^5.3.0"
-packaging = "^21.3"
 
+[tool.poetry.extras]
+docs = ["furo", "m2r2", "sphinx"]
+test = ["pre-commit", "lightning-bolts", "torchvision", "pytest", "pytest-cov", "tox"]
+dev = ["pre-commit"]
 
-[tool.poetry.group.test.dependencies]
-pytest = "^7.2.0"
-tox = "^3.27.0"
 
 [tool.flake8]
 exclude = "docs/"
