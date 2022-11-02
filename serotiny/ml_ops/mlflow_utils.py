@@ -9,6 +9,7 @@ from hydra._internal.utils import _locate
 from mlflow.tracking import MlflowClient
 from mlflow.utils.autologging_utils import autologging_integration
 from omegaconf import OmegaConf
+from hydra.core.utils import setup_globals
 
 from .utils import flatten_config, save_model_predictions
 from .ml_ops import instantiate
@@ -106,6 +107,8 @@ def _get_config(tracking_uri, run_id, tmp_dir, mode="test"):
 
 
 def load_model_from_checkpoint(tracking_uri, run_id, full_conf):
+
+    setup_globals()
     mlflow.set_tracking_uri(tracking_uri)
     with tempfile.TemporaryDirectory() as tmp_dir:
         ckpt_path = _get_latest_checkpoint(tracking_uri, run_id, tmp_dir)
@@ -117,13 +120,14 @@ def load_model_from_checkpoint(tracking_uri, run_id, full_conf):
         config = OmegaConf.load(config)
         if full_conf.get("override_model_conf", True):
             config = OmegaConf.merge(config, full_conf.get("model", {}))
+
         config = OmegaConf.to_container(config, resolve=True)
 
         model_conf = config["model"]
         model_class = model_conf.pop("_target_")
         model_conf = instantiate(model_conf)
         model_class = _locate(model_class)
-        return model_class.load_from_checkpoint(ckpt_path, **model_conf)
+        return model_class.load_from_checkpoint(ckpt_path, strict=False, **model_conf)
 
 
 def _get_patience(trainer):
@@ -173,6 +177,7 @@ def get_run_id(run_name, experiment_name=None, experiment_id=None, raise_error=F
 
 def _mlflow_prep(mlflow_conf, trainer, mode):
     logger.info("Validating and processing MLFlow configuration")
+    setup_globals()
 
     _validate_mlflow_conf(mlflow_conf)
     assert mode in ("fit", "test", "predict")
@@ -432,9 +437,7 @@ def download_artifact(artifact_path, experiment_name=None, run_name=None, run_id
         try:
             client = mlflow.tracking.MlflowClient(mlflow.get_tracking_uri())
             yield client.download_artifacts(
-                run_id=run_id,
-                path=artifact_path,
-                dst_path=tmp_dir,
+                run_id=run_id, path=artifact_path, dst_path=tmp_dir,
             )
 
         finally:

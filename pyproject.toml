@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "serotiny"
-version = "0.0.6"
+version = "0.0.8"
 homepage = "https://allencell.github.io/serotiny"
 documentation = "https://allencell.github.io/serotiny"
 repository = "https://github.com/AllenCell/serotiny"
@@ -48,10 +48,9 @@ fire = "^0.4.0"
 makefun = "^1.13.1"
 hydra-core = "^1.2.0"
 joblib = "^1.2.0"
-mlflow = "^1.23.1"
+mlflow = "^1.30.0"
 nbformat = "^5.2.0"
 omegaconf = "^2.2.2"
-packaging = "^20.9"
 pyarrow = "^7.0.0"
 pytorch-lightning = "^1.6.0"
 PyYAML = "^6.0"
@@ -59,27 +58,28 @@ scikit-learn = "^1.0.2"
 aicsimageio = "^4.6.4"
 numpy = "^1.22"
 pandas = "^1.1"
-sphinx = {version="*", optional = true}
-furo = {version="*", optional = true}
-m2r2 = {version="*", optional = true}
 universal-pathlib = "^0.0.20"
 s3fs = "^2022.3.0"
 fsspec = "^2022.3.0"
 pycryptodome = "^3.14.1"
 frozendict = "^2.3.2"
-ome-zarr = "^0.6.0"
-bfio = "^2.3.0"
+ome-zarr = "^0.6.1"
 scanpy = "^1.9.1"
-waitress = "^2.1.2"
-Mako = "^1.2.2"
-lxml = "^4.9.1"
-PyJWT = "^2.4.0"
-protobuf = "^3.20.2"
-oauthlib = "^3.2.1"
-modin = "^0.16.2"
+protobuf = "<4.0.0"
+pre-commit = {version = "^2.20.0", optional = true}
+furo = {version = "^2022.9.29", optional = true}
+m2r2 = {version = "^0.3.3", optional = true}
+sphinx = {version = "^5.3.0", optional = true}
+packaging = {version = "^21.3", optional = true}
+lightning-bolts = {git = "https://github.com/Lightning-AI/lightning-bolts.git", rev = "78cbcdd5226d5d1cb5d9214a12c499bb702fe80f", optional = true}
+torchvision = {version = "^0.14.0", optional = true}
+pytest = {version = "^7.2.0", optional = true}
+pytest-cov = {version = "^4.0.0", optional = true}
+tox = {version = "^3.27.0", optional = true}
+jupyter-core = "^4.11.2"
+grpcio = "^1.46.0"
+modin = {version = "^0.16.2", optional = true}
 
-
-[tool.poetry.dev-dependencies]
 
 [tool.poetry.scripts]
 serotiny = "serotiny.cli.cli:main"
@@ -87,12 +87,12 @@ serotiny = "serotiny.cli.cli:main"
 "serotiny.test" = "serotiny.cli.cli:main"
 "serotiny.predict" = "serotiny.cli.cli:main"
 
+
 [tool.poetry.extras]
-docs = [
-    "sphinx",
-    "furo",
-    "m2r2",
-]
+docs = ["furo", "m2r2", "sphinx"]
+test = ["pre-commit", "lightning-bolts", "torchvision", "pytest", "pytest-cov", "tox"]
+dev = ["pre-commit"]
+
 
 [tool.flake8]
 exclude = "docs/"

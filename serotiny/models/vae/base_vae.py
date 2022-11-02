@@ -208,12 +208,16 @@ class BaseVAE(BaseModel):
 
         for part, z_comp_part in z_composed.items():
             results.update(
-                {f"z_composed/{part}": z_comp_part.detach(),}
+                {
+                    f"z_composed/{part}": z_comp_part.detach(),
+                }
             )
 
         for part, recon_part in reconstruction_loss.items():
             results.update(
-                {f"reconstruction_loss/{part}": recon_part.detach(),}
+                {
+                    f"reconstruction_loss/{part}": recon_part.detach(),
+                }
             )
 
         for part, z_part in z_parts.items():
