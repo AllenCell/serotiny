@@ -157,9 +157,12 @@ class BaseVAE(BaseModel):
         if not compute_loss:
             return x_hat, z_parts, z_parts_params, z_composed
 
-        (loss, reconstruction_loss, kld_loss, kld_per_part,) = self.calculate_elbo(
-            batch, x_hat, z_parts_params
-        )
+        (
+            loss,
+            reconstruction_loss,
+            kld_loss,
+            kld_per_part,
+        ) = self.calculate_elbo(batch, x_hat, z_parts_params)
 
         return (
             x_hat,

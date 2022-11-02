@@ -437,7 +437,9 @@ def download_artifact(artifact_path, experiment_name=None, run_name=None, run_id
         try:
             client = mlflow.tracking.MlflowClient(mlflow.get_tracking_uri())
             yield client.download_artifacts(
-                run_id=run_id, path=artifact_path, dst_path=tmp_dir,
+                run_id=run_id,
+                path=artifact_path,
+                dst_path=tmp_dir,
             )
 
         finally:
