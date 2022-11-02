@@ -24,24 +24,26 @@ class ImageVAE(BaseVAE):
     def __init__(
         self,
         latent_dim: Union[int, Sequence[int]],
-        in_channels: int,
-        hidden_channels: Sequence[int],
-        max_pool_layers: Sequence[int],
-        input_dims: Sequence[int],
         x_label: str,
         optimizer: torch.optim.Optimizer = torch.optim.Adam,
+        reconstruction_loss: Loss = nn.MSELoss(reduction="none"),
         beta: float = 1.0,
+        prior: Optional[Sequence[Prior]] = None,
+        encoder: Optional[nn.Module] = None,
+        decoder: Optional[nn.Module] = None,
+        in_channels: Optional[int] = None,
+        hidden_channels: Optional[Sequence[int]] = None,
+        max_pool_layers: Optional[Sequence[int]] = None,
+        input_dims: Optional[Sequence[int]] = None,
         id_label: Optional[str] = None,
         non_linearity: Optional[nn.Module] = None,
         decoder_non_linearity: Optional[nn.Module] = None,
         loss_mask_label: Optional[str] = None,
-        reconstruction_loss: Loss = nn.MSELoss(reduction="none"),
-        skip_connections: bool = True,
-        batch_norm: bool = True,
-        mode: str = "3d",
-        prior: Optional[Sequence[Prior]] = None,
-        kernel_size: int = 3,
-        cache_outputs: Sequence = ("test",),
+        skip_connections: Optional[bool] = True,
+        batch_norm: Optional[bool] = True,
+        mode: Optional[str] = "3d",
+        kernel_size: Optional[int] = 3,
+        cache_outputs: Optional[Sequence] = ("test",),
         encoder_clamp: Optional[int] = 6,
         # final_non_linearity: Optional[nn.Module] = None,
     ):
@@ -52,45 +54,47 @@ class ImageVAE(BaseVAE):
         else:
             encoder_latent_dims = latent_dim
 
-        encoder = BasicCNN(
-            in_channels=in_channels,
-            input_dims=input_dims,
-            output_dim=encoder_latent_dims,  # because it has to return mu and sigma
-            hidden_channels=hidden_channels,
-            max_pool_layers=max_pool_layers,
-            mode=mode,
-            kernel_size=kernel_size,
-            non_linearity=non_linearity,
-            skip_connections=skip_connections,
-            batch_norm=batch_norm,
-            encoder_clamp=encoder_clamp,
-        )
-        encoder.apply(weight_init)
+        if encoder is None:
+            encoder = BasicCNN(
+                in_channels=in_channels,
+                input_dims=input_dims,
+                output_dim=encoder_latent_dims,  # because it has to return mu and sigma
+                hidden_channels=hidden_channels,
+                max_pool_layers=max_pool_layers,
+                mode=mode,
+                kernel_size=kernel_size,
+                non_linearity=non_linearity,
+                skip_connections=skip_connections,
+                batch_norm=batch_norm,
+                encoder_clamp=encoder_clamp,
+            )
+            encoder.apply(weight_init)
 
-        dummy_out, intermediate_sizes = encoder.conv_forward(
-            torch.zeros(1, in_channels, *input_dims), return_sizes=True
-        )
+            dummy_out, intermediate_sizes = encoder.conv_forward(
+                torch.zeros(1, in_channels, *input_dims), return_sizes=True
+            )
 
-        compressed_img_shape = dummy_out.shape[2:]
+            compressed_img_shape = dummy_out.shape[2:]
 
-        intermediate_sizes = [input_dims] + intermediate_sizes[:-1]
-        intermediate_sizes = intermediate_sizes[::-1]
+            intermediate_sizes = [input_dims] + intermediate_sizes[:-1]
+            intermediate_sizes = intermediate_sizes[::-1]
 
-        decoder = ImageDecoderBasicCNN(
-            compressed_img_shape=compressed_img_shape,
-            hidden_channels=list(reversed(hidden_channels)),
-            intermediate_sizes=intermediate_sizes,
-            latent_dim=latent_dim,
-            output_dims=tuple(input_dims),
-            output_channels=in_channels,
-            mode=mode,
-            non_linearity=non_linearity,
-            skip_connections=skip_connections,
-            batch_norm=batch_norm,
-            kernel_size=kernel_size,
-        )
-        decoder.apply(weight_init)
-        nn.utils.spectral_norm(decoder.linear_decompress)
+        if decoder is None:
+            decoder = ImageDecoderBasicCNN(
+                compressed_img_shape=compressed_img_shape,
+                hidden_channels=list(reversed(hidden_channels)),
+                intermediate_sizes=intermediate_sizes,
+                latent_dim=latent_dim,
+                output_dims=tuple(input_dims),
+                output_channels=in_channels,
+                mode=mode,
+                non_linearity=non_linearity,
+                skip_connections=skip_connections,
+                batch_norm=batch_norm,
+                kernel_size=kernel_size,
+            )
+            decoder.apply(weight_init)
+            nn.utils.spectral_norm(decoder.linear_decompress)
 
         if decoder_non_linearity is not None:
             decoder = nn.Sequential(decoder, decoder_non_linearity)

@@ -82,6 +82,9 @@ class BaseVAE(BaseModel):
         self.latent_compose_function = latent_compose_function
 
     def calculate_rcl(self, x, x_hat, key):
+        if len(x[key].shape) != len(x_hat[key].shape):
+            x[key] = x[key].squeeze()
+            x_hat[key] = x_hat[key].squeeze()
         rcl_per_input_dimension = self.reconstruction_loss[key](x[key], x_hat[key])
         return rcl_per_input_dimension
 
@@ -154,12 +157,9 @@ class BaseVAE(BaseModel):
         if not compute_loss:
             return x_hat, z_parts, z_parts_params, z_composed
 
-        (
-            loss,
-            reconstruction_loss,
-            kld_loss,
-            kld_per_part,
-        ) = self.calculate_elbo(batch, x_hat, z_parts_params)
+        (loss, reconstruction_loss, kld_loss, kld_per_part,) = self.calculate_elbo(
+            batch, x_hat, z_parts_params
+        )
 
         return (
             x_hat,
@@ -208,16 +208,12 @@ class BaseVAE(BaseModel):
 
         for part, z_comp_part in z_composed.items():
             results.update(
-                {
-                    f"z_composed/{part}": z_comp_part.detach(),
-                }
+                {f"z_composed/{part}": z_comp_part.detach(),}
             )
 
         for part, recon_part in reconstruction_loss.items():
             results.update(
-                {
-                    f"reconstruction_loss/{part}": recon_part.detach(),
-                }
+                {f"reconstruction_loss/{part}": recon_part.detach(),}
             )
 
         for part, z_part in z_parts.items():
@@ -260,6 +256,6 @@ class BaseVAE(BaseModel):
             z_composed,
         )
 
-        self.log_metrics(stage, results, logger, batch[self.hparams.x_label].shape[0])
+        self.log_metrics(stage, results, logger, x_hat[self.hparams.x_label].shape[0])
 
         return results
