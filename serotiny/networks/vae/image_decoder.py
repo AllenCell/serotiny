@@ -2,72 +2,70 @@ import numpy as np
 
 import torch.nn as nn
 import torch
+from serotiny.networks.basic_cnn import BasicCNN
 
 
 class ImageDecoder(nn.Module):
     def __init__(
         self,
         encoder,
-        deconv_block,
-        input_dims,
         in_channels,
         latent_dim,
+        output_dims,
+        kernel_size,
+        mode,
+        non_linearity,
+        skip_connections,
+        batch_norm,
     ):
         super().__init__()
-        inp = torch.zeros(1, in_channels, *input_dims)
-        compressed_img_shape = encoder(inp).shape
-        self.compressed_img_shape = compressed_img_shape[2:]
 
-        deconv_layers = []
+        dummy_out, intermediate_sizes, hidden_channels = encoder.conv_forward(
+            torch.zeros(1, in_channels, *output_dims), return_sizes=True
+        )
 
-        if isinstance(encoder[0][0], torch.nn.Conv3d):
-            mode = "3d"
-        elif isinstance(encoder[0][0], torch.nn.Conv2d):
-            mode = "2d"
+        compressed_img_shape = dummy_out.shape[2:]
 
-        for index in range(len(encoder) - 1, -1, -1):
-            conv = encoder[index][0]
-            if index == len(encoder) - 1:
-                self.first_out_channels = conv.out_channels
-                compressed_img_size = (
-                    np.prod(self.compressed_img_shape) * self.first_out_channels
-                )
-            if index == 0:
-                out_channels = in_channels
-            else:
-                out_channels = conv.out_channels
+        intermediate_sizes = [output_dims] + intermediate_sizes[:-1]
+        intermediate_sizes = intermediate_sizes[::-1]
 
-            if mode == "3d":
-                deconv_layers.append(
-                    torch.nn.LazyConvTranspose3d(
-                        out_channels=out_channels,
-                        kernel_size=conv.kernel_size,
-                        stride=conv.stride,
-                    )
-                )
+        hidden_channels = list(reversed(hidden_channels))
 
-            else:
-                deconv_layers.append(
-                    torch.nn.LazyConvTranspose2d(
-                        out_channels=out_channels,
-                        kernel_size=conv.kernel_size,
-                        stride=conv.stride,
-                    )
-                )
-            if index != 0:
-                deconv_layers.append(deconv_block)
+        self.compressed_img_shape = compressed_img_shape
+        compressed_img_size = np.prod(compressed_img_shape) * hidden_channels[0]
+        orig_img_size = np.prod(output_dims)
 
-        deconv = nn.Sequential(*deconv_layers)
-        self.deconv = deconv
+        hidden_channels[-1] = in_channels
+        self.hidden_channels = hidden_channels
         self.linear_decompress = nn.Linear(latent_dim, compressed_img_size)
+
+        self.deconv = BasicCNN(
+            hidden_channels[0],
+            output_dim=orig_img_size,
+            hidden_channels=hidden_channels,
+            input_dims=compressed_img_shape,
+            upsample_layers={
+                i: tuple(size) for (i, size) in enumerate(intermediate_sizes)
+            },
+            up_conv=True,
+            flat_output=False,
+            kernel_size=kernel_size,
+            mode=mode,
+            non_linearity=non_linearity,
+            skip_connections=skip_connections,
+            batch_norm=batch_norm,
+        )
 
     def forward(self, z):
         z = self.linear_decompress(z)
         z = z.view(
             z.shape[0],  # batch size
-            self.first_out_channels,
+            self.hidden_channels[0],
             *self.compressed_img_shape
         )
+
         z = self.deconv(z)
         z = z.clamp(max=50)
+
         return z
+

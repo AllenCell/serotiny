@@ -232,9 +232,7 @@ class LatentLossVAE(BaseVAE):
 
         for part, value in _loss.items():
             results.update(
-                {
-                    f"adv_loss/{part}": value.detach().cpu(),
-                }
+                {f"adv_loss/{part}": value.detach().cpu(),}
             )
 
         self.log_metrics(stage, results, logger, x_hat.shape[0])

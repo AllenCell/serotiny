@@ -19,6 +19,7 @@ class ImageDecoderBasicCNN(nn.Module):
         skip_connections,
         batch_norm,
         kernel_size,
+        encoder=None,
     ):
         super().__init__()
 

@@ -29,6 +29,7 @@ class BasicCNN(nn.Module):
         skip_connections: Union[bool, Sequence[int]] = False,
         batch_norm: bool = True,
         mode: str = "3d",
+        variational: bool = False,
     ):
         """Instantiate a 3D CNN.
 
@@ -47,7 +48,11 @@ class BasicCNN(nn.Module):
             Sequence of layers in which to apply a max pooling operation
         """
         super().__init__()
-        self.output_dim = output_dim
+
+        if variational:
+            self.output_dim = output_dim * 2
+        else:
+            self.output_dim = output_dim
         self.mode = mode
         _mode = 3 if mode == "3d" else 2
 

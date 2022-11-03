@@ -70,6 +70,8 @@ class ImageVAE(BaseVAE):
             )
             encoder.apply(weight_init)
 
+        if decoder is None:
+
             dummy_out, intermediate_sizes = encoder.conv_forward(
                 torch.zeros(1, in_channels, *input_dims), return_sizes=True
             )
@@ -79,7 +81,6 @@ class ImageVAE(BaseVAE):
             intermediate_sizes = [input_dims] + intermediate_sizes[:-1]
             intermediate_sizes = intermediate_sizes[::-1]
 
-        if decoder is None:
             decoder = ImageDecoderBasicCNN(
                 compressed_img_shape=compressed_img_shape,
                 hidden_channels=list(reversed(hidden_channels)),
