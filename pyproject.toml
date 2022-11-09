@@ -71,7 +71,7 @@ furo = {version = "^2022.9.29", optional = true}
 m2r2 = {version = "^0.3.3", optional = true}
 sphinx = {version = "^5.3.0", optional = true}
 packaging = {version = "^21.3", optional = true}
-lightning-bolts = {git = "https://github.com/Lightning-AI/lightning-bolts.git", rev = "78cbcdd5226d5d1cb5d9214a12c499bb702fe80f", optional = true}
+lightning-bolts = {version = "^0.6.0.post1", optional = true}
 torchvision = {version = "^0.14.0", optional = true}
 pytest = {version = "^7.2.0", optional = true}
 pytest-cov = {version = "^4.0.0", optional = true}
