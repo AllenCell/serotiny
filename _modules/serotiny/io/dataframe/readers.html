@@ -1,13 +1,13 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
-        <title>serotiny.io.dataframe.readers - serotiny 0.0.6 documentation</title>
+    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+        <title>serotiny.io.dataframe.readers - serotiny 0.0.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
@@ -122,7 +122,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../../index.html"><div class="brand">serotiny 0.0.6 documentation</div></a>
+      <a href="../../../../index.html"><div class="brand">serotiny 0.0.8 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -148,7 +148,7 @@
     <img class="sidebar-logo" src="../../../../_static/serotiny_logo.svg" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">serotiny 0.0.6 documentation</span>
+  <span class="sidebar-brand-text">serotiny 0.0.8 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -176,7 +176,7 @@
 <li class="toctree-l6"><a class="reference internal" href="../../../../serotiny.io.dataframe.loaders.classes.html">serotiny.io.dataframe.loaders.classes module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../../serotiny.io.dataframe.loaders.columns.html">serotiny.io.dataframe.loaders.columns module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../../serotiny.io.dataframe.loaders.image.html">serotiny.io.dataframe.loaders.image module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="../../../../serotiny.io.dataframe.loaders.random_image.html">serotiny.io.dataframe.loaders.random_image module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../serotiny.io.dataframe.loaders.random_tensor.html">serotiny.io.dataframe.loaders.random_tensor module</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../serotiny.io.dataframe.dataframe_dataset.html">serotiny.io.dataframe.dataframe_dataset module</a></li>
@@ -216,6 +216,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../../../../serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../serotiny.models.vae.image_vae.html">serotiny.models.vae.image_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../serotiny.models.vae.implicit_decoder_vae.html">serotiny.models.vae.implicit_decoder_vae module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../serotiny.models.vae.latent_loss_vae.html">serotiny.models.vae.latent_loss_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../serotiny.models.vae.tabular_vae.html">serotiny.models.vae.tabular_vae module</a></li>
 </ul>
 </li>
@@ -289,7 +290,8 @@
           </svg>
           <span>Back to top</span>
         </a>
-        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -305,18 +307,23 @@
         <article role="main">
           <h1>Source code for serotiny.io.dataframe.readers</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">suppress</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">upath</span> <span class="kn">import</span> <span class="n">UPath</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">modin.pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
 <span class="kn">import</span> <span class="nn">pyarrow.parquet</span>
 <span class="kn">import</span> <span class="nn">scanpy</span> <span class="k">as</span> <span class="nn">sc</span>
 <span class="kn">import</span> <span class="nn">anndata</span>
 
 
 <div class="viewcode-block" id="read_h5ad"><a class="viewcode-back" href="../../../../serotiny.io.dataframe.readers.html#serotiny.io.dataframe.readers.read_h5ad">[docs]</a><span class="k">def</span> <span class="nf">read_h5ad</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">include_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">"""Read an annData object stored in a .h5ad file.</span>
+    <span class="sd">&quot;&quot;&quot;Read an annData object stored in a .h5ad file.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -331,7 +338,7 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    annData</span>
-<span class="sd">    """</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dataframe</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">include_columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -344,7 +351,7 @@
 
 
 <div class="viewcode-block" id="read_parquet"><a class="viewcode-back" href="../../../../serotiny.io.dataframe.readers.html#serotiny.io.dataframe.readers.read_parquet">[docs]</a><span class="k">def</span> <span class="nf">read_parquet</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">include_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">"""Read a dataframe stored in a .parquet file, and optionally include only</span>
+    <span class="sd">&quot;&quot;&quot;Read a dataframe stored in a .parquet file, and optionally include only</span>
 <span class="sd">    the columns given by `include_columns`</span>
 
 <span class="sd">    Parameters</span>
@@ -360,7 +367,7 @@
 <span class="sd">    -------</span>
 
 <span class="sd">    dataframe: pd.DataFrame</span>
-<span class="sd">    """</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">include_columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">schema</span> <span class="o">=</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">parquet</span><span class="o">.</span><span class="n">read_schema</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">memory_map</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -374,7 +381,7 @@
 
 
 <div class="viewcode-block" id="read_csv"><a class="viewcode-back" href="../../../../serotiny.io.dataframe.readers.html#serotiny.io.dataframe.readers.read_csv">[docs]</a><span class="k">def</span> <span class="nf">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">include_columns</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">"""Read a dataframe stored in a .csv file, and optionally include only the</span>
+    <span class="sd">&quot;&quot;&quot;Read a dataframe stored in a .csv file, and optionally include only the</span>
 <span class="sd">    columns given by `include_columns`</span>
 
 <span class="sd">    Parameters</span>
@@ -390,7 +397,7 @@
 <span class="sd">    -------</span>
 
 <span class="sd">    dataframe: pd.DataFrame</span>
-<span class="sd">    """</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
@@ -409,7 +416,7 @@
     <span class="n">required_columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">include_columns</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-    <span class="sd">"""Load a dataframe from a .csv or .parquet file, or assert a given</span>
+    <span class="sd">&quot;&quot;&quot;Load a dataframe from a .csv or .parquet file, or assert a given</span>
 <span class="sd">    pd.DataFrame contains the expected required columns.</span>
 
 <span class="sd">    Parameters</span>
@@ -420,7 +427,7 @@
 <span class="sd">        file types are .csv and .parquet</span>
 
 <span class="sd">    required_columns: Optional[Sequence[str]] = None</span>
-<span class="sd">        List of columns that the dataframe must contain. If these aren't found,</span>
+<span class="sd">        List of columns that the dataframe must contain. If these aren&#39;t found,</span>
 <span class="sd">        a ValueError is thrown</span>
 
 <span class="sd">    include_columns: Optional[Sequence[str]] = None</span>
@@ -432,7 +439,7 @@
 <span class="sd">    -------</span>
 
 <span class="sd">    dataframe: pd.DataFrame</span>
-<span class="sd">    """</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">required_columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">include_columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">include_columns</span> <span class="o">+=</span> <span class="n">required_columns</span>
@@ -441,22 +448,20 @@
         <span class="n">dataframe</span> <span class="o">=</span> <span class="n">UPath</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="p">(</span><span class="n">UPath</span><span class="p">,</span> <span class="n">Path</span><span class="p">)):</span>
-        <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">suppress</span><span class="p">((</span><span class="ne">NotImplementedError</span><span class="p">,</span> <span class="ne">FileNotFoundError</span><span class="p">)):</span>
             <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">except</span> <span class="p">(</span><span class="ne">NotImplementedError</span><span class="p">,</span> <span class="ne">FileNotFoundError</span><span class="p">):</span>
-            <span class="k">pass</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">"Manifest file not found at given path"</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Manifest file not found at given path&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">".csv"</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;.csv&quot;</span><span class="p">:</span>
             <span class="n">dataframe</span> <span class="o">=</span> <span class="n">read_csv</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">include_columns</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">".parquet"</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;.parquet&quot;</span><span class="p">:</span>
             <span class="n">dataframe</span> <span class="o">=</span> <span class="n">read_parquet</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">include_columns</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">".h5ad"</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;.h5ad&quot;</span><span class="p">:</span>
             <span class="n">dataframe</span> <span class="o">=</span> <span class="n">read_h5ad</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">include_columns</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"File type of provided manifest is not .csv "</span> <span class="s2">"or .parquet"</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;File type of provided manifest is not .csv &quot;</span> <span class="s2">&quot;or .parquet&quot;</span><span class="p">)</span>
 
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">include_columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -474,14 +479,14 @@
             <span class="n">dataframe</span><span class="o">.</span><span class="n">obs</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"`dataframe` must be either a pd.DataFrame or a path to "</span>
-            <span class="sa">f</span><span class="s2">"a file to load one. You passed </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+            <span class="sa">f</span><span class="s2">&quot;`dataframe` must be either a pd.DataFrame or a path to &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;a file to load one. You passed </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">anndata</span><span class="o">.</span><span class="n">AnnData</span><span class="p">):</span>
         <span class="c1"># Make dataframe out of anndata object</span>
         <span class="n">X</span> <span class="o">=</span> <span class="n">dataframe</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
-        <span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">"X_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;X_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span>
             <span class="n">drop</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
         <span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">dataframe</span><span class="o">.</span><span class="n">obs_names</span><span class="p">)</span>
@@ -491,10 +496,10 @@
 
     <span class="k">if</span> <span class="n">required_columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">missing_columns</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">required_columns</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing_columns</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">missing_columns</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">"Some or all of the required columns were not "</span>
-                <span class="sa">f</span><span class="s2">"found on the given dataframe:</span><span class="se">\n</span><span class="si">{</span><span class="n">missing_columns</span><span class="si">}</span><span class="s2">"</span>
+                <span class="sa">f</span><span class="s2">&quot;Some or all of the required columns were not &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;found on the given dataframe:</span><span class="se">\n</span><span class="si">{</span><span class="n">missing_columns</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">dataframe</span></div>
@@ -508,7 +513,7 @@
     <span class="n">contains</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">excludes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sd">"""Filter a list of columns, using a combination of different queries, or a</span>
+    <span class="sd">&quot;&quot;&quot;Filter a list of columns, using a combination of different queries, or a</span>
 <span class="sd">    `regex` pattern. If `regex` is supplied it takes precedence and the</span>
 <span class="sd">    remaining arguments are ignored. Otherwise, the logical AND of the supplied</span>
 <span class="sd">    filters is applied, i.e. the columns that respect all of the supplied</span>
@@ -533,7 +538,7 @@
 
 <span class="sd">    excludes: Optional[str] = None</span>
 <span class="sd">        A substring the matching columns must not contain</span>
-<span class="sd">    """</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">regex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns_to_filter</span> <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">regex</span><span class="p">,</span> <span class="n">col</span><span class="p">)]</span>
 
@@ -586,7 +591,9 @@
 </div><script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
     <script src="../../../../_static/jquery.js"></script>
     <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../_static/scripts/furo.js"></script>
     </body>
 </html>

@@ -1,13 +1,13 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../../../genindex.html" /><link rel="search" title="Search" href="../../../../../search.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
-        <title>serotiny.models.vae.priors.gaussian - serotiny 0.0.6 documentation</title>
+    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+        <title>serotiny.models.vae.priors.gaussian - serotiny 0.0.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
@@ -122,7 +122,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../../../index.html"><div class="brand">serotiny 0.0.6 documentation</div></a>
+      <a href="../../../../../index.html"><div class="brand">serotiny 0.0.8 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -148,7 +148,7 @@
     <img class="sidebar-logo" src="../../../../../_static/serotiny_logo.svg" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">serotiny 0.0.6 documentation</span>
+  <span class="sidebar-brand-text">serotiny 0.0.8 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -176,7 +176,7 @@
 <li class="toctree-l6"><a class="reference internal" href="../../../../../serotiny.io.dataframe.loaders.classes.html">serotiny.io.dataframe.loaders.classes module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../../../serotiny.io.dataframe.loaders.columns.html">serotiny.io.dataframe.loaders.columns module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../../../serotiny.io.dataframe.loaders.image.html">serotiny.io.dataframe.loaders.image module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="../../../../../serotiny.io.dataframe.loaders.random_image.html">serotiny.io.dataframe.loaders.random_image module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../../../serotiny.io.dataframe.loaders.random_tensor.html">serotiny.io.dataframe.loaders.random_tensor module</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../../serotiny.io.dataframe.dataframe_dataset.html">serotiny.io.dataframe.dataframe_dataset module</a></li>
@@ -216,6 +216,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../../../../../serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../../serotiny.models.vae.image_vae.html">serotiny.models.vae.image_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../../serotiny.models.vae.implicit_decoder_vae.html">serotiny.models.vae.implicit_decoder_vae module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../../../serotiny.models.vae.latent_loss_vae.html">serotiny.models.vae.latent_loss_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../../../serotiny.models.vae.tabular_vae.html">serotiny.models.vae.tabular_vae module</a></li>
 </ul>
 </li>
@@ -289,7 +290,8 @@
           </svg>
           <span>Back to top</span>
         </a>
-        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -321,8 +323,8 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dimensionality</span><span class="p">)</span>
 
 <div class="viewcode-block" id="IsotropicGaussianPrior.kl_divergence"><a class="viewcode-back" href="../../../../../serotiny.models.vae.priors.gaussian.html#serotiny.models.vae.priors.gaussian.IsotropicGaussianPrior.kl_divergence">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">kl_divergence</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">logvar</span><span class="p">,</span> <span class="n">tc_penalty_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="s2">"sum"</span><span class="p">):</span>
-        <span class="sd">"""Computes the Kullback-Leibler divergence between a diagonal gaussian</span>
+    <span class="k">def</span> <span class="nf">kl_divergence</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">logvar</span><span class="p">,</span> <span class="n">tc_penalty_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computes the Kullback-Leibler divergence between a diagonal gaussian</span>
 <span class="sd">        and an isotropic (0,1) gaussian. It also works batch-wise.</span>
 
 <span class="sd">        Parameters</span>
@@ -332,18 +334,18 @@
 
 <span class="sd">        logvar: torch.Tensor</span>
 <span class="sd">            Log-variance of the gaussian (or batch of gaussians)</span>
-<span class="sd">        """</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">kl</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">logvar</span> <span class="o">-</span> <span class="n">mean</span><span class="o">.</span><span class="n">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">logvar</span><span class="o">.</span><span class="n">exp</span><span class="p">())</span>
 
-        <span class="k">if</span> <span class="n">reduction</span> <span class="o">==</span> <span class="s2">"none"</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
             <span class="n">loss</span> <span class="o">=</span> <span class="n">kl</span>
-        <span class="k">elif</span> <span class="n">reduction</span> <span class="o">==</span> <span class="s2">"mean"</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;mean&quot;</span><span class="p">:</span>
             <span class="n">loss</span> <span class="o">=</span> <span class="n">kl</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">loss</span> <span class="o">=</span> <span class="n">kl</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">tc_penalty_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">reduction</span> <span class="o">!=</span> <span class="s2">"none"</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">tc_penalty_weight</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">reduction</span> <span class="o">!=</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
             <span class="n">tc_penalty</span> <span class="o">=</span> <span class="n">compute_tc_penalty</span><span class="p">(</span><span class="n">logvar</span><span class="p">)</span>
             <span class="n">loss</span> <span class="o">=</span> <span class="n">loss</span> <span class="o">+</span> <span class="n">tc_penalty_weight</span> <span class="o">*</span> <span class="n">tc_penalty</span>
 
@@ -355,15 +357,15 @@
         <span class="n">eps</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn_like</span><span class="p">(</span><span class="n">std</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">eps</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="n">std</span><span class="p">)</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mean</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="IsotropicGaussianPrior.forward"><a class="viewcode-back" href="../../../../../serotiny.models.vae.priors.gaussian.html#serotiny.models.vae.priors.gaussian.IsotropicGaussianPrior.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"kl"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="IsotropicGaussianPrior.forward"><a class="viewcode-back" href="../../../../../serotiny.models.vae.priors.gaussian.html#serotiny.models.vae.priors.gaussian.IsotropicGaussianPrior.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;kl&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">mean_logvar</span> <span class="o">=</span> <span class="n">z</span>
         <span class="n">mean</span><span class="p">,</span> <span class="n">logvar</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">mean_logvar</span><span class="p">,</span> <span class="n">mean_logvar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">"kl"</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;kl&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">kl_divergence</span><span class="p">(</span>
                 <span class="n">mean</span><span class="p">,</span> <span class="n">logvar</span><span class="p">,</span> <span class="n">tc_penalty_weight</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">tc_penalty_weight</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
             <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">logvar</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">logvar</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="DiagonalGaussianPrior"><a class="viewcode-back" href="../../../../../serotiny.models.vae.priors.gaussian.html#serotiny.models.vae.priors.gaussian.DiagonalGaussianPrior">[docs]</a><span class="k">class</span> <span class="nc">DiagonalGaussianPrior</span><span class="p">(</span><span class="n">IsotropicGaussianPrior</span><span class="p">):</span>
@@ -376,13 +378,13 @@
         <span class="n">learn_logvar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">tc_penalty_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="s2">"__len__"</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="s2">&quot;__len__&quot;</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">dimensionality</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">dimensionality</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">mean</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">assert</span> <span class="n">dimensionality</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">mean</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">logvar</span><span class="p">,</span> <span class="s2">"__len__"</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">logvar</span><span class="p">,</span> <span class="s2">&quot;__len__&quot;</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">dimensionality</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">dimensionality</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">logvar</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -395,7 +397,7 @@
         <span class="k">if</span> <span class="n">logvar</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">logvar</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dimensionality</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">logvar</span><span class="p">,</span> <span class="s2">"__len__"</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">logvar</span><span class="p">,</span> <span class="s2">&quot;__len__&quot;</span><span class="p">):</span>
                 <span class="n">logvar</span> <span class="o">=</span> <span class="p">[</span><span class="n">logvar</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimensionality</span>
             <span class="n">logvar</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fromiter</span><span class="p">(</span><span class="n">logvar</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
 
@@ -407,7 +409,7 @@
         <span class="k">if</span> <span class="n">mean</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">mean</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dimension</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="s2">"__len__"</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="s2">&quot;__len__&quot;</span><span class="p">):</span>
                 <span class="n">logvar</span> <span class="o">=</span> <span class="p">[</span><span class="n">mean</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimensionality</span>
             <span class="n">mean</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fromiter</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">))</span>
 
@@ -419,9 +421,9 @@
 
 <div class="viewcode-block" id="DiagonalGaussianPrior.kl_divergence"><a class="viewcode-back" href="../../../../../serotiny.models.vae.priors.gaussian.html#serotiny.models.vae.priors.gaussian.DiagonalGaussianPrior.kl_divergence">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">kl_divergence</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span> <span class="n">mu1</span><span class="p">,</span> <span class="n">mu2</span><span class="p">,</span> <span class="n">logvar1</span><span class="p">,</span> <span class="n">logvar2</span><span class="p">,</span> <span class="n">tc_penalty_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="s2">"sum"</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">mu1</span><span class="p">,</span> <span class="n">mu2</span><span class="p">,</span> <span class="n">logvar1</span><span class="p">,</span> <span class="n">logvar2</span><span class="p">,</span> <span class="n">tc_penalty_weight</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;sum&quot;</span>
     <span class="p">):</span>
-        <span class="sd">"""Computes the Kullback-Leibler divergence between two diagonal</span>
+        <span class="sd">&quot;&quot;&quot;Computes the Kullback-Leibler divergence between two diagonal</span>
 <span class="sd">        gaussians (not necessarily isotropic). It also works batch-wise.</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -433,7 +435,7 @@
 <span class="sd">            Log-variance of the first gaussian (or batch of first gaussians)</span>
 <span class="sd">        logvar2: torch.Tensor</span>
 <span class="sd">            Log-variance of the second gaussian (or batch of second gaussians)</span>
-<span class="sd">        """</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">mu_diff</span> <span class="o">=</span> <span class="n">mu2</span> <span class="o">-</span> <span class="n">mu1</span>
 
         <span class="n">kl</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span>
@@ -443,7 +445,7 @@
             <span class="o">+</span> <span class="o">-</span><span class="mi">1</span>
         <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">reduction</span> <span class="o">==</span> <span class="s2">"none"</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">reduction</span> <span class="o">==</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">kl</span>
 
         <span class="n">loss</span> <span class="o">=</span> <span class="n">kl</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
@@ -454,11 +456,11 @@
 
         <span class="k">return</span> <span class="n">loss</span></div>
 
-<div class="viewcode-block" id="DiagonalGaussianPrior.forward"><a class="viewcode-back" href="../../../../../serotiny.models.vae.priors.gaussian.html#serotiny.models.vae.priors.gaussian.DiagonalGaussianPrior.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"kl"</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="DiagonalGaussianPrior.forward"><a class="viewcode-back" href="../../../../../serotiny.models.vae.priors.gaussian.html#serotiny.models.vae.priors.gaussian.DiagonalGaussianPrior.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;kl&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">mean_logvar</span> <span class="o">=</span> <span class="n">z</span>
         <span class="n">mean</span><span class="p">,</span> <span class="n">logvar</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">mean_logvar</span><span class="p">,</span> <span class="n">mean_logvar</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">"kl"</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;kl&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">kl_divergence</span><span class="p">(</span>
                 <span class="n">mean</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span>
@@ -506,7 +508,9 @@
 </div><script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
     <script src="../../../../../_static/jquery.js"></script>
     <script src="../../../../../_static/underscore.js"></script>
+    <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../../../_static/doctools.js"></script>
+    <script src="../../../../../_static/sphinx_highlight.js"></script>
     <script src="../../../../../_static/scripts/furo.js"></script>
     </body>
 </html>

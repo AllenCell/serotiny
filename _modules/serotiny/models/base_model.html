@@ -1,13 +1,13 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
-        <title>serotiny.models.base_model - serotiny 0.0.6 documentation</title>
+    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+        <title>serotiny.models.base_model - serotiny 0.0.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
@@ -122,7 +122,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">serotiny 0.0.6 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">serotiny 0.0.8 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -148,7 +148,7 @@
     <img class="sidebar-logo" src="../../../_static/serotiny_logo.svg" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">serotiny 0.0.6 documentation</span>
+  <span class="sidebar-brand-text">serotiny 0.0.8 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -176,7 +176,7 @@
 <li class="toctree-l6"><a class="reference internal" href="../../../serotiny.io.dataframe.loaders.classes.html">serotiny.io.dataframe.loaders.classes module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../serotiny.io.dataframe.loaders.columns.html">serotiny.io.dataframe.loaders.columns module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../serotiny.io.dataframe.loaders.image.html">serotiny.io.dataframe.loaders.image module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="../../../serotiny.io.dataframe.loaders.random_image.html">serotiny.io.dataframe.loaders.random_image module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../serotiny.io.dataframe.loaders.random_tensor.html">serotiny.io.dataframe.loaders.random_tensor module</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.io.dataframe.dataframe_dataset.html">serotiny.io.dataframe.dataframe_dataset module</a></li>
@@ -216,6 +216,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.models.vae.image_vae.html">serotiny.models.vae.image_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.models.vae.implicit_decoder_vae.html">serotiny.models.vae.implicit_decoder_vae module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../serotiny.models.vae.latent_loss_vae.html">serotiny.models.vae.latent_loss_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.models.vae.tabular_vae.html">serotiny.models.vae.tabular_vae module</a></li>
 </ul>
 </li>
@@ -289,7 +290,8 @@
           </svg>
           <span>Back to top</span>
         </a>
-        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -316,7 +318,7 @@
 <span class="kn">from</span> <span class="nn">pytorch_lightning.utilities.parsing</span> <span class="kn">import</span> <span class="n">get_init_args</span>
 
 <span class="n">Array</span> <span class="o">=</span> <span class="n">Union</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span>
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">"lightning"</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;lightning&quot;</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
 
 
@@ -341,17 +343,17 @@
 
 <span class="k">def</span> <span class="nf">_parse_init_args</span><span class="p">(</span><span class="n">frame</span><span class="p">):</span>
     <span class="n">init_args</span> <span class="o">=</span> <span class="n">get_init_args</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_back</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span> <span class="o">==</span> <span class="s2">"__init__"</span><span class="p">:</span>
-        <span class="c1"># if this was called from a subclass's init</span>
+    <span class="k">if</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_back</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span> <span class="o">==</span> <span class="s2">&quot;__init__&quot;</span><span class="p">:</span>
+        <span class="c1"># if this was called from a subclass&#39;s init</span>
         <span class="n">init_args</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">get_init_args</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">f_back</span><span class="p">))</span>
 
     <span class="n">init_args</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_cast_omegaconf</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">init_args</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
     <span class="n">ignore</span> <span class="o">=</span> <span class="p">[</span><span class="n">arg</span> <span class="k">for</span> <span class="n">arg</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">init_args</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_primitive</span><span class="p">(</span><span class="n">v</span><span class="p">)]</span>
-    <span class="k">if</span> <span class="s2">"optimizer"</span> <span class="ow">in</span> <span class="n">ignore</span><span class="p">:</span>
-        <span class="n">ignore</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">"optimizer"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;optimizer&quot;</span> <span class="ow">in</span> <span class="n">ignore</span><span class="p">:</span>
+        <span class="n">ignore</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;optimizer&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="s2">"lr_scheduler"</span> <span class="ow">in</span> <span class="n">ignore</span><span class="p">:</span>
-        <span class="n">ignore</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">"lr_scheduler"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;lr_scheduler&quot;</span> <span class="ow">in</span> <span class="n">ignore</span><span class="p">:</span>
+        <span class="n">ignore</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;lr_scheduler&quot;</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">ignore</span><span class="p">:</span>
         <span class="k">del</span> <span class="n">init_args</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span>
@@ -366,10 +368,10 @@
         <span class="n">init_args</span> <span class="o">=</span> <span class="n">_parse_init_args</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">save_hyperparameters</span><span class="p">(</span><span class="n">init_args</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">init_args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"optimizer"</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">init_args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"lr_scheduler"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cache_outputs</span> <span class="o">=</span> <span class="n">init_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"cache_outputs"</span><span class="p">,</span> <span class="p">(</span><span class="s2">"test"</span><span class="p">,))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_outputs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">init_args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;optimizer&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">init_args</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;lr_scheduler&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_outputs</span> <span class="o">=</span> <span class="n">init_args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cache_outputs&quot;</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">,))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cached_outputs</span> <span class="o">=</span> <span class="p">{}</span>
 
 <div class="viewcode-block" id="BaseModel.parse_batch"><a class="viewcode-back" href="../../../serotiny.models.base_model.html#serotiny.models.base_model.BaseModel.parse_batch">[docs]</a>    <span class="k">def</span> <span class="nf">parse_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
@@ -378,7 +380,7 @@
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
     <span class="k">def</span> <span class="nf">_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stage</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
-        <span class="sd">"""Here you should implement the logic for a step in the</span>
+        <span class="sd">&quot;&quot;&quot;Here you should implement the logic for a step in the</span>
 <span class="sd">        training/validation/test process. The stage (training/validation/test)</span>
 <span class="sd">        is given by the variable `stage`.</span>
 
@@ -391,24 +393,24 @@
 <span class="sd">               ids = batch[self.hparams.id_label].detach().cpu()</span>
 <span class="sd">               results.update({</span>
 <span class="sd">                   self.hparams.id_label: ids,</span>
-<span class="sd">                   "id": ids</span>
+<span class="sd">                   &quot;id&quot;: ids</span>
 <span class="sd">               })</span>
 
 <span class="sd">        return results</span>
-<span class="sd">        """</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span>
 
 <div class="viewcode-block" id="BaseModel.training_step"><a class="viewcode-back" href="../../../serotiny.models.base_model.html#serotiny.models.base_model.BaseModel.training_step">[docs]</a>    <span class="k">def</span> <span class="nf">training_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="p">(</span><span class="s2">"train"</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BaseModel.validation_step"><a class="viewcode-back" href="../../../serotiny.models.base_model.html#serotiny.models.base_model.BaseModel.validation_step">[docs]</a>    <span class="k">def</span> <span class="nf">validation_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="p">(</span><span class="s2">"val"</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BaseModel.test_step"><a class="viewcode-back" href="../../../serotiny.models.base_model.html#serotiny.models.base_model.BaseModel.test_step">[docs]</a>    <span class="k">def</span> <span class="nf">test_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="p">(</span><span class="s2">"test"</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BaseModel.predict_step"><a class="viewcode-back" href="../../../serotiny.models.base_model.html#serotiny.models.base_model.BaseModel.predict_step">[docs]</a>    <span class="k">def</span> <span class="nf">predict_step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="p">(</span><span class="s2">"predict"</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step</span><span class="p">(</span><span class="s2">&quot;predict&quot;</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">split</span><span class="p">,</span> <span class="n">outputs</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">split</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_outputs</span><span class="p">:</span>
@@ -418,24 +420,24 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_cached_outputs</span><span class="p">[</span><span class="n">split</span><span class="p">]</span> <span class="o">=</span> <span class="n">outputs</span>
 
 <div class="viewcode-block" id="BaseModel.train_epoch_end"><a class="viewcode-back" href="../../../serotiny.models.base_model.html#serotiny.models.base_model.BaseModel.train_epoch_end">[docs]</a>    <span class="k">def</span> <span class="nf">train_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputs</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_end</span><span class="p">(</span><span class="s2">"train"</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_end</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BaseModel.validation_epoch_end"><a class="viewcode-back" href="../../../serotiny.models.base_model.html#serotiny.models.base_model.BaseModel.validation_epoch_end">[docs]</a>    <span class="k">def</span> <span class="nf">validation_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputs</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_end</span><span class="p">(</span><span class="s2">"val"</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_end</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BaseModel.test_epoch_end"><a class="viewcode-back" href="../../../serotiny.models.base_model.html#serotiny.models.base_model.BaseModel.test_epoch_end">[docs]</a>    <span class="k">def</span> <span class="nf">test_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outputs</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_end</span><span class="p">(</span><span class="s2">"test"</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_epoch_end</span><span class="p">(</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="BaseModel.configure_optimizers"><a class="viewcode-back" href="../../../serotiny.models.base_model.html#serotiny.models.base_model.BaseModel.configure_optimizers">[docs]</a>    <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">optimizer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">scheduler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">{</span>
-                <span class="s2">"optimizer"</span><span class="p">:</span> <span class="n">optimizer</span><span class="p">,</span>
-                <span class="s2">"lr_scheduler"</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s2">"scheduler"</span><span class="p">:</span> <span class="n">scheduler</span><span class="p">,</span>
-                    <span class="s2">"monitor"</span><span class="p">:</span> <span class="s2">"val_loss"</span><span class="p">,</span>
-                    <span class="s2">"frequency"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="s2">&quot;optimizer&quot;</span><span class="p">:</span> <span class="n">optimizer</span><span class="p">,</span>
+                <span class="s2">&quot;lr_scheduler&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;scheduler&quot;</span><span class="p">:</span> <span class="n">scheduler</span><span class="p">,</span>
+                    <span class="s2">&quot;monitor&quot;</span><span class="p">:</span> <span class="s2">&quot;val_loss&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;frequency&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
                 <span class="p">},</span>
             <span class="p">}</span>
         <span class="k">return</span> <span class="n">optimizer</span></div></div>
@@ -476,7 +478,9 @@
 </div><script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/scripts/furo.js"></script>
     </body>
 </html>

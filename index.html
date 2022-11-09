@@ -1,14 +1,14 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Installation" href="installation.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
-        <title>serotiny 0.0.6 documentation</title>
+    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+        <title>serotiny 0.0.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="#"><div class="brand">serotiny 0.0.6 documentation</div></a>
+      <a href="#"><div class="brand">serotiny 0.0.8 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -149,7 +149,7 @@
     <img class="sidebar-logo" src="_static/serotiny_logo.svg" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">serotiny 0.0.6 documentation</span>
+  <span class="sidebar-brand-text">serotiny 0.0.8 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -177,7 +177,7 @@
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.classes.html">serotiny.io.dataframe.loaders.classes module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.columns.html">serotiny.io.dataframe.loaders.columns module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.image.html">serotiny.io.dataframe.loaders.image module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.random_image.html">serotiny.io.dataframe.loaders.random_image module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.random_tensor.html">serotiny.io.dataframe.loaders.random_tensor module</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.io.dataframe.dataframe_dataset.html">serotiny.io.dataframe.dataframe_dataset module</a></li>
@@ -217,6 +217,7 @@
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.image_vae.html">serotiny.models.vae.image_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.implicit_decoder_vae.html">serotiny.models.vae.implicit_decoder_vae module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.latent_loss_vae.html">serotiny.models.vae.latent_loss_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.tabular_vae.html">serotiny.models.vae.tabular_vae module</a></li>
 </ul>
 </li>
@@ -290,7 +291,9 @@
           </svg>
           <span>Back to top</span>
         </a>
-        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -305,7 +308,7 @@
         </div>
         <article role="main">
           <section id="serotiny">
-<h1>serotiny<a class="headerlink" href="#serotiny" title="Permalink to this headline">#</a></h1>
+<h1>serotiny<a class="headerlink" href="#serotiny" title="Permalink to this heading">#</a></h1>
 <p>While going about the work of building deep learning projects, several simultaneous problems seemed to emerge:</p>
 <ul class="simple">
 <li><p>How do we reuse as much work from previous projects as possible, and focus on building the part of the project that makes it distinct?</p></li>
@@ -316,7 +319,7 @@
 <p>Serotiny arose from the need to address these issues and convert the complexity of deep learning projects into something simple, reproducible, configurable, and automatable at scale.</p>
 <p>Serotiny is still a work-in-progress, but as we go along the solutions to these problems become more clear. Maybe you’ve run into similar situations? We’d love to hear from you.</p>
 <section id="overview">
-<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">#</a></h2>
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">#</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">serotiny</span></code> is a framework and set of tools to structure, configure and drive deep
 learning projects, developed with the intention of streamlining the lifecycle of
 deep learning projects at <a class="reference external" href="https://www.allencell.org/">Allen Institute for Cell Science</a>.</p>
@@ -337,7 +340,7 @@ by tightly integrating with</p>
 benefit from general and powerful tooling.</p>
 </section>
 <section id="getting-started">
-<h2>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">#</a></h2>
+<h2>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this heading">#</a></h2>
 <p>For more information, check our <a class="reference external" href="https://allencell.github.io/serotiny">documentation</a>,
 or jump straight into our <a class="reference external" href="https://allencell.github.io/serotiny/getting_started.html">getting started</a>
 page, and learn how training a DL model can be as simple as:</p>
@@ -346,18 +349,18 @@ page, and learn how training a DL model can be as simple as:</p>
 </div>
 </section>
 <section id="authors">
-<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this headline">#</a></h2>
+<h2>Authors<a class="headerlink" href="#authors" title="Permalink to this heading">#</a></h2>
 <ul class="simple">
-<li><p>Guilherme Pires @colobas</p></li>
-<li><p>Ryan Spangler @prismofeverything</p></li>
-<li><p>Ritvik Vasan @ritvikvasan</p></li>
-<li><p>Caleb Chan @calebium</p></li>
-<li><p>Theo Knijnenburg @tknijnen</p></li>
-<li><p>Nick Gomez @gomeznick86</p></li>
+<li><p>Guilherme Pires &#64;colobas</p></li>
+<li><p>Ryan Spangler &#64;prismofeverything</p></li>
+<li><p>Ritvik Vasan &#64;ritvikvasan</p></li>
+<li><p>Caleb Chan &#64;calebium</p></li>
+<li><p>Theo Knijnenburg &#64;tknijnen</p></li>
+<li><p>Nick Gomez &#64;gomeznick86</p></li>
 </ul>
 </section>
 <section id="citing">
-<h2>Citing<a class="headerlink" href="#citing" title="Permalink to this headline">#</a></h2>
+<h2>Citing<a class="headerlink" href="#citing" title="Permalink to this heading">#</a></h2>
 <p>If you find serotiny useful, please cite this repository as:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Serotiny</span> <span class="n">Authors</span> <span class="p">(</span><span class="mi">2022</span><span class="p">)</span><span class="o">.</span> <span class="n">Serotiny</span><span class="p">:</span> <span class="n">a</span> <span class="n">framework</span> <span class="n">of</span> <span class="n">tools</span> <span class="n">to</span> <span class="n">structure</span><span class="p">,</span> <span class="n">configure</span> <span class="ow">and</span> <span class="n">drive</span> <span class="n">deep</span> <span class="n">learning</span> <span class="n">projects</span> <span class="p">[</span><span class="n">Computer</span> <span class="n">software</span><span class="p">]</span><span class="o">.</span> <span class="n">GitHub</span><span class="o">.</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">AllenCellModeling</span><span class="o">/</span><span class="n">serotiny</span>
 <span class="n">Free</span> <span class="n">software</span><span class="p">:</span> <span class="n">BSD</span><span class="o">-</span><span class="mi">3</span><span class="o">-</span><span class="n">Clause</span>
@@ -380,7 +383,7 @@ page, and learn how training a DL model can be as simple as:</p>
                 </div>
                 <div class="title">Installation</div>
               </div>
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
           
         </div>
@@ -409,7 +412,7 @@ page, and learn how training a DL model can be as simple as:</p>
       <div class="toc-sticky toc-scroll">
         <div class="toc-title-container">
           <span class="toc-title">
-            Contents
+            On this page
           </span>
         </div>
         <div class="toc-tree-container">
@@ -434,7 +437,9 @@ page, and learn how training a DL model can be as simple as:</p>
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/scripts/furo.js"></script>
     </body>
 </html>

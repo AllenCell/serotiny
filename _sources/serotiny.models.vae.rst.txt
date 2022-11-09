@@ -23,4 +23,5 @@ Submodules
    serotiny.models.vae.base_vae
    serotiny.models.vae.image_vae
    serotiny.models.vae.implicit_decoder_vae
+   serotiny.models.vae.latent_loss_vae
    serotiny.models.vae.tabular_vae

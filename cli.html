@@ -1,14 +1,14 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Dataframe wrangling" href="dataframe_transforms.html" /><link rel="prev" title="Getting started" href="getting_started.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
-        <title>serotiny CLI - serotiny 0.0.6 documentation</title>
+    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+        <title>serotiny CLI - serotiny 0.0.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">serotiny 0.0.6 documentation</div></a>
+      <a href="index.html"><div class="brand">serotiny 0.0.8 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -149,7 +149,7 @@
     <img class="sidebar-logo" src="_static/serotiny_logo.svg" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">serotiny 0.0.6 documentation</span>
+  <span class="sidebar-brand-text">serotiny 0.0.8 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -177,7 +177,7 @@
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.classes.html">serotiny.io.dataframe.loaders.classes module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.columns.html">serotiny.io.dataframe.loaders.columns module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.image.html">serotiny.io.dataframe.loaders.image module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.random_image.html">serotiny.io.dataframe.loaders.random_image module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.random_tensor.html">serotiny.io.dataframe.loaders.random_tensor module</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.io.dataframe.dataframe_dataset.html">serotiny.io.dataframe.dataframe_dataset module</a></li>
@@ -217,6 +217,7 @@
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.image_vae.html">serotiny.models.vae.image_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.implicit_decoder_vae.html">serotiny.models.vae.implicit_decoder_vae module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.latent_loss_vae.html">serotiny.models.vae.latent_loss_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.tabular_vae.html">serotiny.models.vae.tabular_vae module</a></li>
 </ul>
 </li>
@@ -290,7 +291,9 @@
           </svg>
           <span>Back to top</span>
         </a>
-        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -305,7 +308,7 @@
         </div>
         <article role="main">
           <section id="serotiny-cli">
-<h1>serotiny CLI<a class="headerlink" href="#serotiny-cli" title="Permalink to this headline">#</a></h1>
+<h1>serotiny CLI<a class="headerlink" href="#serotiny-cli" title="Permalink to this heading">#</a></h1>
 <p><code class="docutils literal notranslate"><span class="pre">serotiny</span></code> comes with a CLI to make its use straightforward. The CLI has
 multiple modules, for different functionalities. You can append <code class="docutils literal notranslate"><span class="pre">--help</span></code>
 to any module in the command-line, to obtain more information.</p>
@@ -322,7 +325,7 @@ to any module in the command-line, to obtain more information.</p>
 </li>
 </ul>
 <section id="ml-operations-train-test-predict">
-<h2>ML operations: train, test, predict<a class="headerlink" href="#ml-operations-train-test-predict" title="Permalink to this headline">#</a></h2>
+<h2>ML operations: train, test, predict<a class="headerlink" href="#ml-operations-train-test-predict" title="Permalink to this heading">#</a></h2>
 <p>These commands run in the context of serotiny projects. In the
 <a class="reference internal" href="getting_started.html#getting-started"><span class="std std-ref">Getting started</span></a>
 section you’ll learn how to create and configure your <code class="docutils literal notranslate"><span class="pre">serotiny</span></code> projects. Once
@@ -331,8 +334,8 @@ you specified in your project. For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ serotiny train \
 model=a_model_config \
 data=a_datamodule_config \
-trainer=default \ # you can omit this line if you're using the default config
-mlflow=default \  # you can omit this line if you're using the default config
+trainer=default \ # you can omit this line if you&#39;re using the default config
+mlflow=default \  # you can omit this line if you&#39;re using the default config
 ++model.latent_dim=11 \ # if you want to override a particular value, you can do so
 ++trainer.max_epochs=50 \
 ++seed=13
@@ -348,14 +351,14 @@ behind this initially intimidating syntax is because these commands are
 to change config parameters, as well as leverage any additional hydra functionality
 like:</p>
 <ul class="simple">
-<li><p>Multi-runs and launchers (check <a class="reference external" href="https://hydra.cc/docs/next/tutorials/basic/running_your_app/multi-run/#--multirun--m-from-the-command-line">the relevant section of the hydra docs</a>)</p>
+<li><p>Multi-runs and launchers (check <a class="reference external" href="https://hydra.cc/docs/tutorials/basic/running_your_app/multi-run/#--multirun--m-from-the-command-line">the relevant section of the hydra docs</a>)</p>
 <ul>
 <li><p>Just add the <code class="docutils literal notranslate"><span class="pre">-m</span></code> flag and the intended sweeps in the command line</p></li>
 </ul>
 </li>
 <li><p>Tab completion (only on Bash) (check <a class="reference external" href="https://hydra.cc/docs/next/tutorials/basic/running_your_app/tab_completion/">the relevant section of the hydra docs</a>)</p>
 <ul>
-<li><p>Run <code class="docutils literal notranslate"><span class="pre">eval</span> <span class="pre">"$(serotiny</span> <span class="pre">train</span> <span class="pre">-sc</span> <span class="pre">install=serotiny_bash)"</span></code>. You now have tab
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">eval</span> <span class="pre">&quot;$(serotiny</span> <span class="pre">train</span> <span class="pre">-sc</span> <span class="pre">install=serotiny_bash)&quot;</span></code>. You now have tab
 completion in serotiny projects in that shell session! (Useful when you have
 many config options for each config group - see the
 <a class="reference internal" href="getting_started.html#getting-started"><span class="std std-ref">Getting started section</span></a> to understand what this means)</p></li>
@@ -365,7 +368,7 @@ many config options for each config group - see the
 </ul>
 </section>
 <section id="debugging-ml-operations">
-<h2>Debugging ML operations<a class="headerlink" href="#debugging-ml-operations" title="Permalink to this headline">#</a></h2>
+<h2>Debugging ML operations<a class="headerlink" href="#debugging-ml-operations" title="Permalink to this heading">#</a></h2>
 <p>For the commands in the above section, you can add an argument
 <code class="docutils literal notranslate"><span class="pre">++make_notebook=/path/to/destination/notebook.ipynb</span></code> to the call, with a path
 to a destination notebook file which will be created and populated with cells
@@ -386,10 +389,10 @@ them and run them one by one.</p>
                 </div>
                 <div class="title">Dataframe wrangling</div>
               </div>
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
           <a class="prev-page" href="getting_started.html">
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
@@ -425,7 +428,7 @@ them and run them one by one.</p>
       <div class="toc-sticky toc-scroll">
         <div class="toc-title-container">
           <span class="toc-title">
-            Contents
+            On this page
           </span>
         </div>
         <div class="toc-tree-container">
@@ -448,7 +451,9 @@ them and run them one by one.</p>
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/scripts/furo.js"></script>
     </body>
 </html>

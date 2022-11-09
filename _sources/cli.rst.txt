@@ -46,7 +46,7 @@ to change config parameters, as well as leverage any additional hydra functional
 like:
 
 - Multi-runs and launchers (check `the relevant section of the hydra docs
-  <https://hydra.cc/docs/next/tutorials/basic/running_your_app/multi-run/#--multirun--m-from-the-command-line>`_)
+  <https://hydra.cc/docs/tutorials/basic/running_your_app/multi-run/#--multirun--m-from-the-command-line>`_)
 
   - Just add the ``-m`` flag and the intended sweeps in the command line
 

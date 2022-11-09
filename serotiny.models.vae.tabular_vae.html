@@ -1,14 +1,14 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny.models.base_model module" href="serotiny.models.base_model.html" /><link rel="prev" title="serotiny.models.vae.implicit_decoder_vae module" href="serotiny.models.vae.implicit_decoder_vae.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny.models.base_model module" href="serotiny.models.base_model.html" /><link rel="prev" title="serotiny.models.vae.latent_loss_vae module" href="serotiny.models.vae.latent_loss_vae.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
-        <title>serotiny.models.vae.tabular_vae module - serotiny 0.0.6 documentation</title>
+    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+        <title>serotiny.models.vae.tabular_vae module - serotiny 0.0.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">serotiny 0.0.6 documentation</div></a>
+      <a href="index.html"><div class="brand">serotiny 0.0.8 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -134,7 +134,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -149,7 +149,7 @@
     <img class="sidebar-logo" src="_static/serotiny_logo.svg" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">serotiny 0.0.6 documentation</span>
+  <span class="sidebar-brand-text">serotiny 0.0.8 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -177,7 +177,7 @@
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.classes.html">serotiny.io.dataframe.loaders.classes module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.columns.html">serotiny.io.dataframe.loaders.columns module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.image.html">serotiny.io.dataframe.loaders.image module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.random_image.html">serotiny.io.dataframe.loaders.random_image module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.random_tensor.html">serotiny.io.dataframe.loaders.random_tensor module</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.io.dataframe.dataframe_dataset.html">serotiny.io.dataframe.dataframe_dataset module</a></li>
@@ -217,6 +217,7 @@
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.image_vae.html">serotiny.models.vae.image_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.implicit_decoder_vae.html">serotiny.models.vae.implicit_decoder_vae module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.latent_loss_vae.html">serotiny.models.vae.latent_loss_vae module</a></li>
 <li class="toctree-l5 current current-page"><a class="current reference internal" href="#">serotiny.models.vae.tabular_vae module</a></li>
 </ul>
 </li>
@@ -290,7 +291,9 @@
           </svg>
           <span>Back to top</span>
         </a>
-        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -298,39 +301,40 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
           <section id="module-serotiny.models.vae.tabular_vae">
-<span id="serotiny-models-vae-tabular-vae-module"></span><h1>serotiny.models.vae.tabular_vae module<a class="headerlink" href="#module-serotiny.models.vae.tabular_vae" title="Permalink to this headline">#</a></h1>
+<span id="serotiny-models-vae-tabular-vae-module"></span><h1>serotiny.models.vae.tabular_vae module<a class="headerlink" href="#module-serotiny.models.vae.tabular_vae" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="serotiny.models.vae.tabular_vae.TabularVAE">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.models.vae.tabular_vae.</span></span><span class="sig-name descname"><span class="pre">TabularVAE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">x_dim:</span> <span class="pre">int,</span> <span class="pre">latent_dim:</span> <span class="pre">int,</span> <span class="pre">hidden_layers:</span> <span class="pre">typing.Sequence[int],</span> <span class="pre">x_label:</span> <span class="pre">str,</span> <span class="pre">id_label:</span> <span class="pre">typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">loss_mask_label:</span> <span class="pre">typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">optimizer=&lt;class</span> <span class="pre">'torch.optim.adam.Adam'&gt;,</span> <span class="pre">beta:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.0,</span> <span class="pre">priors:</span> <span class="pre">typing.Optional[typing.Sequence[serotiny.models.vae.priors.abstract_prior.Prior]]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">reconstruction_loss:</span> <span class="pre">torch.nn.modules.loss._Loss</span> <span class="pre">=</span> <span class="pre">MSELoss(),</span> <span class="pre">reconstruction_reduce:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'sum',</span> <span class="pre">cache_outputs:</span> <span class="pre">typing.Sequence</span> <span class="pre">=</span> <span class="pre">('test',)</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/tabular_vae.html#TabularVAE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.tabular_vae.TabularVAE" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference internal" href="serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE" title="serotiny.models.vae.base_vae.BaseVAE"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.models.vae.base_vae.BaseVAE</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.models.vae.tabular_vae.</span></span><span class="sig-name descname"><span class="pre">TabularVAE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">x_dim:</span> <span class="pre">int,</span> <span class="pre">latent_dim:</span> <span class="pre">int,</span> <span class="pre">hidden_layers:</span> <span class="pre">~typing.Sequence[int],</span> <span class="pre">x_label:</span> <span class="pre">str,</span> <span class="pre">id_label:</span> <span class="pre">~typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">loss_mask_label:</span> <span class="pre">~typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">optimizer=&lt;class</span> <span class="pre">'torch.optim.adam.Adam'&gt;,</span> <span class="pre">beta:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.0,</span> <span class="pre">priors:</span> <span class="pre">~typing.Optional[~typing.Sequence[~serotiny.models.vae.priors.abstract_prior.Prior]]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">reconstruction_loss:</span> <span class="pre">~torch.nn.modules.loss._Loss</span> <span class="pre">=</span> <span class="pre">MSELoss(),</span> <span class="pre">reconstruction_reduce:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'sum',</span> <span class="pre">cache_outputs:</span> <span class="pre">~typing.Sequence</span> <span class="pre">=</span> <span class="pre">('test',)</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/tabular_vae.html#TabularVAE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.tabular_vae.TabularVAE" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE" title="serotiny.models.vae.base_vae.BaseVAE"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseVAE</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.tabular_vae.TabularVAE.allow_zero_length_dataloader_with_multiple_devices">
 <span class="sig-name descname"><span class="pre">allow_zero_length_dataloader_with_multiple_devices</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.vae.tabular_vae.TabularVAE.allow_zero_length_dataloader_with_multiple_devices" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.tabular_vae.TabularVAE.precision">
 <span class="sig-name descname"><span class="pre">precision</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#serotiny.models.vae.tabular_vae.TabularVAE.precision" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.tabular_vae.TabularVAE.prepare_data_per_node">
 <span class="sig-name descname"><span class="pre">prepare_data_per_node</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.vae.tabular_vae.TabularVAE.prepare_data_per_node" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="serotiny.models.vae.tabular_vae.TabularVAE.trainer">
-<span class="sig-name descname"><span class="pre">trainer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'pl.Trainer'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#serotiny.models.vae.tabular_vae.TabularVAE.trainer" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.tabular_vae.TabularVAE.training">
 <span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.vae.tabular_vae.TabularVAE.training" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
+
 </dd></dl>
+
 </section>
 
         </article>
@@ -345,16 +349,16 @@
                 </div>
                 <div class="title">serotiny.models.base_model module</div>
               </div>
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="serotiny.models.vae.implicit_decoder_vae.html">
-              <svg><use href="#svg-arrow-right"></use></svg>
+          <a class="prev-page" href="serotiny.models.vae.latent_loss_vae.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">serotiny.models.vae.implicit_decoder_vae module</div>
+                <div class="title">serotiny.models.vae.latent_loss_vae module</div>
                 
               </div>
             </a>
@@ -378,8 +382,33 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">serotiny.models.vae.tabular_vae module</a><ul>
+<li><a class="reference internal" href="#serotiny.models.vae.tabular_vae.TabularVAE"><code class="docutils literal notranslate"><span class="pre">TabularVAE</span></code></a><ul>
+<li><a class="reference internal" href="#serotiny.models.vae.tabular_vae.TabularVAE.allow_zero_length_dataloader_with_multiple_devices"><code class="docutils literal notranslate"><span class="pre">TabularVAE.allow_zero_length_dataloader_with_multiple_devices</span></code></a></li>
+<li><a class="reference internal" href="#serotiny.models.vae.tabular_vae.TabularVAE.precision"><code class="docutils literal notranslate"><span class="pre">TabularVAE.precision</span></code></a></li>
+<li><a class="reference internal" href="#serotiny.models.vae.tabular_vae.TabularVAE.prepare_data_per_node"><code class="docutils literal notranslate"><span class="pre">TabularVAE.prepare_data_per_node</span></code></a></li>
+<li><a class="reference internal" href="#serotiny.models.vae.tabular_vae.TabularVAE.training"><code class="docutils literal notranslate"><span class="pre">TabularVAE.training</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
@@ -387,7 +416,9 @@
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/scripts/furo.js"></script>
     </body>
 </html>

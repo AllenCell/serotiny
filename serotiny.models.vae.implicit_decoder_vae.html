@@ -1,14 +1,14 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny.models.vae.tabular_vae module" href="serotiny.models.vae.tabular_vae.html" /><link rel="prev" title="serotiny.models.vae.image_vae module" href="serotiny.models.vae.image_vae.html" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny.models.vae.latent_loss_vae module" href="serotiny.models.vae.latent_loss_vae.html" /><link rel="prev" title="serotiny.models.vae.image_vae module" href="serotiny.models.vae.image_vae.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
-        <title>serotiny.models.vae.implicit_decoder_vae module - serotiny 0.0.6 documentation</title>
+    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+        <title>serotiny.models.vae.implicit_decoder_vae module - serotiny 0.0.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">serotiny 0.0.6 documentation</div></a>
+      <a href="index.html"><div class="brand">serotiny 0.0.8 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -134,7 +134,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -149,7 +149,7 @@
     <img class="sidebar-logo" src="_static/serotiny_logo.svg" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">serotiny 0.0.6 documentation</span>
+  <span class="sidebar-brand-text">serotiny 0.0.8 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -177,7 +177,7 @@
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.classes.html">serotiny.io.dataframe.loaders.classes module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.columns.html">serotiny.io.dataframe.loaders.columns module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.image.html">serotiny.io.dataframe.loaders.image module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.random_image.html">serotiny.io.dataframe.loaders.random_image module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.random_tensor.html">serotiny.io.dataframe.loaders.random_tensor module</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.io.dataframe.dataframe_dataset.html">serotiny.io.dataframe.dataframe_dataset module</a></li>
@@ -217,6 +217,7 @@
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.image_vae.html">serotiny.models.vae.image_vae module</a></li>
 <li class="toctree-l5 current current-page"><a class="current reference internal" href="#">serotiny.models.vae.implicit_decoder_vae module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.latent_loss_vae.html">serotiny.models.vae.latent_loss_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.tabular_vae.html">serotiny.models.vae.tabular_vae module</a></li>
 </ul>
 </li>
@@ -290,7 +291,9 @@
           </svg>
           <span>Back to top</span>
         </a>
-        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -298,55 +301,60 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
           <section id="module-serotiny.models.vae.implicit_decoder_vae">
-<span id="serotiny-models-vae-implicit-decoder-vae-module"></span><h1>serotiny.models.vae.implicit_decoder_vae module<a class="headerlink" href="#module-serotiny.models.vae.implicit_decoder_vae" title="Permalink to this headline">#</a></h1>
+<span id="serotiny-models-vae-implicit-decoder-vae-module"></span><h1>serotiny.models.vae.implicit_decoder_vae module<a class="headerlink" href="#module-serotiny.models.vae.implicit_decoder_vae" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.models.vae.implicit_decoder_vae.</span></span><span class="sig-name descname"><span class="pre">ImplicitDecoderVAE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">latent_dim:</span> <span class="pre">typing.Union[int,</span> <span class="pre">typing.Sequence[int]],</span> <span class="pre">in_channels:</span> <span class="pre">int,</span> <span class="pre">hidden_channels:</span> <span class="pre">typing.Sequence[int],</span> <span class="pre">decoder_hidden_channels:</span> <span class="pre">typing.Sequence[int],</span> <span class="pre">max_pool_layers:</span> <span class="pre">typing.Sequence[int],</span> <span class="pre">input_dims:</span> <span class="pre">typing.Sequence[int],</span> <span class="pre">x_label:</span> <span class="pre">str,</span> <span class="pre">beta:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.0,</span> <span class="pre">optimizer=&lt;class</span> <span class="pre">'torch.optim.adam.Adam'&gt;,</span> <span class="pre">id_label:</span> <span class="pre">typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">non_linearity:</span> <span class="pre">typing.Optional[torch.nn.modules.module.Module]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">decoder_non_linearity:</span> <span class="pre">typing.Optional[torch.nn.modules.module.Module]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">loss_mask_label:</span> <span class="pre">typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">reconstruction_loss:</span> <span class="pre">torch.nn.modules.loss._Loss</span> <span class="pre">=</span> <span class="pre">MSELoss(),</span> <span class="pre">reconstruction_reduce:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'mean',</span> <span class="pre">prior_mode:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'isotropic',</span> <span class="pre">prior_logvar:</span> <span class="pre">typing.Optional[typing.Union[torch.Tensor,</span> <span class="pre">numpy.ndarray,</span> <span class="pre">typing.Sequence[float]]]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">learn_prior_logvar:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">skip_connections:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True,</span> <span class="pre">mode:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'3d',</span> <span class="pre">kernel_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">3,</span> <span class="pre">cache_outputs:</span> <span class="pre">typing.Sequence</span> <span class="pre">=</span> <span class="pre">('test',),</span> <span class="pre">temperature:</span> <span class="pre">typing.Optional[float]</span> <span class="pre">=</span> <span class="pre">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/implicit_decoder_vae.html#ImplicitDecoderVAE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference internal" href="serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE" title="serotiny.models.vae.base_vae.BaseVAE"><code class="xref py py-class docutils literal notranslate"><span class="pre">serotiny.models.vae.base_vae.BaseVAE</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">serotiny.models.vae.implicit_decoder_vae.</span></span><span class="sig-name descname"><span class="pre">ImplicitDecoderVAE</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">latent_dim:</span> <span class="pre">~typing.Union[int,</span> <span class="pre">~typing.Sequence[int]],</span> <span class="pre">in_channels:</span> <span class="pre">int,</span> <span class="pre">hidden_channels:</span> <span class="pre">~typing.Sequence[int],</span> <span class="pre">decoder_hidden_channels:</span> <span class="pre">~typing.Sequence[int],</span> <span class="pre">max_pool_layers:</span> <span class="pre">~typing.Sequence[int],</span> <span class="pre">input_dims:</span> <span class="pre">~typing.Sequence[int],</span> <span class="pre">x_label:</span> <span class="pre">str,</span> <span class="pre">beta:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.0,</span> <span class="pre">optimizer=&lt;class</span> <span class="pre">'torch.optim.adam.Adam'&gt;,</span> <span class="pre">id_label:</span> <span class="pre">~typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">non_linearity:</span> <span class="pre">~typing.Optional[~torch.nn.modules.module.Module]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">decoder_non_linearity:</span> <span class="pre">~typing.Optional[~torch.nn.modules.module.Module]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">loss_mask_label:</span> <span class="pre">~typing.Optional[str]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">reconstruction_loss:</span> <span class="pre">~torch.nn.modules.loss._Loss</span> <span class="pre">=</span> <span class="pre">MSELoss(),</span> <span class="pre">reconstruction_reduce:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'mean',</span> <span class="pre">prior_mode:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'isotropic',</span> <span class="pre">prior_logvar:</span> <span class="pre">~typing.Optional[~typing.Union[~torch.Tensor,</span> <span class="pre">~numpy.ndarray,</span> <span class="pre">~typing.Sequence[float]]]</span> <span class="pre">=</span> <span class="pre">None,</span> <span class="pre">learn_prior_logvar:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False,</span> <span class="pre">skip_connections:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True,</span> <span class="pre">mode:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'3d',</span> <span class="pre">kernel_size:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">3,</span> <span class="pre">cache_outputs:</span> <span class="pre">~typing.Sequence</span> <span class="pre">=</span> <span class="pre">('test',),</span> <span class="pre">temperature:</span> <span class="pre">~typing.Optional[float]</span> <span class="pre">=</span> <span class="pre">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/implicit_decoder_vae.html#ImplicitDecoderVAE"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE" title="serotiny.models.vae.base_vae.BaseVAE"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseVAE</span></code></a></p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.allow_zero_length_dataloader_with_multiple_devices">
 <span class="sig-name descname"><span class="pre">allow_zero_length_dataloader_with_multiple_devices</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.allow_zero_length_dataloader_with_multiple_devices" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.calculate_elbo">
 <span class="sig-name descname"><span class="pre">calculate_elbo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logvar</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/implicit_decoder_vae.html#ImplicitDecoderVAE.calculate_elbo"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.calculate_elbo" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.decode">
 <span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z_params</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/implicit_decoder_vae.html#ImplicitDecoderVAE.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.decode" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.log_metrics">
 <span class="sig-name descname"><span class="pre">log_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stage</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reconstruction_loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kld_loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/implicit_decoder_vae.html#ImplicitDecoderVAE.log_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.log_metrics" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.parse_batch">
 <span class="sig-name descname"><span class="pre">parse_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/serotiny/models/vae/implicit_decoder_vae.html#ImplicitDecoderVAE.parse_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.parse_batch" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.precision">
 <span class="sig-name descname"><span class="pre">precision</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.precision" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.prepare_data_per_node">
 <span class="sig-name descname"><span class="pre">prepare_data_per_node</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.prepare_data_per_node" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.trainer">
-<span class="sig-name descname"><span class="pre">trainer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'pl.Trainer'</span></span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.trainer" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.training">
 <span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.training" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
+
 </dd></dl>
+
 </section>
 
         </article>
@@ -354,17 +362,17 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="serotiny.models.vae.tabular_vae.html">
+          <a class="next-page" href="serotiny.models.vae.latent_loss_vae.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">serotiny.models.vae.tabular_vae module</div>
+                <div class="title">serotiny.models.vae.latent_loss_vae module</div>
               </div>
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
           <a class="prev-page" href="serotiny.models.vae.image_vae.html">
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
@@ -394,8 +402,37 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">serotiny.models.vae.implicit_decoder_vae module</a><ul>
+<li><a class="reference internal" href="#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE"><code class="docutils literal notranslate"><span class="pre">ImplicitDecoderVAE</span></code></a><ul>
+<li><a class="reference internal" href="#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.allow_zero_length_dataloader_with_multiple_devices"><code class="docutils literal notranslate"><span class="pre">ImplicitDecoderVAE.allow_zero_length_dataloader_with_multiple_devices</span></code></a></li>
+<li><a class="reference internal" href="#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.calculate_elbo"><code class="docutils literal notranslate"><span class="pre">ImplicitDecoderVAE.calculate_elbo()</span></code></a></li>
+<li><a class="reference internal" href="#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.decode"><code class="docutils literal notranslate"><span class="pre">ImplicitDecoderVAE.decode()</span></code></a></li>
+<li><a class="reference internal" href="#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.log_metrics"><code class="docutils literal notranslate"><span class="pre">ImplicitDecoderVAE.log_metrics()</span></code></a></li>
+<li><a class="reference internal" href="#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.parse_batch"><code class="docutils literal notranslate"><span class="pre">ImplicitDecoderVAE.parse_batch()</span></code></a></li>
+<li><a class="reference internal" href="#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.precision"><code class="docutils literal notranslate"><span class="pre">ImplicitDecoderVAE.precision</span></code></a></li>
+<li><a class="reference internal" href="#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.prepare_data_per_node"><code class="docutils literal notranslate"><span class="pre">ImplicitDecoderVAE.prepare_data_per_node</span></code></a></li>
+<li><a class="reference internal" href="#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.training"><code class="docutils literal notranslate"><span class="pre">ImplicitDecoderVAE.training</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
@@ -403,7 +440,9 @@
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/scripts/furo.js"></script>
     </body>
 </html>

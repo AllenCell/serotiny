@@ -16,4 +16,4 @@ Submodules
    serotiny.io.dataframe.loaders.classes
    serotiny.io.dataframe.loaders.columns
    serotiny.io.dataframe.loaders.image
-   serotiny.io.dataframe.loaders.random_image
+   serotiny.io.dataframe.loaders.random_tensor

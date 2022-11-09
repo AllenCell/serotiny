@@ -1,14 +1,14 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny.ml_ops.ml_ops module" href="serotiny.ml_ops.ml_ops.html" /><link rel="prev" title="serotiny.losses.weibull module" href="serotiny.losses.weibull.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
-        <title>serotiny.ml_ops package - serotiny 0.0.6 documentation</title>
+    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+        <title>serotiny.ml_ops package - serotiny 0.0.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">serotiny 0.0.6 documentation</div></a>
+      <a href="index.html"><div class="brand">serotiny 0.0.8 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -149,7 +149,7 @@
     <img class="sidebar-logo" src="_static/serotiny_logo.svg" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">serotiny 0.0.6 documentation</span>
+  <span class="sidebar-brand-text">serotiny 0.0.8 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -177,7 +177,7 @@
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.classes.html">serotiny.io.dataframe.loaders.classes module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.columns.html">serotiny.io.dataframe.loaders.columns module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.image.html">serotiny.io.dataframe.loaders.image module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.random_image.html">serotiny.io.dataframe.loaders.random_image module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.random_tensor.html">serotiny.io.dataframe.loaders.random_tensor module</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.io.dataframe.dataframe_dataset.html">serotiny.io.dataframe.dataframe_dataset module</a></li>
@@ -217,6 +217,7 @@
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.image_vae.html">serotiny.models.vae.image_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.implicit_decoder_vae.html">serotiny.models.vae.implicit_decoder_vae module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.latent_loss_vae.html">serotiny.models.vae.latent_loss_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.tabular_vae.html">serotiny.models.vae.tabular_vae module</a></li>
 </ul>
 </li>
@@ -290,7 +291,9 @@
           </svg>
           <span>Back to top</span>
         </a>
-        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -305,14 +308,33 @@
         </div>
         <article role="main">
           <section id="module-serotiny.ml_ops">
-<span id="serotiny-ml-ops-package"></span><h1>serotiny.ml_ops package<a class="headerlink" href="#module-serotiny.ml_ops" title="Permalink to this headline">#</a></h1>
+<span id="serotiny-ml-ops-package"></span><h1>serotiny.ml_ops package<a class="headerlink" href="#module-serotiny.ml_ops" title="Permalink to this heading">#</a></h1>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">#</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">#</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="serotiny.ml_ops.ml_ops.html">serotiny.ml_ops.ml_ops module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="serotiny.ml_ops.mlflow_utils.html">serotiny.ml_ops.mlflow_utils module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="serotiny.ml_ops.utils.html">serotiny.ml_ops.utils module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="serotiny.ml_ops.ml_ops.html">serotiny.ml_ops.ml_ops module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.ml_ops.ml_ops.html#serotiny.ml_ops.ml_ops.instantiate"><code class="docutils literal notranslate"><span class="pre">instantiate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="serotiny.ml_ops.mlflow_utils.html">serotiny.ml_ops.mlflow_utils module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.ml_ops.mlflow_utils.html#serotiny.ml_ops.mlflow_utils.download_artifact"><code class="docutils literal notranslate"><span class="pre">download_artifact()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.ml_ops.mlflow_utils.html#serotiny.ml_ops.mlflow_utils.get_run_id"><code class="docutils literal notranslate"><span class="pre">get_run_id()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.ml_ops.mlflow_utils.html#serotiny.ml_ops.mlflow_utils.load_model_from_checkpoint"><code class="docutils literal notranslate"><span class="pre">load_model_from_checkpoint()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.ml_ops.mlflow_utils.html#serotiny.ml_ops.mlflow_utils.mlflow_fit"><code class="docutils literal notranslate"><span class="pre">mlflow_fit()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.ml_ops.mlflow_utils.html#serotiny.ml_ops.mlflow_utils.mlflow_predict"><code class="docutils literal notranslate"><span class="pre">mlflow_predict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.ml_ops.mlflow_utils.html#serotiny.ml_ops.mlflow_utils.mlflow_test"><code class="docutils literal notranslate"><span class="pre">mlflow_test()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.ml_ops.mlflow_utils.html#serotiny.ml_ops.mlflow_utils.patched_autolog"><code class="docutils literal notranslate"><span class="pre">patched_autolog()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.ml_ops.mlflow_utils.html#serotiny.ml_ops.mlflow_utils.upload_artifacts"><code class="docutils literal notranslate"><span class="pre">upload_artifacts()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="serotiny.ml_ops.utils.html">serotiny.ml_ops.utils module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.ml_ops.utils.html#serotiny.ml_ops.utils.flatten_config"><code class="docutils literal notranslate"><span class="pre">flatten_config()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.ml_ops.utils.html#serotiny.ml_ops.utils.get_serotiny_project"><code class="docutils literal notranslate"><span class="pre">get_serotiny_project()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.ml_ops.utils.html#serotiny.ml_ops.utils.make_notebook"><code class="docutils literal notranslate"><span class="pre">make_notebook()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.ml_ops.utils.html#serotiny.ml_ops.utils.save_model_predictions"><code class="docutils literal notranslate"><span class="pre">save_model_predictions()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </div>
 </section>
@@ -330,10 +352,10 @@
                 </div>
                 <div class="title">serotiny.ml_ops.ml_ops module</div>
               </div>
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
           <a class="prev-page" href="serotiny.losses.weibull.html">
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
@@ -369,7 +391,7 @@
       <div class="toc-sticky toc-scroll">
         <div class="toc-title-container">
           <span class="toc-title">
-            Contents
+            On this page
           </span>
         </div>
         <div class="toc-tree-container">
@@ -391,7 +413,9 @@
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/scripts/furo.js"></script>
     </body>
 </html>

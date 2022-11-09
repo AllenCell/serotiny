@@ -1,14 +1,14 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny.models.vae.priors package" href="serotiny.models.vae.priors.html" /><link rel="prev" title="serotiny.models.utils.optimizer_utils module" href="serotiny.models.utils.optimizer_utils.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
-        <title>serotiny.models.vae package - serotiny 0.0.6 documentation</title>
+    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+        <title>serotiny.models.vae package - serotiny 0.0.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">serotiny 0.0.6 documentation</div></a>
+      <a href="index.html"><div class="brand">serotiny 0.0.8 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -149,7 +149,7 @@
     <img class="sidebar-logo" src="_static/serotiny_logo.svg" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">serotiny 0.0.6 documentation</span>
+  <span class="sidebar-brand-text">serotiny 0.0.8 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -177,7 +177,7 @@
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.classes.html">serotiny.io.dataframe.loaders.classes module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.columns.html">serotiny.io.dataframe.loaders.columns module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.image.html">serotiny.io.dataframe.loaders.image module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.random_image.html">serotiny.io.dataframe.loaders.random_image module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.random_tensor.html">serotiny.io.dataframe.loaders.random_tensor module</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.io.dataframe.dataframe_dataset.html">serotiny.io.dataframe.dataframe_dataset module</a></li>
@@ -217,6 +217,7 @@
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.image_vae.html">serotiny.models.vae.image_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.implicit_decoder_vae.html">serotiny.models.vae.implicit_decoder_vae module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.latent_loss_vae.html">serotiny.models.vae.latent_loss_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.tabular_vae.html">serotiny.models.vae.tabular_vae module</a></li>
 </ul>
 </li>
@@ -290,7 +291,9 @@
           </svg>
           <span>Back to top</span>
         </a>
-        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -305,17 +308,31 @@
         </div>
         <article role="main">
           <section id="module-serotiny.models.vae">
-<span id="serotiny-models-vae-package"></span><h1>serotiny.models.vae package<a class="headerlink" href="#module-serotiny.models.vae" title="Permalink to this headline">#</a></h1>
+<span id="serotiny-models-vae-package"></span><h1>serotiny.models.vae package<a class="headerlink" href="#module-serotiny.models.vae" title="Permalink to this heading">#</a></h1>
 <section id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">#</a></h2>
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">#</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="serotiny.models.vae.priors.html">serotiny.models.vae.priors package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="serotiny.models.vae.priors.html#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.priors.abstract_prior.html">serotiny.models.vae.priors.abstract_prior module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.priors.gaussian.html">serotiny.models.vae.priors.gaussian module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.priors.identity_prior.html">serotiny.models.vae.priors.identity_prior module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.priors.joint_prior.html">serotiny.models.vae.priors.joint_prior module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.priors.abstract_prior.html">serotiny.models.vae.priors.abstract_prior module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.models.vae.priors.abstract_prior.html#serotiny.models.vae.priors.abstract_prior.Prior"><code class="docutils literal notranslate"><span class="pre">Prior</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.priors.gaussian.html">serotiny.models.vae.priors.gaussian module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.models.vae.priors.gaussian.html#serotiny.models.vae.priors.gaussian.DiagonalGaussianPrior"><code class="docutils literal notranslate"><span class="pre">DiagonalGaussianPrior</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.models.vae.priors.gaussian.html#serotiny.models.vae.priors.gaussian.IsotropicGaussianPrior"><code class="docutils literal notranslate"><span class="pre">IsotropicGaussianPrior</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.models.vae.priors.gaussian.html#serotiny.models.vae.priors.gaussian.compute_tc_penalty"><code class="docutils literal notranslate"><span class="pre">compute_tc_penalty()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.priors.identity_prior.html">serotiny.models.vae.priors.identity_prior module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.models.vae.priors.identity_prior.html#serotiny.models.vae.priors.identity_prior.IdentityPrior"><code class="docutils literal notranslate"><span class="pre">IdentityPrior</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.priors.joint_prior.html">serotiny.models.vae.priors.joint_prior module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="serotiny.models.vae.priors.joint_prior.html#serotiny.models.vae.priors.joint_prior.JointPrior"><code class="docutils literal notranslate"><span class="pre">JointPrior</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -324,13 +341,75 @@
 </div>
 </section>
 <section id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">#</a></h2>
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">#</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="serotiny.models.vae.image_vae.html">serotiny.models.vae.image_vae module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="serotiny.models.vae.implicit_decoder_vae.html">serotiny.models.vae.implicit_decoder_vae module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="serotiny.models.vae.tabular_vae.html">serotiny.models.vae.tabular_vae module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE"><code class="docutils literal notranslate"><span class="pre">BaseVAE</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.allow_zero_length_dataloader_with_multiple_devices"><code class="docutils literal notranslate"><span class="pre">BaseVAE.allow_zero_length_dataloader_with_multiple_devices</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.calculate_elbo"><code class="docutils literal notranslate"><span class="pre">BaseVAE.calculate_elbo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.calculate_rcl"><code class="docutils literal notranslate"><span class="pre">BaseVAE.calculate_rcl()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.decode"><code class="docutils literal notranslate"><span class="pre">BaseVAE.decode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.encode"><code class="docutils literal notranslate"><span class="pre">BaseVAE.encode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.forward"><code class="docutils literal notranslate"><span class="pre">BaseVAE.forward()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.log_metrics"><code class="docutils literal notranslate"><span class="pre">BaseVAE.log_metrics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.make_results_dict"><code class="docutils literal notranslate"><span class="pre">BaseVAE.make_results_dict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.precision"><code class="docutils literal notranslate"><span class="pre">BaseVAE.precision</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.prepare_data_per_node"><code class="docutils literal notranslate"><span class="pre">BaseVAE.prepare_data_per_node</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.sample_z"><code class="docutils literal notranslate"><span class="pre">BaseVAE.sample_z()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.training"><code class="docutils literal notranslate"><span class="pre">BaseVAE.training</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="serotiny.models.vae.image_vae.html">serotiny.models.vae.image_vae module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.models.vae.image_vae.html#serotiny.models.vae.image_vae.ImageVAE"><code class="docutils literal notranslate"><span class="pre">ImageVAE</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.image_vae.html#serotiny.models.vae.image_vae.ImageVAE.allow_zero_length_dataloader_with_multiple_devices"><code class="docutils literal notranslate"><span class="pre">ImageVAE.allow_zero_length_dataloader_with_multiple_devices</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.image_vae.html#serotiny.models.vae.image_vae.ImageVAE.precision"><code class="docutils literal notranslate"><span class="pre">ImageVAE.precision</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.image_vae.html#serotiny.models.vae.image_vae.ImageVAE.prepare_data_per_node"><code class="docutils literal notranslate"><span class="pre">ImageVAE.prepare_data_per_node</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.image_vae.html#serotiny.models.vae.image_vae.ImageVAE.training"><code class="docutils literal notranslate"><span class="pre">ImageVAE.training</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="serotiny.models.vae.implicit_decoder_vae.html">serotiny.models.vae.implicit_decoder_vae module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.models.vae.implicit_decoder_vae.html#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE"><code class="docutils literal notranslate"><span class="pre">ImplicitDecoderVAE</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.implicit_decoder_vae.html#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.allow_zero_length_dataloader_with_multiple_devices"><code class="docutils literal notranslate"><span class="pre">ImplicitDecoderVAE.allow_zero_length_dataloader_with_multiple_devices</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.implicit_decoder_vae.html#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.calculate_elbo"><code class="docutils literal notranslate"><span class="pre">ImplicitDecoderVAE.calculate_elbo()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.implicit_decoder_vae.html#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.decode"><code class="docutils literal notranslate"><span class="pre">ImplicitDecoderVAE.decode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.implicit_decoder_vae.html#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.log_metrics"><code class="docutils literal notranslate"><span class="pre">ImplicitDecoderVAE.log_metrics()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.implicit_decoder_vae.html#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.parse_batch"><code class="docutils literal notranslate"><span class="pre">ImplicitDecoderVAE.parse_batch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.implicit_decoder_vae.html#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.precision"><code class="docutils literal notranslate"><span class="pre">ImplicitDecoderVAE.precision</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.implicit_decoder_vae.html#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.prepare_data_per_node"><code class="docutils literal notranslate"><span class="pre">ImplicitDecoderVAE.prepare_data_per_node</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.implicit_decoder_vae.html#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.training"><code class="docutils literal notranslate"><span class="pre">ImplicitDecoderVAE.training</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="serotiny.models.vae.latent_loss_vae.html">serotiny.models.vae.latent_loss_vae module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.models.vae.latent_loss_vae.html#serotiny.models.vae.latent_loss_vae.LatentLossVAE"><code class="docutils literal notranslate"><span class="pre">LatentLossVAE</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.latent_loss_vae.html#serotiny.models.vae.latent_loss_vae.LatentLossVAE.allow_zero_length_dataloader_with_multiple_devices"><code class="docutils literal notranslate"><span class="pre">LatentLossVAE.allow_zero_length_dataloader_with_multiple_devices</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.latent_loss_vae.html#serotiny.models.vae.latent_loss_vae.LatentLossVAE.configure_optimizers"><code class="docutils literal notranslate"><span class="pre">LatentLossVAE.configure_optimizers()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.latent_loss_vae.html#serotiny.models.vae.latent_loss_vae.LatentLossVAE.encode"><code class="docutils literal notranslate"><span class="pre">LatentLossVAE.encode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.latent_loss_vae.html#serotiny.models.vae.latent_loss_vae.LatentLossVAE.latent_compose_function"><code class="docutils literal notranslate"><span class="pre">LatentLossVAE.latent_compose_function()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.latent_loss_vae.html#serotiny.models.vae.latent_loss_vae.LatentLossVAE.parse_batch"><code class="docutils literal notranslate"><span class="pre">LatentLossVAE.parse_batch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.latent_loss_vae.html#serotiny.models.vae.latent_loss_vae.LatentLossVAE.precision"><code class="docutils literal notranslate"><span class="pre">LatentLossVAE.precision</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.latent_loss_vae.html#serotiny.models.vae.latent_loss_vae.LatentLossVAE.prepare_data_per_node"><code class="docutils literal notranslate"><span class="pre">LatentLossVAE.prepare_data_per_node</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.latent_loss_vae.html#serotiny.models.vae.latent_loss_vae.LatentLossVAE.training"><code class="docutils literal notranslate"><span class="pre">LatentLossVAE.training</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="serotiny.models.vae.tabular_vae.html">serotiny.models.vae.tabular_vae module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="serotiny.models.vae.tabular_vae.html#serotiny.models.vae.tabular_vae.TabularVAE"><code class="docutils literal notranslate"><span class="pre">TabularVAE</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.tabular_vae.html#serotiny.models.vae.tabular_vae.TabularVAE.allow_zero_length_dataloader_with_multiple_devices"><code class="docutils literal notranslate"><span class="pre">TabularVAE.allow_zero_length_dataloader_with_multiple_devices</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.tabular_vae.html#serotiny.models.vae.tabular_vae.TabularVAE.precision"><code class="docutils literal notranslate"><span class="pre">TabularVAE.precision</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.tabular_vae.html#serotiny.models.vae.tabular_vae.TabularVAE.prepare_data_per_node"><code class="docutils literal notranslate"><span class="pre">TabularVAE.prepare_data_per_node</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="serotiny.models.vae.tabular_vae.html#serotiny.models.vae.tabular_vae.TabularVAE.training"><code class="docutils literal notranslate"><span class="pre">TabularVAE.training</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </div>
 </section>
@@ -348,10 +427,10 @@
                 </div>
                 <div class="title">serotiny.models.vae.priors package</div>
               </div>
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
           <a class="prev-page" href="serotiny.models.utils.optimizer_utils.html">
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
@@ -387,7 +466,7 @@
       <div class="toc-sticky toc-scroll">
         <div class="toc-title-container">
           <span class="toc-title">
-            Contents
+            On this page
           </span>
         </div>
         <div class="toc-tree-container">
@@ -410,7 +489,9 @@
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/scripts/furo.js"></script>
     </body>
 </html>

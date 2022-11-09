@@ -1,0 +1,7 @@
+serotiny.io.dataframe.loaders.random\_tensor module
+===================================================
+
+.. automodule:: serotiny.io.dataframe.loaders.random_tensor
+   :members:
+   :undoc-members:
+   :show-inheritance:

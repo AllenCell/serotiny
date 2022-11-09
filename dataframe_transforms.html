@@ -1,14 +1,14 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny" href="modules.html" /><link rel="prev" title="serotiny CLI" href="cli.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
-        <title>Dataframe wrangling - serotiny 0.0.6 documentation</title>
+    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+        <title>Dataframe wrangling - serotiny 0.0.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">serotiny 0.0.6 documentation</div></a>
+      <a href="index.html"><div class="brand">serotiny 0.0.8 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -149,7 +149,7 @@
     <img class="sidebar-logo" src="_static/serotiny_logo.svg" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">serotiny 0.0.6 documentation</span>
+  <span class="sidebar-brand-text">serotiny 0.0.8 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -177,7 +177,7 @@
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.classes.html">serotiny.io.dataframe.loaders.classes module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.columns.html">serotiny.io.dataframe.loaders.columns module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.image.html">serotiny.io.dataframe.loaders.image module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.random_image.html">serotiny.io.dataframe.loaders.random_image module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.random_tensor.html">serotiny.io.dataframe.loaders.random_tensor module</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.io.dataframe.dataframe_dataset.html">serotiny.io.dataframe.dataframe_dataset module</a></li>
@@ -217,6 +217,7 @@
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.image_vae.html">serotiny.models.vae.image_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.implicit_decoder_vae.html">serotiny.models.vae.implicit_decoder_vae module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.latent_loss_vae.html">serotiny.models.vae.latent_loss_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.tabular_vae.html">serotiny.models.vae.tabular_vae module</a></li>
 </ul>
 </li>
@@ -290,7 +291,9 @@
           </svg>
           <span>Back to top</span>
         </a>
-        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -305,7 +308,7 @@
         </div>
         <article role="main">
           <section id="dataframe-wrangling">
-<span id="df-wrangling"></span><h1>Dataframe wrangling<a class="headerlink" href="#dataframe-wrangling" title="Permalink to this headline">#</a></h1>
+<span id="df-wrangling"></span><h1>Dataframe wrangling<a class="headerlink" href="#dataframe-wrangling" title="Permalink to this heading">#</a></h1>
 <p>Wrangling dataframes is a common need. For us this mostly involves transforming
 manifest files - partitioning, merging, creating train-val-test splits, filtering
 rows and/or columns, …</p>
@@ -313,18 +316,18 @@ rows and/or columns, …</p>
 in the <a class="reference internal" href="serotiny.transforms.dataframe.html#module-serotiny.transforms.dataframe" title="serotiny.transforms.dataframe"><code class="xref py py-mod docutils literal notranslate"><span class="pre">dataframe</span> <span class="pre">transforms</span> <span class="pre">module</span></code></a>, but
 importantly it also allows the user to chain them in a single CLI call.</p>
 <section id="calling-a-single-transform">
-<h2>Calling a single transform<a class="headerlink" href="#calling-a-single-transform" title="Permalink to this headline">#</a></h2>
+<h2>Calling a single transform<a class="headerlink" href="#calling-a-single-transform" title="Permalink to this heading">#</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ serotiny dataframe \
-      filter_columns my_input.csv --columns='["cellid","crop_seg","crop_raw"]' \
+      filter_columns my_input.csv --columns=&#39;[&quot;cellid&quot;,&quot;crop_seg&quot;,&quot;crop_raw&quot;]&#39; \
       --output_path my_output.csv
 </pre></div>
 </div>
 </section>
 <section id="chaining-multiple-transforms">
-<h2>Chaining multiple transforms<a class="headerlink" href="#chaining-multiple-transforms" title="Permalink to this headline">#</a></h2>
+<h2>Chaining multiple transforms<a class="headerlink" href="#chaining-multiple-transforms" title="Permalink to this heading">#</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ serotiny dataframe \
-      filter_rows my_input.csv cellid '[1,2,3,4]' --exclude - \
-      filter_columns ... --columns='["cellid","crop_seg","crop_raw"]' - \
+      filter_rows my_input.csv cellid &#39;[1,2,3,4]&#39; --exclude - \
+      filter_columns ... --columns=&#39;[&quot;cellid&quot;,&quot;crop_seg&quot;,&quot;crop_raw&quot;]&#39; - \
       split_dataframe ... --train_frac=0.7 --return_splits=false - \
       --output_path my_output.csv
 </pre></div>
@@ -335,12 +338,12 @@ second and third steps. That is a placeholder, letting the CLI know which of the
 input arguments to be provided with the result of the previous step</p>
 </section>
 <section id="testing-dataframe-wrangling-pipelines">
-<h2>Testing dataframe wrangling pipelines<a class="headerlink" href="#testing-dataframe-wrangling-pipelines" title="Permalink to this headline">#</a></h2>
+<h2>Testing dataframe wrangling pipelines<a class="headerlink" href="#testing-dataframe-wrangling-pipelines" title="Permalink to this heading">#</a></h2>
 <p>To test and experiment with dataframe wrangling pipelines, we provide a
 helper transform which generates a random dataframe, which you can use
 as a starting point:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ serotiny dataframe \
-      make_random_df --columns='["a", "b", "c"]' --n_rows=50 -\
+      make_random_df --columns=&#39;[&quot;a&quot;, &quot;b&quot;, &quot;c&quot;]&#39; --n_rows=50 -\
       # you can chain the steps you want to test here!
       --output_path my_output.csv
 </pre></div>
@@ -360,10 +363,10 @@ as a starting point:</p>
                 </div>
                 <div class="title">serotiny</div>
               </div>
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
           <a class="prev-page" href="cli.html">
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
@@ -399,7 +402,7 @@ as a starting point:</p>
       <div class="toc-sticky toc-scroll">
         <div class="toc-title-container">
           <span class="toc-title">
-            Contents
+            On this page
           </span>
         </div>
         <div class="toc-tree-container">
@@ -423,7 +426,9 @@ as a starting point:</p>
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/scripts/furo.js"></script>
     </body>
 </html>

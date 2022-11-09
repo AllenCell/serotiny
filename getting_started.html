@@ -1,14 +1,14 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="serotiny CLI" href="cli.html" /><link rel="prev" title="Installation" href="installation.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
-        <title>Getting started - serotiny 0.0.6 documentation</title>
+    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+        <title>Getting started - serotiny 0.0.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">serotiny 0.0.6 documentation</div></a>
+      <a href="index.html"><div class="brand">serotiny 0.0.8 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -149,7 +149,7 @@
     <img class="sidebar-logo" src="_static/serotiny_logo.svg" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">serotiny 0.0.6 documentation</span>
+  <span class="sidebar-brand-text">serotiny 0.0.8 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -177,7 +177,7 @@
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.classes.html">serotiny.io.dataframe.loaders.classes module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.columns.html">serotiny.io.dataframe.loaders.columns module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.image.html">serotiny.io.dataframe.loaders.image module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.random_image.html">serotiny.io.dataframe.loaders.random_image module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.random_tensor.html">serotiny.io.dataframe.loaders.random_tensor module</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.io.dataframe.dataframe_dataset.html">serotiny.io.dataframe.dataframe_dataset module</a></li>
@@ -217,6 +217,7 @@
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.image_vae.html">serotiny.models.vae.image_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.implicit_decoder_vae.html">serotiny.models.vae.implicit_decoder_vae module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.latent_loss_vae.html">serotiny.models.vae.latent_loss_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.tabular_vae.html">serotiny.models.vae.tabular_vae module</a></li>
 </ul>
 </li>
@@ -290,7 +291,9 @@
           </svg>
           <span>Back to top</span>
         </a>
-        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -305,7 +308,7 @@
         </div>
         <article role="main">
           <section id="getting-started">
-<span id="id1"></span><h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">#</a></h1>
+<span id="id1"></span><h1>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this heading">#</a></h1>
 <p>One of <code class="docutils literal notranslate"><span class="pre">serotiny</span></code>’s main purposes is to standardize the structure of ML projects
 at our organization. For that, we created <a class="reference external" href="https://github.com/AllenCellModeling/serotiny-project-cookiecutter">a cookiecutter template</a>
 for <code class="docutils literal notranslate"><span class="pre">serotiny</span></code> projects, which makes it easier to get started with the right structure in place.</p>
@@ -318,13 +321,13 @@ the inner workings of serotiny projects. We rely heavily on <code class="docutil
 to <a class="reference external" href="https://hydra.cc/docs/advanced/instantiate_objects/overview/">instantiate Python objects from YAML configurations</a>,
 as well as its general framework to configure applications in a modular fashion.</p>
 <section id="project-structure">
-<h2>Project structure<a class="headerlink" href="#project-structure" title="Permalink to this headline">#</a></h2>
+<h2>Project structure<a class="headerlink" href="#project-structure" title="Permalink to this heading">#</a></h2>
 <p>Using <a class="reference external" href="https://github.com/AllenCellModeling/serotiny-project-cookiecutter">our cookiecutter template</a>,
 you can create a <code class="docutils literal notranslate"><span class="pre">serotiny</span></code> project as:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cookiecutter https://github.com/AllenCellModeling/serotiny-project-cookiecutter
 project_name [My Project]: A Tiny Project
 package_name [a_tiny_project]:
-project_description [a simple project]: it's just a tiny project
+project_description [a simple project]: it&#39;s just a tiny project
 </pre></div>
 </div>
 <p>A folder named <code class="docutils literal notranslate"><span class="pre">a_tiny_project</span></code> will be created, with the following structure:</p>
@@ -352,7 +355,7 @@ and refer to them in the configuration files, as you will see ahead.</p>
 </div>
 </section>
 <section id="configuration">
-<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">#</a></h2>
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading">#</a></h2>
 <p>From the above structure we should note the following:</p>
 <ul class="simple">
 <li><p>There are three “top-level” YAML files: <code class="docutils literal notranslate"><span class="pre">train.yaml</span></code>, <code class="docutils literal notranslate"><span class="pre">test.yaml</span></code>, <code class="docutils literal notranslate"><span class="pre">predict.yaml</span></code></p>
@@ -375,7 +378,7 @@ may have different datasets, and so on.</p></li>
 blocks in and out.</p></li>
 </ul>
 <section id="the-model-config-group">
-<h3><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">model</span></code> <strong>config group</strong><a class="headerlink" href="#the-model-config-group" title="Permalink to this headline">#</a></h3>
+<h3><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">model</span></code> <strong>config group</strong><a class="headerlink" href="#the-model-config-group" title="Permalink to this heading">#</a></h3>
 <p>This is where the available models for training will be specified.
 Each configuration file in this group should contain a <code class="docutils literal notranslate"><span class="pre">hydra</span></code> specification of a <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.core.LightningModule.html">(LightningModule)</a> model class.</p>
 <p>An (incomplete) example of a possible model config could be:</p>
@@ -383,7 +386,7 @@ Each configuration file in this group should contain a <code class="docutils lit
 <span class="n">x_dim</span><span class="p">:</span> <span class="mi">100</span>
 <span class="n">latent_dim</span><span class="p">:</span> <span class="mi">16</span>
 <span class="n">hidden_layers</span><span class="p">:</span> <span class="p">[</span><span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">32</span><span class="p">]</span>
-<span class="n">x_label</span><span class="p">:</span> <span class="s2">"x"</span>
+<span class="n">x_label</span><span class="p">:</span> <span class="s2">&quot;x&quot;</span>
 <span class="n">optimizer</span><span class="p">:</span>
   <span class="n">_partial_</span><span class="p">:</span> <span class="n">true</span>
   <span class="n">_target_</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span>
@@ -391,7 +394,7 @@ Each configuration file in this group should contain a <code class="docutils lit
 </pre></div>
 </div>
 <section id="bring-your-own-architecture">
-<h4>Bring your own architecture<a class="headerlink" href="#bring-your-own-architecture" title="Permalink to this headline">#</a></h4>
+<h4>Bring your own architecture<a class="headerlink" href="#bring-your-own-architecture" title="Permalink to this heading">#</a></h4>
 <p>If you developed your own architecture and want to use it, you can create a config
 file for it too, where the value for the <code class="docutils literal notranslate"><span class="pre">_target_</span></code> key would be something like
 <code class="docutils literal notranslate"><span class="pre">a_tiny_project.models.MyCustomModel</span></code> - assuming your project is called
@@ -449,7 +452,7 @@ to drive your model training/evaluation this is where you’d implement it.</p><
 </section>
 </section>
 <section id="the-data-config-group">
-<h3><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">data</span></code> <strong>config group</strong><a class="headerlink" href="#the-data-config-group" title="Permalink to this headline">#</a></h3>
+<h3><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">data</span></code> <strong>config group</strong><a class="headerlink" href="#the-data-config-group" title="Permalink to this heading">#</a></h3>
 <p>This is where the available datasets for training will be specified.
 Each configuration file in this group should contain a <code class="docutils literal notranslate"><span class="pre">hydra</span></code> specification of a
 <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/extensions/datamodules.html?highlight=datamodule">LightiningDatamodule</a> datamodule class.</p>
@@ -462,7 +465,7 @@ or use one developed by someone else.</p>
 can install via <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">lightning-bolts</span></code>. See <a class="reference external" href="https://lightning-bolts.readthedocs.io/en/latest/">here</a> for more info about it.</p>
 </div>
 <section id="the-manifestdatamodule">
-<h4>The ManifestDatamodule<a class="headerlink" href="#the-manifestdatamodule" title="Permalink to this headline">#</a></h4>
+<h4>The ManifestDatamodule<a class="headerlink" href="#the-manifestdatamodule" title="Permalink to this heading">#</a></h4>
 <p>At the Allen Institute for Cell Science we usually center our datasets around
 a “manifest file” - a <code class="docutils literal notranslate"><span class="pre">.csv</span></code> file where each row normally corresponds to a cell,
 and each column corresponds to a feature of that cell and/or a path to a file
@@ -486,14 +489,8 @@ is the default behavior when you call <code class="docutils literal notranslate"
 <a class="reference internal" href="serotiny.io.dataframe.loaders.html#module-serotiny.io.dataframe.loaders" title="serotiny.io.dataframe.loaders"><code class="xref py py-mod docutils literal notranslate"><span class="pre">loader</span> <span class="pre">classes</span></code></a> which consume values
 from the dataframe, either directly, or e.g. by reading file paths.</p>
 <p>For example, if we have a <code class="docutils literal notranslate"><span class="pre">manifest.csv</span></code> file whose first few rows look like:</p>
-<div class="table-wrapper"><table class="docutils align-default">
-<colgroup>
-<col style="width: 20%"/>
-<col style="width: 20%"/>
-<col style="width: 20%"/>
-<col style="width: 20%"/>
-<col style="width: 20%"/>
-</colgroup>
+<div class="table-wrapper docutils container">
+<table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>cell_id</p></th>
 <th class="head"><p>image_path</p></th>
@@ -522,7 +519,8 @@ from the dataframe, either directly, or e.g. by reading file paths.</p>
 <td><p>valid</p></td>
 </tr>
 </tbody>
-</table></div>
+</table>
+</div>
 <p>An example of a compatible datamodule instantiation could be:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">_target_</span><span class="p">:</span> <span class="n">serotiny</span><span class="o">.</span><span class="n">datamodules</span><span class="o">.</span><span class="n">ManifestDatamodule</span>
 
@@ -538,13 +536,13 @@ from the dataframe, either directly, or e.g. by reading file paths.</p>
   <span class="n">image</span><span class="p">:</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="n">serotiny</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">loaders</span><span class="o">.</span><span class="n">LoadImage</span>
     <span class="n">column</span><span class="p">:</span> <span class="n">image_path</span>
-    <span class="n">select_channels</span><span class="p">:</span> <span class="p">[</span><span class="s1">'dna'</span><span class="p">]</span>
+    <span class="n">select_channels</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;dna&#39;</span><span class="p">]</span>
   <span class="n">volume</span><span class="p">:</span>
     <span class="n">_target_</span><span class="p">:</span> <span class="n">serotiny</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">loaders</span><span class="o">.</span><span class="n">LoadColumn</span>
     <span class="n">column</span><span class="p">:</span> <span class="n">volume</span>
     <span class="n">dtype</span><span class="p">:</span> <span class="nb">float</span>
 
-<span class="n">split_column</span><span class="p">:</span> <span class="s2">"split"</span>
+<span class="n">split_column</span><span class="p">:</span> <span class="s2">&quot;split&quot;</span>
 </pre></div>
 </div>
 <p>A <code class="docutils literal notranslate"><span class="pre">ManifestDatamodule</span></code> instantiated with this configuration
@@ -555,13 +553,13 @@ the <a class="reference internal" href="serotiny.io.dataframe.loaders.html#modul
 </section>
 </section>
 <section id="the-trainer-config-group">
-<h3><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">trainer</span></code> <strong>config group</strong><a class="headerlink" href="#the-trainer-config-group" title="Permalink to this headline">#</a></h3>
+<h3><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">trainer</span></code> <strong>config group</strong><a class="headerlink" href="#the-trainer-config-group" title="Permalink to this heading">#</a></h3>
 <p>Each configuration file in this group should contain a <code class="docutils literal notranslate"><span class="pre">hydra</span></code> specification of a <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.trainer.trainer.Trainer.html">Trainer</a></p>
 <p>This is the class that governs the training/testing/prediction process. See the
 Pytorch Lightning docs for more on its available parameters and functionality.</p>
 </section>
 <section id="the-trainer-callbacks-config-group">
-<h3><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">trainer/callbacks</span></code> <strong>config group</strong><a class="headerlink" href="#the-trainer-callbacks-config-group" title="Permalink to this headline">#</a></h3>
+<h3><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">trainer/callbacks</span></code> <strong>config group</strong><a class="headerlink" href="#the-trainer-callbacks-config-group" title="Permalink to this heading">#</a></h3>
 <p>Each configuration file in this group should contain a list of <code class="docutils literal notranslate"><span class="pre">hydra</span></code> specifications of
 <a class="reference external" href="https://pytorch-lightning.readthedocs.io/en/latest/api/pytorch_lightning.trainer.trainer.Trainer.html">Callbacks</a>
 you want to use during training/testing.</p>
@@ -578,14 +576,14 @@ either <code class="docutils literal notranslate"><span class="pre">serotiny</sp
   <span class="n">min_delta</span><span class="p">:</span> <span class="mf">0.1</span>
 
 <span class="o">-</span> <span class="n">_target_</span><span class="p">:</span> <span class="n">a_tiny_project</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">YourCustomCallback</span>
-  <span class="n">param1</span><span class="p">:</span> <span class="s2">"a"</span>
-  <span class="n">param2</span><span class="p">:</span> <span class="s2">"b"</span>
+  <span class="n">param1</span><span class="p">:</span> <span class="s2">&quot;a&quot;</span>
+  <span class="n">param2</span><span class="p">:</span> <span class="s2">&quot;b&quot;</span>
   <span class="n">more_params</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
 </pre></div>
 </div>
 </section>
 <section id="the-mlflow-config-group">
-<h3><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">mlflow</span></code> <strong>config group</strong><a class="headerlink" href="#the-mlflow-config-group" title="Permalink to this headline">#</a></h3>
+<h3><strong>The</strong> <code class="docutils literal notranslate"><span class="pre">mlflow</span></code> <strong>config group</strong><a class="headerlink" href="#the-mlflow-config-group" title="Permalink to this heading">#</a></h3>
 <p>This config should contain a couple parameters to configure the usage of an MLFlow
 server. The three required parameters are: <code class="docutils literal notranslate"><span class="pre">tracking_uri</span></code>, <code class="docutils literal notranslate"><span class="pre">experiment_name</span></code>,
 <code class="docutils literal notranslate"><span class="pre">run_name</span></code>.  In MLFlow, an “experiment” is a set
@@ -599,8 +597,8 @@ going to remain throughout your project, whereas the <code class="docutils liter
 <code class="docutils literal notranslate"><span class="pre">run_name</span></code> might change with each different run. For that reason, we recommend
 setting the <code class="docutils literal notranslate"><span class="pre">tracking_uri</span></code> argument in <code class="docutils literal notranslate"><span class="pre">config/mlflow/default.yaml</span></code> and
 setting <code class="docutils literal notranslate"><span class="pre">experiment_name</span></code> and <code class="docutils literal notranslate"><span class="pre">run_name</span></code> in the command-line, by doing:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ serotiny train ... ++mlflow.experiment_name="Your experiment name" \
-++mlflow.run_name="your run name"
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ serotiny train ... ++mlflow.experiment_name=&quot;Your experiment name&quot; \
+++mlflow.run_name=&quot;your run name&quot;
 </pre></div>
 </div>
 <p>Additionally, in scenarios such as parameter sweeps, it might be useful to
@@ -636,7 +634,7 @@ change the value of <code class="docutils literal notranslate"><span class="pre"
 </section>
 </section>
 <section id="train-a-model">
-<h2>Train a model<a class="headerlink" href="#train-a-model" title="Permalink to this headline">#</a></h2>
+<h2>Train a model<a class="headerlink" href="#train-a-model" title="Permalink to this heading">#</a></h2>
 <p>With the above configurations in place, you should be ready to train a model.
 You can override configuration parameters in the CLI call, using
 <a class="reference external" href="https://hydra.cc/docs/next/advanced/override_grammar/basic/">hydra’s overrides syntax</a>.</p>
@@ -655,7 +653,7 @@ that mimic the behavior of the respective CLI call, so that you can tinker with
 them and run them one by one.</p>
 </section>
 <section id="use-a-trained-model-to-make-predictions">
-<h2>Use a trained model to make predictions<a class="headerlink" href="#use-a-trained-model-to-make-predictions" title="Permalink to this headline">#</a></h2>
+<h2>Use a trained model to make predictions<a class="headerlink" href="#use-a-trained-model-to-make-predictions" title="Permalink to this heading">#</a></h2>
 <p>Assuming you have a trained model, under a run named <code class="docutils literal notranslate"><span class="pre">some_run</span></code> under some
 MLFlow experiment, you can use that model to make predictions ony any datamodule
 with a <code class="docutils literal notranslate"><span class="pre">predict_dataloader</span></code>. (<code class="docutils literal notranslate"><span class="pre">serotiny</span></code>’s
@@ -695,7 +693,7 @@ will be stored in a <code class="docutils literal notranslate"><span class="pre"
 command from.</p>
 </section>
 <section id="load-a-trained-model">
-<h2>Load a trained model<a class="headerlink" href="#load-a-trained-model" title="Permalink to this headline">#</a></h2>
+<h2>Load a trained model<a class="headerlink" href="#load-a-trained-model" title="Permalink to this heading">#</a></h2>
 <p>On MLFlow’s dashboard, identify the run id for the model you just trained.
 You can now load it e.g. in a Jupyter Notebook by doing:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">serotiny.ml_ops.mlflow_utils</span> <span class="kn">import</span> <span class="n">load_model_from_checkpoint</span>
@@ -718,10 +716,10 @@ You can now load it e.g. in a Jupyter Notebook by doing:</p>
                 </div>
                 <div class="title">serotiny CLI</div>
               </div>
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
           <a class="prev-page" href="installation.html">
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
@@ -757,7 +755,7 @@ You can now load it e.g. in a Jupyter Notebook by doing:</p>
       <div class="toc-sticky toc-scroll">
         <div class="toc-title-container">
           <span class="toc-title">
-            Contents
+            On this page
           </span>
         </div>
         <div class="toc-tree-container">
@@ -796,7 +794,9 @@ You can now load it e.g. in a Jupyter Notebook by doing:</p>
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/scripts/furo.js"></script>
     </body>
 </html>

@@ -1,13 +1,13 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
-        <title>serotiny.io.image - serotiny 0.0.6 documentation</title>
+    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+        <title>serotiny.io.image - serotiny 0.0.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
@@ -122,7 +122,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">serotiny 0.0.6 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">serotiny 0.0.8 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -148,7 +148,7 @@
     <img class="sidebar-logo" src="../../../_static/serotiny_logo.svg" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">serotiny 0.0.6 documentation</span>
+  <span class="sidebar-brand-text">serotiny 0.0.8 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -176,7 +176,7 @@
 <li class="toctree-l6"><a class="reference internal" href="../../../serotiny.io.dataframe.loaders.classes.html">serotiny.io.dataframe.loaders.classes module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../serotiny.io.dataframe.loaders.columns.html">serotiny.io.dataframe.loaders.columns module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../serotiny.io.dataframe.loaders.image.html">serotiny.io.dataframe.loaders.image module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="../../../serotiny.io.dataframe.loaders.random_image.html">serotiny.io.dataframe.loaders.random_image module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../serotiny.io.dataframe.loaders.random_tensor.html">serotiny.io.dataframe.loaders.random_tensor module</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.io.dataframe.dataframe_dataset.html">serotiny.io.dataframe.dataframe_dataset module</a></li>
@@ -216,6 +216,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.models.vae.image_vae.html">serotiny.models.vae.image_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.models.vae.implicit_decoder_vae.html">serotiny.models.vae.implicit_decoder_vae module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../serotiny.models.vae.latent_loss_vae.html">serotiny.models.vae.latent_loss_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.models.vae.tabular_vae.html">serotiny.models.vae.tabular_vae module</a></li>
 </ul>
 </li>
@@ -289,7 +290,8 @@
           </svg>
           <span>Back to top</span>
         </a>
-        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -318,28 +320,28 @@
 
 
 <div class="viewcode-block" id="infer_dims"><a class="viewcode-back" href="../../../serotiny.io.image.html#serotiny.io.image.infer_dims">[docs]</a><span class="k">def</span> <span class="nf">infer_dims</span><span class="p">(</span><span class="n">img</span><span class="p">:</span> <span class="n">aicsimageio</span><span class="o">.</span><span class="n">AICSImage</span><span class="p">):</span>
-    <span class="sd">"""Given a an AICSImage image, infer the corresponding dimensions."""</span>
+    <span class="sd">&quot;&quot;&quot;Given a an AICSImage image, infer the corresponding dimensions.&quot;&quot;&quot;</span>
     <span class="n">dims</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">dims</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
 
-    <span class="k">if</span> <span class="n">dims</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"T"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Expected image with no T dimensions"</span><span class="p">)</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="s2">"X"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="s2">"Y"</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Expected image with height and width"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dims</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected image with no T dimensions&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="s2">&quot;Y&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Expected image with height and width&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">dims</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"S"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">dims</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"C"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Can't handle S dimension &gt; 1 AND C dimension &gt; 1"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dims</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">dims</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t handle S dimension &gt; 1 AND C dimension &gt; 1&quot;</span><span class="p">)</span>
 
-    <span class="n">zero_dims</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"T"</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
-    <span class="n">order</span> <span class="o">=</span> <span class="s2">"YX"</span>
-    <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="s2">"ZCS"</span><span class="p">):</span>
+    <span class="n">zero_dims</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;T&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="s2">&quot;YX&quot;</span>
+    <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="s2">&quot;ZCS&quot;</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">dims</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">zero_dims</span><span class="p">[</span><span class="n">dim</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">order</span> <span class="o">=</span> <span class="n">dim</span> <span class="o">+</span> <span class="n">order</span>
 
-    <span class="k">if</span> <span class="s2">"C"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">order</span> <span class="ow">and</span> <span class="s2">"S"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">order</span><span class="p">:</span>
-        <span class="n">order</span> <span class="o">=</span> <span class="s2">"C"</span> <span class="o">+</span> <span class="n">order</span>
-        <span class="k">del</span> <span class="n">zero_dims</span><span class="p">[</span><span class="s2">"C"</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s2">&quot;C&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">order</span> <span class="ow">and</span> <span class="s2">&quot;S&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">order</span><span class="p">:</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="s2">&quot;C&quot;</span> <span class="o">+</span> <span class="n">order</span>
+        <span class="n">zero_dims</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">order</span><span class="p">,</span> <span class="n">zero_dims</span></div>
 
@@ -353,9 +355,9 @@
     <span class="n">reader</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">unsqueeze_first_dim</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">ome_zarr_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-    <span class="n">ome_zarr_image_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"default"</span><span class="p">,</span>
+    <span class="n">ome_zarr_image_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">"""Load image from path given by `path`. If the given image doesn't have</span>
+    <span class="sd">&quot;&quot;&quot;Load image from path given by `path`. If the given image doesn&#39;t have</span>
 <span class="sd">    channel names, `select_channels` must be a list of integers.</span>
 
 <span class="sd">    Parameters</span>
@@ -364,7 +366,7 @@
 <span class="sd">        Path of the image to load</span>
 
 <span class="sd">    select_channels: Optional[Union[Sequence[int], Sequence[str]]] = None</span>
-<span class="sd">        Channels to be retrieved from the image. If the given image doesn't</span>
+<span class="sd">        Channels to be retrieved from the image. If the given image doesn&#39;t</span>
 <span class="sd">        have channel names, `select_channels` must be a list of integers</span>
 
 <span class="sd">    dtype: Type[np.number] = np.float32</span>
@@ -379,18 +381,18 @@
 
 <span class="sd">    unsqueeze_first_dim: bool = False</span>
 <span class="sd">        Whether to unsqueeze the first dimension.</span>
-<span class="sd">        Useful when the channel dimension is needed even if there's a single</span>
+<span class="sd">        Useful when the channel dimension is needed even if there&#39;s a single</span>
 <span class="sd">        channel.</span>
 
 <span class="sd">    ome_zarr_level: int = 0</span>
 <span class="sd">        If reading an ome zarr image, this specifies what level of the pyramid</span>
 <span class="sd">        to return</span>
 
-<span class="sd">    ome_zarr_image_name: str = "default"</span>
+<span class="sd">    ome_zarr_image_name: str = &quot;default&quot;</span>
 <span class="sd">        If reading an ome zarr image, this specifies the image name</span>
-<span class="sd">    """</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">".zarr"</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.zarr&quot;</span><span class="p">):</span>
         <span class="n">img</span> <span class="o">=</span> <span class="n">read_ome_zarr</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">ome_zarr_level</span><span class="p">,</span> <span class="n">ome_zarr_image_name</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">reader</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -403,9 +405,9 @@
 
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">set</span><span class="p">(</span><span class="n">select_channels</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">channel_names</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-            <span class="s2">"Some elements of `select_channels` aren't available: "</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="se">\t</span><span class="s2">available channels: </span><span class="si">{</span><span class="n">channel_names</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span>
-            <span class="sa">f</span><span class="s2">"</span><span class="se">\t</span><span class="s2">select_channels: </span><span class="si">{</span><span class="n">select_channels</span><span class="si">}</span><span class="s2">"</span>
+            <span class="s2">&quot;Some elements of `select_channels` aren&#39;t available: &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">available channels: </span><span class="si">{</span><span class="n">channel_names</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">select_channels: </span><span class="si">{</span><span class="n">select_channels</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
     <span class="n">loaded_channels</span> <span class="o">=</span> <span class="n">select_channels</span>
@@ -413,11 +415,11 @@
 
     <span class="n">order</span><span class="p">,</span> <span class="n">zero_dims</span> <span class="o">=</span> <span class="n">infer_dims</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
 
-    <span class="n">first_dim</span> <span class="o">=</span> <span class="p">{</span><span class="n">order</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">loaded_channels_idx</span><span class="p">}</span> <span class="k">if</span> <span class="n">order</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"S"</span><span class="p">,</span> <span class="s2">"C"</span><span class="p">]</span> <span class="k">else</span> <span class="p">{}</span>
+    <span class="n">first_dim</span> <span class="o">=</span> <span class="p">{</span><span class="n">order</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">loaded_channels_idx</span><span class="p">}</span> <span class="k">if</span> <span class="n">order</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="p">{}</span>
 
     <span class="k">for</span> <span class="n">first_dim_key</span><span class="p">,</span> <span class="n">first_dim_val</span> <span class="ow">in</span> <span class="n">first_dim</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">first_dim_val</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">order</span> <span class="o">=</span> <span class="n">order</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">first_dim_key</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+            <span class="n">order</span> <span class="o">=</span> <span class="n">order</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">first_dim_key</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
             <span class="n">first_dim</span><span class="p">[</span><span class="n">first_dim_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">first_dim_val</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="n">data</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">get_image_data</span><span class="p">(</span><span class="n">order</span><span class="p">,</span> <span class="o">**</span><span class="n">zero_dims</span><span class="p">,</span> <span class="o">**</span><span class="n">first_dim</span><span class="p">)</span>
@@ -447,22 +449,22 @@
     <span class="k">return</span> <span class="n">data</span></div>
 
 
-<div class="viewcode-block" id="read_ome_zarr"><a class="viewcode-back" href="../../../serotiny.io.image.html#serotiny.io.image.read_ome_zarr">[docs]</a><span class="k">def</span> <span class="nf">read_ome_zarr</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">image_name</span><span class="o">=</span><span class="s2">"default"</span><span class="p">):</span>
-    <span class="sd">"""Function that reads an ome.zarr image and (optionally) returns an</span>
+<div class="viewcode-block" id="read_ome_zarr"><a class="viewcode-back" href="../../../serotiny.io.image.html#serotiny.io.image.read_ome_zarr">[docs]</a><span class="k">def</span> <span class="nf">read_ome_zarr</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">image_name</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Function that reads an ome.zarr image and (optionally) returns an</span>
 <span class="sd">    AICSImage object.</span>
 
 <span class="sd">    Note: This is here temporarily, until aicsimageio</span>
 <span class="sd">    provides an OmeZarrReader class</span>
-<span class="sd">    """</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span> <span class="k">if</span> <span class="n">image_name</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="o">/</span> <span class="n">image_name</span><span class="p">)</span>
     <span class="n">reader</span> <span class="o">=</span> <span class="n">Reader</span><span class="p">(</span><span class="n">parse_url</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
 
     <span class="n">node</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">reader</span><span class="p">()))</span>
-    <span class="n">pps</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"coordinateTransformations"</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">"scale"</span><span class="p">][</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span>
+    <span class="n">pps</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;coordinateTransformations&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;scale&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span>
 
     <span class="k">return</span> <span class="n">aicsimageio</span><span class="o">.</span><span class="n">AICSImage</span><span class="p">(</span>
         <span class="n">node</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">level</span><span class="p">]</span><span class="o">.</span><span class="n">compute</span><span class="p">(),</span>
-        <span class="n">channel_names</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">"name"</span><span class="p">],</span>
+        <span class="n">channel_names</span><span class="o">=</span><span class="n">node</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
         <span class="n">physical_pixel_sizes</span><span class="o">=</span><span class="n">pps</span><span class="p">,</span>
     <span class="p">)</span></div>
 
@@ -473,7 +475,7 @@
     <span class="n">channel_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">dim_order</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">"""Write an image to disk.</span>
+    <span class="sd">&quot;&quot;&quot;Write an image to disk.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -487,20 +489,20 @@
 <span class="sd">    channel_names: Optional[Sequence] = None</span>
 <span class="sd">        Optional list of labels to assign to each channel</span>
 <span class="sd">        (in the correct order)</span>
-<span class="sd">    """</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">dim_order</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
-            <span class="n">dim_order</span> <span class="o">=</span> <span class="s2">"CZYX"</span>
+            <span class="n">dim_order</span> <span class="o">=</span> <span class="s2">&quot;CZYX&quot;</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-            <span class="n">dim_order</span> <span class="o">=</span> <span class="s2">"CYX"</span>
+            <span class="n">dim_order</span> <span class="o">=</span> <span class="s2">&quot;CYX&quot;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Unexpected image shape </span><span class="si">{</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected image shape </span><span class="si">{</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dim_order</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">"The dimension spec (</span><span class="si">{</span><span class="n">dim_order</span><span class="si">}</span><span class="s2">) is incompatible "</span>
-            <span class="sa">f</span><span class="s2">"with the image shape </span><span class="si">{</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">"</span>
+            <span class="sa">f</span><span class="s2">&quot;The dimension spec (</span><span class="si">{</span><span class="n">dim_order</span><span class="si">}</span><span class="s2">) is incompatible &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;with the image shape </span><span class="si">{</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">channel_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -546,7 +548,9 @@
 </div><script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/scripts/furo.js"></script>
     </body>
 </html>

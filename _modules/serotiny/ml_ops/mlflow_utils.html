@@ -1,13 +1,13 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
-        <title>serotiny.ml_ops.mlflow_utils - serotiny 0.0.6 documentation</title>
+    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+        <title>serotiny.ml_ops.mlflow_utils - serotiny 0.0.8 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
@@ -122,7 +122,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">serotiny 0.0.6 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">serotiny 0.0.8 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -148,7 +148,7 @@
     <img class="sidebar-logo" src="../../../_static/serotiny_logo.svg" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">serotiny 0.0.6 documentation</span>
+  <span class="sidebar-brand-text">serotiny 0.0.8 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -176,7 +176,7 @@
 <li class="toctree-l6"><a class="reference internal" href="../../../serotiny.io.dataframe.loaders.classes.html">serotiny.io.dataframe.loaders.classes module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../serotiny.io.dataframe.loaders.columns.html">serotiny.io.dataframe.loaders.columns module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="../../../serotiny.io.dataframe.loaders.image.html">serotiny.io.dataframe.loaders.image module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="../../../serotiny.io.dataframe.loaders.random_image.html">serotiny.io.dataframe.loaders.random_image module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="../../../serotiny.io.dataframe.loaders.random_tensor.html">serotiny.io.dataframe.loaders.random_tensor module</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.io.dataframe.dataframe_dataset.html">serotiny.io.dataframe.dataframe_dataset module</a></li>
@@ -216,6 +216,7 @@
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.models.vae.image_vae.html">serotiny.models.vae.image_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.models.vae.implicit_decoder_vae.html">serotiny.models.vae.implicit_decoder_vae module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../../serotiny.models.vae.latent_loss_vae.html">serotiny.models.vae.latent_loss_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="../../../serotiny.models.vae.tabular_vae.html">serotiny.models.vae.tabular_vae module</a></li>
 </ul>
 </li>
@@ -289,7 +290,8 @@
           </svg>
           <span>Back to top</span>
         </a>
-        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -308,7 +310,7 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span><span class="p">,</span> <span class="n">suppress</span>
 
 <span class="kn">import</span> <span class="nn">mlflow</span>
 <span class="kn">from</span> <span class="nn">hydra._internal.utils</span> <span class="kn">import</span> <span class="n">_locate</span>
@@ -322,7 +324,7 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="patched_autolog"><a class="viewcode-back" href="../../../serotiny.ml_ops.mlflow_utils.html#serotiny.ml_ops.mlflow_utils.patched_autolog">[docs]</a><span class="nd">@autologging_integration</span><span class="p">(</span><span class="s2">"pytorch"</span><span class="p">)</span>
+<div class="viewcode-block" id="patched_autolog"><a class="viewcode-back" href="../../../serotiny.ml_ops.mlflow_utils.html#serotiny.ml_ops.mlflow_utils.patched_autolog">[docs]</a><span class="nd">@autologging_integration</span><span class="p">(</span><span class="s2">&quot;pytorch&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">patched_autolog</span><span class="p">(</span>
     <span class="n">log_every_n_epoch</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
     <span class="n">log_models</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># we handle this</span>
@@ -330,10 +332,10 @@
     <span class="n">exclusive</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">disable_for_unsupported_versions</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">silent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">mode</span><span class="o">=</span><span class="s2">"fit"</span><span class="p">,</span>
+    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;fit&quot;</span><span class="p">,</span>
 <span class="p">):</span>
-    <span class="sd">"""Patched mlflow autolog, to enable on_test_epoch_end callbacks and to</span>
-<span class="sd">    cover trainer.test calls as well."""</span>
+    <span class="sd">&quot;&quot;&quot;Patched mlflow autolog, to enable on_test_epoch_end callbacks and to</span>
+<span class="sd">    cover trainer.test calls as well.&quot;&quot;&quot;</span>
 
     <span class="kn">import</span> <span class="nn">mlflow.pytorch._pytorch_autolog</span> <span class="k">as</span> <span class="nn">_pytorch_autolog</span>
     <span class="kn">from</span> <span class="nn">mlflow.utils.autologging_utils</span> <span class="kn">import</span> <span class="n">safe_patch</span>
@@ -346,20 +348,20 @@
     <span class="p">):</span>  <span class="c1"># pylint: disable=signature-differs,arguments-differ,unused-argument</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_log_metrics</span><span class="p">(</span><span class="n">trainer</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
 
-    <span class="k">assert</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"fit"</span><span class="p">,</span> <span class="s2">"test"</span><span class="p">,</span> <span class="s2">"predict"</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;fit&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="s2">&quot;predict&quot;</span><span class="p">)</span>
 
     <span class="n">safe_patch</span><span class="p">(</span>
-        <span class="s2">"pytorch"</span><span class="p">,</span>
+        <span class="s2">&quot;pytorch&quot;</span><span class="p">,</span>
         <span class="n">_pytorch_autolog</span><span class="o">.</span><span class="n">__MLflowPLCallback</span><span class="p">,</span>
-        <span class="s2">"on_test_epoch_end"</span><span class="p">,</span>
+        <span class="s2">&quot;on_test_epoch_end&quot;</span><span class="p">,</span>
         <span class="n">_patched_on_test_epoch_end</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">safe_patch</span><span class="p">(</span><span class="s2">"pytorch"</span><span class="p">,</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pytorch</span><span class="p">,</span> <span class="s2">"autolog"</span><span class="p">,</span> <span class="n">patched_autolog</span><span class="p">)</span>
+    <span class="n">safe_patch</span><span class="p">(</span><span class="s2">&quot;pytorch&quot;</span><span class="p">,</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">pytorch</span><span class="p">,</span> <span class="s2">&quot;autolog&quot;</span><span class="p">,</span> <span class="n">patched_autolog</span><span class="p">)</span>
 
-    <span class="n">safe_patch</span><span class="p">(</span><span class="s2">"pytorch"</span><span class="p">,</span> <span class="n">Trainer</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">_pytorch_autolog</span><span class="o">.</span><span class="n">patched_fit</span><span class="p">,</span> <span class="n">manage_run</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">safe_patch</span><span class="p">(</span><span class="s2">&quot;pytorch&quot;</span><span class="p">,</span> <span class="n">Trainer</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">_pytorch_autolog</span><span class="o">.</span><span class="n">patched_fit</span><span class="p">,</span> <span class="n">manage_run</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="n">safe_patch</span><span class="p">(</span><span class="s2">"pytorch"</span><span class="p">,</span> <span class="n">Trainer</span><span class="p">,</span> <span class="s2">"save_checkpoint"</span><span class="p">,</span> <span class="n">_patched_save_checkpoint</span><span class="p">)</span></div>
+    <span class="n">safe_patch</span><span class="p">(</span><span class="s2">&quot;pytorch&quot;</span><span class="p">,</span> <span class="n">Trainer</span><span class="p">,</span> <span class="s2">&quot;save_checkpoint&quot;</span><span class="p">,</span> <span class="n">_patched_save_checkpoint</span><span class="p">)</span></div>
 
 
 <span class="k">def</span> <span class="nf">_is_empty</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
@@ -367,25 +369,25 @@
 
 
 <span class="k">def</span> <span class="nf">_validate_mlflow_conf</span><span class="p">(</span><span class="n">conf</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">_is_empty</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="s2">"tracking_uri"</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Must specify `tracking_uri`"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">_is_empty</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="s2">&quot;tracking_uri&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must specify `tracking_uri`&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">_is_empty</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="s2">"experiment_name"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_is_empty</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="s2">"run_id"</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">_is_empty</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="s2">&quot;experiment_name&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_is_empty</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="s2">&quot;run_id&quot;</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">"If you don't specify `experiment_name`, you must "</span> <span class="s2">"specify `run_id`."</span>
+            <span class="s2">&quot;If you don&#39;t specify `experiment_name`, you must &quot;</span> <span class="s2">&quot;specify `run_id`.&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">_is_empty</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="s2">"run_name"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_is_empty</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="s2">"run_id"</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"You must specify at least `run_id` or `run_name`"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">_is_empty</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="s2">&quot;run_name&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_is_empty</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="s2">&quot;run_id&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You must specify at least `run_id` or `run_name`&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_patched_save_checkpoint</span><span class="p">(</span><span class="n">original</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">save_weights_only</span><span class="p">):</span>
     <span class="n">original</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">save_weights_only</span><span class="p">)</span>
 
-    <span class="n">latest_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="s2">"latest.ckpt"</span><span class="p">)</span>
+    <span class="n">latest_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">with_name</span><span class="p">(</span><span class="s2">&quot;latest.ckpt&quot;</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">link</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">latest_path</span><span class="p">)</span>
 
-    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_artifact</span><span class="p">(</span><span class="n">local_path</span><span class="o">=</span><span class="n">latest_path</span><span class="p">,</span> <span class="n">artifact_path</span><span class="o">=</span><span class="s2">"checkpoints"</span><span class="p">)</span>
+    <span class="n">mlflow</span><span class="o">.</span><span class="n">log_artifact</span><span class="p">(</span><span class="n">local_path</span><span class="o">=</span><span class="n">latest_path</span><span class="p">,</span> <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;checkpoints&quot;</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">latest_path</span><span class="p">)</span>
 
 
@@ -394,18 +396,18 @@
 
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">download_artifacts</span><span class="p">(</span>
-            <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">"checkpoints/latest.ckpt"</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="n">tmp_dir</span>
+            <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;checkpoints/latest.ckpt&quot;</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="n">tmp_dir</span>
         <span class="p">)</span>
     <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa</span>
         <span class="k">return</span> <span class="kc">None</span>
 
 
-<span class="k">def</span> <span class="nf">_get_config</span><span class="p">(</span><span class="n">tracking_uri</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"test"</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_config</span><span class="p">(</span><span class="n">tracking_uri</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">):</span>
     <span class="n">client</span> <span class="o">=</span> <span class="n">MlflowClient</span><span class="p">(</span><span class="n">tracking_uri</span><span class="o">=</span><span class="n">tracking_uri</span><span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">client</span><span class="o">.</span><span class="n">download_artifacts</span><span class="p">(</span>
-            <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="sa">f</span><span class="s2">"configs/</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">_config.yaml"</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="n">tmp_dir</span>
+            <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;configs/</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">_config.yaml&quot;</span><span class="p">,</span> <span class="n">dst_path</span><span class="o">=</span><span class="n">tmp_dir</span>
         <span class="p">)</span>
     <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa</span>
         <span class="k">return</span> <span class="kc">None</span>
@@ -416,17 +418,17 @@
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_dir</span><span class="p">:</span>
         <span class="n">ckpt_path</span> <span class="o">=</span> <span class="n">_get_latest_checkpoint</span><span class="p">(</span><span class="n">tracking_uri</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ckpt_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Given run_id doesn't have a checkpoint we can use."</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Given run_id doesn&#39;t have a checkpoint we can use.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="n">config</span> <span class="o">=</span> <span class="n">_get_config</span><span class="p">(</span><span class="n">tracking_uri</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"train"</span><span class="p">)</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">_get_config</span><span class="p">(</span><span class="n">tracking_uri</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">tmp_dir</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
         <span class="n">config</span> <span class="o">=</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">full_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"override_model_conf"</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
-            <span class="n">config</span> <span class="o">=</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">full_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"model"</span><span class="p">,</span> <span class="p">{}))</span>
+        <span class="k">if</span> <span class="n">full_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;override_model_conf&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">full_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="p">{}))</span>
         <span class="n">config</span> <span class="o">=</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">to_container</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">resolve</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="n">model_conf</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">"model"</span><span class="p">]</span>
-        <span class="n">model_class</span> <span class="o">=</span> <span class="n">model_conf</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"_target_"</span><span class="p">)</span>
+        <span class="n">model_conf</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">]</span>
+        <span class="n">model_class</span> <span class="o">=</span> <span class="n">model_conf</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;_target_&quot;</span><span class="p">)</span>
         <span class="n">model_conf</span> <span class="o">=</span> <span class="n">instantiate</span><span class="p">(</span><span class="n">model_conf</span><span class="p">)</span>
         <span class="n">model_class</span> <span class="o">=</span> <span class="n">_locate</span><span class="p">(</span><span class="n">model_class</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">model_class</span><span class="o">.</span><span class="n">load_from_checkpoint</span><span class="p">(</span><span class="n">ckpt_path</span><span class="p">,</span> <span class="o">**</span><span class="n">model_conf</span><span class="p">)</span></div>
@@ -444,64 +446,64 @@
 <div class="viewcode-block" id="get_run_id"><a class="viewcode-back" href="../../../serotiny.ml_ops.mlflow_utils.html#serotiny.ml_ops.mlflow_utils.get_run_id">[docs]</a><span class="k">def</span> <span class="nf">get_run_id</span><span class="p">(</span><span class="n">run_name</span><span class="p">,</span> <span class="n">experiment_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">experiment_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">raise_error</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">experiment_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">experiment_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"`experiment_name` and `experiment_id` can't both be None"</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;`experiment_name` and `experiment_id` can&#39;t both be None&quot;</span><span class="p">)</span>
 
-        <span class="n">experiment</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">for</span> <span class="n">_experiment</span> <span class="ow">in</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">list_experiments</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">_experiment</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">experiment_name</span><span class="p">:</span>
-                <span class="n">experiment</span> <span class="o">=</span> <span class="n">_experiment</span>
-                <span class="k">break</span>
+        <span class="n">_experiments</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">search_experiments</span><span class="p">(</span>
+            <span class="n">max_results</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">filter_string</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;name = &#39;</span><span class="si">{</span><span class="n">experiment_name</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
+        <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">experiment</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_experiments</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">raise_error</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"No experiment matches the specified experiment_name"</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No experiment matches the specified experiment_name&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">experiment</span> <span class="o">=</span> <span class="n">_experiments</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">experiment_id</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">experiment_id</span>
 
     <span class="n">runs</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">run_info</span> <span class="ow">in</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">list_run_infos</span><span class="p">(</span><span class="n">experiment_id</span><span class="o">=</span><span class="n">experiment_id</span><span class="p">):</span>
-        <span class="n">run_tags</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">run_info</span><span class="o">.</span><span class="n">run_id</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tags</span>
+    <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">search_runs</span><span class="p">(</span><span class="n">experiment_ids</span><span class="o">=</span><span class="p">[</span><span class="n">experiment_id</span><span class="p">],</span> <span class="n">output_format</span><span class="o">=</span><span class="s2">&quot;list&quot;</span><span class="p">):</span>
+        <span class="n">run_tags</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">run</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span><span class="p">)</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">tags</span>
 
-        <span class="k">if</span> <span class="s2">"mlflow.runName"</span> <span class="ow">in</span> <span class="n">run_tags</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">run_tags</span><span class="p">[</span><span class="s2">"mlflow.runName"</span><span class="p">]</span> <span class="o">==</span> <span class="n">run_name</span><span class="p">:</span>
-                <span class="n">runs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">run_info</span><span class="o">.</span><span class="n">run_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;mlflow.runName&quot;</span> <span class="ow">in</span> <span class="n">run_tags</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">run_tags</span><span class="p">[</span><span class="s2">&quot;mlflow.runName&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">run_name</span><span class="p">:</span>
+                <span class="n">runs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">run</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">run_id</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">runs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"There are multiple runs in this experiment with that name."</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;There are multiple runs in this experiment with that name.&quot;</span><span class="p">)</span>
     <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">runs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">runs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="n">raise_error</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Not run matches the specified run_name and experiment"</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Not run matches the specified run_name and experiment&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="kc">None</span></div>
 
 
 <span class="k">def</span> <span class="nf">_mlflow_prep</span><span class="p">(</span><span class="n">mlflow_conf</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Validating and processing MLFlow configuration"</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Validating and processing MLFlow configuration&quot;</span><span class="p">)</span>
 
     <span class="n">_validate_mlflow_conf</span><span class="p">(</span><span class="n">mlflow_conf</span><span class="p">)</span>
-    <span class="k">assert</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"fit"</span><span class="p">,</span> <span class="s2">"test"</span><span class="p">,</span> <span class="s2">"predict"</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;fit&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="s2">&quot;predict&quot;</span><span class="p">)</span>
 
-    <span class="c1"># if autolog arguments aren't given, or are None, set to empty dict</span>
+    <span class="c1"># if autolog arguments aren&#39;t given, or are None, set to empty dict</span>
     <span class="n">autolog</span> <span class="o">=</span> <span class="p">(</span>
         <span class="n">OmegaConf</span><span class="o">.</span><span class="n">to_object</span><span class="p">(</span><span class="n">mlflow_conf</span><span class="o">.</span><span class="n">autolog</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mlflow_conf</span><span class="p">,</span> <span class="s2">"autolog"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">mlflow_conf</span><span class="p">,</span> <span class="s2">&quot;autolog&quot;</span><span class="p">)</span>
         <span class="k">else</span> <span class="kc">None</span>
     <span class="p">)</span>
     <span class="n">autolog</span> <span class="o">=</span> <span class="n">autolog</span> <span class="k">if</span> <span class="n">autolog</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="p">{}</span>
-    <span class="n">autolog</span><span class="p">[</span><span class="s2">"mode"</span><span class="p">]</span> <span class="o">=</span> <span class="n">mode</span>
-    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">"test"</span><span class="p">:</span>
-        <span class="n">autolog</span><span class="p">[</span><span class="s2">"log_models"</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">autolog</span><span class="p">[</span><span class="s2">&quot;mode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mode</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;test&quot;</span><span class="p">:</span>
+        <span class="n">autolog</span><span class="p">[</span><span class="s2">&quot;log_models&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">patched_autolog</span><span class="p">(</span><span class="o">**</span><span class="n">autolog</span><span class="p">)</span>
 
     <span class="n">mlflow</span><span class="o">.</span><span class="n">set_tracking_uri</span><span class="p">(</span><span class="n">mlflow_conf</span><span class="o">.</span><span class="n">tracking_uri</span><span class="p">)</span>
 
-    <span class="n">run_id</span> <span class="o">=</span> <span class="n">mlflow_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"run_id"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">run_id</span> <span class="o">=</span> <span class="n">mlflow_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;run_id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">run_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">run_name</span> <span class="o">=</span> <span class="n">mlflow_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"run_name"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">run_name</span> <span class="o">=</span> <span class="n">mlflow_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;run_name&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">run_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="c1"># creates experiment if it doesn't exist, otherwise just gets it</span>
+        <span class="c1"># creates experiment if it doesn&#39;t exist, otherwise just gets it</span>
         <span class="n">experiment</span> <span class="o">=</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">set_experiment</span><span class="p">(</span><span class="n">experiment_name</span><span class="o">=</span><span class="n">mlflow_conf</span><span class="o">.</span><span class="n">experiment_name</span><span class="p">)</span>
         <span class="n">run_id</span> <span class="o">=</span> <span class="n">get_run_id</span><span class="p">(</span><span class="n">run_name</span><span class="p">,</span> <span class="n">experiment_id</span><span class="o">=</span><span class="n">experiment</span><span class="o">.</span><span class="n">experiment_id</span><span class="p">)</span>
 
@@ -511,53 +513,51 @@
 
     <span class="n">patience</span> <span class="o">=</span> <span class="n">_get_patience</span><span class="p">(</span><span class="n">trainer</span><span class="p">)</span>
 
-    <span class="c1"># before this point, argv[0] will contain e.g. "/path/to/exectuable/serotiny train"</span>
-    <span class="c1"># because we append "train" or "test" for presentation purposes in the CLI.</span>
+    <span class="c1"># before this point, argv[0] will contain e.g. &quot;/path/to/exectuable/serotiny train&quot;</span>
+    <span class="c1"># because we append &quot;train&quot; or &quot;test&quot; for presentation purposes in the CLI.</span>
     <span class="c1"># however, this causes problems when using tools that need to fork this program</span>
-    <span class="c1"># e.g. torch's ddp training strategy, and which make use of argv[0] to rerun</span>
+    <span class="c1"># e.g. torch&#39;s ddp training strategy, and which make use of argv[0] to rerun</span>
     <span class="c1"># the program. For that reason, from this point on we remove the suffix, and</span>
     <span class="c1"># re-insert it as the second element in argv</span>
 
-    <span class="k">try</span><span class="p">:</span>
-        <span class="kn">import</span> <span class="nn">sys</span>
-
-        <span class="n">command</span><span class="p">,</span> <span class="n">suffix</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">" "</span><span class="p">)</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">command</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
-    <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa</span>
+    <span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
         <span class="c1"># in hydra sweeps, this only needs to be done once and will cause an</span>
         <span class="c1"># error if we try to do it again</span>
-        <span class="k">pass</span>
+        <span class="kn">import</span> <span class="nn">sys</span>
+
+        <span class="n">command</span><span class="p">,</span> <span class="n">suffix</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">command</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">experiment</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">patience</span>
 
 
 <span class="k">def</span> <span class="nf">_log_conf</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">full_conf</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"train"</span><span class="p">,</span> <span class="s2">"test"</span><span class="p">,</span> <span class="s2">"predict"</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Got unexpected mode: '</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="s2">&quot;predict&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Got unexpected mode: &#39;</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="n">conf_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">_config.yaml"</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">conf_path</span><span class="p">,</span> <span class="s2">"w"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">conf_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">_config.yaml&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">conf_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">OmegaConf</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">full_conf</span><span class="p">,</span> <span class="n">f</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_artifact</span><span class="p">(</span><span class="n">local_path</span><span class="o">=</span><span class="n">conf_path</span><span class="p">,</span> <span class="n">artifact_path</span><span class="o">=</span><span class="s2">"configs"</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">log_artifact</span><span class="p">(</span><span class="n">local_path</span><span class="o">=</span><span class="n">conf_path</span><span class="p">,</span> <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;configs&quot;</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_log_predictions</span><span class="p">(</span><span class="n">preds_dir</span><span class="p">,</span> <span class="n">tracking_uri</span><span class="p">,</span> <span class="n">run_id</span><span class="p">):</span>
     <span class="n">client</span> <span class="o">=</span> <span class="n">MlflowClient</span><span class="p">(</span><span class="n">tracking_uri</span><span class="o">=</span><span class="n">tracking_uri</span><span class="p">)</span>
     <span class="n">client</span><span class="o">.</span><span class="n">log_artifacts</span><span class="p">(</span>
-        <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span> <span class="n">local_dir</span><span class="o">=</span><span class="n">preds_dir</span><span class="p">,</span> <span class="n">artifact_path</span><span class="o">=</span><span class="s2">"predictions"</span>
+        <span class="n">run_id</span><span class="o">=</span><span class="n">run_id</span><span class="p">,</span> <span class="n">local_dir</span><span class="o">=</span><span class="n">preds_dir</span><span class="p">,</span> <span class="n">artifact_path</span><span class="o">=</span><span class="s2">&quot;predictions&quot;</span>
     <span class="p">)</span>
 
 
 <div class="viewcode-block" id="mlflow_fit"><a class="viewcode-back" href="../../../serotiny.ml_ops.mlflow_utils.html#serotiny.ml_ops.mlflow_utils.mlflow_fit">[docs]</a><span class="k">def</span> <span class="nf">mlflow_fit</span><span class="p">(</span>
     <span class="n">mlflow_conf</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">full_conf</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">predict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tune</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">):</span>
-    <span class="n">experiment</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">patience</span> <span class="o">=</span> <span class="n">_mlflow_prep</span><span class="p">(</span><span class="n">mlflow_conf</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="s2">"fit"</span><span class="p">)</span>
+    <span class="n">experiment</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">patience</span> <span class="o">=</span> <span class="n">_mlflow_prep</span><span class="p">(</span><span class="n">mlflow_conf</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="s2">&quot;fit&quot;</span><span class="p">)</span>
 
-    <span class="c1"># if run_id has been specified, we're trying to resume</span>
+    <span class="c1"># if run_id has been specified, we&#39;re trying to resume</span>
     <span class="k">if</span> <span class="n">run_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">trainer</span><span class="o">.</span><span class="n">checkpoint_callback</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">"You're trying to resume training, but checkpointing is not enabled."</span>
+            <span class="s2">&quot;You&#39;re trying to resume training, but checkpointing is not enabled.&quot;</span>
         <span class="p">)</span>
 
     <span class="n">skip</span> <span class="o">=</span> <span class="kc">False</span>
@@ -569,69 +569,69 @@
     <span class="p">):</span>
 
         <span class="k">if</span> <span class="n">run_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">params_to_log</span> <span class="o">=</span> <span class="n">mlflow_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"params_to_log"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">params_to_log</span> <span class="o">=</span> <span class="n">mlflow_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;params_to_log&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">params_to_log</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">mlflow</span><span class="o">.</span><span class="n">log_params</span><span class="p">(</span>
                     <span class="n">flatten_config</span><span class="p">(</span><span class="n">OmegaConf</span><span class="o">.</span><span class="n">to_container</span><span class="p">(</span><span class="n">params_to_log</span><span class="p">,</span> <span class="n">resolve</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
                 <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">run_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">client</span> <span class="o">=</span> <span class="n">MlflowClient</span><span class="p">(</span><span class="n">tracking_uri</span><span class="o">=</span><span class="n">mlflow_conf</span><span class="p">[</span><span class="s2">"tracking_uri"</span><span class="p">])</span>
+            <span class="n">client</span> <span class="o">=</span> <span class="n">MlflowClient</span><span class="p">(</span><span class="n">tracking_uri</span><span class="o">=</span><span class="n">mlflow_conf</span><span class="p">[</span><span class="s2">&quot;tracking_uri&quot;</span><span class="p">])</span>
             <span class="n">run</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_run</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">patience</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">if</span> <span class="s2">"wait_count"</span> <span class="ow">in</span> <span class="n">run</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">metrics</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">run</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">"wait_count"</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">patience</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;wait_count&quot;</span> <span class="ow">in</span> <span class="n">run</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">metrics</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">run</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;wait_count&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">patience</span><span class="p">:</span>
                         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                            <span class="s2">"This model has trained until or beyond the early "</span>
-                            <span class="s2">"stopping patience value. Skipping"</span>
+                            <span class="s2">&quot;This model has trained until or beyond the early &quot;</span>
+                            <span class="s2">&quot;stopping patience value. Skipping&quot;</span>
                         <span class="p">)</span>
                         <span class="n">skip</span> <span class="o">=</span> <span class="kc">True</span>
 
             <span class="k">if</span> <span class="n">trainer</span><span class="o">.</span><span class="n">max_epochs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">if</span> <span class="s2">"train_loss"</span> <span class="ow">in</span> <span class="n">run</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">metrics</span><span class="p">:</span>
-                    <span class="n">timepoints</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_metric_history</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="s2">"train_loss"</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s2">&quot;train_loss&quot;</span> <span class="ow">in</span> <span class="n">run</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">metrics</span><span class="p">:</span>
+                    <span class="n">timepoints</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_metric_history</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span> <span class="s2">&quot;train_loss&quot;</span><span class="p">)</span>
                     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">timepoints</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">max_epochs</span><span class="p">:</span>
                         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                            <span class="s2">"This model has trained until or beyond "</span>
-                            <span class="s2">"max epochs. Skipping"</span>
+                            <span class="s2">&quot;This model has trained until or beyond &quot;</span>
+                            <span class="s2">&quot;max epochs. Skipping&quot;</span>
                         <span class="p">)</span>
                         <span class="n">skip</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">skip</span><span class="p">:</span>
-            <span class="c1"># we don't know yet if there's a checkpoint</span>
+            <span class="c1"># we don&#39;t know yet if there&#39;s a checkpoint</span>
             <span class="n">ckpt_path</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_dir</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">run_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Trying to retrieve checkpoint to resume training"</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Trying to retrieve checkpoint to resume training&quot;</span><span class="p">)</span>
                     <span class="n">ckpt_path</span> <span class="o">=</span> <span class="n">_get_latest_checkpoint</span><span class="p">(</span>
                         <span class="n">mlflow_conf</span><span class="o">.</span><span class="n">tracking_uri</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">tmp_dir</span>
                     <span class="p">)</span>
 
-                <span class="n">_log_conf</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">full_conf</span><span class="p">,</span> <span class="s2">"train"</span><span class="p">)</span>
+                <span class="n">_log_conf</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">full_conf</span><span class="p">,</span> <span class="s2">&quot;train&quot;</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">tune</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Calling trainer.tune"</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calling trainer.tune&quot;</span><span class="p">)</span>
                     <span class="n">trainer</span><span class="o">.</span><span class="n">tune</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Calling trainer.fit"</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calling trainer.fit&quot;</span><span class="p">)</span>
                 <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">ckpt_path</span><span class="o">=</span><span class="n">ckpt_path</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">test</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Calling trainer.test"</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calling trainer.test&quot;</span><span class="p">)</span>
                     <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">predict</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Calling trainer.predict"</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calling trainer.predict&quot;</span><span class="p">)</span>
                     <span class="n">trainer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
-        <span class="n">mlflow</span><span class="o">.</span><span class="n">end_run</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s2">"FINISHED"</span><span class="p">)</span></div>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">end_run</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s2">&quot;FINISHED&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="mlflow_test"><a class="viewcode-back" href="../../../serotiny.ml_ops.mlflow_utils.html#serotiny.ml_ops.mlflow_utils.mlflow_test">[docs]</a><span class="k">def</span> <span class="nf">mlflow_test</span><span class="p">(</span><span class="n">mlflow_conf</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">full_conf</span><span class="p">):</span>
-    <span class="n">experiment</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_mlflow_prep</span><span class="p">(</span><span class="n">mlflow_conf</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="s2">"test"</span><span class="p">)</span>
+    <span class="n">experiment</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_mlflow_prep</span><span class="p">(</span><span class="n">mlflow_conf</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">run_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">"You're calling serotiny test but you haven't specified the run_id"</span>
+            <span class="s2">&quot;You&#39;re calling serotiny test but you haven&#39;t specified the run_id&quot;</span>
         <span class="p">)</span>
 
     <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span>
@@ -644,30 +644,30 @@
         <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_dir</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">_get_config</span><span class="p">(</span>
                 <span class="n">mlflow_conf</span><span class="o">.</span><span class="n">tracking_uri</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">tmp_dir</span>
-            <span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">full_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"force"</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">full_conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;force&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                    <span class="s2">"This run has been tested before. If you want to "</span>
-                    <span class="s2">"retest it, set ++force=True"</span>
+                    <span class="s2">&quot;This run has been tested before. If you want to &quot;</span>
+                    <span class="s2">&quot;retest it, set ++force=True&quot;</span>
                 <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">model</span> <span class="o">=</span> <span class="n">load_model_from_checkpoint</span><span class="p">(</span>
                     <span class="n">mlflow_conf</span><span class="o">.</span><span class="n">tracking_uri</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">full_conf</span>
                 <span class="p">)</span>
 
-                <span class="n">_log_conf</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">full_conf</span><span class="p">,</span> <span class="s2">"test"</span><span class="p">)</span>
+                <span class="n">_log_conf</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">full_conf</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Calling trainer.test"</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calling trainer.test&quot;</span><span class="p">)</span>
                     <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
-        <span class="n">mlflow</span><span class="o">.</span><span class="n">end_run</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s2">"FINISHED"</span><span class="p">)</span></div>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">end_run</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s2">&quot;FINISHED&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="mlflow_predict"><a class="viewcode-back" href="../../../serotiny.ml_ops.mlflow_utils.html#serotiny.ml_ops.mlflow_utils.mlflow_predict">[docs]</a><span class="k">def</span> <span class="nf">mlflow_predict</span><span class="p">(</span><span class="n">mlflow_conf</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">full_conf</span><span class="p">):</span>
-    <span class="n">experiment</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_mlflow_prep</span><span class="p">(</span><span class="n">mlflow_conf</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="s2">"predict"</span><span class="p">)</span>
+    <span class="n">experiment</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_mlflow_prep</span><span class="p">(</span><span class="n">mlflow_conf</span><span class="p">,</span> <span class="n">trainer</span><span class="p">,</span> <span class="s2">&quot;predict&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">run_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">"You're calling serotiny predict but you "</span> <span class="s2">"haven't specified the run_id"</span>
+            <span class="s2">&quot;You&#39;re calling serotiny predict but you &quot;</span> <span class="s2">&quot;haven&#39;t specified the run_id&quot;</span>
         <span class="p">)</span>
 
     <span class="k">with</span> <span class="n">mlflow</span><span class="o">.</span><span class="n">start_run</span><span class="p">(</span>
@@ -682,30 +682,30 @@
                 <span class="n">mlflow_conf</span><span class="o">.</span><span class="n">tracking_uri</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">full_conf</span>
             <span class="p">)</span>
 
-            <span class="n">_log_conf</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">full_conf</span><span class="p">,</span> <span class="s2">"predict"</span><span class="p">)</span>
+            <span class="n">_log_conf</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">,</span> <span class="n">full_conf</span><span class="p">,</span> <span class="s2">&quot;predict&quot;</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Calling trainer.predict"</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calling trainer.predict&quot;</span><span class="p">)</span>
                 <span class="n">preds</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
-                <span class="n">preds_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"predictions"</span>
+                <span class="n">preds_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">tmp_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;predictions&quot;</span>
                 <span class="n">preds_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
                 <span class="n">save_model_predictions</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">preds</span><span class="p">,</span> <span class="n">preds_dir</span><span class="p">)</span>
-                <span class="n">_log_predictions</span><span class="p">(</span><span class="n">preds_dir</span><span class="p">,</span> <span class="n">mlflow_conf</span><span class="p">[</span><span class="s2">"tracking_uri"</span><span class="p">],</span> <span class="n">run_id</span><span class="p">)</span>
-        <span class="n">mlflow</span><span class="o">.</span><span class="n">end_run</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s2">"FINISHED"</span><span class="p">)</span></div>
+                <span class="n">_log_predictions</span><span class="p">(</span><span class="n">preds_dir</span><span class="p">,</span> <span class="n">mlflow_conf</span><span class="p">[</span><span class="s2">&quot;tracking_uri&quot;</span><span class="p">],</span> <span class="n">run_id</span><span class="p">)</span>
+        <span class="n">mlflow</span><span class="o">.</span><span class="n">end_run</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="s2">&quot;FINISHED&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="upload_artifacts"><a class="viewcode-back" href="../../../serotiny.ml_ops.mlflow_utils.html#serotiny.ml_ops.mlflow_utils.upload_artifacts">[docs]</a><span class="nd">@contextmanager</span>
-<span class="k">def</span> <span class="nf">upload_artifacts</span><span class="p">(</span><span class="n">artifact_path</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="p">[],</span> <span class="n">globstr</span><span class="o">=</span><span class="s2">"*"</span><span class="p">):</span>
-    <span class="sd">"""Util context manager to upload artifacts.</span>
+<span class="k">def</span> <span class="nf">upload_artifacts</span><span class="p">(</span><span class="n">artifact_path</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="p">[],</span> <span class="n">globstr</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Util context manager to upload artifacts.</span>
 
 <span class="sd">    It yields a temporary directory to store results and then uploads the files</span>
 <span class="sd">    stored therein. Optionally exclude given files or restrict to a given glob</span>
 <span class="sd">    filter.</span>
 
 <span class="sd">    NOTE: Must be used in the context of an active MLFlow run!</span>
-<span class="sd">    """</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp_dir</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
@@ -720,16 +720,16 @@
 
 <div class="viewcode-block" id="download_artifact"><a class="viewcode-back" href="../../../serotiny.ml_ops.mlflow_utils.html#serotiny.ml_ops.mlflow_utils.download_artifact">[docs]</a><span class="nd">@contextmanager</span>
 <span class="k">def</span> <span class="nf">download_artifact</span><span class="p">(</span><span class="n">artifact_path</span><span class="p">,</span> <span class="n">experiment_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">run_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">run_id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">"""Util context manager to download artifacts.</span>
+    <span class="sd">&quot;&quot;&quot;Util context manager to download artifacts.</span>
 
 <span class="sd">    Returns a path to the downloaded artifact</span>
-<span class="sd">    """</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="n">run_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="p">[</span><span class="n">experiment_name</span><span class="p">,</span> <span class="n">run_name</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="p">(</span><span class="n">experiment_name</span><span class="p">,</span> <span class="n">run_name</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">"If `run_id` is None, you must specify `experiment_name` and "</span>
-                <span class="s2">"`run_name`"</span>
+                <span class="s2">&quot;If `run_id` is None, you must specify `experiment_name` and &quot;</span>
+                <span class="s2">&quot;`run_name`&quot;</span>
             <span class="p">)</span>
 
         <span class="n">run_id</span> <span class="o">=</span> <span class="n">get_run_id</span><span class="p">(</span>
@@ -784,7 +784,9 @@
 </div><script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/scripts/furo.js"></script>
     </body>
 </html>

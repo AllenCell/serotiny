@@ -1,12 +1,12 @@
 <!doctype html>
-<html class="no-js">
+<html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="#" /><link rel="search" title="Search" href="search.html" />
 
-    <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/><title>Index - serotiny 0.0.6 documentation</title>
+    <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/><title>Index - serotiny 0.0.8 documentation</title>
 <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
@@ -121,7 +121,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">serotiny 0.0.6 documentation</div></a>
+      <a href="index.html"><div class="brand">serotiny 0.0.8 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -147,7 +147,7 @@
     <img class="sidebar-logo" src="_static/serotiny_logo.svg" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">serotiny 0.0.6 documentation</span>
+  <span class="sidebar-brand-text">serotiny 0.0.8 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -175,7 +175,7 @@
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.classes.html">serotiny.io.dataframe.loaders.classes module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.columns.html">serotiny.io.dataframe.loaders.columns module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.image.html">serotiny.io.dataframe.loaders.image module</a></li>
-<li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.random_image.html">serotiny.io.dataframe.loaders.random_image module</a></li>
+<li class="toctree-l6"><a class="reference internal" href="serotiny.io.dataframe.loaders.random_tensor.html">serotiny.io.dataframe.loaders.random_tensor module</a></li>
 </ul>
 </li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.io.dataframe.dataframe_dataset.html">serotiny.io.dataframe.dataframe_dataset module</a></li>
@@ -215,6 +215,7 @@
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.base_vae.html">serotiny.models.vae.base_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.image_vae.html">serotiny.models.vae.image_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.implicit_decoder_vae.html">serotiny.models.vae.implicit_decoder_vae module</a></li>
+<li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.latent_loss_vae.html">serotiny.models.vae.latent_loss_vae module</a></li>
 <li class="toctree-l5"><a class="reference internal" href="serotiny.models.vae.tabular_vae.html">serotiny.models.vae.tabular_vae module</a></li>
 </ul>
 </li>
@@ -288,7 +289,8 @@
           </svg>
           <span>Back to top</span>
         </a>
-        <div class="content-icon-container"><div class="theme-toggle-container theme-toggle-content">
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
             <button class="theme-toggle">
               <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
               <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
@@ -321,6 +323,8 @@
           <li><a href="serotiny.models.vae.image_vae.html#serotiny.models.vae.image_vae.ImageVAE.allow_zero_length_dataloader_with_multiple_devices">(serotiny.models.vae.image_vae.ImageVAE attribute)</a>
 </li>
           <li><a href="serotiny.models.vae.implicit_decoder_vae.html#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.allow_zero_length_dataloader_with_multiple_devices">(serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE attribute)</a>
+</li>
+          <li><a href="serotiny.models.vae.latent_loss_vae.html#serotiny.models.vae.latent_loss_vae.LatentLossVAE.allow_zero_length_dataloader_with_multiple_devices">(serotiny.models.vae.latent_loss_vae.LatentLossVAE attribute)</a>
 </li>
           <li><a href="serotiny.models.vae.tabular_vae.html#serotiny.models.vae.tabular_vae.TabularVAE.allow_zero_length_dataloader_with_multiple_devices">(serotiny.models.vae.tabular_vae.TabularVAE attribute)</a>
 </li>
@@ -371,10 +375,14 @@
 </li>
         <li><a href="serotiny.models.vae.priors.gaussian.html#serotiny.models.vae.priors.gaussian.compute_tc_penalty">compute_tc_penalty() (in module serotiny.models.vae.priors.gaussian)</a>
 </li>
+        <li><a href="serotiny.models.base_model.html#serotiny.models.base_model.BaseModel.configure_optimizers">configure_optimizers() (serotiny.models.base_model.BaseModel method)</a>
+
+        <ul>
+          <li><a href="serotiny.models.vae.latent_loss_vae.html#serotiny.models.vae.latent_loss_vae.LatentLossVAE.configure_optimizers">(serotiny.models.vae.latent_loss_vae.LatentLossVAE method)</a>
+</li>
+        </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="serotiny.models.base_model.html#serotiny.models.base_model.BaseModel.configure_optimizers">configure_optimizers() (serotiny.models.base_model.BaseModel method)</a>
-</li>
         <li><a href="serotiny.networks.layers.convolution_block.html#serotiny.networks.layers.convolution_block.conv_block">conv_block() (in module serotiny.networks.layers.convolution_block)</a>
 </li>
         <li><a href="serotiny.networks.basic_cnn.basic_cnn.html#serotiny.networks.basic_cnn.basic_cnn.BasicCNN.conv_forward">conv_forward() (serotiny.networks.basic_cnn.basic_cnn.BasicCNN method)</a>
@@ -416,7 +424,11 @@
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.encode">encode() (serotiny.models.vae.base_vae.BaseVAE method)</a>
+
+        <ul>
+          <li><a href="serotiny.models.vae.latent_loss_vae.html#serotiny.models.vae.latent_loss_vae.LatentLossVAE.encode">(serotiny.models.vae.latent_loss_vae.LatentLossVAE method)</a>
 </li>
+        </ul></li>
         <li><a href="serotiny.transforms.image.pad.html#serotiny.transforms.image.pad.expand_columns">expand_columns() (in module serotiny.transforms.image.pad)</a>
 </li>
     </ul></td>
@@ -581,6 +593,10 @@
   <h2>L</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="serotiny.models.vae.latent_loss_vae.html#serotiny.models.vae.latent_loss_vae.LatentLossVAE.latent_compose_function">latent_compose_function() (serotiny.models.vae.latent_loss_vae.LatentLossVAE method)</a>
+</li>
+        <li><a href="serotiny.models.vae.latent_loss_vae.html#serotiny.models.vae.latent_loss_vae.LatentLossVAE">LatentLossVAE (class in serotiny.models.vae.latent_loss_vae)</a>
+</li>
         <li><a href="serotiny.ml_ops.mlflow_utils.html#serotiny.ml_ops.mlflow_utils.load_model_from_checkpoint">load_model_from_checkpoint() (in module serotiny.ml_ops.mlflow_utils)</a>
 </li>
         <li><a href="serotiny.io.dataframe.loaders.html#serotiny.io.dataframe.loaders.LoadClass">LoadClass (class in serotiny.io.dataframe.loaders)</a>
@@ -595,14 +611,14 @@
           <li><a href="serotiny.io.dataframe.loaders.columns.html#serotiny.io.dataframe.loaders.columns.LoadColumn">(class in serotiny.io.dataframe.loaders.columns)</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="serotiny.io.dataframe.loaders.html#serotiny.io.dataframe.loaders.LoadColumns">LoadColumns (class in serotiny.io.dataframe.loaders)</a>
 
         <ul>
           <li><a href="serotiny.io.dataframe.loaders.columns.html#serotiny.io.dataframe.loaders.columns.LoadColumns">(class in serotiny.io.dataframe.loaders.columns)</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="serotiny.io.dataframe.loaders.abstract_loader.html#serotiny.io.dataframe.loaders.abstract_loader.Loader">Loader (class in serotiny.io.dataframe.loaders.abstract_loader)</a>
 </li>
         <li><a href="serotiny.io.dataframe.loaders.html#serotiny.io.dataframe.loaders.LoadImage">LoadImage (class in serotiny.io.dataframe.loaders)</a>
@@ -611,7 +627,7 @@
           <li><a href="serotiny.io.dataframe.loaders.image.html#serotiny.io.dataframe.loaders.image.LoadImage">(class in serotiny.io.dataframe.loaders.image)</a>
 </li>
         </ul></li>
-        <li><a href="serotiny.io.dataframe.loaders.random_image.html#serotiny.io.dataframe.loaders.random_image.LoadRandomTensor">LoadRandomTensor (class in serotiny.io.dataframe.loaders.random_image)</a>
+        <li><a href="serotiny.io.dataframe.loaders.random_tensor.html#serotiny.io.dataframe.loaders.random_tensor.LoadRandomTensor">LoadRandomTensor (class in serotiny.io.dataframe.loaders.random_tensor)</a>
 </li>
         <li><a href="serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.log_metrics">log_metrics() (serotiny.models.vae.base_vae.BaseVAE method)</a>
 
@@ -681,7 +697,7 @@
 </li>
           <li><a href="serotiny.io.dataframe.loaders.image.html#module-serotiny.io.dataframe.loaders.image">serotiny.io.dataframe.loaders.image</a>
 </li>
-          <li><a href="serotiny.io.dataframe.loaders.random_image.html#module-serotiny.io.dataframe.loaders.random_image">serotiny.io.dataframe.loaders.random_image</a>
+          <li><a href="serotiny.io.dataframe.loaders.random_tensor.html#module-serotiny.io.dataframe.loaders.random_tensor">serotiny.io.dataframe.loaders.random_tensor</a>
 </li>
           <li><a href="serotiny.io.dataframe.readers.html#module-serotiny.io.dataframe.readers">serotiny.io.dataframe.readers</a>
 </li>
@@ -724,6 +740,8 @@
           <li><a href="serotiny.models.vae.image_vae.html#module-serotiny.models.vae.image_vae">serotiny.models.vae.image_vae</a>
 </li>
           <li><a href="serotiny.models.vae.implicit_decoder_vae.html#module-serotiny.models.vae.implicit_decoder_vae">serotiny.models.vae.implicit_decoder_vae</a>
+</li>
+          <li><a href="serotiny.models.vae.latent_loss_vae.html#module-serotiny.models.vae.latent_loss_vae">serotiny.models.vae.latent_loss_vae</a>
 </li>
           <li><a href="serotiny.models.vae.priors.html#module-serotiny.models.vae.priors">serotiny.models.vae.priors</a>
 </li>
@@ -827,6 +845,8 @@
 </li>
           <li><a href="serotiny.models.vae.implicit_decoder_vae.html#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.parse_batch">(serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE method)</a>
 </li>
+          <li><a href="serotiny.models.vae.latent_loss_vae.html#serotiny.models.vae.latent_loss_vae.LatentLossVAE.parse_batch">(serotiny.models.vae.latent_loss_vae.LatentLossVAE method)</a>
+</li>
         </ul></li>
         <li><a href="serotiny.ml_ops.mlflow_utils.html#serotiny.ml_ops.mlflow_utils.patched_autolog">patched_autolog() (in module serotiny.ml_ops.mlflow_utils)</a>
 </li>
@@ -840,6 +860,8 @@
           <li><a href="serotiny.models.vae.image_vae.html#serotiny.models.vae.image_vae.ImageVAE.precision">(serotiny.models.vae.image_vae.ImageVAE attribute)</a>
 </li>
           <li><a href="serotiny.models.vae.implicit_decoder_vae.html#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.precision">(serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE attribute)</a>
+</li>
+          <li><a href="serotiny.models.vae.latent_loss_vae.html#serotiny.models.vae.latent_loss_vae.LatentLossVAE.precision">(serotiny.models.vae.latent_loss_vae.LatentLossVAE attribute)</a>
 </li>
           <li><a href="serotiny.models.vae.tabular_vae.html#serotiny.models.vae.tabular_vae.TabularVAE.precision">(serotiny.models.vae.tabular_vae.TabularVAE attribute)</a>
 </li>
@@ -862,6 +884,8 @@
           <li><a href="serotiny.models.vae.image_vae.html#serotiny.models.vae.image_vae.ImageVAE.prepare_data_per_node">(serotiny.models.vae.image_vae.ImageVAE attribute)</a>
 </li>
           <li><a href="serotiny.models.vae.implicit_decoder_vae.html#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.prepare_data_per_node">(serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE attribute)</a>
+</li>
+          <li><a href="serotiny.models.vae.latent_loss_vae.html#serotiny.models.vae.latent_loss_vae.LatentLossVAE.prepare_data_per_node">(serotiny.models.vae.latent_loss_vae.LatentLossVAE attribute)</a>
 </li>
           <li><a href="serotiny.models.vae.tabular_vae.html#serotiny.models.vae.tabular_vae.TabularVAE.prepare_data_per_node">(serotiny.models.vae.tabular_vae.TabularVAE attribute)</a>
 </li>
@@ -1004,10 +1028,10 @@
 </li>
         </ul></li>
         <li>
-    serotiny.io.dataframe.loaders.random_image
+    serotiny.io.dataframe.loaders.random_tensor
 
         <ul>
-          <li><a href="serotiny.io.dataframe.loaders.random_image.html#module-serotiny.io.dataframe.loaders.random_image">module</a>
+          <li><a href="serotiny.io.dataframe.loaders.random_tensor.html#module-serotiny.io.dataframe.loaders.random_tensor">module</a>
 </li>
         </ul></li>
         <li>
@@ -1159,6 +1183,13 @@
         </ul></li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    serotiny.models.vae.latent_loss_vae
+
+        <ul>
+          <li><a href="serotiny.models.vae.latent_loss_vae.html#module-serotiny.models.vae.latent_loss_vae">module</a>
+</li>
+        </ul></li>
         <li>
     serotiny.models.vae.priors
 
@@ -1427,18 +1458,6 @@
         </ul></li>
         <li><a href="serotiny.models.base_model.html#serotiny.models.base_model.BaseModel.train_epoch_end">train_epoch_end() (serotiny.models.base_model.BaseModel method)</a>
 </li>
-        <li><a href="serotiny.models.basic_model.html#serotiny.models.basic_model.BasicModel.trainer">trainer (serotiny.models.basic_model.BasicModel attribute)</a>
-
-        <ul>
-          <li><a href="serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.trainer">(serotiny.models.vae.base_vae.BaseVAE attribute)</a>
-</li>
-          <li><a href="serotiny.models.vae.image_vae.html#serotiny.models.vae.image_vae.ImageVAE.trainer">(serotiny.models.vae.image_vae.ImageVAE attribute)</a>
-</li>
-          <li><a href="serotiny.models.vae.implicit_decoder_vae.html#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.trainer">(serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE attribute)</a>
-</li>
-          <li><a href="serotiny.models.vae.tabular_vae.html#serotiny.models.vae.tabular_vae.TabularVAE.trainer">(serotiny.models.vae.tabular_vae.TabularVAE attribute)</a>
-</li>
-        </ul></li>
         <li><a href="serotiny.models.base_model.html#serotiny.models.base_model.BaseModel.training">training (serotiny.models.base_model.BaseModel attribute)</a>
 
         <ul>
@@ -1449,6 +1468,8 @@
           <li><a href="serotiny.models.vae.image_vae.html#serotiny.models.vae.image_vae.ImageVAE.training">(serotiny.models.vae.image_vae.ImageVAE attribute)</a>
 </li>
           <li><a href="serotiny.models.vae.implicit_decoder_vae.html#serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE.training">(serotiny.models.vae.implicit_decoder_vae.ImplicitDecoderVAE attribute)</a>
+</li>
+          <li><a href="serotiny.models.vae.latent_loss_vae.html#serotiny.models.vae.latent_loss_vae.LatentLossVAE.training">(serotiny.models.vae.latent_loss_vae.LatentLossVAE attribute)</a>
 </li>
           <li><a href="serotiny.models.vae.priors.abstract_prior.html#serotiny.models.vae.priors.abstract_prior.Prior.training">(serotiny.models.vae.priors.abstract_prior.Prior attribute)</a>
 </li>
@@ -1574,7 +1595,9 @@
 </div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/scripts/furo.js"></script>
     </body>
 </html>
