@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 @autologging_integration("pytorch")
 def patched_autolog(
     log_every_n_epoch=1,
+    log_every_n_step=50,
     log_models=False,  # we handle this
     disable=False,
     exclusive=False,
