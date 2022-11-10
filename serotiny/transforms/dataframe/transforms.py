@@ -10,6 +10,7 @@ def split_dataframe(
     train_frac: float,
     val_frac: Optional[float] = None,
     return_splits: bool = True,
+    seed: int = 42,
 ):
     """Given a pandas dataframe, perform a train-val-test split and either
     return three different dataframes, or append a column identifying the split
@@ -34,13 +35,16 @@ def split_dataframe(
         Whether to return the three splits separately, or to append
         a column to the existing dataframe and return the modified
         dataframe
+
+    seed: int = 42
+        Random seed for reproducibility
     """
 
     # import here to optimize CLIs / Fire usage
     from sklearn.model_selection import train_test_split
 
     train_ix, val_test_ix = train_test_split(
-        dataframe.index.tolist(), train_size=train_frac
+        dataframe.index.tolist(), train_size=train_frac, random_state=seed
     )
     if val_frac is not None:
         val_frac = val_frac / (1 - train_frac)
@@ -48,7 +52,9 @@ def split_dataframe(
         # by default use same size for val and test
         val_frac = 0.5
 
-    val_ix, test_ix = train_test_split(val_test_ix, train_size=val_frac)
+    val_ix, test_ix = train_test_split(
+        val_test_ix, train_size=val_frac, random_state=seed
+    )
 
     if return_splits:
         return dict(
