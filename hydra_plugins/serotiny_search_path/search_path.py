@@ -13,7 +13,7 @@ class SerotinySearchPath(SearchPathPlugin):
             if "-sc" in sys.argv and any(["install" in _arg for _arg in sys.argv]):
                 pass
             elif not any(
-                [("config-dir" in _arg or "-cd" in _arg) for _arg in sys.argv]
+                [("config-dir" in _arg or _arg.startswith("-cd")) for _arg in sys.argv]
             ):
                 # look for a .serotiny file in the current directory. if it exists,
                 # it means we're in a serotiny project. the .serotiny file will contain
