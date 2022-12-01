@@ -175,7 +175,9 @@ class BaseVAE(BaseModel):
         on_step = (stage == "val") | (stage == "train")
 
         for key, value in results.items():
-            if (len(value.shape) == 0) | (len(value.shape) == value.shape[0] == 1):
+            if (len(value.shape) == 0) | (
+                len(value.shape) == 1 and value.shape[0] == 1  # noqa
+            ):
                 self.log(
                     f"{stage} {key}",
                     value.squeeze(),
