@@ -106,7 +106,7 @@ def _get_config(tracking_uri, run_id, tmp_dir, mode="test"):
         return None
 
 
-def load_model_from_checkpoint(tracking_uri, run_id, full_conf):
+def load_model_from_checkpoint(tracking_uri, run_id, full_conf, strict=True):
     mlflow.set_tracking_uri(tracking_uri)
     with tempfile.TemporaryDirectory() as tmp_dir:
         ckpt_path = _get_latest_checkpoint(tracking_uri, run_id, tmp_dir)
@@ -124,7 +124,7 @@ def load_model_from_checkpoint(tracking_uri, run_id, full_conf):
         model_class = model_conf.pop("_target_")
         model_conf = instantiate(model_conf)
         model_class = _locate(model_class)
-        return model_class.load_from_checkpoint(ckpt_path, **model_conf)
+        return model_class.load_from_checkpoint(ckpt_path, **model_conf, strict=strict)
 
 
 def _get_patience(trainer):
