@@ -99,7 +99,7 @@ class LatentLossVAE(BaseVAE):
         return batch
 
     def encode(self, batch):
-        encoded = dict()
+        encoded = {}
         encoded[self.hparams.x_label] = self.encoder[self.hparams.x_label](
             batch[self.hparams.x_label]
         )
@@ -278,7 +278,7 @@ class LatentLossVAE(BaseVAE):
                 self.lr_scheduler[non_main_key](optimizer=optimizers[-1])
             )
 
-        self.latent_loss_optimizer_map = dict()
+        self.latent_loss_optimizer_map = {}
         for optim_ix, (group_key, group) in enumerate(
             self.latent_loss_optimizer.items()
         ):
