@@ -4,7 +4,7 @@ _full_slice = slice(None, None, None)
 
 
 class Prior(nn.Module):
-    def __init__(self, dimensionality: int, **kwargs):
+    def __init__(self, dimensionality: int = -1, **kwargs):
         super().__init__()
         self.dimensionality = dimensionality
 
