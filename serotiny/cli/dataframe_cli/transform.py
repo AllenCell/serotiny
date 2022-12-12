@@ -6,8 +6,8 @@ from typing import Optional, Sequence, T, Union
 import pandas as pd
 from makefun import wraps
 
-import serotiny.transforms.dataframe as df_transforms
-from serotiny.io.dataframe import read_dataframe
+import serotiny.dataframe.transforms as df_transforms
+from serotiny.dataframe import read_dataframe
 
 from .._utils import PipelineCLI
 
