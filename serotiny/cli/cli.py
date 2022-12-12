@@ -64,8 +64,10 @@ def main():
         from fire import Fire
 
         import serotiny.cli.config_cli as config_cli
-        import serotiny.cli.image_cli as image_cli
         from serotiny.cli.dataframe_cli import DataframeTransformCLI as dataframe_cli
+
+        def image_cli():
+            raise NotImplementedError
 
         sys.argv.insert(1, mode)
         cli_dict = {
