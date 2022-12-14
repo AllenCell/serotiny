@@ -1,18 +1,22 @@
 from contextlib import suppress
-from pathlib import Path
 import nbformat
 import nbformat.v4 as v4
 from omegaconf import OmegaConf
 
 
-def get_serotiny_project():
-    with suppress():
-        if (Path.cwd() / ".serotiny").exists():
-            with open(".serotiny", "r") as f:
-                project_name = f.read().strip()
-            return project_name
+def instantiate(cfg):
+    from hydra.utils import instantiate as _instantiate
+    from copy import copy
 
-    return "serotiny"
+    if not isinstance(cfg, (list, dict)):
+        _cfg = OmegaConf.to_container(cfg, resolve=True)
+    else:
+        _cfg = copy(cfg)
+
+    if "_aux_" in _cfg:
+        del _cfg["_aux_"]
+
+    return _instantiate(_cfg)
 
 
 def flatten_config(cfg):
