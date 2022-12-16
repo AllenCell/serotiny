@@ -5,10 +5,10 @@ from upath import UPath as Path
 import numpy as np
 import pandas as pd
 from omegaconf import OmegaConf, ListConfig
-from serotiny.io import read_dataframe
 
 from monai.data import Dataset, PersistentDataset
 from monai.transforms import Compose
+from .readers import read_dataframe
 
 
 def get_canonical_split_name(split):
