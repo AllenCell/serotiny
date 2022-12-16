@@ -1,14 +1,30 @@
 import os
+from typing import Union, Dict, Any, Namespace
 from pathlib import Path
+import tempfile
 
+from omegaconf import OmegaConf
 from mlflow.store.artifact.artifact_repository_registry import get_artifact_repository
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import MLFlowLogger as _MLFlowLogger
-
-LOCAL_FILE_URI_PREFIX = "file:"
+from pytorch_lightning.utilities.rank_zero import rank_zero_only
 
 
 class MLFlowLogger(_MLFlowLogger):
+    @rank_zero_only
+    def log_hyperparams(self, params: Union[Dict[str, Any], Namespace]) -> None:
+        mode = self.trainer.fn
+
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            conf_path = Path(tmp_dir) / f"{mode}.yaml"
+            with open(conf_path, "w") as f:
+                config = OmegaConf.create(params)
+                OmegaConf.save(config=config, f=f)
+
+            self.experiment.log_artifact(
+                self.run_id, local_path=conf_path, artifact_path="config"
+            )
+
     def after_save_checkpoint(self, ckpt_callback: ModelCheckpoint) -> None:
         """Called after model checkpoint callback saves a new checkpoint."""
 
