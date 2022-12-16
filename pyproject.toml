@@ -21,7 +21,6 @@ license = "BSD-3"
 readme = "README.md"
 packages = [
     { include = "serotiny" },
-    { include = "hydra_plugins" }
 ]
 include = [
     "LICENSE",
@@ -83,9 +82,6 @@ modin = {version = "^0.16.2", optional = true}
 
 [tool.poetry.scripts]
 serotiny = "serotiny.cli.cli:main"
-"serotiny.train" = "serotiny.cli.cli:main"
-"serotiny.test" = "serotiny.cli.cli:main"
-"serotiny.predict" = "serotiny.cli.cli:main"
 
 
 [tool.poetry.extras]
