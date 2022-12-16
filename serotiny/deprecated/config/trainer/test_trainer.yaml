@@ -1,9 +1,0 @@
-defaults:
-  - /defaults/trainer/default@_here_ #inherit serotiny's trainer config
-  - callbacks: default
-
-_target_: pytorch_lightning.Trainer
-max_epochs: 2
-max_steps: 5000
-gpus:
-enable_checkpointing: True
