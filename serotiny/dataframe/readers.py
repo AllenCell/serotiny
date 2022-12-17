@@ -136,7 +136,7 @@ def read_dataframe(
     required_columns = set(required_columns) if required_columns else set()
     include_columns = set(include_columns) if include_columns else set()
 
-    include_columns += required_columns
+    include_columns = include_columns | required_columns
 
     include_columns = sorted(list(include_columns))
     required_columns = sorted(list(required_columns))
