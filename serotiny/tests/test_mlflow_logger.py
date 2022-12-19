@@ -9,6 +9,7 @@ from pytorch_lightning.demos.boring_classes import BoringModel
 from pytorch_lightning.callbacks import ModelCheckpoint
 
 from serotiny.loggers import MLFlowLogger
+from serotiny.models.utils.mlflow import get_config
 
 
 @mock.patch("pytorch_lightning.loggers.mlflow._MLFLOW_AVAILABLE", return_value=True)
@@ -86,3 +87,25 @@ def test_mlflow_log_model(_, tmpdir, monitor):
         )
         assert len(os.listdir(ckpt_folder)) == 1
         assert os.path.isfile(os.path.join(ckpt_folder, "last.ckpt"))
+
+
+@mock.patch("pytorch_lightning.loggers.mlflow._MLFLOW_AVAILABLE", return_value=True)
+def test_mlflow_log_hyperparams(_, tmpdir):
+    """Test that the logger creates the folders and files in the right
+    place."""
+
+    mlflow_root = os.path.join(tmpdir, "mlflow/")
+
+    logger = MLFlowLogger("test", save_dir=mlflow_root)
+    logger.log_hyperparams(dict(a=1, b=2))
+
+    config = get_config(
+        logger._tracking_uri,
+        logger.run_id,
+        tmpdir,
+    )
+
+    assert "a" in config
+    assert config["a"] == 1
+    assert "b" in config
+    assert config["b"] == 2
