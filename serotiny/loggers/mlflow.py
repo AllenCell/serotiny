@@ -1,10 +1,14 @@
 import os
-from typing import Union, Dict, Any, Namespace
+import warnings
+from typing import Union, Dict, Any
+from argparse import Namespace
 from pathlib import Path
 import tempfile
 
 from omegaconf import OmegaConf
+from mlflow.store.artifact.local_artifact_repo import LocalArtifactRepository
 from mlflow.store.artifact.artifact_repository_registry import get_artifact_repository
+from mlflow.utils.file_utils import local_file_uri_to_path
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import MLFlowLogger as _MLFlowLogger
 from pytorch_lightning.utilities.rank_zero import rank_zero_only
@@ -27,12 +31,11 @@ class MLFlowLogger(_MLFlowLogger):
 
     def after_save_checkpoint(self, ckpt_callback: ModelCheckpoint) -> None:
         """Called after model checkpoint callback saves a new checkpoint."""
-
         monitor = ckpt_callback.monitor
         if monitor is not None:
             artifact_path = f"checkpoints/{monitor}"
             existing_ckpts = set(
-                _.split("/")[-1]
+                _.path.split("/")[-1]
                 for _ in self.experiment.list_artifacts(self.run_id, path=artifact_path)
             )
 
@@ -46,11 +49,22 @@ class MLFlowLogger(_MLFlowLogger):
             run = self.experiment.get_run(self.run_id)
             repository = get_artifact_repository(run.info.artifact_uri)
             for ckpt in to_delete:
-                repository.delete_artifact(Path(ckpt).name)
+                if isinstance(repository, LocalArtifactRepository):
+                    _delete_local_artifact(repository, f"checkpoints/{monitor}/{ckpt}")
+                elif hasattr(repository, "delete_artifacts"):
+                    repository.delete_artifacts(f"checkpoints/{monitor}/{ckpt}")
+                else:
+                    warnings.warn(
+                        "The artifact repository configured for this "
+                        "MLFlow server doesn't support deleting artifacts, "
+                        "so we're keeping all checkpoints."
+                    )
 
             for ckpt in to_upload:
                 self.experiment.log_artifact(
-                    self.run_id, local_path=ckpt, artifact_path=artifact_path
+                    self.run_id,
+                    local_path=os.path.join(ckpt_callback.dirpath, ckpt),
+                    artifact_path=artifact_path,
                 )
         else:
             filepath = ckpt_callback.best_model_path
@@ -58,7 +72,7 @@ class MLFlowLogger(_MLFlowLogger):
 
             # mimic ModelCheckpoint's behavior: if `self.save_top_k == 1` only
             # keep the latest checkpoint, otherwise keep all of them.
-            if self.save_top_k == 1:
+            if ckpt_callback.save_top_k == 1:
                 last_path = Path(filepath).with_name("last.ckpt")
                 os.link(filepath, last_path)
 
@@ -71,3 +85,14 @@ class MLFlowLogger(_MLFlowLogger):
                 self.experiment.log_artifact(
                     self.run_id, local_path=filepath, artifact_path=artifact_path
                 )
+
+
+def _delete_local_artifact(repo, artifact_path):
+    artifact_path = local_file_uri_to_path(
+        os.path.join(repo._artifact_dir, artifact_path)
+        if artifact_path
+        else repo._artifact_dir
+    )
+
+    if os.path.isfile(artifact_path):
+        os.remove(artifact_path)
