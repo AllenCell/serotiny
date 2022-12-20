@@ -1,4 +1,5 @@
 import numpy as np
+import torch
 import pytorch_lightning as pl
 from monai.data import DataLoader
 
@@ -39,6 +40,7 @@ class DataframeDatamodule(pl.LightningDataModule):
         just_inference: bool = False,
         cache_dir: Optional[Union[Path, str]] = None,
         subsample: Optional[Dict] = None,
+        seed: int = 42,
         **dataloader_kwargs,
     ):
         """
@@ -85,6 +87,8 @@ class DataframeDatamodule(pl.LightningDataModule):
         """
 
         super().__init__()
+        torch.manual_seed(seed)
+        self.seed = seed
         self.path = path
         self.cache_dir = cache_dir
 
@@ -115,7 +119,7 @@ class DataframeDatamodule(pl.LightningDataModule):
         self.just_inference = just_inference
         self.dataloader_kwargs = dataloader_kwargs
         self.dataloaders = {}
-        self.rng = np.random.default_rng(seed=dataloader_kwargs.get("seed", 42))
+        self.rng = np.random.default_rng(seed=seed)
         self.subsample = subsample or {}
         for key in list(self.subsample.keys()):
             self.subsample[get_canonical_split_name(key)] = self.subsample[key]
