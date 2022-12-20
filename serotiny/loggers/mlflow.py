@@ -1,11 +1,12 @@
 import os
 import warnings
-from typing import Union, Dict, Any
+from typing import Union, Dict, Any, Optional
 from argparse import Namespace
 from pathlib import Path
 import tempfile
 
 from omegaconf import OmegaConf
+import mlflow
 from mlflow.store.artifact.local_artifact_repo import LocalArtifactRepository
 from mlflow.store.artifact.artifact_repository_registry import get_artifact_repository
 from mlflow.utils.file_utils import local_file_uri_to_path
@@ -15,6 +16,32 @@ from pytorch_lightning.utilities.rank_zero import rank_zero_only
 
 
 class MLFlowLogger(_MLFlowLogger):
+    def __init__(
+        self,
+        experiment_name: str = "lightning_logs",
+        run_name: Optional[str] = None,
+        tracking_uri: Optional[str] = os.getenv("MLFLOW_TRACKING_URI"),
+        tags: Optional[Dict[str, Any]] = None,
+        save_dir: Optional[str] = "./mlruns",
+        prefix: str = "",
+        artifact_location: Optional[str] = None,
+        run_id: Optional[str] = None,
+    ):
+        _MLFlowLogger.__init__(
+            self,
+            experiment_name=experiment_name,
+            run_name=run_name,
+            tracking_uri=tracking_uri,
+            tags=tags,
+            save_dir=save_dir,
+            prefix=prefix,
+            artifact_location=artifact_location,
+            run_id=run_id,
+        )
+
+        if tracking_uri is not None:
+            mlflow.set_tracking_uri(tracking_uri)
+
     @rank_zero_only
     def log_hyperparams(
         self, params: Union[Dict[str, Any], Namespace], mode="train"
