@@ -4,11 +4,10 @@ from upath import UPath as Path
 
 import numpy as np
 
-# try:
-#   import modin.pandas as pd
-# except ModuleNotFoundError:
-# import pandas as pd
-import pandas as pd
+try:
+    import modin.pandas as pd
+except ModuleNotFoundError:
+    import pandas as pd
 from omegaconf import ListConfig, DictConfig
 
 from monai.data import Dataset, PersistentDataset
