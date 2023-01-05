@@ -99,7 +99,7 @@ class DataframeDatamodule(pl.LightningDataModule):
         # dataframe file, which is expected to have a
         if path.is_dir():
             self.datasets = make_multiple_dataframe_splits(
-                path, transforms, columns, just_inference
+                path, transforms, columns, just_inference, cache_dir
             )
         else:
             if split_column is None and not just_inference:
@@ -109,7 +109,13 @@ class DataframeDatamodule(pl.LightningDataModule):
                 )
 
             self.datasets = make_single_dataframe_splits(
-                path, transforms, split_column, columns, just_inference, split_map
+                path,
+                transforms,
+                split_column,
+                columns,
+                just_inference,
+                split_map,
+                cache_dir,
             )
 
         self.just_inference = just_inference
@@ -136,7 +142,7 @@ class DataframeDatamodule(pl.LightningDataModule):
         kwargs = dict(**self.dataloader_kwargs)
         kwargs["shuffle"] = kwargs.get("shuffle", True) and split == "train"
 
-        return DataLoader(dataset=self.datasets[split], **kwargs)
+        return DataLoader(dataset=self.get_dataset(split), **kwargs)
 
     def get_dataloader(self, split):
         sample_size = self.subsample.get(split, -1)
