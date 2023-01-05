@@ -3,6 +3,20 @@ import numpy as np
 from typing import Sequence, Callable, Dict
 
 
+def _apply_slice(data, slicee):
+    # pop z dimension to take corresponding 2d slice if 2d image is passed
+    if len(data.shape) == len(slicee) - 1:
+        slicee.pop(1)
+    return data[slicee]
+
+
+def _generate_slice(start_coords: Sequence[int], roi_size: Sequence[int]) -> slice:
+    """Creates slice starting at `start_coords` of size `roi_size`"""
+    return [slice(None, None)] + [
+        slice(start, end) for start, end in zip(start_coords, start_coords + roi_size)
+    ]
+
+
 class RandomMultiScaleCropd(RandomizableTransform):
     """Monai-style transform that generates random slices at integer multiple
     scales.
@@ -58,15 +72,6 @@ class RandomMultiScaleCropd(RandomizableTransform):
                 self.reversed_scale_dict[v_item] = k
         assert 1 in self.scale_dict.keys()
 
-    def _generate_slice(
-        self, start_coords: Sequence[int], roi_size: Sequence[int]
-    ) -> slice:
-        """Creates slice starting at `start_coords` of size `roi_size`"""
-        return [slice(None, None)] + [
-            slice(start, end)
-            for start, end in zip(start_coords, start_coords + roi_size)
-        ]
-
     def generate_slices(self, image_dict: Dict) -> Dict:
         """Generate dictionary of slices at all scales starting at random
         point."""
@@ -79,11 +84,9 @@ class RandomMultiScaleCropd(RandomizableTransform):
             s: (start_indices // s).astype(int) for s in self.scale_dict.keys()
         }
         return {
-            s: [
-                self._generate_slice(
-                    scaled_start_indices[s], (self.roi_size // s).astype(int)
-                )
-            ]
+            s: _generate_slice(
+                scaled_start_indices[s], (self.roi_size // s).astype(int)
+            )
             for s in scaled_start_indices.keys()
         }
 
@@ -93,15 +96,18 @@ class RandomMultiScaleCropd(RandomizableTransform):
         while len(patches) < self.num_samples:
             if attempts > self.max_attempts:
                 raise ValueError(
-                    "Max attempts reached. Please chack your selection function "
+                    "Max attempts reached. Please check your selection function "
                     "or adjust max_attempts"
                 )
             slices = self.generate_slices(image_dict)
+
             patch_dict = {
-                key: data[slices[self.reversed_scale_dict[key]][0]]
-                for key, data in image_dict.items()
-                if key in self.keys
+                key: _apply_slice(
+                    image_dict[key], slices[self.reversed_scale_dict[key]]
+                )
+                for key in self.keys
             }
+
             if self.selection_fn is None or self.selection_fn(patch_dict):
                 patches.append(patch_dict)
                 attempts = 0
