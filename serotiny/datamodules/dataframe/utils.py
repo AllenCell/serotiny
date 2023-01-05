@@ -4,10 +4,11 @@ from upath import UPath as Path
 
 import numpy as np
 
-try:
-    import modin.pandas as pd
-except ModuleNotFoundError:
-    import pandas as pd
+# try:
+#   import modin.pandas as pd
+# except ModuleNotFoundError:
+# import pandas as pd
+import pandas as pd
 from omegaconf import ListConfig, DictConfig
 
 from monai.data import Dataset, PersistentDataset
@@ -22,9 +23,9 @@ def get_canonical_split_name(split):
     raise ValueError
 
 
-def get_dataset(dataframe, transform, cache_dir=None):
+def get_dataset(dataframe, transform, split, cache_dir=None):
     data = list(dataframe.to_dict("records"))
-    if cache_dir is not None:
+    if cache_dir is not None and split in ["train", "val"]:
         return PersistentDataset(data, transform=transform, cache_dir=cache_dir)
     return Dataset(data, transform=transform)
 
@@ -67,10 +68,13 @@ def make_single_dataframe_splits(
             datasets[split] = get_dataset(
                 dataframe.loc[dataframe["split"].str.startswith(split)],
                 transforms[split],
+                split,
                 _split_cache,
             )
 
-    datasets["predict"] = get_dataset(dataframe, transform=transforms["predict"])
+    datasets["predict"] = get_dataset(
+        dataframe, transform=transforms["predict"], split="predict", cache_dir=cache_dir
+    )
     return datasets
 
 
@@ -94,11 +98,18 @@ def make_multiple_dataframe_splits(
             _split_cache = None
 
         if not just_inference:
-            datasets[split] = get_dataset(dataframe, transforms[split], _split_cache)
+            datasets[split] = get_dataset(
+                dataframe, transforms[split], split, _split_cache
+            )
         predict_df.append(dataframe.copy())
 
     predict_df = pd.concat(predict_df)
-    datasets["predict"] = get_dataset(predict_df, transform=transforms["predict"])
+    datasets["predict"] = get_dataset(
+        predict_df,
+        transform=transforms["predict"],
+        split="predict",
+        cache_dir=cache_dir,
+    )
 
     return datasets
 
