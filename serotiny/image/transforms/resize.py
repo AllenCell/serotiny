@@ -38,7 +38,7 @@ class Resized(Transform):
             see https://pytorch.org/docs/stable/generated/torch.nn.functional.interpolate.html # noqa
         """
         super().__init__()
-        assert spatial_dims in (1, 2), f"Patch must be 2D or 3D, got {spatial_dims}"
+        assert spatial_dims in (2, 3), f"Patch must be 2D or 3D, got {spatial_dims}"
         self.keys = keys
         self.scale_factor = np.asarray(scale_factor)
         self.spatial_dims = spatial_dims
