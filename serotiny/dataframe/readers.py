@@ -168,7 +168,9 @@ def read_dataframe(
         elif dataframe.suffix == ".h5ad":
             dataframe = read_h5ad(dataframe, include_columns)
         else:
-            raise TypeError("File type of provided manifest is not .csv " "or .parquet")
+            raise TypeError(
+                "File type of provided manifest is not in [.csv, .parquet, .h5ad]"
+            )
 
     elif isinstance(dataframe, pd.DataFrame):
         if include_columns is not None:
