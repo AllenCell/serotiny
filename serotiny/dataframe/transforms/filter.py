@@ -3,6 +3,7 @@ from typing import Optional, Sequence, Union, Dict
 from collections.abc import MutableMapping
 
 import pandas as pd
+import numpy as np
 
 
 def filter_rows(
@@ -133,8 +134,8 @@ def filter_columns(
         )
 
     if isinstance(input, pd.DataFrame):
-        return input[columns].numpy()
+        return input[columns]
     elif isinstance(input, MutableMapping):
-        return tuple(input[col] for col in columns)
+        return np.array(tuple(input[col] for col in columns))
 
     return columns
