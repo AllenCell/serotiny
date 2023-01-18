@@ -10,7 +10,7 @@ class GroupCols(Transform):
 
     def __init__(
         self,
-        groups: Dict[Optional[Union[str, Dict]]],
+        groups: Dict[str, Optional[Union[str, Dict]]],
     ):
         """
         Parameters
