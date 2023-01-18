@@ -38,7 +38,7 @@ class GroupCols(Transform):
     def __call__(self, row):
         res = {}
 
-        for k, v in self.groups:
+        for k, v in self.groups.items():
             res.update(self._make_group(k, v, row))
 
         return res
