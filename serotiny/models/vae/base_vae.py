@@ -81,16 +81,15 @@ class BaseVAE(BaseModel):
             latent_compose_function = _latent_compose_function
         self.latent_compose_function = latent_compose_function
 
-    def calculate_rcl(self, x, x_hat, key):
-        rcl_per_input_dimension = self.reconstruction_loss[key](x[key], x_hat[key])
+    def calculate_rcl(self, x_hat, x, key):
+        rcl_per_input_dimension = self.reconstruction_loss[key](x_hat[key], x[key])
         return rcl_per_input_dimension
 
     def calculate_elbo(self, x, x_hat, z):
-
         rcl_per_input_dimension = {}
         rcl_reduced = {}
         for key in x_hat.keys():
-            rcl_per_input_dimension[key] = self.calculate_rcl(x, x_hat, key)
+            rcl_per_input_dimension[key] = self.calculate_rcl(x_hat, x, key)
             if len(rcl_per_input_dimension[key].shape) > 0:
                 rcl = (
                     rcl_per_input_dimension[key]
@@ -176,10 +175,12 @@ class BaseVAE(BaseModel):
         on_step = (stage == "val") | (stage == "train")
 
         for key, value in results.items():
-            if (len(value.shape) == 0) | (len(value.shape) == 1):
+            if (len(value.shape) == 0) | (
+                len(value.shape) == 1 and value.shape[0] == 1  # noqa
+            ):
                 self.log(
                     f"{stage} {key}",
-                    value,
+                    value.squeeze(),
                     logger=logger,
                     on_step=on_step,
                     on_epoch=True,

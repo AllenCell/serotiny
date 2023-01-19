@@ -212,7 +212,11 @@ def _make_multiple_manifest_splits(
 
 def _dict_depth(d):
     return (
-        max((_dict_depth(v) if OmegaConf.is_config(v) else 0) for v in d.values()) + 1
+        max(
+            (_dict_depth(v) if (OmegaConf.is_config(v) or isinstance(v, dict)) else 0)
+            for v in d.values()
+        )
+        + 1
     )
 
 
