@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" />
 
     <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
-        <title>serotiny.models.vae.base_vae - serotiny 0.0.8 documentation</title>
+        <title>serotiny.models.vae.base_vae - serotiny 0.0.9 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -122,7 +122,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../../index.html"><div class="brand">serotiny 0.0.8 documentation</div></a>
+      <a href="../../../../index.html"><div class="brand">serotiny 0.0.9 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -148,7 +148,7 @@
     <img class="sidebar-logo" src="../../../../_static/serotiny_logo.svg" alt="Logo"/>
   </div>
   
-  <span class="sidebar-brand-text">serotiny 0.0.8 documentation</span>
+  <span class="sidebar-brand-text">serotiny 0.0.9 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
   <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
@@ -389,16 +389,15 @@
             <span class="n">latent_compose_function</span> <span class="o">=</span> <span class="n">_latent_compose_function</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">latent_compose_function</span> <span class="o">=</span> <span class="n">latent_compose_function</span>
 
-<div class="viewcode-block" id="BaseVAE.calculate_rcl"><a class="viewcode-back" href="../../../../serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.calculate_rcl">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_rcl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x_hat</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-        <span class="n">rcl_per_input_dimension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reconstruction_loss</span><span class="p">[</span><span class="n">key</span><span class="p">](</span><span class="n">x</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">x_hat</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+<div class="viewcode-block" id="BaseVAE.calculate_rcl"><a class="viewcode-back" href="../../../../serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.calculate_rcl">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_rcl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_hat</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">rcl_per_input_dimension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reconstruction_loss</span><span class="p">[</span><span class="n">key</span><span class="p">](</span><span class="n">x_hat</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">rcl_per_input_dimension</span></div>
 
 <div class="viewcode-block" id="BaseVAE.calculate_elbo"><a class="viewcode-back" href="../../../../serotiny.models.vae.base_vae.html#serotiny.models.vae.base_vae.BaseVAE.calculate_elbo">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_elbo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x_hat</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
-
         <span class="n">rcl_per_input_dimension</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">rcl_reduced</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">x_hat</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">rcl_per_input_dimension</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_rcl</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x_hat</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="n">rcl_per_input_dimension</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_rcl</span><span class="p">(</span><span class="n">x_hat</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rcl_per_input_dimension</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">rcl</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="n">rcl_per_input_dimension</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
@@ -484,10 +483,12 @@
         <span class="n">on_step</span> <span class="o">=</span> <span class="p">(</span><span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;val&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">stage</span> <span class="o">==</span> <span class="s2">&quot;train&quot;</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>  <span class="c1"># noqa</span>
+            <span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                    <span class="n">value</span><span class="p">,</span>
+                    <span class="n">value</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span>
                     <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span>
                     <span class="n">on_step</span><span class="o">=</span><span class="n">on_step</span><span class="p">,</span>
                     <span class="n">on_epoch</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
