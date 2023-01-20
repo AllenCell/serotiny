@@ -7,8 +7,6 @@ from . import filter_columns
 
 
 class GroupCols(Transform):
-    """Transform to resize image by`scale_factor`"""
-
     def __init__(
         self,
         groups: Dict[str, Optional[Union[str, Dict]]],
