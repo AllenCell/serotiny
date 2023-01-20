@@ -13,7 +13,6 @@ Subpackages
    :maxdepth: 4
 
    serotiny.models.utils
-   serotiny.models.vae
 
 Submodules
 ----------

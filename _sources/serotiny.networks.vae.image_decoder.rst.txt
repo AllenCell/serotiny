@@ -1,7 +1,0 @@
-serotiny.networks.vae.image\_decoder module
-===========================================
-
-.. automodule:: serotiny.networks.vae.image_decoder
-   :members:
-   :undoc-members:
-   :show-inheritance:

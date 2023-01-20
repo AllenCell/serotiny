@@ -1,7 +1,0 @@
-serotiny.networks.layers.multiply\_constant module
-==================================================
-
-.. automodule:: serotiny.networks.layers.multiply_constant
-   :members:
-   :undoc-members:
-   :show-inheritance:
