@@ -4,15 +4,17 @@ from typing import Sequence, Callable, Dict
 
 
 def _apply_slice(data, slicee):
-    """
-    If the slice is generated for 3d images, but the passed data is a 2d image
-    (e.g. if we are predicting a 3d image and a 2d image), this will apply the CXY portions
-    of the slice.
+    """If the slice is generated for 3d images, but the passed data is a 2d
+    image (e.g. if we are predicting a 3d image and a 2d image), this will
+    apply the CXY portions of the slice.
 
     Parameters
     ----------
-    data: image with shape C[Z]YX
-    slice: slice object with length 3 (generated for 2d images) or 4 (generated for 3d images)
+    data:
+        image with shape C[Z]YX
+    slice:
+        slice object with length 3 (generated for 2d images) or 4
+        (generated for 3d images)
     """
     # pop z dimension to take corresponding 2d slice if 2d image is passed
     if len(data.shape) == len(slicee) - 1:
