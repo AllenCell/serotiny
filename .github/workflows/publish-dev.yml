@@ -18,6 +18,7 @@ jobs:
 
       - name: Build package
         run: |
+          pip install pdm-version && \
           pdm version "$(pdm show --version).dev$(date '+%Y%m%d%H%M')" && \
           pdm build
 
