@@ -18,7 +18,7 @@ jobs:
 
       - name: Build package
         run: |
-          pip install pdm-version && \
+          pip install "git+https://github.com/abersheeran/pdm-version@cc207695495a9940cd95d2b0a96a27b4275cffaa"
           pdm version "$(pdm show --version).dev$(date '+%Y%m%d%H%M')" && \
           pdm build
 
