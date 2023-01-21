@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from unittest import mock
 
 import pytest
@@ -74,17 +75,21 @@ def test_mlflow_log_model(_, tmpdir, monitor):
     )
     trainer.fit(model)
 
+    run_folders = [
+        _ for _ in Path(mlflow_root).glob("*") if _.name not in ("0", ".trash")
+    ]
+    assert len(run_folders) == 1
+    run_root = run_folders.pop()
+
     if monitor:
         ckpt_folder = os.path.join(
-            mlflow_root,
-            f"1/{logger.run_id}/artifacts/checkpoints/{monitor_key}",
+            run_root,
+            f"{logger.run_id}/artifacts/checkpoints/{monitor_key}",
         )
 
         assert len(os.listdir(ckpt_folder)) == 2
     else:
-        ckpt_folder = os.path.join(
-            mlflow_root, f"1/{logger.run_id}/artifacts/checkpoints"
-        )
+        ckpt_folder = os.path.join(run_root, f"{logger.run_id}/artifacts/checkpoints")
         assert len(os.listdir(ckpt_folder)) == 1
         assert os.path.isfile(os.path.join(ckpt_folder, "last.ckpt"))
 
