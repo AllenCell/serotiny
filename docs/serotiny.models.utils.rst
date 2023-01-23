@@ -12,4 +12,4 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   serotiny.models.utils.optimizer_utils
+   serotiny.models.utils.mlflow

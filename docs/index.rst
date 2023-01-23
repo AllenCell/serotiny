@@ -7,7 +7,5 @@
 
    Home <self>
    installation
-   getting_started
-   cli
    dataframe_transforms
    Package modules <modules>
