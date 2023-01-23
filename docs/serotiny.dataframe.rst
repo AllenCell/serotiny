@@ -1,7 +1,7 @@
-serotiny.io package
-===================
+serotiny.dataframe package
+==========================
 
-.. automodule:: serotiny.io
+.. automodule:: serotiny.dataframe
    :members:
    :undoc-members:
    :show-inheritance:
@@ -12,7 +12,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   serotiny.io.dataframe
+   serotiny.dataframe.transforms
 
 Submodules
 ----------
@@ -20,4 +20,4 @@ Submodules
 .. toctree::
    :maxdepth: 4
 
-   serotiny.io.image
+   serotiny.dataframe.readers

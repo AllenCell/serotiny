@@ -1,7 +1,7 @@
-serotiny.networks.utils.weight\_init module
+serotiny.nn.losses.adversarial\_loss module
 ===========================================
 
-.. automodule:: serotiny.networks.utils.weight_init
+.. automodule:: serotiny.nn.losses.adversarial_loss
    :members:
    :undoc-members:
    :show-inheritance:

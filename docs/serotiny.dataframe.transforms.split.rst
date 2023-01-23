@@ -1,7 +1,7 @@
-serotiny.models.vae.priors.gaussian module
+serotiny.dataframe.transforms.split module
 ==========================================
 
-.. automodule:: serotiny.models.vae.priors.gaussian
+.. automodule:: serotiny.dataframe.transforms.split
    :members:
    :undoc-members:
    :show-inheritance:
