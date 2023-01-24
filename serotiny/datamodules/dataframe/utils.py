@@ -24,7 +24,7 @@ def get_canonical_split_name(split):
 
 def get_dataset(dataframe, transform, split, cache_dir=None):
     data = list(dataframe.to_dict("records"))
-    if cache_dir is not None and split in ("train", "val"):
+    if cache_dir is not None and split in ["train", "val"]:
         return PersistentDataset(data, transform=transform, cache_dir=cache_dir)
     return Dataset(data, transform=transform)
 
