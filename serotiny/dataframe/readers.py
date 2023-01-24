@@ -133,8 +133,8 @@ def read_dataframe(
     dataframe: pd.DataFrame
     """
 
-    required_columns = set(required_columns) if required_columns else set()
-    include_columns = set(include_columns) if include_columns else set()
+    required_columns = required_columns or set()
+    include_columns = include_columns or set()
 
     include_columns += required_columns
 
