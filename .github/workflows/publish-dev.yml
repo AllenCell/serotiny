@@ -8,19 +8,16 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Setup PDM
-        uses: pdm-project/setup-pdm@v2
+      - uses: actions/setup-python@v2
         with:
           python-version: 3.8
-
-      - name: Build package
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: install poetry and build
         run: |
+          pip install pdm pdm-version && \
           pdm version "$(pdm show --version).dev$(date '+%Y%m%d%H%M')" && \
-          pdm build
-
+          poetry build
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@master
         with:
