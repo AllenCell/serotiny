@@ -16,9 +16,9 @@ from pytorch_lightning.utilities.rank_zero import rank_zero_only
 
 class MLFlowLogger(_MLFlowLogger):
     @rank_zero_only
-    def log_hyperparams(
-        self, params: Union[Dict[str, Any], Namespace], mode="train"
-    ) -> None:
+    def log_hyperparams(self, params: Union[Dict[str, Any], Namespace]) -> None:
+        mode = self.trainer.fn
+
         with tempfile.TemporaryDirectory() as tmp_dir:
             conf_path = Path(tmp_dir) / f"{mode}.yaml"
             with open(conf_path, "w") as f:
