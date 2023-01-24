@@ -1,0 +1,12 @@
+defaults:
+  - model: default
+  - data: default
+  - trainer: default
+  - mlflow: default
+  - base
+  - hydra@hydra
+  - _self_
+
+mode: test
+
+hydra: {}

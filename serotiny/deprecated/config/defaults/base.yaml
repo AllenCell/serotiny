@@ -1,0 +1,6 @@
+defaults:
+  - _self_
+
+seed: 42
+log_level: INFO
+logs_root: /tmp/serotiny_logs_${uuid:}

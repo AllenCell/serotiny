@@ -1,0 +1,12 @@
+_target_: serotiny.models.TabularVAE
+x_dim:
+latent_dim:
+hidden_layers:
+x_label:
+loss_mask_label:
+optimizer: "Adam"
+lr: 1e-3
+beta: 1.0
+prior_mode: "isotropic"
+prior_logvar:
+learn_prior_logvar: false
