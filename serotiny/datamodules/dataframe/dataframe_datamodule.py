@@ -161,7 +161,7 @@ class DataframeDatamodule(pl.LightningDataModule):
         if self.just_inference:
             raise TypeError(
                 "This datamodule was configured with `just_inference=True`, "
-                "so it doesn't have a val_dataloader and can't be "
+                "so it doesn't have a train_dataloader and can't be "
                 "used for training."
             )
 
