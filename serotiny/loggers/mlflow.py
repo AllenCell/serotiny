@@ -43,14 +43,14 @@ class MLFlowLogger(_MLFlowLogger):
             # mimic ModelCheckpoint's behavior: if `self.save_top_k == 1` only
             # keep the latest checkpoint, otherwise keep all of them.
             if self.save_top_k == 1:
-                last_path = Path(filepath).with_name("last.ckpt")
-                os.link(filepath, last_path)
+                latest_path = Path(filepath).with_name("latest.ckpt")
+                os.link(filepath, latest_path)
 
                 self.experiment.log_artifact(
-                    self.run_id, local_path=last_path, artifact_path=artifact_path
+                    self.run_id, local_path=latest_path, artifact_path=artifact_path
                 )
 
-                os.unlink(last_path)
+                os.unlink(latest_path)
             else:
                 self.experiment.log_artifact(
                     self.run_id, local_path=filepath, artifact_path=artifact_path
