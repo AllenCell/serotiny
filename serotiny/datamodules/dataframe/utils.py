@@ -8,7 +8,7 @@ try:
     import modin.pandas as pd
 except ModuleNotFoundError:
     import pandas as pd
-from omegaconf import ListConfig, DictConfig
+from omegaconf import OmegaConf, ListConfig
 
 from monai.data import Dataset, PersistentDataset
 from monai.transforms import Compose
@@ -103,17 +103,22 @@ def make_multiple_dataframe_splits(
     return datasets
 
 
+def _dict_depth(d):
+    return (
+        max((_dict_depth(v) if OmegaConf.is_config(v) else 0) for v in d.values()) + 1
+    )
+
+
 def parse_transforms(transforms):
-    if not isinstance(transforms, (DictConfig, dict)):
+    depth = _dict_depth(transforms)
+    if depth == 1:
         transforms = {
             split: transforms for split in ["train", "val", "test", "predict"]
         }
+    elif depth != 2:
+        raise ValueError(f"Transforms dict should have depth 1 or 2. Got {depth}")
 
     for k, v in transforms.items():
-        if isinstance(v, (list, tuple, ListConfig)):
-            v = Compose(v)
-            transforms[k] = v
-
         transforms[get_canonical_split_name(k)] = v
 
     for k in transforms:
@@ -127,5 +132,9 @@ def parse_transforms(transforms):
 
     if "predict" not in transforms:
         transforms["predict"] = transforms["test"]
+
+    for k in transforms:
+        if isinstance(transforms[k], (list, ListConfig)):
+            transforms[k] = Compose(transforms[k])
 
     return transforms
