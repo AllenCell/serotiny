@@ -1,8 +1,6 @@
 name: Test and Lint
 
-on:
-  pull_request:
-    branches: [main, dev]
+on: pull_request
 
 # Cancel actions when new commits are pushed to PR
 concurrency:
