@@ -6,10 +6,10 @@ serotiny.datamodules package
    :undoc-members:
    :show-inheritance:
 
-Subpackages
------------
+Submodules
+----------
 
 .. toctree::
    :maxdepth: 4
 
-   serotiny.datamodules.dataframe
+   serotiny.datamodules.manifest_datamodule

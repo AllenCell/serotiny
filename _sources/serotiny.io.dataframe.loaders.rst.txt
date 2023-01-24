@@ -1,0 +1,19 @@
+serotiny.io.dataframe.loaders package
+=====================================
+
+.. automodule:: serotiny.io.dataframe.loaders
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   serotiny.io.dataframe.loaders.abstract_loader
+   serotiny.io.dataframe.loaders.classes
+   serotiny.io.dataframe.loaders.columns
+   serotiny.io.dataframe.loaders.image
+   serotiny.io.dataframe.loaders.random_tensor

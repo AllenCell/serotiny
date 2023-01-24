@@ -1,0 +1,7 @@
+serotiny.models.vae.implicit\_decoder\_vae module
+=================================================
+
+.. automodule:: serotiny.models.vae.implicit_decoder_vae
+   :members:
+   :undoc-members:
+   :show-inheritance:

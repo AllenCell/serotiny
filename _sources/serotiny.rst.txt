@@ -12,8 +12,10 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   serotiny.dataframe
    serotiny.datamodules
-   serotiny.loggers
+   serotiny.io
+   serotiny.losses
+   serotiny.ml_ops
    serotiny.models
-   serotiny.nn
+   serotiny.networks
+   serotiny.transforms
