@@ -78,7 +78,6 @@ jupyter-core = "^4.11.2"
 grpcio = "^1.46.0"
 modin = {version = "^0.16.2", optional = true}
 anndata = "^0.8.0"
-monai = "^1.1.0"
 
 
 [tool.poetry.scripts]
