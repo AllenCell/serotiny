@@ -6,7 +6,21 @@ from contextlib import suppress
 
 from omegaconf import OmegaConf
 from hydra.utils import get_original_cwd
-from serotiny.ml_ops.utils import instantiate
+
+
+def instantiate(cfg):
+    from hydra.utils import instantiate as _instantiate
+    from copy import copy
+
+    if not isinstance(cfg, (list, dict)):
+        _cfg = OmegaConf.to_container(cfg, resolve=True)
+    else:
+        _cfg = copy(cfg)
+
+    if "_aux_" in _cfg:
+        del _cfg["_aux_"]
+
+    return _instantiate(_cfg)
 
 
 def _do_model_op(
