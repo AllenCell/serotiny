@@ -88,7 +88,7 @@ class RandomMultiScaleCropd(RandomizableTransform):
         max_shape = np.asarray(
             image_dict[self.scale_dict[1][0]].shape[-self.spatial_dims :]
         )
-        max_start_indices = max_shape - self.roi_size + 1
+        max_start_indices = max_shape - self.roi_size
         start_indices = self.R.randint(max_start_indices)
         scaled_start_indices = {
             s: (start_indices // s).astype(int) for s in self.scale_dict.keys()
