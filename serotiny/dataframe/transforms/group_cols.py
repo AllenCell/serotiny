@@ -10,19 +10,19 @@ class GroupCols(Transform):
     def __init__(
         self,
         groups: Dict[str, Optional[Union[str, Dict]]],
-        dtypes: Dict[str, Optional[Union[str, np.dtype, type]]],
+        dtypes: Optional[Dict[str, Optional[Union[str, np.dtype, type]]]] = None,
     ):
         """
         Parameters
         ----------
-        groups: Dict[Optional[Union[str, Dict]]]
+        groups: Dict[str, Optional[Union[str, Dict]]]
             Dictionary where keys are column group names (which become batch keys)
             and values are either:
             - a dictionary containing the kwargs to be used in a col to `filter_cols`
             - a string, to use a single column in that group
             - `None`, to use a single column, with the same name as the key
 
-        dtypes: Dict[Optional[Union[str, np.dtype]]],
+        dtypes: Dict[str, Optional[Union[str, np.dtype]]],
             Dictionary where keys are column group names (as in `groups`),
             and values are either:
             - a numpy dtype or python type
@@ -32,7 +32,7 @@ class GroupCols(Transform):
         """
         super().__init__()
         self.groups = groups
-        self.dtypes = dtypes
+        self.dtypes = dtypes or {}
 
     def _make_group(self, k, v, row):
         if not isinstance(v, (str, MutableMapping)) and v is not None:
@@ -65,7 +65,7 @@ class GroupCols(Transform):
                     f"Got `{type(v)}` for key '{k}'"
                 )
 
-            _dtype = self.dtypes[k]
+            _dtype = self.dtypes.get(k)
             if _dtype is not None:
                 if isinstance(_dtype, str):
                     _dtype = np.dtype(_dtype)
