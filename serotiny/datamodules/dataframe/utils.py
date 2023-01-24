@@ -3,11 +3,7 @@ from itertools import chain
 from upath import UPath as Path
 
 import numpy as np
-
-try:
-    import modin.pandas as pd
-except ModuleNotFoundError:
-    import pandas as pd
+import pandas as pd
 from omegaconf import OmegaConf, ListConfig
 
 from monai.data import Dataset, PersistentDataset
