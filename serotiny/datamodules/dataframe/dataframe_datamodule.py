@@ -133,7 +133,7 @@ class DataframeDatamodule(pl.LightningDataModule):
     def get_dataset(self, split):
         sample_size = self.subsample.get(split, -1)
 
-        if sample_size == -1:
+        if self.subsample[split] == -1:
             return self.datasets[split]
 
         sample = self.rng.integers(len(self.datasets[split]), size=sample_size).tolist()
