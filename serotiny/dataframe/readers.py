@@ -124,8 +124,8 @@ def read_dataframe(
 
     include_columns: Optional[Sequence[str]] = None
         List of column names and/or regex expressions, used to only include the
-        desired columns in the resulting dataframe. If `required_columns` is not
-        None, those get appended to `include_columns` (without duplication).
+        desired columns in the resulting dataframe. For .parquet this also results
+        in slower read latency.
 
     Returns
     -------
@@ -133,13 +133,8 @@ def read_dataframe(
     dataframe: pd.DataFrame
     """
 
-    required_columns = required_columns or set()
-    include_columns = include_columns or set()
-
-    include_columns += required_columns
-
-    include_columns = sorted(list(include_columns))
-    required_columns = sorted(list(required_columns))
+    if required_columns is not None and include_columns is not None:
+        include_columns += required_columns
 
     if isinstance(dataframe, str):
         dataframe = UPath(dataframe)
