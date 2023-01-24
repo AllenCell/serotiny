@@ -117,8 +117,8 @@ class DataframeDatamodule(pl.LightningDataModule):
         self.dataloaders = {}
         self.rng = np.random.default_rng(seed=dataloader_kwargs.get("seed", 42))
         self.subsample = subsample or {}
-        for key in list(self.subsample.keys()):
-            self.subsample[get_canonical_split_name(key)] = self.subsample[key]
+        for key in list(subsample.keys()):
+            subsample[get_canonical_split_name(key)] = subsample[key]
 
     def get_dataset(self, split):
         sample_size = self.subsample.get(split, -1)
@@ -165,11 +165,11 @@ class DataframeDatamodule(pl.LightningDataModule):
                 "used for training."
             )
 
-        return self.get_dataloader("val")
+        return self._get_dataloader("val")
 
     def test_dataloader(self):
         split = "predict" if self.just_inference else "test"
-        return self.get_dataloader(split)
+        return self._get_dataloader(split)
 
     def predict_dataloader(self):
-        return self.get_dataloader("predict")
+        return self._get_dataloader("predict")
