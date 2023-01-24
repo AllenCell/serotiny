@@ -117,6 +117,3 @@ ENV/
 
 # mypy
 .mypy_cache/
-
-# pdm
-.pdm.toml
