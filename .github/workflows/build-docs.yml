@@ -17,10 +17,11 @@ jobs:
         python-version: 3.8
     - name: Install Dependencies
       run: |
-        pip install .[docs]
+        pip install --upgrade pip poetry
+        poetry install --extras docs
     - name: Generate Docs
       run: |
-        make gen-docs
+        poetry run make gen-docs
         # touch docs/_build/html/.nojekyll
     - name: Publish Docs
       uses: JamesIves/github-pages-deploy-action@releases/v3
