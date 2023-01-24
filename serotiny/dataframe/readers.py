@@ -10,10 +10,11 @@ except ModuleNotFoundError:
     import pandas as pd
 
 import pyarrow.parquet
+import scanpy as sc
 import anndata
 
 
-def read_h5ad(path, include_columns=None, backed=None):
+def read_h5ad(path, include_columns=None):
     """Read an annData object stored in a .h5ad file.
 
     Parameters
@@ -26,19 +27,11 @@ def read_h5ad(path, include_columns=None, backed=None):
         List of column names and/or regex expressions, used to only include the
         desired columns in the resulting dataframe.
 
-    backed: Optional[str] = None
-        Can be (either "r" or "r+").
-        See anndata's docs for details:
-        https://anndata.readthedocs.io/en/latest/generated/anndata.read_h5ad.html#anndata.read_h5ad
-
     Returns
     -------
     annData
     """
-
-    if backed:
-        assert backed in ("r", "r+")
-    dataframe = anndata.read_hda5(path, backed=backed)
+    dataframe = sc.read(path)
 
     if include_columns is not None:
         columns = []
