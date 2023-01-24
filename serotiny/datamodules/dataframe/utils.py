@@ -8,7 +8,7 @@ from omegaconf import OmegaConf, ListConfig
 
 from monai.data import Dataset, PersistentDataset
 from monai.transforms import Compose
-from serotiny.dataframe import read_dataframe
+from .readers import read_dataframe
 
 
 def get_canonical_split_name(split):
