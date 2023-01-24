@@ -1,6 +1,5 @@
 import re
-from typing import Optional, Sequence, Union, Dict
-from collections.abc import MutableMapping
+from typing import Optional, Sequence, Union
 
 import numpy as np
 import pandas as pd
@@ -146,7 +145,7 @@ def _filter_columns(
 
 
 def filter_columns(
-    input: Union[pd.DataFrame, Dict, Sequence[str]],
+    input: Union[pd.DataFrame, Sequence[str]],
     columns: Optional[Sequence[str]] = None,
     startswith: Optional[str] = None,
     endswith: Optional[str] = None,
@@ -155,7 +154,7 @@ def filter_columns(
     regex: Optional[str] = None,
 ):
     """Select columns in a dataset, using different filtering options. See
-    serotiny.dataframe.transforms.filter_columns for more details.
+    serotiny.data.dataframe.transforms.filter_columns for more details.
 
     Parameters
     ----------
@@ -186,24 +185,15 @@ def filter_columns(
         A string containing a regular expression to be matched
     """
 
-    if columns is None:
-        if isinstance(input, pd.DataFrame):
-            columns = input.columns.tolist()
-        elif isinstance(input, MutableMapping):
-            columns = input.keys()
-        else:
-            columns = input
-
-        columns = _filter_columns(
-            columns, regex, startswith, endswith, contains, excludes
-        )
-
     if isinstance(input, pd.DataFrame):
-        return input[columns]
-    elif isinstance(input, MutableMapping):
-        return tuple(input[col] for col in columns)
-
-    return columns
+        if columns is None:
+            columns = _filter_columns(
+                input.columns.tolist(), regex, startswith, endswith, contains, excludes
+            )
+            return input[columns]
+    return _filter_columns(
+        input.columns.tolist(), regex, startswith, endswith, contains, excludes
+    )
 
 
 def sample_n_each(
