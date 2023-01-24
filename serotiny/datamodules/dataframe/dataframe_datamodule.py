@@ -1,6 +1,6 @@
 import numpy as np
 import pytorch_lightning as pl
-from monai.data import DataLoader
+from torch.utils.data import DataLoader
 
 from upath import UPath as Path
 from typing import Dict, Optional, Sequence, Union
