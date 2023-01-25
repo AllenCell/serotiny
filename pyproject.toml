@@ -4,7 +4,7 @@ build-backend = "pdm.pep517.api"
 
 [project]
 name = "serotiny"
-version = "1.0.0"
+version = "1.0.1"
 description = "A framework of tools to structure, configure and drive deep learning projects"
 readme = "README.md"
 classifiers = ["Natural Language :: English", "Programming Language :: Python :: 3.8", "Programming Language :: Python :: 3.9", "Programming Language :: Python :: 3.10", "Natural Language :: English", "Programming Language :: Python :: 3.8", "Programming Language :: Python :: 3.9", "Programming Language :: Python :: 3.10"]
