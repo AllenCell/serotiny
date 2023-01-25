@@ -1,7 +1,0 @@
-serotiny.networks.vae.image\_decoder\_basiccnn module
-=====================================================
-
-.. automodule:: serotiny.networks.vae.image_decoder_basiccnn
-   :members:
-   :undoc-members:
-   :show-inheritance:

@@ -1,7 +1,0 @@
-serotiny.losses.cosine\_loss module
-===================================
-
-.. automodule:: serotiny.losses.cosine_loss
-   :members:
-   :undoc-members:
-   :show-inheritance:
