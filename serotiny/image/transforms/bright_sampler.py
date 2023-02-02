@@ -24,6 +24,8 @@ class BrightSampler:
         self.ch = ch
 
     def __call__(self, patch):
-        return patch[self.key][self.ch].mean() > self.threshold or np.random.choice(
+        return patch[self.key][
+            self.ch
+        ].float().mean() > self.threshold or np.random.choice(
             [False, True], p=[1 - self.base_prob, self.base_prob]
         )
