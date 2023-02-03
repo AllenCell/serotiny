@@ -18,8 +18,7 @@ def _apply_slice(data, slicee):
     """
     # pop z dimension to take corresponding 2d slice if 2d image is passed
     if len(data.shape) == len(slicee) - 1:
-        # copy to avoid changing slicee object
-        return data[slicee.copy().pop(1)]
+        return data[[x for i, x in enumerate(slicee) if i != 1]]
     return data[slicee]
 
 
