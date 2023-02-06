@@ -43,7 +43,13 @@ class OmeZarrReader(ImageReader):
         for img_obj in ensure_tuple(img):
             data = img_obj.data[self.level].compute()[0]
             if self.channels:
-                data = data[self.channels]
+                _metadata_channels = img_obj.metadata["name"]
+                _channels = [
+                    ch if isinstance(ch, int) else _metadata_channels.index(ch)
+                    for ch in self.channels
+                ]
+                data = data[_channels]
+
             img_array.append(data)
 
         return _stack_images(img_array, {}), {}
