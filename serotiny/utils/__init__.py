@@ -1,3 +1,1 @@
-from .config import (
-    kv_to_dict
-)
+from .config import kv_to_dict
