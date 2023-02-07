@@ -4,7 +4,6 @@ import tempfile
 import mlflow
 from hydra.utils import instantiate
 from hydra._internal.utils import _locate
-from mlflow.tracking import MlflowClient
 from omegaconf import OmegaConf
 
 logger = logging.getLogger(__name__)
@@ -12,10 +11,10 @@ logger = logging.getLogger(__name__)
 
 def get_config(tracking_uri, run_id, tmp_dir, mode="train"):
     artifact_path = f"config/{mode}.yaml"
-    client = mlflow.tracking.MlflowClient(tracking_uri)
-    config = client.download_artifacts(
+    mlflow.set_tracking_uri(tracking_uri)
+    config = mlflow.artifacts.download_artifacts(
         run_id=run_id,
-        path=artifact_path,
+        artifact_path=artifact_path,
         dst_path=tmp_dir,
     )
 
@@ -30,9 +29,8 @@ def load_model_from_checkpoint(
 ):
     mlflow.set_tracking_uri(tracking_uri)
     with tempfile.TemporaryDirectory() as tmp_dir:
-        client = MlflowClient(tracking_uri=tracking_uri)
-        ckpt_path = client.download_artifacts(
-            run_id=run_id, path=path, dst_path=tmp_dir
+        ckpt_path = mlflow.artifacts.download_artifacts(
+            run_id=run_id, artifact_path=path, dst_path=tmp_dir
         )
 
         config = get_config(tracking_uri, run_id, tmp_dir, mode="train")
@@ -41,4 +39,6 @@ def load_model_from_checkpoint(
         model_class = model_conf.pop("_target_")
         model_conf = instantiate(model_conf)
         model_class = _locate(model_class)
-        return model_class.load_from_checkpoint(ckpt_path, **model_conf, strict=strict)
+        return model_class.load_from_checkpoint(
+            ckpt_path, **model_conf, strict=strict
+        ).eval()
