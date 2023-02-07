@@ -6,7 +6,9 @@ def kv_to_dict(kv: ListConfig) -> DictConfig:
     Parameters
     ----------
     kv: ListConfig
-        ListConfig where every item is a nested list of the form [interpolated key, value]
+        ListConfig where every item is a nested list of the
+        form [interpolated key, value]
+
     Returns
     -------
     DictConfig of input
