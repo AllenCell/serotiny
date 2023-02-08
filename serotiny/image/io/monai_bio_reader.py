@@ -1,6 +1,17 @@
 """ADAPTED FROM https://github.com/MMV-Lab/mmv_im2im/"""
 
+import logging
+
+logging.getLogger("ome_zarr").setLevel(logging.WARNING)
+logging.getLogger("ome_zarr.reader").setLevel(logging.WARNING)
+logging.getLogger("bfio.init").setLevel(logging.ERROR)
+logging.getLogger("bfio.backends").setLevel(logging.ERROR)
+logging.getLogger("xmlschema").setLevel(logging.ERROR)
+
 import warnings
+
+warnings.filterwarnings("ignore")
+
 from typing import Union, Dict, List
 import numpy as np
 from aicsimageio import AICSImage
@@ -9,8 +20,6 @@ from monai.data import ImageReader
 from monai.utils import ensure_tuple, require_pkg
 from monai.config import PathLike
 from monai.data.image_reader import _stack_images
-
-warnings.filterwarnings("ignore")
 
 
 @require_pkg(pkg_name="aicsimageio")
